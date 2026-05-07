@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [countdown, setCountdown] = useState(0);
 
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -47,21 +48,30 @@ export default function ProfilePage() {
     e.preventDefault();
     setLoading(true); setError(''); setMessage('');
     try {
-      if (!formData.email || !formData.password) throw new Error('Email và password là bắt buộc');
-      if (formData.password !== formData.confirmPassword) throw new Error('Password không khớp');
-      if (formData.password.length < 6) throw new Error('Password phải ít nhất 6 ký tự');
+      if (!formData.username || !formData.password) throw new Error('Tên đăng nhập và mật khẩu là bắt buộc');
+      if (formData.password !== formData.confirmPassword) throw new Error('Mật khẩu không khớp');
+      if (formData.password.length < 6) throw new Error('Mật khẩu phải ít nhất 6 ký tự');
 
       const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, password: formData.password, confirmPassword: formData.confirmPassword, fullName: formData.fullName || 'User' }),
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          fullName: formData.fullName || formData.username,
+          email: formData.email || undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Đăng ký thất bại');
 
-      setMessage('Đã gửi mã OTP tới email của bạn');
-      setTab('verify-otp');
-      startCountdown();
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      setMessage('Đăng ký thành công!');
+      setTimeout(() => router.push('/dashboard'), 1500);
     } catch (err: any) {
       setError(err.message || 'Có lỗi xảy ra');
     } finally {
@@ -250,8 +260,8 @@ export default function ProfilePage() {
         {tab === 'login' && (
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập hoặc email</label>
+              <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="username hoặc email@example.com"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
             </div>
             <div>
@@ -274,15 +284,15 @@ export default function ProfilePage() {
         {tab === 'register' && (
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập *</label>
+              <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="vd: nguyen_van_a" required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+              <p className="text-xs text-gray-500 mt-1">Chỉ chữ cái, số và dấu _, ít nhất 3 ký tự</p>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
               <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Nguyễn Văn A"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-              <p className="text-xs text-gray-500 mt-1">Bạn sẽ nhận OTP tại email này</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu *</label>
@@ -292,6 +302,13 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu *</label>
               <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••" required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email <span className="text-gray-400 font-normal">(tùy chọn, để xác thực sau)</span>
+              </label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
             </div>
             <button type="submit" disabled={loading}
