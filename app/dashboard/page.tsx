@@ -512,6 +512,7 @@ export default function DashboardPage() {
 }
 
 function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void }) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
   const [form, setForm] = useState({
     fullName: user.fullName || '',
     address: user.address || '',
@@ -521,6 +522,63 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
   const [pwMsg, setPwMsg] = useState('');
+
+  // Email verification state
+  const [emailInput, setEmailInput] = useState(user.email || '');
+  const [otpInput, setOtpInput] = useState('');
+  const [emailStep, setEmailStep] = useState<'idle' | 'otp'>('idle');
+  const [emailMsg, setEmailMsg] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  function startCountdown() {
+    setCountdown(60);
+    const t = setInterval(() => setCountdown(p => { if (p <= 1) { clearInterval(t); return 0; } return p - 1; }), 1000);
+  }
+
+  async function handleSendEmailOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setEmailLoading(true); setEmailMsg('');
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${API_URL}/users/me/add-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ email: emailInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setEmailMsg('Đã gửi mã OTP tới email của bạn');
+      setEmailStep('otp');
+      startCountdown();
+    } catch (err: any) {
+      setEmailMsg(err.message || 'Có lỗi xảy ra');
+    } finally {
+      setEmailLoading(false);
+    }
+  }
+
+  async function handleVerifyEmail(e: React.FormEvent) {
+    e.preventDefault();
+    setEmailLoading(true); setEmailMsg('');
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(`${API_URL}/users/me/verify-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ code: otpInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setEmailMsg('Xác thực email thành công!');
+      setEmailStep('idle');
+      onUpdate({ ...user, email: emailInput, isEmailVerified: true });
+    } catch (err: any) {
+      setEmailMsg(err.message || 'Có lỗi xảy ra');
+    } finally {
+      setEmailLoading(false);
+    }
+  }
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -593,7 +651,13 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="text" value={user.email || '-'} disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" />
+            <div className="flex items-center gap-2">
+              <input type="text" value={user.email || 'Chưa có email'} disabled className="flex-1 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" />
+              {user.isEmailVerified
+                ? <span className="text-green-600 text-sm font-medium whitespace-nowrap">Đã xác thực</span>
+                : <span className="text-orange-500 text-sm font-medium whitespace-nowrap">Chưa xác thực</span>
+              }
+            </div>
           </div>
 
           {msg && (
@@ -660,6 +724,76 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           </button>
         </form>
       </div>
+
+      {/* Email Verification */}
+      {!user.isEmailVerified && (
+        <div className="bg-white rounded-xl p-6 shadow-sm mt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="font-semibold text-gray-900">Xác thực email</h3>
+            <span className="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full">Bắt buộc để đăng bài</span>
+          </div>
+
+          {emailMsg && (
+            <p className={`mb-3 text-sm ${emailMsg.includes('thành công') ? 'text-green-600' : emailMsg.includes('gửi') ? 'text-green-600' : 'text-red-600'}`}>{emailMsg}</p>
+          )}
+
+          {emailStep === 'idle' ? (
+            <form onSubmit={handleSendEmailOtp} className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {user.email ? 'Email của bạn' : 'Thêm email'}
+                </label>
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={e => setEmailInput(e.target.value)}
+                  placeholder="email@example.com"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+              <button type="submit" disabled={emailLoading}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+                {emailLoading ? 'Đang gửi...' : 'Gửi mã xác thực'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyEmail} className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mã OTP (6 chữ số)</label>
+                <input
+                  type="text"
+                  value={otpInput}
+                  onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 font-mono"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button type="submit" disabled={emailLoading || otpInput.length !== 6}
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+                  {emailLoading ? 'Đang xác nhận...' : 'Xác nhận'}
+                </button>
+                <button type="button" onClick={handleSendEmailOtp} disabled={countdown > 0 || emailLoading}
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm">
+                  {countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi lại OTP'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      )}
+
+      {user.isEmailVerified && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mt-6 flex items-center gap-3">
+          <i className="ri-checkbox-circle-fill text-green-600 text-xl"></i>
+          <div>
+            <p className="font-medium text-green-800">Email đã được xác thực</p>
+            <p className="text-sm text-green-600">{user.email}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
