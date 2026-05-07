@@ -298,6 +298,13 @@ export default function ProfilePage() {
               className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang xử lý...' : 'Đăng ký'}
             </button>
+            <p className="text-center text-sm text-gray-500 mt-2">
+              Đã có tài khoản?{' '}
+              <button type="button" onClick={() => { setTab('login'); setError(''); setMessage(''); }}
+                className="text-green-600 hover:text-green-700 font-medium">
+                Đăng nhập
+              </button>
+            </p>
           </form>
         )}
 
@@ -404,7 +411,11 @@ export default function ProfilePage() {
 
         {/* Footer */}
         <div className="mt-8 pt-6 border-t text-center text-sm text-gray-600">
-          <p>Cần giúp? <Link href="/support" className="text-green-600 hover:text-green-700 font-medium">Liên hệ hỗ trợ</Link></p>
+          <p>Cần giúp?{' '}
+            <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 font-medium">
+              Liên hệ hỗ trợ
+            </a>
+          </p>
         </div>
       </div>
     </div>
