@@ -119,6 +119,7 @@ export default function DashboardPage() {
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line' },
     { id: 'notifications', label: 'Thông báo', icon: 'ri-notification-line' },
+    { id: 'security', label: 'Bảo mật', icon: 'ri-shield-check-line' },
     { id: 'settings', label: 'Cài đặt', icon: 'ri-settings-line' },
   ];
 
@@ -500,12 +501,103 @@ export default function DashboardPage() {
             )}
 
             {/* SETTINGS TAB */}
+            {activeTab === 'security' && (
+              <SecurityTab />
+            )}
+
             {activeTab === 'settings' && user && (
               <SettingsTab user={user} onUpdate={setUser} />
             )}
 
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SecurityTab() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch(`${API_URL}/users/me/login-history`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setHistory(data.data || []);
+      } catch {
+        setHistory([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  function getStatusStyle(status: string) {
+    if (status === 'SUCCESS') return 'bg-green-100 text-green-700';
+    if (status === 'FAILED') return 'bg-red-100 text-red-700';
+    if (status === 'LOCKED') return 'bg-orange-100 text-orange-700';
+    return 'bg-gray-100 text-gray-700';
+  }
+
+  function getStatusLabel(status: string) {
+    if (status === 'SUCCESS') return 'Thành công';
+    if (status === 'FAILED') return 'Sai mật khẩu';
+    if (status === 'LOCKED') return 'Bị khóa';
+    return status;
+  }
+
+  function formatDevice(userAgent: string) {
+    if (!userAgent) return 'Không rõ';
+    if (userAgent.includes('Mobile')) return 'Điện thoại';
+    if (userAgent.includes('Chrome')) return 'Chrome';
+    if (userAgent.includes('Firefox')) return 'Firefox';
+    if (userAgent.includes('Safari')) return 'Safari';
+    return 'Trình duyệt';
+  }
+
+  return (
+    <div>
+      <h2 className="text-xl font-bold text-gray-900 mb-6">Bảo mật tài khoản</h2>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <i className="ri-lock-password-line text-green-600 text-xl"></i>
+          <h3 className="font-semibold text-gray-900">Khóa tài khoản tự động</h3>
+        </div>
+        <p className="text-sm text-gray-500">Tài khoản sẽ bị khóa <strong>15 phút</strong> nếu nhập sai mật khẩu <strong>5 lần liên tiếp</strong>.</p>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h3 className="font-semibold text-gray-900 mb-4">Lịch sử đăng nhập gần đây</h3>
+        {loading ? (
+          <p className="text-gray-400 text-sm">Đang tải...</p>
+        ) : history.length === 0 ? (
+          <p className="text-gray-400 text-sm">Chưa có lịch sử đăng nhập</p>
+        ) : (
+          <div className="space-y-3">
+            {history.map((item: any) => (
+              <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                <div className="flex items-center gap-3">
+                  <i className={`text-xl ${item.status === 'SUCCESS' ? 'ri-shield-check-line text-green-500' : 'ri-shield-cross-line text-red-500'}`}></i>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{formatDevice(item.userAgent)}</p>
+                    <p className="text-xs text-gray-400">{item.ipAddress} · {new Date(item.createdAt).toLocaleString('vi-VN')}</p>
+                  </div>
+                </div>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusStyle(item.status)}`}>
+                  {getStatusLabel(item.status)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
