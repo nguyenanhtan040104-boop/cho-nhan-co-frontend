@@ -337,6 +337,10 @@ export const jobs = {
   async getMine(page = 1) {
     return request<any>(`/jobs/mine?page=${page}`);
   },
+
+  async markUrgent(id: string) {
+    return request(`/jobs/${id}/urgent`, { method: 'POST' });
+  },
 };
 
 // =================== FORUM ===================
