@@ -271,64 +271,10 @@ export default function DashboardPage() {
 
             {/* PRODUCTS TAB */}
             {activeTab === 'products' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Sản phẩm của tôi ({myProducts.length})</h2>
-                  <Link href="/products/create" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
-                    + Đăng sản phẩm
-                  </Link>
-                </div>
-
-                {myProducts.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-plant-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500 mb-4">Bạn chưa có sản phẩm nào</p>
-                    <Link href="/products/create" className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
-                      Đăng sản phẩm ngay
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myProducts.map(product => (
-                      <div key={product.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {product.images?.[0] ? (
-                            <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <i className="ri-image-line text-gray-400 text-xl"></i>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{product.title}</h4>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="text-green-600 font-semibold">{Number(product.price).toLocaleString()}đ/{product.unit}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              product.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                            }`}>{product.status === 'ACTIVE' ? 'Đang hiển thị' : 'Đã tạm dừng'}</span>
-                          </div>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                            <span><i className="ri-eye-line mr-1"></i>{product.viewCount} lượt xem</span>
-                            <span><i className="ri-map-pin-line mr-1"></i>{product.location}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/products/${product.id}`} className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
-                            <i className="ri-eye-line text-lg"></i>
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteProduct(product.id)}
-                            className="p-2 text-gray-500 hover:text-red-600 transition-colors"
-                          >
-                            <i className="ri-delete-bin-line text-lg"></i>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ProductsTab
+                myProducts={myProducts}
+                setMyProducts={setMyProducts}
+              />
             )}
 
             {/* REAL ESTATE TAB */}
@@ -884,6 +830,193 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
             <p className="font-medium text-green-800">Email đã được xác thực</p>
             <p className="text-sm text-green-600">{user.email}</p>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =================== PRODUCTS TAB COMPONENT ===================
+function ProductsTab({ myProducts, setMyProducts }: { myProducts: any[]; setMyProducts: any }) {
+  const [editingQuantity, setEditingQuantity] = useState<string | null>(null);
+  const [quantityValue, setQuantityValue] = useState('');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  async function handleDelete(id: string) {
+    if (!confirm('Xóa sản phẩm này?')) return;
+    setActionLoading(id + '-delete');
+    try {
+      await products.delete(id);
+      setMyProducts((prev: any[]) => prev.filter(p => p.id !== id));
+    } catch { alert('Xóa thất bại'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function handleRestore(id: string) {
+    setActionLoading(id + '-restore');
+    try {
+      await products.restore(id);
+      setMyProducts((prev: any[]) => prev.map(p => p.id === id ? { ...p, isDeleted: false, status: 'ACTIVE' } : p));
+    } catch { alert('Khôi phục thất bại'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function handleToggleStatus(product: any) {
+    const newStatus = product.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+    setActionLoading(product.id + '-status');
+    try {
+      await products.updateStatus(product.id, newStatus);
+      setMyProducts((prev: any[]) => prev.map(p => p.id === product.id ? { ...p, status: newStatus } : p));
+    } catch { alert('Cập nhật thất bại'); }
+    finally { setActionLoading(null); }
+  }
+
+  async function handleSaveQuantity(id: string) {
+    const qty = Number(quantityValue);
+    if (isNaN(qty) || qty < 0) { alert('Số lượng không hợp lệ'); return; }
+    setActionLoading(id + '-qty');
+    try {
+      const updated = await products.updateQuantity(id, qty);
+      setMyProducts((prev: any[]) => prev.map(p => p.id === id ? { ...p, quantity: qty, status: qty <= 0 ? 'SOLD_OUT' : p.status } : p));
+      setEditingQuantity(null);
+    } catch { alert('Cập nhật thất bại'); }
+    finally { setActionLoading(null); }
+  }
+
+  const statusLabel: any = { ACTIVE: 'Đang hiển thị', PAUSED: 'Tạm dừng', SOLD_OUT: 'Hết hàng', DRAFT: 'Nháp' };
+  const statusColor: any = {
+    ACTIVE: 'bg-green-100 text-green-700',
+    PAUSED: 'bg-yellow-100 text-yellow-700',
+    SOLD_OUT: 'bg-red-100 text-red-700',
+    DRAFT: 'bg-gray-100 text-gray-600',
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">Sản phẩm của tôi ({myProducts.length})</h2>
+        <Link href="/products/create" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm">
+          + Đăng sản phẩm
+        </Link>
+      </div>
+
+      {myProducts.length === 0 ? (
+        <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+          <i className="ri-plant-line text-5xl text-gray-300 block mb-3"></i>
+          <p className="text-gray-500 mb-4">Bạn chưa có sản phẩm nào</p>
+          <Link href="/products/create" className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+            Đăng sản phẩm ngay
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {myProducts.map(product => (
+            <div key={product.id} className={`bg-white rounded-xl p-4 shadow-sm ${product.isDeleted ? 'opacity-60' : ''}`}>
+              <div className="flex items-start gap-4">
+                {/* Ảnh */}
+                <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                  {product.images?.[0] ? (
+                    <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <i className="ri-image-line text-gray-400 text-xl"></i>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-medium text-gray-900 truncate">{product.title}</h4>
+                    <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 ${statusColor[product.status] || 'bg-gray-100 text-gray-600'}`}>
+                      {statusLabel[product.status] || product.status}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                    <span className="text-green-600 font-semibold text-sm">{Number(product.price).toLocaleString()}đ/{product.unit}</span>
+                    {product.isVip && (
+                      <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">VIP</span>
+                    )}
+                    <span className="text-xs text-gray-400"><i className="ri-eye-line mr-1"></i>{product.viewCount}</span>
+                  </div>
+
+                  {/* Tồn kho */}
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-gray-500">Tồn kho:</span>
+                    {editingQuantity === product.id ? (
+                      <div className="flex items-center gap-1">
+                        <input type="number" value={quantityValue} onChange={e => setQuantityValue(e.target.value)}
+                          className="w-20 px-2 py-0.5 border border-gray-300 rounded text-xs" min="0" autoFocus />
+                        <button onClick={() => handleSaveQuantity(product.id)}
+                          disabled={actionLoading === product.id + '-qty'}
+                          className="text-xs bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 disabled:opacity-50">
+                          {actionLoading === product.id + '-qty' ? '...' : 'Lưu'}
+                        </button>
+                        <button onClick={() => setEditingQuantity(null)} className="text-xs text-gray-500 hover:text-gray-700">Hủy</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => { setEditingQuantity(product.id); setQuantityValue(String(product.quantity ?? 0)); }}
+                        className="text-xs text-blue-600 hover:underline">
+                        {product.quantity ?? 0} {product.unit} (sửa)
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t flex-wrap">
+                <Link href={`/products/${product.id}`}
+                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50">
+                  <i className="ri-eye-line"></i> Xem
+                </Link>
+
+                {!product.isDeleted && (
+                  <Link href={`/products/${product.id}/edit`}
+                    className="flex items-center gap-1 text-xs text-gray-600 hover:text-green-600 px-2 py-1 rounded hover:bg-green-50">
+                    <i className="ri-edit-line"></i> Sửa
+                  </Link>
+                )}
+
+                {!product.isDeleted && product.status !== 'SOLD_OUT' && (
+                  <button onClick={() => handleToggleStatus(product)}
+                    disabled={actionLoading === product.id + '-status'}
+                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors disabled:opacity-50 ${
+                      product.status === 'ACTIVE'
+                        ? 'text-yellow-600 hover:bg-yellow-50'
+                        : 'text-green-600 hover:bg-green-50'
+                    }`}>
+                    <i className={product.status === 'ACTIVE' ? 'ri-pause-circle-line' : 'ri-play-circle-line'}></i>
+                    {actionLoading === product.id + '-status' ? '...' : product.status === 'ACTIVE' ? 'Tạm dừng' : 'Hiển thị lại'}
+                  </button>
+                )}
+
+                {!product.isDeleted && !product.isVip && (
+                  <Link href={`/products/vip?id=${product.id}`}
+                    className="flex items-center gap-1 text-xs text-yellow-600 hover:text-yellow-700 px-2 py-1 rounded hover:bg-yellow-50">
+                    <i className="ri-vip-crown-line"></i> Nâng VIP
+                  </Link>
+                )}
+
+                {!product.isDeleted ? (
+                  <button onClick={() => handleDelete(product.id)}
+                    disabled={actionLoading === product.id + '-delete'}
+                    className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 ml-auto disabled:opacity-50">
+                    <i className="ri-delete-bin-line"></i>
+                    {actionLoading === product.id + '-delete' ? '...' : 'Xóa'}
+                  </button>
+                ) : (
+                  <button onClick={() => handleRestore(product.id)}
+                    disabled={actionLoading === product.id + '-restore'}
+                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 ml-auto disabled:opacity-50">
+                    <i className="ri-restart-line"></i>
+                    {actionLoading === product.id + '-restore' ? '...' : 'Khôi phục'}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

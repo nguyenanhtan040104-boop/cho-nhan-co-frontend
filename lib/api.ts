@@ -238,8 +238,28 @@ export const products = {
     return request(`/products/${id}`, { method: 'DELETE' });
   },
 
-  async getMine(page = 1) {
-    return request<any>(`/products/mine?page=${page}`);
+  async getMine(page = 1, limit = 20) {
+    return request<any>(`/products/me/list?page=${page}&limit=${limit}`);
+  },
+
+  async updateStatus(id: string, status: string) {
+    return request(`/products/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
+  },
+
+  async updateQuantity(id: string, quantity: number) {
+    return request(`/products/${id}/quantity`, { method: 'PUT', body: JSON.stringify({ quantity }) });
+  },
+
+  async restore(id: string) {
+    return request(`/products/${id}/restore`, { method: 'POST' });
+  },
+
+  async bulkDelete(ids: string[]) {
+    return request('/products/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) });
+  },
+
+  async upgradeVip(id: string, durationDays = 30) {
+    return request(`/products/${id}/vip`, { method: 'POST', body: JSON.stringify({ durationDays }) });
   },
 };
 
