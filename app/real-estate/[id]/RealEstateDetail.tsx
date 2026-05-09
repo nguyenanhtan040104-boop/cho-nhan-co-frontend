@@ -156,6 +156,39 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                 <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">{item.description}</p>
               </div>
             </div>
+
+            {/* Lịch sử giá */}
+            {item.priceHistory && item.priceHistory.length > 0 && (
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <p className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <i className="ri-line-chart-line text-green-600"></i>
+                  Lịch sử thay đổi giá
+                </p>
+                <div className="relative">
+                  <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                  <div className="space-y-3">
+                    {/* Giá hiện tại */}
+                    <div className="flex items-start gap-4 pl-7 relative">
+                      <div className="absolute left-0 w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow-sm"></div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-green-600">{formatPrice(Number(item.price))}</p>
+                        <p className="text-xs text-gray-400">Giá hiện tại</p>
+                      </div>
+                    </div>
+                    {/* Lịch sử */}
+                    {item.priceHistory.map((h: any, i: number) => (
+                      <div key={i} className="flex items-start gap-4 pl-7 relative">
+                        <div className="absolute left-0 w-4 h-4 rounded-full bg-gray-300 border-2 border-white shadow-sm"></div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-700">{formatPrice(Number(h.price))}</p>
+                          <p className="text-xs text-gray-400">{new Date(h.changedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right - Seller */}
