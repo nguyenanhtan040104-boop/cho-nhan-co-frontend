@@ -6,10 +6,7 @@ import { useRouter } from 'next/navigation';
 import { jobs } from '../../../lib/api';
 
 const typeOptions = [
-  { value: 'FULL_TIME', label: 'Toàn thời gian' },
-  { value: 'PART_TIME', label: 'Bán thời gian' },
-  { value: 'SEASONAL', label: 'Thời vụ' },
-  { value: 'FREELANCE', label: 'Tự do' },
+  { value: 'JOB_SEEKER', label: 'Tìm việc' },
 ];
 
 const categoryOptions = [
@@ -19,7 +16,7 @@ const categoryOptions = [
 export default function SeekJobPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    title: '', description: '', type: 'FULL_TIME', category: '',
+    title: '', description: '', category: '',
     salary: '', location: '', experience: '', benefits: '',
   });
   const [loading, setLoading] = useState(false);
@@ -38,13 +35,12 @@ export default function SeekJobPage() {
       await jobs.create({
         title: form.title,
         description: form.description,
-        type: form.type,
+        type: 'JOB_SEEKER',
         category: form.category,
         salary: form.salary || undefined,
         location: form.location,
         experience: form.experience || undefined,
         benefits: form.benefits || undefined,
-        postType: 'SEEKING',
       });
       setSuccess(true);
       setTimeout(() => router.push('/jobs'), 2000);
@@ -90,22 +86,13 @@ export default function SeekJobPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loại công việc mong muốn</label>
-              <select name="type" value={form.type} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                {typeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ngành nghề *</label>
-              <select name="category" required value={form.category} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                <option value="">Chọn ngành nghề</option>
-                {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
-              </select>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Ngành nghề *</label>
+            <select name="category" required value={form.category} onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Chọn ngành nghề</option>
+              {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -6,10 +6,8 @@ import Link from 'next/link';
 import { jobs } from '../../../../lib/api';
 
 const typeOptions = [
-  { value: 'FULL_TIME', label: 'Toàn thời gian' },
-  { value: 'PART_TIME', label: 'Bán thời gian' },
-  { value: 'SEASONAL', label: 'Thời vụ' },
-  { value: 'FREELANCE', label: 'Tự do' },
+  { value: 'EMPLOYER', label: 'Tuyển dụng' },
+  { value: 'JOB_SEEKER', label: 'Tìm việc' },
 ];
 
 const categoryOptions = [
@@ -21,7 +19,7 @@ export default function EditJobPage() {
   const router = useRouter();
 
   const [form, setForm] = useState({
-    title: '', description: '', type: 'FULL_TIME', category: '',
+    title: '', description: '', type: 'EMPLOYER', category: '',
     salary: '', location: '', experience: '', benefits: '',
     deadline: '', isUrgent: false,
   });
@@ -36,7 +34,7 @@ export default function EditJobPage() {
         setForm({
           title: data.title || '',
           description: data.description || '',
-          type: data.type || 'FULL_TIME',
+          type: data.type || 'EMPLOYER',
           category: data.category || '',
           salary: data.salary || '',
           location: data.location || '',

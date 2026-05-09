@@ -6,10 +6,7 @@ import { useRouter } from 'next/navigation';
 import { jobs } from '../../../lib/api';
 
 const typeOptions = [
-  { value: 'FULL_TIME', label: 'Toàn thời gian' },
-  { value: 'PART_TIME', label: 'Bán thời gian' },
-  { value: 'SEASONAL', label: 'Thời vụ' },
-  { value: 'FREELANCE', label: 'Tự do' },
+  { value: 'EMPLOYER', label: 'Tuyển dụng' },
 ];
 
 const categoryOptions = [
@@ -19,7 +16,7 @@ const categoryOptions = [
 export default function CreateJobPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    title: '', description: '', type: 'FULL_TIME', category: '',
+    title: '', description: '', type: 'EMPLOYER', category: '',
     salary: '', location: '', experience: '', benefits: '',
     deadline: '', isUrgent: false,
   });

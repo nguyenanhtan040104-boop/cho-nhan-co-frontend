@@ -5,11 +5,9 @@ import Link from 'next/link';
 import { jobs } from '../../lib/api';
 
 const typeOptions = [
-  { value: '', label: 'Tất cả loại' },
-  { value: 'FULL_TIME', label: 'Toàn thời gian' },
-  { value: 'PART_TIME', label: 'Bán thời gian' },
-  { value: 'SEASONAL', label: 'Thời vụ' },
-  { value: 'FREELANCE', label: 'Tự do' },
+  { value: '', label: 'Tất cả' },
+  { value: 'EMPLOYER', label: 'Tuyển dụng' },
+  { value: 'JOB_SEEKER', label: 'Tìm việc' },
 ];
 
 export default function JobsPage() {
@@ -133,7 +131,7 @@ export default function JobsPage() {
                         <span className="text-green-600 font-semibold text-sm">{job.salary}</span>
                       )}
                       <span className="bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded">
-                        {job.type === 'FULL_TIME' ? 'Toàn thời gian' : job.type === 'PART_TIME' ? 'Bán thời gian' : job.type === 'SEASONAL' ? 'Thời vụ' : 'Tự do'}
+                        {job.type === 'EMPLOYER' ? 'Tuyển dụng' : job.type === 'JOB_SEEKER' ? 'Tìm việc' : job.type}
                       </span>
                       {job.category && (
                         <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{job.category}</span>

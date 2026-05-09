@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { jobs } from '../../../lib/api';
 
 const typeLabel: any = {
-  FULL_TIME: 'Toàn thời gian', PART_TIME: 'Bán thời gian', SEASONAL: 'Thời vụ', FREELANCE: 'Tự do',
+  EMPLOYER: 'Tuyển dụng', JOB_SEEKER: 'Tìm việc',
 };
 
 export default function JobDetail({ jobId }: { jobId: string }) {
