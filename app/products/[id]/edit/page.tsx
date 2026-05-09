@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { products as productsApi, uploads } from '../../../../lib/api';
 
 const categories = [
@@ -13,9 +13,10 @@ const categories = [
   { value: 'DICH_VU', label: 'Dịch vụ' },
 ];
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage() {
   const router = useRouter();
-  const { id } = params;
+  const params = useParams();
+  const id = params.id as string;
 
   const [form, setForm] = useState({
     title: '', description: '', category: '', price: '', unit: '',

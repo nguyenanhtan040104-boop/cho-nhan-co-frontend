@@ -1,5 +1,6 @@
 import RealEstateDetail from './RealEstateDetail';
 
-export default function RealEstateDetailPage({ params }: { params: { id: string } }) {
-  return <RealEstateDetail propertyId={params.id} />;
+export default async function RealEstateDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <RealEstateDetail propertyId={id} />;
 }

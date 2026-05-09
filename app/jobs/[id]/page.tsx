@@ -1,5 +1,6 @@
 import JobDetail from './JobDetail';
 
-export default function JobDetailPage({ params }: { params: { id: string } }) {
-  return <JobDetail jobId={params.id} />;
+export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <JobDetail jobId={id} />;
 }

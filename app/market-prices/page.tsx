@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { marketPrices, auth } from '../../lib/api';
+import { marketPrices, auth, users } from '../../lib/api';
 
 const PRESET_CATEGORIES = [
   { value: '', label: 'Tất cả' },
@@ -36,6 +36,7 @@ export default function MarketPricesPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
@@ -67,6 +68,12 @@ export default function MarketPricesPage() {
   }, [category, search, location]);
 
   useEffect(() => { loadData(1); }, [loadData]);
+
+  useEffect(() => {
+    if (auth.isLoggedIn()) {
+      users.getMe().then(u => setIsAdmin(u.role === 'admin')).catch(() => {});
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,16 +115,18 @@ export default function MarketPricesPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Giá thị trường</h1>
-              <p className="text-gray-500 text-sm mt-1">Cập nhật bởi cộng đồng • {total} bản ghi</p>
+              <p className="text-gray-500 text-sm mt-1">Cập nhật bởi Admin • {total} bản ghi</p>
             </div>
-            <button onClick={() => setShowForm(!showForm)}
-              className="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 text-sm font-medium">
-              + Đóng góp giá
-            </button>
+            {isAdmin && (
+              <button onClick={() => setShowForm(!showForm)}
+                className="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 text-sm font-medium">
+                + Thêm giá
+              </button>
+            )}
           </div>
 
-          {/* Form */}
-          {showForm && (
+          {/* Form - chỉ admin */}
+          {isAdmin && showForm && (
             <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-4">
               <h3 className="font-semibold text-gray-900 mb-3">Đóng góp giá thị trường</h3>
               {formError && <p className="text-red-600 text-sm mb-3">{formError}</p>}
@@ -190,9 +199,11 @@ export default function MarketPricesPage() {
           <div className="bg-white rounded-xl p-16 text-center shadow-sm">
             <i className="ri-line-chart-line text-6xl text-gray-300 block mb-3"></i>
             <p className="text-gray-500 mb-4">Chưa có dữ liệu giá nào</p>
-            <button onClick={() => setShowForm(true)} className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 text-sm">
-              Đóng góp giá đầu tiên
-            </button>
+            {isAdmin && (
+              <button onClick={() => setShowForm(true)} className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 text-sm">
+                Thêm giá đầu tiên
+              </button>
+            )}
           </div>
         ) : category || search || location ? (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -225,11 +236,13 @@ export default function MarketPricesPage() {
                       <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">{item.location}</td>
                       <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{item.source || '-'}</td>
                       <td className="px-4 py-3 text-xs text-gray-400">{getTimeDiff(item.createdAt)}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button onClick={() => handleDelete(item.id)} className="text-gray-300 hover:text-red-500 text-xs">
-                          <i className="ri-delete-bin-line"></i>
-                        </button>
-                      </td>
+                      {isAdmin && (
+                        <td className="px-4 py-3 text-right">
+                          <button onClick={() => handleDelete(item.id)} className="text-gray-300 hover:text-red-500 text-xs">
+                            <i className="ri-delete-bin-line"></i>
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
