@@ -26,6 +26,7 @@ export default function ForumPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
@@ -42,8 +43,8 @@ export default function ForumPage() {
       setTotal(res.total || 0);
       setTotalPages(res.totalPages || 1);
       setPage(p);
-    } catch {
-      // ignore
+    } catch (e: any) {
+      setError(e?.message || 'Không thể tải dữ liệu. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -86,6 +87,11 @@ export default function ForumPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+            <i className="ri-error-warning-line mr-2"></i>{error}
+          </div>
+        )}
         {loading && posts.length === 0 ? (
           <div className="flex justify-center py-20">
             <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
