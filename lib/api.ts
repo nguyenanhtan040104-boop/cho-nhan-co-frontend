@@ -295,6 +295,14 @@ export const realEstate = {
   async getMine(page = 1) {
     return request<any>(`/real-estates/mine?page=${page}`);
   },
+
+  async updateStatus(id: string, status: string) {
+    return request(`/real-estates/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
+  },
+
+  async addImages(id: string, images: { url: string; caption?: string }[]) {
+    return request(`/real-estates/${id}/images`, { method: 'POST', body: JSON.stringify({ images }) });
+  },
 };
 
 // =================== JOBS ===================

@@ -6,12 +6,10 @@ import { realEstate } from '../../lib/api';
 
 const typeOptions = [
   { value: '', label: 'Tất cả loại' },
-  { value: 'HOUSE', label: 'Nhà ở' },
-  { value: 'LAND', label: 'Đất nền' },
-  { value: 'APARTMENT', label: 'Căn hộ' },
-  { value: 'ROOM', label: 'Phòng trọ' },
-  { value: 'COMMERCIAL', label: 'Mặt bằng KD' },
-  { value: 'OTHER', label: 'Khác' },
+  { value: 'NHA_O', label: 'Nhà ở' },
+  { value: 'DAT_NEN', label: 'Đất nền' },
+  { value: 'PHONG_TRO', label: 'Phòng trọ' },
+  { value: 'MAT_BANG', label: 'Mặt bằng KD' },
 ];
 
 const sortOptions = [
@@ -194,7 +192,7 @@ export default function RealEstatePage() {
                       <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded">VIP</span>
                     )}
                     <span className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-0.5 rounded">
-                      {item.type === 'HOUSE' ? 'Nhà ở' : item.type === 'LAND' ? 'Đất nền' : item.type === 'APARTMENT' ? 'Căn hộ' : item.type === 'ROOM' ? 'Phòng trọ' : item.type === 'COMMERCIAL' ? 'Mặt bằng' : item.type}
+                      {item.type === 'NHA_O' ? 'Nhà ở' : item.type === 'DAT_NEN' ? 'Đất nền' : item.type === 'PHONG_TRO' ? 'Phòng trọ' : item.type === 'MAT_BANG' ? 'Mặt bằng' : item.type}
                     </span>
                   </div>
                   <div className="p-4">

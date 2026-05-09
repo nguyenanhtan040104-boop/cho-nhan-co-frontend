@@ -6,12 +6,10 @@ import { useRouter } from 'next/navigation';
 import { realEstate, uploads } from '../../../lib/api';
 
 const typeOptions = [
-  { value: 'HOUSE', label: 'Nhà ở' },
-  { value: 'LAND', label: 'Đất nền' },
-  { value: 'APARTMENT', label: 'Căn hộ' },
-  { value: 'ROOM', label: 'Phòng trọ' },
-  { value: 'COMMERCIAL', label: 'Mặt bằng kinh doanh' },
-  { value: 'OTHER', label: 'Khác' },
+  { value: 'NHA_O', label: 'Nhà ở' },
+  { value: 'DAT_NEN', label: 'Đất nền' },
+  { value: 'PHONG_TRO', label: 'Phòng trọ' },
+  { value: 'MAT_BANG', label: 'Mặt bằng kinh doanh' },
 ];
 
 const legalOptions = [
@@ -21,7 +19,7 @@ const legalOptions = [
 export default function CreateRealEstatePage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    title: '', description: '', type: 'HOUSE',
+    title: '', description: '', type: 'NHA_O',
     price: '', area: '', address: '', legalStatus: '',
   });
   const [imageFiles, setImageFiles] = useState<File[]>([]);

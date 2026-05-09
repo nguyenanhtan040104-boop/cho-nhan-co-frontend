@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { realEstate } from '../../../lib/api';
 
+function getCurrentUserId(): string | null {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.sub || payload.id || null;
+  } catch {
+    return null;
+  }
+}
+
 function formatPrice(price: number) {
   if (price >= 1_000_000_000) return (price / 1_000_000_000).toFixed(2) + ' tỷ';
   if (price >= 1_000_000) return (price / 1_000_000).toFixed(0) + ' triệu';
@@ -11,8 +22,7 @@ function formatPrice(price: number) {
 }
 
 const typeLabel: any = {
-  HOUSE: 'Nhà ở', LAND: 'Đất nền', APARTMENT: 'Căn hộ',
-  ROOM: 'Phòng trọ', COMMERCIAL: 'Mặt bằng KD', OTHER: 'Khác',
+  NHA_O: 'Nhà ở', DAT_NEN: 'Đất nền', PHONG_TRO: 'Phòng trọ', MAT_BANG: 'Mặt bằng KD',
 };
 
 const statusLabel: any = {
@@ -24,6 +34,11 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedImg, setSelectedImg] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentUserId(getCurrentUserId());
+  }, []);
 
   useEffect(() => {
     realEstate.getOne(propertyId)
@@ -54,11 +69,17 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
           <Link href="/real-estate" className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">
             <i className="ri-arrow-left-line"></i>
           </Link>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 flex-1">
             <Link href="/real-estate" className="hover:text-green-600">Bất động sản</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900">{item.title}</span>
           </div>
+          {currentUserId && item.user?.id === currentUserId && (
+            <Link href={`/real-estate/${propertyId}/edit`}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+              <i className="ri-edit-line"></i> Chỉnh sửa
+            </Link>
+          )}
         </div>
       </div>
 
