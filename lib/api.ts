@@ -460,3 +460,33 @@ export const marketPrices = {
     return request(`/market-prices/${id}`, { method: 'DELETE' });
   },
 };
+
+// =================== ADVERTISEMENTS ===================
+
+export const advertisements = {
+  async getAll(params?: any) {
+    const query = new URLSearchParams();
+    if (params) Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') query.append(k, String(v)); });
+    return request<any>(`/advertisements?${query}`);
+  },
+
+  async getOne(id: string) {
+    return request<any>(`/advertisements/${id}`);
+  },
+
+  async getMine(page = 1) {
+    return request<any>(`/advertisements/mine?page=${page}`);
+  },
+
+  async create(data: any) {
+    return request('/advertisements', { method: 'POST', body: JSON.stringify(data) });
+  },
+
+  async update(id: string, data: any) {
+    return request(`/advertisements/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+
+  async delete(id: string) {
+    return request(`/advertisements/${id}`, { method: 'DELETE' });
+  },
+};
