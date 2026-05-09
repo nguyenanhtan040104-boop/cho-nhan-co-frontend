@@ -1,208 +1,289 @@
-
 'use client';
 
-import { useState } from 'react';
-import MarketPriceHeader from './MarketPriceHeader';
-import PriceTable from './PriceTable';
-import PriceChart from './PriceChart';
-import MarketNews from './MarketNews';
-import PriceNotifications from './PriceNotifications';
+import { useState, useEffect, useCallback } from 'react';
+import { marketPrices, auth } from '../../lib/api';
+
+const PRESET_CATEGORIES = [
+  { value: '', label: 'Tất cả' },
+  { value: 'Cà phê', label: 'Cà phê' },
+  { value: 'Hồ tiêu', label: 'Hồ tiêu' },
+  { value: 'Cao su', label: 'Cao su' },
+  { value: 'Lúa gạo', label: 'Lúa gạo' },
+  { value: 'Trái cây', label: 'Trái cây' },
+  { value: 'Rau củ', label: 'Rau củ' },
+  { value: 'Vật nuôi', label: 'Vật nuôi' },
+  { value: 'Thủy sản', label: 'Thủy sản' },
+  { value: 'Khác', label: 'Khác' },
+];
+
+function formatPrice(price: number) {
+  if (price >= 1_000_000) return (price / 1_000_000).toFixed(1) + 'tr';
+  return price.toLocaleString('vi-VN');
+}
+
+function getTimeDiff(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins} phút trước`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} giờ trước`;
+  return `${Math.floor(hrs / 24)} ngày trước`;
+}
 
 export default function MarketPricesPage() {
-  const [selectedCategory, setSelectedCategory] = useState('ca-phe');
-  const [timeRange, setTimeRange] = useState('7-days');
+  const [items, setItems] = useState<any[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState('');
+  const [search, setSearch] = useState('');
+  const [location, setLocation] = useState('');
+
+  // Form thêm giá
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ productName: '', category: 'Cà phê', unit: 'kg', price: '', location: '', note: '', source: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  const loadData = useCallback(async (p = 1) => {
+    setLoading(true);
+    try {
+      const params: any = { page: p, limit: 30 };
+      if (category) params.category = category;
+      if (search) params.search = search;
+      if (location) params.location = location;
+      const res = await marketPrices.getAll(params);
+      if (p === 1) setItems(res.data || []);
+      else setItems(prev => [...prev, ...(res.data || [])]);
+      setTotal(res.total || 0);
+      setTotalPages(res.totalPages || 1);
+      setPage(p);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  }, [category, search, location]);
+
+  useEffect(() => { loadData(1); }, [loadData]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!auth.isLoggedIn()) { setFormError('Vui lòng đăng nhập để đóng góp giá'); return; }
+    setFormError('');
+    setSubmitting(true);
+    try {
+      const newItem = await marketPrices.create({ ...form, price: Number(form.price) });
+      setItems(prev => [newItem, ...prev]);
+      setTotal(prev => prev + 1);
+      setForm({ productName: '', category: 'Cà phê', unit: 'kg', price: '', location: '', note: '', source: '' });
+      setShowForm(false);
+    } catch (e: any) {
+      setFormError(e.message || 'Lỗi đăng giá');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Xóa bản ghi giá này?')) return;
+    try {
+      await marketPrices.delete(id);
+      setItems(prev => prev.filter((i: any) => i.id !== id));
+    } catch { alert('Xóa thất bại'); }
+  }
+
+  // Group by category
+  const grouped = items.reduce((acc: any, item: any) => {
+    if (!acc[item.category]) acc[item.category] = [];
+    acc[item.category].push(item);
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <MarketPriceHeader 
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-      />
-      
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Giá thị trường</h1>
+              <p className="text-gray-500 text-sm mt-1">Cập nhật bởi cộng đồng • {total} bản ghi</p>
+            </div>
+            <button onClick={() => setShowForm(!showForm)}
+              className="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 text-sm font-medium">
+              + Đóng góp giá
+            </button>
+          </div>
+
+          {/* Form */}
+          {showForm && (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-4">
+              <h3 className="font-semibold text-gray-900 mb-3">Đóng góp giá thị trường</h3>
+              {formError && <p className="text-red-600 text-sm mb-3">{formError}</p>}
+              <form onSubmit={handleSubmit} className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <input required placeholder="Tên sản phẩm *" value={form.productName}
+                  onChange={e => setForm(p => ({ ...p, productName: e.target.value }))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                  {PRESET_CATEGORIES.filter(c => c.value).map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <input required type="number" placeholder="Giá *" value={form.price} min="0"
+                    onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                  <input placeholder="đvt" value={form.unit}
+                    onChange={e => setForm(p => ({ ...p, unit: e.target.value }))}
+                    className="w-16 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                </div>
+                <input required placeholder="Địa điểm *" value={form.location}
+                  onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <input placeholder="Nguồn (Chợ, Thương lái...)" value={form.source}
+                  onChange={e => setForm(p => ({ ...p, source: e.target.value }))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <input placeholder="Ghi chú" value={form.note}
+                  onChange={e => setForm(p => ({ ...p, note: e.target.value }))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <div className="col-span-2 md:col-span-3 flex gap-2 justify-end">
+                  <button type="button" onClick={() => setShowForm(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Hủy</button>
+                  <button type="submit" disabled={submitting}
+                    className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-green-700 disabled:opacity-50">
+                    {submitting ? 'Đang lưu...' : 'Lưu giá'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Category tabs */}
+          <div className="flex flex-wrap gap-2 items-center mb-3">
+            {PRESET_CATEGORIES.map(c => (
+              <button key={c.value} onClick={() => setCategory(c.value)}
+                className={`px-3 py-1.5 rounded-full text-sm transition-colors ${category === c.value ? 'bg-green-600 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <input type="text" placeholder="Tìm sản phẩm..." value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && loadData(1)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500" />
+            <input type="text" placeholder="Địa điểm..." value={location}
+              onChange={e => setLocation(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && loadData(1)}
+              className="w-44 px-4 py-2 border border-gray-300 rounded-lg text-sm" />
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Price Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Giá cao nhất hôm nay</p>
-                    <p className="text-2xl font-bold text-green-600">85,000đ</p>
-                    <p className="text-xs text-gray-500">Cà phê Robusta/kg</p>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <i className="ri-arrow-up-line text-green-600 text-xl"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Giá thấp nhất hôm nay</p>
-                    <p className="text-2xl font-bold text-red-600">82,500đ</p>
-                    <p className="text-xs text-gray-500">Cà phê Robusta/kg</p>
-                  </div>
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <i className="ri-arrow-down-line text-red-600 text-xl"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Biến động</p>
-                    <p className="text-2xl font-bold text-green-600">+2.5%</p>
-                    <p className="text-xs text-gray-500">So với hôm qua</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i className="ri-trending-up-line text-blue-600 text-xl"></i>
-                  </div>
-                </div>
-              </div>
+        {loading && items.length === 0 ? (
+          <div className="flex justify-center py-20">
+            <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : items.length === 0 ? (
+          <div className="bg-white rounded-xl p-16 text-center shadow-sm">
+            <i className="ri-line-chart-line text-6xl text-gray-300 block mb-3"></i>
+            <p className="text-gray-500 mb-4">Chưa có dữ liệu giá nào</p>
+            <button onClick={() => setShowForm(true)} className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 text-sm">
+              Đóng góp giá đầu tiên
+            </button>
+          </div>
+        ) : category || search || location ? (
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b">
+              <h2 className="font-semibold text-gray-900">{category || 'Kết quả tìm kiếm'} <span className="text-gray-400 font-normal text-sm">({items.length} bản ghi)</span></h2>
             </div>
-
-            {/* Price Table */}
-            <PriceTable category={selectedCategory} />
-
-            {/* Price Chart */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">Biểu đồ giá</h2>
-                  <div className="flex space-x-2">
-                    {[
-                      { key: '7-days', label: '7 ngày' },
-                      { key: '30-days', label: '30 ngày' },
-                      { key: '90-days', label: '3 tháng' }
-                    ].map((range) => (
-                      <button
-                        key={range.key}
-                        onClick={() => setTimeRange(range.key)}
-                        className={`px-3 py-1 text-sm rounded-full transition-colors whitespace-nowrap ${
-                          timeRange === range.key
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      >
-                        {range.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <PriceChart category={selectedCategory} timeRange={timeRange} />
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Giá</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Địa điểm</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Nguồn</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Cập nhật</th>
+                    <th className="px-4 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {items.map((item: any) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-gray-900 text-sm">{item.productName}</p>
+                        {item.note && <p className="text-xs text-gray-400">{item.note}</p>}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="font-bold text-green-600">{formatPrice(item.price)}đ</span>
+                        <span className="text-xs text-gray-400">/{item.unit}</span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">{item.location}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{item.source || '-'}</td>
+                      <td className="px-4 py-3 text-xs text-gray-400">{getTimeDiff(item.createdAt)}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button onClick={() => handleDelete(item.id)} className="text-gray-300 hover:text-red-500 text-xs">
+                          <i className="ri-delete-bin-line"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-
-            {/* Price Comparison */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">So sánh giá theo ngày</h2>
-              </div>
-              <div className="p-6">
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {Object.entries(grouped).map(([cat, catItems]: [string, any]) => (
+              <div key={cat} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b flex items-center justify-between">
+                  <h2 className="font-semibold text-gray-900">{cat} <span className="text-gray-400 font-normal text-sm ml-1">({catItems.length})</span></h2>
+                  <button onClick={() => setCategory(cat)} className="text-sm text-green-600 hover:underline">Xem tất cả</button>
+                </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 font-medium text-gray-700">Ngày</th>
-                        <th className="text-right py-3 font-medium text-gray-700">Giá mua vào</th>
-                        <th className="text-right py-3 font-medium text-gray-700">Giá bán ra</th>
-                        <th className="text-right py-3 font-medium text-gray-700">Biến động</th>
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left px-4 py-2 text-xs font-medium text-gray-500">Sản phẩm</th>
+                        <th className="text-right px-4 py-2 text-xs font-medium text-gray-500">Giá</th>
+                        <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 hidden md:table-cell">Địa điểm</th>
+                        <th className="text-left px-4 py-2 text-xs font-medium text-gray-500">Cập nhật</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {[
-                        { date: '20/12/2024', buyPrice: '82,500', sellPrice: '85,000', change: '+2.5%', changeColor: 'text-green-600' },
-                        { date: '19/12/2024', buyPrice: '80,000', sellPrice: '82,800', change: '+1.2%', changeColor: 'text-green-600' },
-                        { date: '18/12/2024', buyPrice: '79,500', sellPrice: '82,000', change: '-0.8%', changeColor: 'text-red-600' },
-                        { date: '17/12/2024', buyPrice: '80,200', sellPrice: '82,700', change: '+0.5%', changeColor: 'text-green-600' },
-                        { date: '16/12/2024', buyPrice: '79,800', sellPrice: '82,300', change: '-1.1%', changeColor: 'text-red-600' }
-                      ].map((row, index) => (
-                        <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 text-gray-900">{row.date}</td>
-                          <td className="py-3 text-right text-gray-900">{row.buyPrice}đ</td>
-                          <td className="py-3 text-right text-gray-900">{row.sellPrice}đ</td>
-                          <td className={`py-3 text-right font-medium ${row.changeColor}`}>{row.change}</td>
+                    <tbody className="divide-y divide-gray-50">
+                      {catItems.slice(0, 5).map((item: any) => (
+                        <tr key={item.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-2.5">
+                            <p className="text-sm font-medium text-gray-900">{item.productName}</p>
+                          </td>
+                          <td className="px-4 py-2.5 text-right">
+                            <span className="font-bold text-green-600 text-sm">{formatPrice(item.price)}đ</span>
+                            <span className="text-xs text-gray-400">/{item.unit}</span>
+                          </td>
+                          <td className="px-4 py-2.5 text-sm text-gray-500 hidden md:table-cell">{item.location}</td>
+                          <td className="px-4 py-2.5 text-xs text-gray-400">{getTimeDiff(item.createdAt)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
+        )}
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Price Notifications */}
-            <PriceNotifications />
-            
-            {/* Market News */}
-            <MarketNews />
-
-            {/* Quick Search */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Tìm kiếm nhanh</h3>
-              </div>
-              <div className="p-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Tìm theo tên sản phẩm..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="ri-search-line text-gray-400"></i>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <h4 className="text-sm font-medium text-gray-700">Tìm kiếm phổ biến:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {['Cà phê', 'Hồ tiêu', 'Cao su', 'Lúa gạo', 'Rau củ'].map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full cursor-pointer hover:bg-green-100 hover:text-green-700 transition-colors whitespace-nowrap"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Market Statistics */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Thống kê thị trường</h3>
-              </div>
-              <div className="p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Số sản phẩm theo dõi</span>
-                  <span className="text-sm font-medium text-gray-900">248</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Cập nhật cuối</span>
-                  <span className="text-sm font-medium text-gray-900">10:30 AM</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Sản phẩm tăng giá</span>
-                  <span className="text-sm font-medium text-green-600">156</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Sản phẩm giảm giá</span>
-                  <span className="text-sm font-medium text-red-600">92</span>
-                </div>
-              </div>
-            </div>
+        {page < totalPages && (
+          <div className="text-center mt-8">
+            <button onClick={() => loadData(page + 1)} disabled={loading}
+              className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 disabled:opacity-50">
+              {loading ? 'Đang tải...' : 'Xem thêm'}
+            </button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

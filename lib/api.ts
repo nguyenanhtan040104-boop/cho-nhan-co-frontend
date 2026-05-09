@@ -427,3 +427,36 @@ export const uploads = {
     return Promise.all(files.map(f => uploads.uploadImage(f)));
   },
 };
+
+// =================== MARKET PRICES ===================
+
+export const marketPrices = {
+  async getAll(params?: any) {
+    const query = new URLSearchParams();
+    if (params) Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') query.append(k, String(v)); });
+    return request<any>(`/market-prices?${query}`);
+  },
+
+  async getLatest(category?: string) {
+    const q = category ? `?category=${category}` : '';
+    return request<any>(`/market-prices/latest${q}`);
+  },
+
+  async getCategories() {
+    return request<any>('/market-prices/categories');
+  },
+
+  async getPriceHistory(productName: string, location?: string, days = 30) {
+    const q = new URLSearchParams({ productName, days: String(days) });
+    if (location) q.append('location', location);
+    return request<any>(`/market-prices/history?${q}`);
+  },
+
+  async create(data: any) {
+    return request('/market-prices', { method: 'POST', body: JSON.stringify(data) });
+  },
+
+  async delete(id: string) {
+    return request(`/market-prices/${id}`, { method: 'DELETE' });
+  },
+};
