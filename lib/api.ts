@@ -342,6 +342,20 @@ export const forum = {
       body: JSON.stringify({ content, parentId }),
     });
   },
+
+  // Aliases để dùng chung
+  async getAll(params?: any) {
+    return forum.getPosts(params);
+  },
+  async getOne(id: string) {
+    return forum.getPost(id);
+  },
+  async create(data: any) {
+    return forum.createPost(data);
+  },
+  async likePost(id: string) {
+    return request(`/forum/posts/${id}/like`, { method: 'POST' });
+  },
 };
 
 // =================== MESSAGES ===================
