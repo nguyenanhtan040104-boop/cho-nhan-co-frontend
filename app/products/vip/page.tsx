@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { products as productsApi, auth } from '../../../lib/api';
@@ -12,6 +12,14 @@ const VIP_PLANS = [
 ];
 
 export default function VipProductPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div></div>}>
+      <VipProductContent />
+    </Suspense>
+  );
+}
+
+function VipProductContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const productId = searchParams.get('id');
