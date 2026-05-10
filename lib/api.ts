@@ -168,7 +168,7 @@ export const users = {
     return request<any>('/users/me');
   },
 
-  async updateProfile(data: { fullName?: string; address?: string; phone?: string }) {
+  async updateProfile(data: { fullName?: string; address?: string; phone?: string; avatarUrl?: string }) {
     return request('/users/me', {
       method: 'PUT',
       body: JSON.stringify(data),

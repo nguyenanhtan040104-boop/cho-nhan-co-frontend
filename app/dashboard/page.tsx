@@ -132,12 +132,16 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4 md:mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-14 md:h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
-              {user?.fullName?.[0] || 'U'}
-            </div>
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover flex-shrink-0 border-2 border-green-200" />
+            ) : (
+              <div className="w-10 h-10 md:w-14 md:h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
+                {user?.fullName?.[0] || 'U'}
+              </div>
+            )}
             <div className="min-w-0">
               <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">{user?.fullName}</h1>
-              <p className="text-sm text-gray-500 truncate">@{user?.username}</p>
+              {user?.username && <p className="text-sm text-gray-500 truncate">@{user.username}</p>}
             </div>
           </div>
           <button onClick={handleLogout}
@@ -604,6 +608,8 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
   const [pwMsg, setPwMsg] = useState('');
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarMsg, setAvatarMsg] = useState('');
 
   // Email verification state
   const [emailInput, setEmailInput] = useState(user.email || '');
@@ -677,6 +683,30 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
     }
   }
 
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!user.isEmailVerified) {
+      setAvatarMsg('Vui lòng xác thực email trước khi cập nhật ảnh đại diện');
+      return;
+    }
+    setAvatarUploading(true);
+    setAvatarMsg('');
+    try {
+      const { uploads } = await import('../../lib/api');
+      const { url } = await uploads.uploadImage(file);
+      const updated = await users.updateProfile({ avatarUrl: url });
+      onUpdate({ ...user, ...updated, avatarUrl: url });
+      setAvatarMsg('Cập nhật ảnh đại diện thành công!');
+      setTimeout(() => setAvatarMsg(''), 3000);
+    } catch (err: any) {
+      setAvatarMsg(err.message || 'Lỗi tải ảnh lên');
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = '';
+    }
+  }
+
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
     if (pwForm.newPassword !== pwForm.confirmPassword) {
@@ -696,6 +726,41 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-900 mb-6">Cài đặt tài khoản</h2>
+
+      {/* Avatar */}
+      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+        <h3 className="font-semibold text-gray-900 mb-4">Ảnh đại diện</h3>
+        <div className="flex items-center gap-5">
+          {user.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-green-200" />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-2xl">
+              {user.fullName?.[0] || 'U'}
+            </div>
+          )}
+          <div>
+            {user.isEmailVerified ? (
+              <label className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${avatarUploading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}>
+                <i className={avatarUploading ? 'ri-loader-4-line animate-spin' : 'ri-camera-line'}></i>
+                {avatarUploading ? 'Đang tải...' : 'Đổi ảnh đại diện'}
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={avatarUploading} />
+              </label>
+            ) : (
+              <div>
+                <button disabled className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-300 cursor-not-allowed">
+                  <i className="ri-camera-line"></i> Đổi ảnh đại diện
+                </button>
+                <p className="text-xs text-orange-500 mt-1.5 flex items-center gap-1">
+                  <i className="ri-information-line"></i> Cần xác thực email để đổi ảnh
+                </p>
+              </div>
+            )}
+            {avatarMsg && (
+              <p className={`text-xs mt-1.5 ${avatarMsg.includes('thành công') ? 'text-green-600' : 'text-red-500'}`}>{avatarMsg}</p>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Profile Info */}
       <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
