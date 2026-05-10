@@ -59,8 +59,8 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
             {/* Images */}
             {images.length > 0 && (
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="h-56 md:h-72 bg-gray-100">
-                  <img src={images[selectedImg]} alt={ad.title} className="w-full h-full object-cover" />
+                <div className="bg-gray-100">
+                  <img src={images[selectedImg]} alt={ad.title} className="w-full h-auto max-h-[500px] object-contain" />
                 </div>
                 {images.length > 1 && (
                   <div className="flex gap-2 p-3 overflow-x-auto">

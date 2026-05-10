@@ -172,7 +172,7 @@ export default function PostDetail({ postId }: { postId: string }) {
           {post.images?.length > 0 && (
             <div className="grid grid-cols-2 gap-2 mb-4">
               {post.images.map((img: any, i: number) => (
-                <img key={i} src={img.url || img} alt="" className="rounded-lg w-full h-48 object-cover" />
+                <img key={i} src={img.url || img} alt="" className="rounded-lg w-full h-auto max-h-72 object-contain bg-gray-100" />
               ))}
             </div>
           )}
