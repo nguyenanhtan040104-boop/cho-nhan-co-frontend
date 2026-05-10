@@ -17,7 +17,11 @@ export default function ProfileDetail({ userId }: { userId: string }) {
       users.getProfile(userId),
       users.getUserProducts(userId),
     ]).then(([profileRes, productsRes]) => {
-      if (profileRes.status === 'fulfilled') setProfile(profileRes.value);
+      if (profileRes.status === 'fulfilled') {
+        setProfile(profileRes.value);
+      } else {
+        console.error('Profile fetch failed:', profileRes.reason);
+      }
       if (productsRes.status === 'fulfilled') setProducts(productsRes.value?.data || []);
     }).finally(() => setLoading(false));
   }, [userId]);
