@@ -115,6 +115,9 @@ export default function DashboardPage() {
 
   const tabs = [
     { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-line' },
+    { id: 'analytics', label: 'Hiệu suất', icon: 'ri-bar-chart-line' },
+    { id: 'revenue', label: 'Doanh thu', icon: 'ri-money-dollar-circle-line' },
+    { id: 'engagement', label: 'Tương tác', icon: 'ri-heart-line' },
     { id: 'products', label: 'Sản phẩm', icon: 'ri-plant-line' },
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line' },
@@ -268,6 +271,15 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* ANALYTICS TAB - 3.2 Theo dõi hiệu suất */}
+            {activeTab === 'analytics' && <AnalyticsTab />}
+
+            {/* REVENUE TAB - 3.3 Báo cáo doanh thu */}
+            {activeTab === 'revenue' && <RevenueTab />}
+
+            {/* ENGAGEMENT TAB - 3.4 User Engagement */}
+            {activeTab === 'engagement' && <EngagementTab />}
 
             {/* PRODUCTS TAB */}
             {activeTab === 'products' && (
@@ -1021,4 +1033,303 @@ function ProductsTab({ myProducts, setMyProducts }: { myProducts: any[]; setMyPr
       )}
     </div>
   );
+}
+
+// =================== 3.2 ANALYTICS TAB ===================
+function AnalyticsTab() {
+  const [data, setData] = useState<any>(null);
+  const [reData, setReData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.allSettled([analytics.getProductStats(), analytics.getRealEstateStats()])
+      .then(([p, r]) => {
+        if (p.status === 'fulfilled') setData(p.value);
+        if (r.status === 'fulfilled') setReData(r.value || []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div></div>;
+
+  const products = data?.products || [];
+  const maxViews = Math.max(...products.map((p: any) => p.viewCount), 1);
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-gray-900">Hiệu suất tin đăng</h2>
+
+      {/* Sản phẩm */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i className="ri-plant-line text-green-600"></i>
+          Top sản phẩm theo lượt xem
+        </h3>
+        {products.length === 0 ? (
+          <p className="text-gray-400 text-sm text-center py-6">Chưa có dữ liệu</p>
+        ) : (
+          <div className="space-y-3">
+            {products.map((p: any, i: number) => (
+              <div key={p.id} className="flex items-center gap-3">
+                <span className="w-6 text-sm text-gray-400 text-center font-medium">{i + 1}</span>
+                {p.images?.[0] && (
+                  <img src={p.images[0].url} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" alt="" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                      <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${(p.viewCount / maxViews) * 100}%` }}></div>
+                    </div>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">{p.viewCount} lượt xem</span>
+                  </div>
+                </div>
+                {p.isVip && <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-medium">VIP</span>}
+                <span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  {p.status === 'ACTIVE' ? 'Hoạt động' : 'Ẩn'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+        {data?.totalViews !== undefined && (
+          <p className="text-xs text-gray-400 mt-4 pt-4 border-t">Tổng lượt xem sản phẩm: <strong className="text-gray-700">{data.totalViews.toLocaleString()}</strong></p>
+        )}
+      </div>
+
+      {/* Bất động sản */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i className="ri-home-4-line text-blue-600"></i>
+          Bất động sản theo lượt xem
+        </h3>
+        {reData.length === 0 ? (
+          <p className="text-gray-400 text-sm text-center py-6">Chưa có dữ liệu</p>
+        ) : (
+          <div className="space-y-3">
+            {reData.map((r: any, i: number) => (
+              <div key={r.id} className="flex items-center gap-3">
+                <span className="w-6 text-sm text-gray-400 text-center font-medium">{i + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{r.title}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                      <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${(r.viewCount / Math.max(...reData.map((x: any) => x.viewCount), 1)) * 100}%` }}></div>
+                    </div>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">{r.viewCount} lượt xem</span>
+                  </div>
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  r.status === 'NEW' ? 'bg-green-100 text-green-700' :
+                  r.status === 'TRADING' ? 'bg-yellow-100 text-yellow-700' :
+                  r.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
+                }`}>
+                  {r.status === 'NEW' ? 'Mới' : r.status === 'TRADING' ? 'Giao dịch' : r.status === 'COMPLETED' ? 'Hoàn tất' : 'Tạm dừng'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// =================== 3.3 REVENUE TAB ===================
+function RevenueTab() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    analytics.getRevenue()
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div></div>;
+
+  const vip = data?.vip;
+  const vipProducts = data?.vipProducts || [];
+  const vipRealEstates = data?.vipRealEstates || [];
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-gray-900">Báo cáo doanh thu & VIP</h2>
+
+      {/* VIP Status */}
+      <div className={`rounded-xl p-6 shadow-sm ${vip?.isActive ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white' : 'bg-white'}`}>
+        <div className="flex items-center gap-3 mb-3">
+          <i className={`ri-vip-crown-2-fill text-2xl ${vip?.isActive ? 'text-white' : 'text-yellow-500'}`}></i>
+          <h3 className={`font-semibold text-lg ${vip?.isActive ? 'text-white' : 'text-gray-900'}`}>Gói VIP tài khoản</h3>
+        </div>
+        {vip?.isActive ? (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-yellow-100 text-xs">Gói hiện tại</p>
+              <p className="font-bold text-xl">{vip.plan}</p>
+            </div>
+            <div>
+              <p className="text-yellow-100 text-xs">Hết hạn</p>
+              <p className="font-bold">{new Date(vip.endDate).toLocaleDateString('vi-VN')}</p>
+            </div>
+            <div>
+              <p className="text-yellow-100 text-xs">Còn lại</p>
+              <p className="font-bold">{vip.daysLeft} ngày</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <p className="text-gray-500 text-sm">Bạn chưa có gói VIP tài khoản</p>
+            <Link href="/pricing" className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-500">
+              Nâng cấp VIP
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* VIP Products */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <i className="ri-plant-line text-green-600"></i>
+          Sản phẩm đang VIP ({vipProducts.length})
+        </h3>
+        {vipProducts.length === 0 ? (
+          <p className="text-gray-400 text-sm text-center py-4">Chưa có sản phẩm VIP nào</p>
+        ) : (
+          <div className="space-y-3">
+            {vipProducts.map((p: any) => (
+              <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{p.title}</p>
+                  <p className="text-xs text-gray-400">Đăng ngày {new Date(p.createdAt).toLocaleDateString('vi-VN')}</p>
+                </div>
+                <div className="text-right">
+                  {p.vipExpiresAt ? (
+                    <p className={`text-xs font-medium ${new Date(p.vipExpiresAt) > new Date() ? 'text-green-600' : 'text-red-500'}`}>
+                      {new Date(p.vipExpiresAt) > new Date() ? `Còn đến ${new Date(p.vipExpiresAt).toLocaleDateString('vi-VN')}` : 'Đã hết hạn'}
+                    </p>
+                  ) : (
+                    <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-medium">VIP</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* VIP Real Estates */}
+      {vipRealEstates.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <i className="ri-home-4-line text-blue-600"></i>
+            BĐS đang VIP ({vipRealEstates.length})
+          </h3>
+          <div className="space-y-3">
+            {vipRealEstates.map((r: any) => (
+              <div key={r.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{r.title}</p>
+                  <p className="text-xs text-gray-400">Đăng ngày {new Date(r.createdAt).toLocaleDateString('vi-VN')}</p>
+                </div>
+                <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-medium">VIP</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =================== 3.4 ENGAGEMENT TAB ===================
+function EngagementTab() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    analytics.getEngagement()
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div></div>;
+
+  const summary = data?.summary || {};
+  const forumPosts = data?.forumPosts || [];
+
+  const totalViews = (summary.totalProductViews || 0) + (summary.totalRealEstateViews || 0) + (summary.totalJobViews || 0);
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-gray-900">Tương tác & Engagement</h2>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Tổng lượt xem', value: totalViews.toLocaleString(), icon: 'ri-eye-line', color: 'bg-blue-100 text-blue-600' },
+          { label: 'Lượt thích forum', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-red-100 text-red-500' },
+          { label: 'Bình luận', value: summary.totalForumComments || 0, icon: 'ri-chat-1-line', color: 'bg-purple-100 text-purple-600' },
+          { label: 'View BĐS', value: (summary.totalRealEstateViews || 0).toLocaleString(), icon: 'ri-home-4-line', color: 'bg-green-100 text-green-600' },
+        ].map((item, i) => (
+          <div key={i} className="bg-white rounded-xl p-5 shadow-sm">
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${item.color}`}>
+              <i className={`${item.icon} text-lg`}></i>
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{item.value}</p>
+            <p className="text-xs text-gray-500 mt-1">{item.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Breakdown lượt xem theo loại */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h3 className="font-semibold text-gray-900 mb-4">Lượt xem theo danh mục</h3>
+        {[
+          { label: 'Sản phẩm', value: summary.totalProductViews || 0, color: 'bg-green-500', total: totalViews },
+          { label: 'Bất động sản', value: summary.totalRealEstateViews || 0, color: 'bg-blue-500', total: totalViews },
+          { label: 'Tuyển dụng', value: summary.totalJobViews || 0, color: 'bg-indigo-500', total: totalViews },
+        ].map((item, i) => (
+          <div key={i} className="mb-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-700">{item.label}</span>
+              <span className="font-medium text-gray-900">{item.value.toLocaleString()} lượt</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2">
+              <div className={`${item.color} h-2 rounded-full`}
+                style={{ width: item.total > 0 ? `${(item.value / item.total) * 100}%` : '0%' }}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Forum posts engagement */}
+      {forumPosts.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <i className="ri-chat-3-line text-purple-600"></i>
+            Bài viết diễn đàn
+          </h3>
+          <div className="space-y-3">
+            {forumPosts.map((p: any) => (
+              <div key={p.id} className="flex items-center gap-4 py-2 border-b border-gray-100 last:border-0">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
+                  <p className="text-xs text-gray-400">{new Date(p.createdAt).toLocaleDateString('vi-VN')}</p>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-500 flex-shrink-0">
+                  <span className="flex items-center gap-1"><i className="ri-heart-line text-red-400"></i>{p.likeCount}</span>
+                  <span className="flex items-center gap-1"><i className="ri-chat-1-line text-blue-400"></i>{p._count?.comments || 0}</span>
+                  <span className="flex items-center gap-1"><i className="ri-eye-line text-gray-400"></i>{p.viewCount}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 }

@@ -443,9 +443,17 @@ export const analytics = {
   async getOverview() {
     return request<any>('/analytics/overview');
   },
-
   async getProductStats() {
     return request<any>('/analytics/products');
+  },
+  async getRealEstateStats() {
+    return request<any>('/analytics/real-estates');
+  },
+  async getEngagement() {
+    return request<any>('/analytics/engagement');
+  },
+  async getRevenue() {
+    return request<any>('/analytics/revenue');
   },
 };
 
