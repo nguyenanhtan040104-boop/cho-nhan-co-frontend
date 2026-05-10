@@ -69,10 +69,10 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
           <Link href="/real-estate" className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">
             <i className="ri-arrow-left-line"></i>
           </Link>
-          <div className="text-sm text-gray-500 flex-1">
-            <Link href="/real-estate" className="hover:text-green-600">Bất động sản</Link>
+          <div className="text-sm text-gray-500 flex-1 min-w-0">
+            <Link href="/real-estate" className="hover:text-green-600 flex-shrink-0">Bất động sản</Link>
             <span className="mx-2">/</span>
-            <span className="text-gray-900">{item.title}</span>
+            <span className="text-gray-900 truncate">{item.title}</span>
           </div>
           {currentUserId && item.user?.id === currentUserId && (
             <Link href={`/real-estate/${propertyId}/edit`}
@@ -83,8 +83,8 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           {/* Left */}
           <div className="lg:col-span-2 space-y-6">
             {/* Images */}

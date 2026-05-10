@@ -45,21 +45,21 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
           <Link href="/advertisements" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
             <i className="ri-arrow-left-line"></i>
           </Link>
-          <div className="text-sm text-gray-500">
-            <Link href="/advertisements" className="hover:text-orange-500">Quảng cáo</Link>
+          <div className="text-sm text-gray-500 flex-1 min-w-0">
+            <Link href="/advertisements" className="hover:text-orange-500 flex-shrink-0">Quảng cáo</Link>
             <span className="mx-2">/</span>
-            <span className="text-gray-900">{ad.title}</span>
+            <span className="text-gray-900 truncate">{ad.title}</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           <div className="lg:col-span-2 space-y-6">
             {/* Images */}
             {images.length > 0 && (
               <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="h-72 bg-gray-100">
+                <div className="h-56 md:h-72 bg-gray-100">
                   <img src={images[selectedImg]} alt={ad.title} className="w-full h-full object-cover" />
                 </div>
                 {images.length > 1 && (
@@ -76,7 +76,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
             )}
 
             {/* Content */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
               <div className="flex flex-wrap gap-2 mb-3">
                 <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded font-medium">
                   {CATEGORIES[ad.category] || ad.category}
@@ -84,7 +84,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 {ad.isVip && <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded">VIP</span>}
               </div>
 
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{ad.title}</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{ad.title}</h1>
               {ad.businessName && (
                 <p className="text-orange-600 font-semibold text-lg mb-4">{ad.businessName}</p>
               )}

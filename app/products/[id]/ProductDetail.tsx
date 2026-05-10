@@ -115,8 +115,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
           {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-white border">
@@ -162,14 +162,14 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   Sản phẩm VIP
                 </div>
               )}
-              <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
+              <h1 className="text-xl md:text-3xl font-bold text-gray-900 break-words">{product.title}</h1>
               <div className="flex items-center gap-4 mt-2">
                 <span className="text-gray-600">Đã bán {product.soldCount || 0}</span>
               </div>
             </div>
 
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-              <div className="text-3xl font-bold text-orange-600">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <div className="text-2xl md:text-3xl font-bold text-orange-600">
                 {formatPrice(product.price)}
                 <span className="text-lg text-gray-600 font-normal">/{product.unit}</span>
               </div>
@@ -214,18 +214,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex gap-2 md:gap-4">
               <button
                 onClick={handleContactClick}
-                className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium"
+                className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium text-sm md:text-base"
               >
                 <i className="ri-phone-line"></i>
                 Liên hệ mua hàng
               </button>
-              <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <i className="ri-heart-line"></i>
               </button>
-              <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <i className="ri-share-line"></i>
               </button>
             </div>

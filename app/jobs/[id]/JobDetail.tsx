@@ -40,19 +40,19 @@ export default function JobDetail({ jobId }: { jobId: string }) {
           <Link href="/jobs" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
             <i className="ri-arrow-left-line"></i>
           </Link>
-          <div className="text-sm text-gray-500">
-            <Link href="/jobs" className="hover:text-indigo-600">Tuyển dụng</Link>
+          <div className="text-sm text-gray-500 flex-1 min-w-0">
+            <Link href="/jobs" className="hover:text-indigo-600 flex-shrink-0">Tuyển dụng</Link>
             <span className="mx-2">/</span>
-            <span className="text-gray-900">{job.title}</span>
+            <span className="text-gray-900 truncate">{job.title}</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-start gap-4 mb-4">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+              <div className="flex items-start gap-3 mb-4">
                 <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   <i className="ri-briefcase-line text-indigo-600 text-2xl"></i>
                 </div>
@@ -63,7 +63,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                     <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded">{typeLabel[job.type] || job.type}</span>
                     {job.category && <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{job.category}</span>}
                   </div>
-                  <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
+                  <h1 className="text-xl md:text-2xl font-bold text-gray-900">{job.title}</h1>
                 </div>
               </div>
 

@@ -143,9 +143,9 @@ export default function PostDetail({ postId }: { postId: string }) {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-4 md:py-8 space-y-6">
         {/* Post */}
-        <div className="bg-white rounded-xl p-6 shadow-sm">
+        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             {post.isAnonymous ? (
               <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
@@ -167,7 +167,7 @@ export default function PostDetail({ postId }: { postId: string }) {
             )}
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">{post.title}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">{post.title}</h1>
 
           {post.images?.length > 0 && (
             <div className="grid grid-cols-2 gap-2 mb-4">
@@ -203,7 +203,7 @@ export default function PostDetail({ postId }: { postId: string }) {
         </div>
 
         {/* Comments */}
-        <div className="bg-white rounded-xl p-6 shadow-sm">
+        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
           <h2 className="font-semibold text-gray-900 mb-4">Bình luận ({post.comments?.length || 0})</h2>
 
           {/* Comment form */}
