@@ -25,6 +25,10 @@ export default function ProductsPage() {
 
   useEffect(() => { loadProducts(); }, [category, sortBy, page]);
 
+  useEffect(() => {
+    if (search === '') { setPage(1); loadProducts(''); }
+  }, [search]);
+
   async function loadProducts(searchQuery?: string) {
     setLoading(true);
     try {
