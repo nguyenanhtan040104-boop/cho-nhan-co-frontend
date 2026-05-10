@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { advertisements } from '../../../lib/api';
+import { advertisements, messages as messagesApi, auth } from '../../../lib/api';
 
 const CATEGORIES: any = {
   KHAI_TRUONG: 'Khai trương', KHUYEN_MAI: 'Khuyến mãi',
@@ -139,17 +139,24 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 </a>
               )}
 
-              {ad.contactPhone && (
-                <a href={`https://zalo.me/${ad.contactPhone}`} target="_blank" rel="noreferrer"
-                  className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600">
-                  <i className="ri-message-2-line"></i> Nhắn Zalo
-                </a>
+              {ad.user?.id && (
+                <button
+                  onClick={async () => {
+                    if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+                    try {
+                      const conv = await messagesApi.getOrCreate(ad.user.id) as any;
+                      window.location.href = `/messages/${conv.id}`;
+                    } catch { alert('Không thể mở chat'); }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 mb-2">
+                  <i className="ri-message-3-line"></i> Nhắn tin
+                </button>
               )}
-
-              {!ad.contactPhone && (
-                <div className="text-center py-4">
-                  <p className="text-sm text-gray-500">Người đăng: {ad.user?.fullName}</p>
-                </div>
+              {ad.user?.id && (
+                <Link href={`/profile/${ad.user.id}`}
+                  className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 text-sm">
+                  Xem trang người đăng
+                </Link>
               )}
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { jobs } from '../../../lib/api';
+import { jobs, messages as messagesApi, auth } from '../../../lib/api';
 
 const typeLabel: any = {
   EMPLOYER: 'Tuyển dụng', JOB_SEEKER: 'Tìm việc',
@@ -129,10 +129,21 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                   <i className="ri-phone-line"></i> {job.user.phone}
                 </a>
               )}
-              <a href={`https://zalo.me/${job.user?.phone || ''}`} target="_blank" rel="noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 mb-2">
-                <i className="ri-message-2-line"></i> Nhắn Zalo
-              </a>
+              <button
+                onClick={async () => {
+                  if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+                  try {
+                    const conv = await messagesApi.getOrCreate(job.user?.id) as any;
+                    window.location.href = `/messages/${conv.id}`;
+                  } catch { alert('Không thể mở chat'); }
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 mb-2">
+                <i className="ri-message-3-line"></i> Nhắn tin
+              </button>
+              <Link href={`/profile/${job.user?.id}`}
+                className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 text-sm">
+                Xem trang người đăng
+              </Link>
 
               <p className="text-xs text-gray-400 text-center mt-3">
                 Đăng ngày {new Date(job.createdAt).toLocaleDateString('vi-VN')} • {job.viewCount} lượt xem

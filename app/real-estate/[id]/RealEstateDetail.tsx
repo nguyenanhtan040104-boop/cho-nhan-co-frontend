@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { realEstate } from '../../../lib/api';
+import { realEstate, messages as messagesApi, auth } from '../../../lib/api';
 
 function getCurrentUserId(): string | null {
   try {
@@ -217,15 +217,22 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                 </a>
               )}
 
-              <a href={`https://zalo.me/${item.user?.phone || ''}`} target="_blank" rel="noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors mb-2">
-                <i className="ri-message-2-line"></i>
-                Nhắn Zalo
-              </a>
+              <button
+                onClick={async () => {
+                  if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+                  try {
+                    const conv = await messagesApi.getOrCreate(item.user?.id) as any;
+                    window.location.href = `/messages/${conv.id}`;
+                  } catch { alert('Không thể mở chat'); }
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors mb-2">
+                <i className="ri-message-3-line"></i>
+                Nhắn tin
+              </button>
 
-              <Link href={`/sellers/${item.user?.id}`}
+              <Link href={`/profile/${item.user?.id}`}
                 className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors text-sm">
-                Xem trang người bán
+                Xem trang người đăng
               </Link>
 
               <p className="text-xs text-gray-400 mt-3 text-center">
