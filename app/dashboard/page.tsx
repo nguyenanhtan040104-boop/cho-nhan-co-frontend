@@ -127,35 +127,56 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+        <div className="flex items-center justify-between mb-4 md:mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 md:w-14 md:h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
               {user?.fullName?.[0] || 'U'}
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{user?.fullName}</h1>
-              <p className="text-gray-500">@{user?.username}</p>
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">{user?.fullName}</h1>
+              <p className="text-sm text-gray-500 truncate">@{user?.username}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
-          >
+          <button onClick={handleLogout}
+            className="flex items-center gap-1.5 px-3 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 text-sm flex-shrink-0">
             <i className="ri-logout-box-line"></i>
-            Đăng xuất
+            <span className="hidden sm:inline">Đăng xuất</span>
           </button>
         </div>
 
+        {/* Mobile: horizontal scroll tabs */}
+        <div className="md:hidden mb-4">
+          <div className="bg-white rounded-xl shadow-sm p-1.5 overflow-x-auto">
+            <div className="flex gap-1 min-w-max">
+              {tabs.map(tab => (
+                <button key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    if (tab.id === 'notifications') notifications.getAll().then((d: any) => setNotifs(d.data || [])).catch(() => {});
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors relative ${
+                    activeTab === tab.id ? 'bg-green-50 text-green-700' : 'text-gray-600'
+                  }`}>
+                  <i className={`${tab.icon} text-base`}></i>
+                  {tab.label}
+                  {tab.id === 'notifications' && notifs.filter(n => !n.isRead).length > 0 && (
+                    <span className="bg-red-500 text-white text-xs px-1 rounded-full leading-4">{notifs.filter(n => !n.isRead).length}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="flex gap-6">
-          {/* Sidebar */}
-          <div className="w-56 flex-shrink-0">
+          {/* Sidebar - desktop only */}
+          <div className="hidden md:block w-56 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-sm p-2">
               {tabs.map(tab => (
-                <button
-                  key={tab.id}
+                <button key={tab.id}
                   onClick={() => {
                     setActiveTab(tab.id);
                     if (tab.id === 'notifications') {
@@ -163,11 +184,8 @@ export default function DashboardPage() {
                     }
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors mb-1 ${
-                    activeTab === tab.id
-                      ? 'bg-green-50 text-green-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
+                    activeTab === tab.id ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50'
+                  }`}>
                   <i className={`${tab.icon} text-lg`}></i>
                   <span className="text-sm">{tab.label}</span>
                   {tab.id === 'notifications' && notifs.filter(n => !n.isRead).length > 0 && (
@@ -181,7 +199,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
 
             {/* OVERVIEW TAB */}
             {activeTab === 'overview' && stats && (

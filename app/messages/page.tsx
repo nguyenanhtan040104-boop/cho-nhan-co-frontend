@@ -46,7 +46,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="max-w-2xl mx-auto px-3 py-3 md:px-4 md:py-4">
         {conversations.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <i className="ri-chat-3-line text-5xl mb-3 block"></i>

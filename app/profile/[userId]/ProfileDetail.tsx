@@ -68,8 +68,8 @@ export default function ProfileDetail({ userId }: { userId: string }) {
         </Link>
 
         {/* Profile card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
-          <div className="flex items-start gap-5">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-4">
+          <div className="flex items-start gap-3 md:gap-5">
             {profile.avatarUrl ? (
               <img src={profile.avatarUrl} alt="" className="w-20 h-20 rounded-full object-cover flex-shrink-0" />
             ) : (
@@ -78,9 +78,9 @@ export default function ProfileDetail({ userId }: { userId: string }) {
               </div>
             )}
 
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <h1 className="text-xl font-bold text-gray-900">{profile.fullName || profile.username}</h1>
+                <h1 className="text-lg md:text-xl font-bold text-gray-900 break-words">{profile.fullName || profile.username}</h1>
                 {profile.isVerified && (
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-0.5">
                     <i className="ri-shield-check-line"></i> Đã xác thực
