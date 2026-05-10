@@ -89,9 +89,9 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
           <div className="lg:col-span-2 space-y-6">
             {/* Images */}
             <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <div className="relative h-80 bg-gray-100">
+              <div className="relative bg-gray-100">
                 {images[selectedImg] ? (
-                  <img src={images[selectedImg].url} alt={item.title} className="w-full h-full object-cover" />
+                  <img src={images[selectedImg].url} alt={item.title} className="w-full h-auto max-h-[500px] object-contain" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <i className="ri-home-4-line text-6xl text-gray-300"></i>

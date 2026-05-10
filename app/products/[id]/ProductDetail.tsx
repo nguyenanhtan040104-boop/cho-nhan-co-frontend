@@ -119,12 +119,12 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
           {/* Product Images */}
           <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-lg bg-white border">
+            <div className="w-full rounded-lg bg-white border overflow-hidden">
               {mainImage ? (
                 <img
                   src={mainImage.url || mainImage}
                   alt={product.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto max-h-[500px] object-contain"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -145,7 +145,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                     <img
                       src={image.url || image}
                       alt={`${product.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </button>
                 ))}
