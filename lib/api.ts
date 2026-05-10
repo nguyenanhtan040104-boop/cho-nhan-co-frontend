@@ -419,6 +419,26 @@ export const messages = {
   async getMessages(conversationId: string, page = 1) {
     return request<any>(`/conversations/${conversationId}/messages?page=${page}`);
   },
+
+  async archive(conversationId: string) {
+    return request(`/conversations/${conversationId}/archive`, { method: 'PUT' });
+  },
+
+  async mute(conversationId: string) {
+    return request(`/conversations/${conversationId}/mute`, { method: 'PUT' });
+  },
+
+  async blockUser(targetUserId: string) {
+    return request(`/conversations/block/${targetUserId}`, { method: 'POST' });
+  },
+
+  async unblockUser(targetUserId: string) {
+    return request(`/conversations/block/${targetUserId}`, { method: 'DELETE' });
+  },
+
+  async getBlockedUsers() {
+    return request<any>('/conversations/blocks/list');
+  },
 };
 
 // =================== NOTIFICATIONS ===================

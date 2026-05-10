@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MessengerModal from '../../../components/MessengerModal';
-import { products as productsApi } from '../../../lib/api';
+import { products as productsApi, messages as messagesApi, auth } from '../../../lib/api';
 
 interface ProductDetailProps {
   productId: string;
@@ -81,9 +81,12 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     if (phoneNumber) window.open(`tel:${phoneNumber}`, '_self');
   };
 
-  const handleMessageClick = () => {
-    setShowMessengerModal(true);
-    setShowContactModal(false);
+  const handleMessageClick = async () => {
+    if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+    try {
+      const conv = await messagesApi.getOrCreate(product.user?.id) as any;
+      window.location.href = `/messages/${conv.id}`;
+    } catch { alert('Không thể mở chat'); }
   };
 
   const handleContactProfile = () => {
