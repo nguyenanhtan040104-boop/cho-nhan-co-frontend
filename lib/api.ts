@@ -388,6 +388,18 @@ export const forum = {
   async likePost(id: string) {
     return request(`/forum/posts/${id}/like`, { method: 'POST' });
   },
+  async updatePost(id: string, data: any) {
+    return request(`/forum/posts/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  async deleteComment(commentId: string) {
+    return request(`/forum/comments/${commentId}`, { method: 'DELETE' });
+  },
+  async updateComment(commentId: string, content: string) {
+    return request(`/forum/comments/${commentId}`, { method: 'PUT', body: JSON.stringify({ content }) });
+  },
+  async pinComment(commentId: string) {
+    return request(`/forum/comments/${commentId}/pin`, { method: 'POST' });
+  },
 };
 
 // =================== MESSAGES ===================
