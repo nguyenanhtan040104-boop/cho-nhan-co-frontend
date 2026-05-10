@@ -156,7 +156,12 @@ export default function DashboardPage() {
               {tabs.map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    if (tab.id === 'notifications') {
+                      notifications.getAll().then((d: any) => setNotifs(d.data || [])).catch(() => {});
+                    }
+                  }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors mb-1 ${
                     activeTab === tab.id
                       ? 'bg-green-50 text-green-700 font-medium'
@@ -428,27 +433,40 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {notifs.map(notif => (
-                      <div key={notif.id} className={`bg-white rounded-xl p-4 shadow-sm border-l-4 ${
-                        notif.isRead ? 'border-gray-200' : 'border-green-500'
-                      }`}>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className={`font-medium ${notif.isRead ? 'text-gray-600' : 'text-gray-900'}`}>{notif.title}</p>
-                            <p className="text-sm text-gray-500 mt-1">{notif.body}</p>
+                    {notifs.map(notif => {
+                      const convId = notif.data?.conversationId;
+                      const isMessage = notif.type === 'MESSAGE' && convId;
+                      const icon = notif.type === 'MESSAGE' ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-green-500';
+                      const content = (
+                        <div className={`bg-white rounded-xl p-4 shadow-sm border-l-4 transition-colors ${
+                          notif.isRead ? 'border-gray-200' : 'border-green-500'
+                        } ${isMessage ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
+                          onClick={async () => {
+                            if (!notif.isRead) {
+                              await notifications.markRead(notif.id).catch(() => {});
+                              setNotifs(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+                            }
+                            if (isMessage) router.push(`/messages/${convId}`);
+                          }}>
+                          <div className="flex items-start gap-3">
+                            <i className={`${icon} text-xl flex-shrink-0 mt-0.5`}></i>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className={`font-medium text-sm ${notif.isRead ? 'text-gray-600' : 'text-gray-900'}`}>{notif.title}</p>
+                                {!notif.isRead && <span className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-1"></span>}
+                              </div>
+                              {notif.body && <p className="text-sm text-gray-500 mt-0.5 truncate">{notif.body}</p>}
+                              <p className="text-xs text-gray-400 mt-1">
+                                {new Date(notif.createdAt).toLocaleString('vi-VN', {
+                                  day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                                })}
+                              </p>
+                            </div>
                           </div>
-                          {!notif.isRead && (
-                            <span className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-1"></span>
-                          )}
                         </div>
-                        <p className="text-xs text-gray-400 mt-2">
-                          {new Date(notif.createdAt).toLocaleDateString('vi-VN', {
-                            day: '2-digit', month: '2-digit', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit'
-                          })}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                      return <div key={notif.id}>{content}</div>;
+                    })}
                   </div>
                 )}
               </div>
