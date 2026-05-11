@@ -81,8 +81,8 @@ export default function MarketPricesPage() {
               <div>
                 <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
                 <p className="text-xs text-gray-500">
-                  {goldSource === 'SJC' ? '🟢 Dữ liệu thực từ SJC' : '🟡 Dữ liệu tham khảo'}
-                  {goldUpdatedAt && ` • Cập nhật: ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                  {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? '🟢 Dữ liệu thực' : '🟡 Dữ liệu tham khảo'}
+                  {goldUpdatedAt && ` • ${new Date(goldUpdatedAt).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })} ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
                 </p>
               </div>
             </div>
