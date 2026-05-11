@@ -391,6 +391,18 @@ export const forum = {
   async isLiked(id: string) {
     return request(`/forum/posts/${id}/liked`, { method: 'GET' });
   },
+  async likeComment(commentId: string) {
+    return request(`/forum/comments/${commentId}/like`, { method: 'POST' });
+  },
+  async isCommentLiked(commentId: string) {
+    return request(`/forum/comments/${commentId}/liked`, { method: 'GET' });
+  },
+  async addReply(postId: string, content: string, parentId: string) {
+    return request(`/forum/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content, parentId }),
+    });
+  },
   async updatePost(id: string, data: any) {
     return request(`/forum/posts/${id}`, { method: 'PUT', body: JSON.stringify(data) });
   },
