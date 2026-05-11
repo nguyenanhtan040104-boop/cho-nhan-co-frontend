@@ -388,6 +388,9 @@ export const forum = {
   async likePost(id: string) {
     return request(`/forum/posts/${id}/like`, { method: 'POST' });
   },
+  async isLiked(id: string) {
+    return request(`/forum/posts/${id}/liked`, { method: 'GET' });
+  },
   async updatePost(id: string, data: any) {
     return request(`/forum/posts/${id}`, { method: 'PUT', body: JSON.stringify(data) });
   },

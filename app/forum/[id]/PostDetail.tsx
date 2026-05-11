@@ -32,14 +32,24 @@ export default function PostDetail({ postId }: { postId: string }) {
       .then(data => setPost(data))
       .catch(() => setError('Không tìm thấy bài viết'))
       .finally(() => setLoading(false));
+
+    // Check xem user đã like bài này chưa
+    if (auth.isLoggedIn()) {
+      forum.isLiked(postId).then((res: any) => {
+        setLiked(typeof res === 'boolean' ? res : !!res);
+      }).catch(() => {});
+    }
   }, [postId]);
 
   async function handleLike() {
     if (!auth.isLoggedIn()) { alert('Vui lòng đăng nhập để thích bài viết'); return; }
     try {
-      await forum.likePost(postId);
-      setLiked(true);
-      setPost((prev: any) => ({ ...prev, likeCount: prev.likeCount + 1 }));
+      const res = await forum.likePost(postId);
+      // Server trả về { likeCount, liked }
+      if (res && typeof res.liked === 'boolean') {
+        setLiked(res.liked);
+        setPost((prev: any) => ({ ...prev, likeCount: res.likeCount }));
+      }
     } catch { }
   }
 
