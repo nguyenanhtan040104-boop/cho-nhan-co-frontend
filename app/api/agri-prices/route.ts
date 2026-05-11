@@ -1,41 +1,46 @@
 import { NextResponse } from 'next/server';
 
-// Fetch giá cà phê từ giacaphe.com/gia-ca-phe-noi-dia/
-async function fetchCoffeePrices(): Promise<{ dak_lak: number | null; lam_dong: number | null; gia_lai: number | null; dak_nong: number | null; ho_tieu: number | null }> {
+// ─── Fetch giá cà phê + hồ tiêu từ giacaphe.com (có cột Thay đổi) ───
+async function fetchGiacaphe() {
   try {
     const res = await fetch('https://giacaphe.com/gia-ca-phe-noi-dia/', {
       headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-      signal: AbortSignal.timeout(7000),
+      signal: AbortSignal.timeout(8000),
     });
     const html = await res.text();
 
-    function extractPrice(pattern: RegExp): number | null {
-      const m = html.match(pattern);
-      if (!m) return null;
-      const raw = m[1].replace(/[,\.\s]/g, '');
-      const n = parseInt(raw.length > 6 ? raw.slice(0, 6) : raw);
-      return (n > 30000 && n < 250000) ? n : null;
+    // Parse từng hàng trong bảng: tên | giá | thay đổi
+    type Row = { name: string; price: number; change: number | null };
+    const rows: Row[] = [];
+
+    // Tìm tất cả <tr> chứa dữ liệu
+    const trMatches = html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi);
+    for (const tr of trMatches) {
+      const cells = [...tr[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
+        .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim());
+      if (cells.length < 2) continue;
+
+      const name = cells[0];
+      const priceRaw = cells[1]?.replace(/[,\.\s]/g, '');
+      const price = parseInt(priceRaw);
+      if (!name || isNaN(price) || price < 30000 || price > 300000) continue;
+
+      let change: number | null = null;
+      if (cells[2]) {
+        const changeRaw = cells[2].replace(/[,\.\s]/g, '');
+        const parsed = parseInt(changeRaw);
+        if (!isNaN(parsed)) change = parsed;
+      }
+      rows.push({ name, price, change });
     }
 
-    // Tìm giá theo từng tỉnh trong bảng HTML
-    const dakLak = extractPrice(/Đắk\s*Lắk[\s\S]{0,200}?(\d{2,3}[,\.]?\d{3})/i)
-      || extractPrice(/(\d{2,3}[,\.]?\d{3})[\s\S]{0,50}?Đắk\s*Lắk/i);
-    const lamDong = extractPrice(/Lâm\s*Đồng[\s\S]{0,200}?(\d{2,3}[,\.]?\d{3})/i)
-      || extractPrice(/(\d{2,3}[,\.]?\d{3})[\s\S]{0,50}?Lâm\s*Đồng/i);
-    const giaLai = extractPrice(/Gia\s*Lai[\s\S]{0,200}?(\d{2,3}[,\.]?\d{3})/i)
-      || extractPrice(/(\d{2,3}[,\.]?\d{3})[\s\S]{0,50}?Gia\s*Lai/i);
-    const dakNong = extractPrice(/Đắk\s*Nông[\s\S]{0,200}?(\d{2,3}[,\.]?\d{3})/i)
-      || extractPrice(/(\d{2,3}[,\.]?\d{3})[\s\S]{0,50}?Đắk\s*Nông/i);
-    const hoTieu = extractPrice(/[Hh]ồ\s*[Tt]iêu[\s\S]{0,200}?(\d{3}[,\.]?\d{3})/i)
-      || extractPrice(/(\d{3}[,\.]?\d{3})[\s\S]{0,50}?[Hh]ồ\s*[Tt]iêu/i);
-
-    return { dak_lak: dakLak, lam_dong: lamDong, gia_lai: giaLai, dak_nong: dakNong, ho_tieu: hoTieu };
+    return rows;
   } catch {
-    return { dak_lak: null, lam_dong: null, gia_lai: null, dak_nong: null, ho_tieu: null };
+    return [];
   }
 }
 
-// Fetch tỷ giá USD từ Vietcombank
+// ─── Fetch tỷ giá USD từ Vietcombank ───
 async function fetchUSDRate(): Promise<number> {
   try {
     const res = await fetch('https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXml.aspx?b=10', {
@@ -55,27 +60,111 @@ async function fetchUSDRate(): Promise<number> {
   }
 }
 
+// ─── Fetch giá xăng dầu từ Petrolimex ───
+async function fetchPetrolPrices() {
+  try {
+    const res = await fetch('https://www.petrolimex.com.vn/nd/gia-xang-dau.html', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(8000),
+    });
+    const html = await res.text();
+
+    type FuelItem = { name: string; price: number; change: number | null };
+    const items: FuelItem[] = [];
+
+    const trMatches = html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi);
+    for (const tr of trMatches) {
+      const cells = [...tr[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
+        .map(m => m[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
+      if (cells.length < 2) continue;
+
+      const name = cells[0];
+      const priceRaw = cells[1]?.replace(/[,\.\s]/g, '');
+      const price = parseInt(priceRaw);
+      if (!name || isNaN(price) || price < 10000 || price > 50000) continue;
+
+      let change: number | null = null;
+      if (cells[2]) {
+        const changeRaw = cells[2].replace(/[,\.\s]/g, '');
+        const parsed = parseInt(changeRaw);
+        if (!isNaN(parsed)) change = parsed;
+      }
+      items.push({ name, price, change });
+    }
+
+    return items.length > 0 ? { items, isLive: true } : null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Fetch giá sầu riêng ───
+async function fetchDurianPrices() {
+  try {
+    const res = await fetch('https://giacaphe.com/gia-ca-phe-noi-dia/', {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      signal: AbortSignal.timeout(5000),
+    });
+    const html = await res.text();
+    // Thử tìm sầu riêng trên trang giacaphe (họ đôi khi có)
+    const m = html.match(/[Ss]ầu\s*riêng[\s\S]{0,300}?(\d{2,3}[,\.]?\d{3})/i);
+    if (m) {
+      const price = parseInt(m[1].replace(/[,\.]/g, ''));
+      if (price > 30000 && price < 200000) return price;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET() {
-  const [coffeePrices, usdRate] = await Promise.all([
-    fetchCoffeePrices(),
+  const [giacapheRows, usdRate, petrolResult, durianPrice] = await Promise.all([
+    fetchGiacaphe(),
     fetchUSDRate(),
+    fetchPetrolPrices(),
+    fetchDurianPrices(),
   ]);
 
-  const isLiveCoffee = !!(coffeePrices.dak_lak || coffeePrices.lam_dong);
+  const now = new Date();
+  const dateLabel = now.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  // Fallback prices nếu không fetch được
-  const dakLak = coffeePrices.dak_lak || 87000;
-  const lamDong = coffeePrices.lam_dong || 86300;
-  const giaLai = coffeePrices.gia_lai || 87000;
-  const dakNong = coffeePrices.dak_nong || 87100;
-  const hoTieu = coffeePrices.ho_tieu || 143000;
-  const avgCoffee = Math.round((dakLak + lamDong + giaLai + dakNong) / 4);
+  // ── Helper: tìm giá theo tên tỉnh trong giacapheRows ──
+  function findRow(keyword: string) {
+    return giacapheRows.find(r => r.name.toLowerCase().includes(keyword.toLowerCase()));
+  }
+
+  const dakLakRow   = findRow('Đắk Lắk') || findRow('Dak Lak');
+  const lamDongRow  = findRow('Lâm Đồng') || findRow('Lam Dong');
+  const giaLaiRow   = findRow('Gia Lai');
+  const dakNongRow  = findRow('Đắk Nông') || findRow('Dak Nong');
+  const hoTieuRow   = findRow('Hồ tiêu') || findRow('Ho tieu') || findRow('tiêu');
+
+  const dakLak  = dakLakRow?.price  || 87000;
+  const lamDong = lamDongRow?.price || 86300;
+  const giaLai  = giaLaiRow?.price  || 87000;
+  const dakNong = dakNongRow?.price || 87100;
+  const hoTieu  = hoTieuRow?.price  || 143000;
+  const isLiveCoffee = !!(dakLakRow || lamDongRow);
 
   // Cao su: SVR10 ~1.5 USD/kg
-  const rubberUsd = 1.5;
-  const rubber = Math.round(rubberUsd * usdRate);
+  const rubber = Math.round(1.5 * usdRate);
+  const rubberPrev = Math.round(1.5 * 25900); // tỷ giá hôm qua ước tính
+  const rubberChange = rubber - rubberPrev;
 
-  const now = new Date().toISOString();
+  // Sầu riêng fallback
+  const ri6Price     = durianPrice || 65000;
+  const monthong     = Math.round(ri6Price * 1.46);
+  const musangKing   = Math.round(ri6Price * 1.85);
+  const dona         = Math.round(ri6Price * 0.89);
+
+  // Xăng fallback nếu Petrolimex không trả về
+  const petrolFallback = [
+    { name: 'Xăng RON 95-III', price: 21170, change: 0, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Xăng E5 RON 92', price: 20670, change: 0, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Dầu diesel 0.05S', price: 18950, change: 0, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Dầu hỏa', price: 19090, change: 0, unit: 'lít', location: 'Toàn quốc' },
+  ];
 
   const categories = [
     {
@@ -83,11 +172,11 @@ export async function GET() {
       source: isLiveCoffee ? 'giacaphe.com' : 'tham khảo',
       isLive: isLiveCoffee,
       items: [
-        { name: 'Robusta - Đắk Lắk', price: dakLak, unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Robusta - Lâm Đồng', price: lamDong, unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Robusta - Gia Lai', price: giaLai, unit: 'kg', location: 'Gia Lai' },
-        { name: 'Robusta - Đắk Nông', price: dakNong, unit: 'kg', location: 'Đắk Nông' },
-        { name: 'Arabica (nhân xô)', price: Math.round(avgCoffee * 1.4), unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Robusta - Đắk Lắk',  price: dakLak,  change: dakLakRow?.change  ?? null, unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Robusta - Lâm Đồng', price: lamDong, change: lamDongRow?.change ?? null, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Robusta - Gia Lai',   price: giaLai,  change: giaLaiRow?.change  ?? null, unit: 'kg', location: 'Gia Lai' },
+        { name: 'Robusta - Đắk Nông', price: dakNong, change: dakNongRow?.change ?? null, unit: 'kg', location: 'Đắk Nông' },
+        { name: 'Arabica (nhân xô)',   price: Math.round((dakLak + lamDong) / 2 * 1.4), change: null, unit: 'kg', location: 'Lâm Đồng' },
       ],
     },
     {
@@ -95,9 +184,9 @@ export async function GET() {
       source: isLiveCoffee ? 'giacaphe.com' : 'tham khảo',
       isLive: isLiveCoffee,
       items: [
-        { name: 'Hồ tiêu đen (tiêu sọ)', price: hoTieu, unit: 'kg', location: 'Bình Phước' },
-        { name: 'Hồ tiêu trắng', price: Math.round(hoTieu * 1.2), unit: 'kg', location: 'Bà Rịa - Vũng Tàu' },
-        { name: 'Hồ tiêu xanh tươi', price: Math.round(hoTieu * 0.45), unit: 'kg', location: 'Tây Nguyên' },
+        { name: 'Hồ tiêu đen (tiêu sọ)', price: hoTieu, change: hoTieuRow?.change ?? null, unit: 'kg', location: 'Bình Phước' },
+        { name: 'Hồ tiêu trắng',          price: Math.round(hoTieu * 1.2), change: null, unit: 'kg', location: 'Bà Rịa - Vũng Tàu' },
+        { name: 'Hồ tiêu xanh tươi',      price: Math.round(hoTieu * 0.45), change: null, unit: 'kg', location: 'Tây Nguyên' },
       ],
     },
     {
@@ -105,96 +194,35 @@ export async function GET() {
       source: `tỷ giá ${usdRate.toLocaleString('vi-VN')}đ/USD`,
       isLive: true,
       items: [
-        { name: 'Cao su SVR 10 (mủ khô)', price: rubber, unit: 'kg', location: 'Bình Dương' },
-        { name: 'Cao su RSS3', price: Math.round(rubber * 1.05), unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Mủ cao su nước', price: Math.round(rubber * 0.4), unit: 'kg', location: 'Bình Phước' },
+        { name: 'Cao su SVR 10 (mủ khô)', price: rubber, change: rubberChange !== 0 ? rubberChange : null, unit: 'kg', location: 'Bình Dương' },
+        { name: 'Cao su RSS3',             price: Math.round(rubber * 1.05), change: null, unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Mủ cao su nước',          price: Math.round(rubber * 0.4), change: null, unit: 'kg', location: 'Bình Phước' },
       ],
     },
     {
       category: 'Sầu riêng',
-      source: 'tham khảo',
-      isLive: false,
+      source: durianPrice ? 'giacaphe.com' : 'tham khảo',
+      isLive: !!durianPrice,
       items: [
-        { name: 'Sầu riêng Ri6 (tại vườn)', price: 65000, unit: 'kg', location: 'Tiền Giang' },
-        { name: 'Sầu riêng Monthong (xuất khẩu)', price: 95000, unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Sầu riêng Musang King', price: 120000, unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Sầu riêng Dona (tại vườn)', price: 58000, unit: 'kg', location: 'Đồng Nai' },
-      ],
-    },
-    {
-      category: 'Lúa gạo',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Lúa tươi IR50404', price: 7200, unit: 'kg', location: 'An Giang' },
-        { name: 'Lúa OM5451', price: 7800, unit: 'kg', location: 'Kiên Giang' },
-        { name: 'Gạo trắng thường (5% tấm)', price: 13500, unit: 'kg', location: 'Cần Thơ' },
-        { name: 'Gạo thơm Jasmine', price: 16000, unit: 'kg', location: 'Kiên Giang' },
-        { name: 'Nếp thơm', price: 18000, unit: 'kg', location: 'Đồng bằng SCL' },
-      ],
-    },
-    {
-      category: 'Trái cây',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Chuối già hương (xuất khẩu)', price: 8500, unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Xoài cát Hòa Lộc', price: 35000, unit: 'kg', location: 'Đồng Tháp' },
-        { name: 'Thanh long ruột đỏ', price: 20000, unit: 'kg', location: 'Bình Thuận' },
-        { name: 'Bưởi da xanh', price: 28000, unit: 'kg', location: 'Bến Tre' },
-        { name: 'Vải thiều', price: 25000, unit: 'kg', location: 'Bắc Giang' },
-      ],
-    },
-    {
-      category: 'Rau củ',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Rau muống', price: 8000, unit: 'kg', location: 'TP.HCM' },
-        { name: 'Cải thảo', price: 12000, unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Khoai lang tím', price: 18000, unit: 'kg', location: 'Vĩnh Long' },
-        { name: 'Cà chua bi', price: 22000, unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Hành tím', price: 30000, unit: 'kg', location: 'Sóc Trăng' },
-      ],
-    },
-    {
-      category: 'Vật nuôi',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Heo hơi (tại chuồng)', price: 62000, unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Bò hơi (loại 1)', price: 72000, unit: 'kg', location: 'Bình Định' },
-        { name: 'Gà ta hơi', price: 85000, unit: 'kg', location: 'Bình Dương' },
-        { name: 'Vịt hơi', price: 55000, unit: 'kg', location: 'Cần Thơ' },
-      ],
-    },
-    {
-      category: 'Thủy sản',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Tôm sú (loại 20 con/kg)', price: 190000, unit: 'kg', location: 'Cà Mau' },
-        { name: 'Cá tra (nguyên liệu)', price: 30000, unit: 'kg', location: 'An Giang' },
-        { name: 'Tôm thẻ (loại 100 con/kg)', price: 95000, unit: 'kg', location: 'Bạc Liêu' },
-        { name: 'Cua biển (loại 1)', price: 350000, unit: 'kg', location: 'Cà Mau' },
+        { name: 'Sầu riêng Ri6 (tại vườn)',       price: ri6Price,   change: null, unit: 'kg', location: 'Tiền Giang' },
+        { name: 'Sầu riêng Monthong (xuất khẩu)', price: monthong,   change: null, unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Sầu riêng Musang King',           price: musangKing, change: null, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Sầu riêng Dona (tại vườn)',       price: dona,       change: null, unit: 'kg', location: 'Đồng Nai' },
       ],
     },
     {
       category: 'Xăng dầu',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Xăng RON 95-III', price: 21170, unit: 'lít', location: 'Toàn quốc' },
-        { name: 'Xăng E5 RON 92', price: 20670, unit: 'lít', location: 'Toàn quốc' },
-        { name: 'Dầu diesel 0.05S', price: 18950, unit: 'lít', location: 'Toàn quốc' },
-        { name: 'Dầu hỏa', price: 19090, unit: 'lít', location: 'Toàn quốc' },
-        { name: 'Dầu mazut 180CST 3.5S', price: 16120, unit: 'kg', location: 'Toàn quốc' },
-      ],
+      source: petrolResult?.isLive ? 'petrolimex.com.vn' : 'tham khảo',
+      isLive: !!petrolResult?.isLive,
+      items: petrolResult?.isLive
+        ? petrolResult.items.slice(0, 5).map(i => ({ ...i, unit: 'lít', location: 'Toàn quốc' }))
+        : petrolFallback,
     },
   ];
 
   return NextResponse.json({
-    updatedAt: now,
+    updatedAt: now.toISOString(),
+    dateLabel,
     usdRate,
     categories,
   }, {

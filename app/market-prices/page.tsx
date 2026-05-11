@@ -51,6 +51,7 @@ export default function MarketPricesPage() {
   const [agriCategories, setAgriCategories] = useState<any[]>([]);
   const [agriLoading, setAgriLoading] = useState(true);
   const [agriUpdatedAt, setAgriUpdatedAt] = useState('');
+  const [agriDateLabel, setAgriDateLabel] = useState('');
   const [openCat, setOpenCat] = useState<string>('');
 
   // Form thêm giá
@@ -102,6 +103,7 @@ export default function MarketPricesPage() {
       .then(d => {
         setAgriCategories(d.categories || []);
         setAgriUpdatedAt(d.updatedAt || '');
+        setAgriDateLabel(d.dateLabel || '');
         if (d.categories?.length > 0) setOpenCat(d.categories[0].category);
       })
       .catch(() => {})
@@ -307,10 +309,10 @@ export default function MarketPricesPage() {
                 <span className="text-lg">🌾</span>
               </div>
               <div>
-                <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Nông Sản Tham Khảo</h2>
+                <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Hàng Hóa Hôm Nay</h2>
                 <p className="text-xs text-gray-500">
-                  🟡 Giá tham khảo thị trường
-                  {agriUpdatedAt && ` • Cập nhật: ${new Date(agriUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                  {agriDateLabel || new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  {agriUpdatedAt && ` • ${new Date(agriUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
                 </p>
               </div>
             </div>
@@ -319,6 +321,7 @@ export default function MarketPricesPage() {
               fetch('/api/agri-prices').then(r => r.json()).then(d => {
                 setAgriCategories(d.categories || []);
                 setAgriUpdatedAt(d.updatedAt || '');
+                setAgriDateLabel(d.dateLabel || '');
               }).finally(() => setAgriLoading(false));
             }} className="text-green-600 hover:text-green-700 p-2 rounded-lg hover:bg-green-100 transition-colors" title="Làm mới">
               <i className={`ri-refresh-line text-lg ${agriLoading ? 'animate-spin' : ''}`}></i>
@@ -362,20 +365,34 @@ export default function MarketPricesPage() {
                         <tr>
                           <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
                           <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Giá</th>
+                          <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
                           <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Địa điểm</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {cat.items.map((item: any, i: number) => (
-                          <tr key={i} className="hover:bg-green-50/30 transition-colors">
-                            <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                            <td className="px-5 py-3 text-right">
-                              <span className="font-bold text-green-600">{item.price.toLocaleString('vi-VN')}đ</span>
-                              <span className="text-xs text-gray-400">/{item.unit}</span>
-                            </td>
-                            <td className="px-5 py-3 text-sm text-gray-500 hidden sm:table-cell">{item.location}</td>
-                          </tr>
-                        ))}
+                        {cat.items.map((item: any, i: number) => {
+                          const ch = item.change;
+                          const isUp = ch > 0;
+                          const isDown = ch < 0;
+                          return (
+                            <tr key={i} className="hover:bg-green-50/30 transition-colors">
+                              <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
+                              <td className="px-5 py-3 text-right">
+                                <span className="font-bold text-green-600">{item.price.toLocaleString('vi-VN')}đ</span>
+                                <span className="text-xs text-gray-400">/{item.unit}</span>
+                              </td>
+                              <td className="px-5 py-3 text-right text-sm font-medium">
+                                {ch == null || ch === 0
+                                  ? <span className="text-gray-300">—</span>
+                                  : isUp
+                                    ? <span className="text-red-500">▲ {Math.abs(ch).toLocaleString('vi-VN')}</span>
+                                    : <span className="text-green-600">▼ {Math.abs(ch).toLocaleString('vi-VN')}</span>
+                                }
+                              </td>
+                              <td className="px-5 py-3 text-sm text-gray-500 hidden sm:table-cell">{item.location}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
