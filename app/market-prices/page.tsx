@@ -41,6 +41,12 @@ export default function MarketPricesPage() {
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
 
+  // Giá vàng thực tế
+  const [goldPrices, setGoldPrices] = useState<any[]>([]);
+  const [goldUpdatedAt, setGoldUpdatedAt] = useState('');
+  const [goldSource, setGoldSource] = useState('');
+  const [goldLoading, setGoldLoading] = useState(true);
+
   // Form thêm giá
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ productName: '', category: 'Cà phê', unit: 'kg', price: '', location: '', note: '', source: '' });
@@ -73,6 +79,16 @@ export default function MarketPricesPage() {
     if (auth.isLoggedIn()) {
       users.getMe().then(u => setIsAdmin(u.role === 'admin')).catch(() => {});
     }
+    // Fetch giá vàng SJC
+    fetch('/api/gold-prices')
+      .then(r => r.json())
+      .then(d => {
+        setGoldPrices(d.data || []);
+        setGoldUpdatedAt(d.updatedAt || '');
+        setGoldSource(d.source || '');
+      })
+      .catch(() => {})
+      .finally(() => setGoldLoading(false));
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -187,6 +203,83 @@ export default function MarketPricesPage() {
               onKeyDown={e => e.key === 'Enter' && loadData(1)}
               className="w-44 px-4 py-2 border border-gray-300 rounded-lg text-sm" />
           </div>
+        </div>
+      </div>
+
+      {/* Giá vàng SJC */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow">
+                <span className="text-lg font-bold text-white">Au</span>
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
+                <p className="text-xs text-gray-500">
+                  {goldSource === 'SJC' ? '🟢 Dữ liệu thực từ SJC' : '🟡 Dữ liệu tham khảo'}
+                  {goldUpdatedAt && ` • Cập nhật: ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                </p>
+              </div>
+            </div>
+            <button onClick={() => {
+              setGoldLoading(true);
+              fetch('/api/gold-prices').then(r => r.json()).then(d => {
+                setGoldPrices(d.data || []); setGoldUpdatedAt(d.updatedAt || ''); setGoldSource(d.source || '');
+              }).finally(() => setGoldLoading(false));
+            }} className="text-yellow-600 hover:text-yellow-700 p-2 rounded-lg hover:bg-yellow-100 transition-colors" title="Làm mới">
+              <i className={`ri-refresh-line text-lg ${goldLoading ? 'animate-spin' : ''}`}></i>
+            </button>
+          </div>
+
+          {goldLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                  <div className="flex justify-between">
+                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {goldPrices.map((item, i) => (
+                <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-yellow-100">
+                  <p className="text-sm font-semibold text-gray-800 mb-3 line-clamp-1">{item.name}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-1">Mua vào</p>
+                      <p className="text-base font-bold text-blue-600">
+                        {item.buy > 0 ? (item.buy / 1_000_000).toFixed(1) + ' tr' : '—'}
+                      </p>
+                    </div>
+                    <div className="w-px h-10 bg-gray-200"></div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-1">Bán ra</p>
+                      <p className="text-base font-bold text-red-500">
+                        {item.sell > 0 ? (item.sell / 1_000_000).toFixed(1) + ' tr' : '—'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-400">/{item.unit}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {goldPrices.length === 0 && (
+                <div className="col-span-2 text-center py-4 text-gray-400 text-sm">
+                  Không thể tải giá vàng lúc này
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="text-xs text-gray-400 mt-3 text-center">
+            Nguồn: sjc.com.vn • Giá đơn vị triệu đồng/lượng (37.5g) • Chỉ mang tính tham khảo
+          </p>
         </div>
       </div>
 
