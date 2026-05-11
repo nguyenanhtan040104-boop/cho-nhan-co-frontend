@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 
 export default function MarketPricesPage() {
-  // Giá vàng SJC
+  // Giá vàng
   const [goldPrices, setGoldPrices] = useState<any[]>([]);
   const [goldUpdatedAt, setGoldUpdatedAt] = useState('');
   const [goldSource, setGoldSource] = useState('');
   const [goldLoading, setGoldLoading] = useState(true);
+  const [goldData, setGoldData] = useState<any>(null);
 
   // Giá hàng hóa
   const [agriCategories, setAgriCategories] = useState<any[]>([]);
@@ -19,7 +20,12 @@ export default function MarketPricesPage() {
   useEffect(() => {
     fetch('/api/gold-prices')
       .then(r => r.json())
-      .then(d => { setGoldPrices(d.data || []); setGoldUpdatedAt(d.updatedAt || ''); setGoldSource(d.source || ''); })
+      .then(d => {
+        setGoldPrices(d.data || []);
+        setGoldUpdatedAt(d.updatedAt || '');
+        setGoldSource(d.source || '');
+        setGoldData(d);
+      })
       .catch(() => {})
       .finally(() => setGoldLoading(false));
 
@@ -38,7 +44,7 @@ export default function MarketPricesPage() {
   function refreshGold() {
     setGoldLoading(true);
     fetch('/api/gold-prices').then(r => r.json()).then(d => {
-      setGoldPrices(d.data || []); setGoldUpdatedAt(d.updatedAt || ''); setGoldSource(d.source || '');
+      setGoldPrices(d.data || []); setGoldUpdatedAt(d.updatedAt || ''); setGoldSource(d.source || ''); setGoldData(d);
     }).finally(() => setGoldLoading(false));
   }
 
@@ -86,42 +92,85 @@ export default function MarketPricesPage() {
           </div>
 
           {goldLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[...Array(2)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
-                  <div className="flex justify-between">
-                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-                  </div>
-                </div>
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl p-3 animate-pulse h-14"></div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {goldPrices.map((item, i) => (
-                <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-yellow-100">
-                  <p className="text-sm font-semibold text-gray-800 mb-3">{item.name}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500 mb-1">Mua vào</p>
-                      <p className="text-base font-bold text-blue-600">{item.buy > 0 ? (item.buy / 1_000_000).toFixed(1) + ' tr' : '—'}</p>
-                    </div>
-                    <div className="w-px h-10 bg-gray-200"></div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500 mb-1">Bán ra</p>
-                      <p className="text-base font-bold text-red-500">{item.sell > 0 ? (item.sell / 1_000_000).toFixed(1) + ' tr' : '—'}</p>
-                    </div>
-                    <p className="text-xs text-gray-400">/{item.unit}</p>
+            <>
+              {/* Giá vàng thế giới */}
+              {goldData?.worldPrice && (
+                <div className="bg-yellow-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">🌍 Vàng thế giới (XAU/USD)</span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-gray-900">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</span>
+                    {goldData.worldChange != null && (
+                      <span className={`text-sm font-semibold ${goldData.worldChange >= 0 ? 'text-red-500' : 'text-green-600'}`}>
+                        {goldData.worldChange >= 0 ? '▲' : '▼'} {Math.abs(goldData.worldChange).toFixed(2)}
+                      </span>
+                    )}
                   </div>
                 </div>
-              ))}
-              {goldPrices.length === 0 && (
-                <div className="col-span-2 text-center py-4 text-gray-400 text-sm">Không thể tải giá vàng</div>
               )}
-            </div>
+
+              {/* Bảng giá vàng trong nước */}
+              <div className="overflow-x-auto rounded-xl border border-yellow-100">
+                <table className="w-full">
+                  <thead className="bg-yellow-50 border-b border-yellow-100">
+                    <tr>
+                      <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thương hiệu</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Mua vào</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Bán ra</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Per chỉ</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-yellow-50">
+                    {goldPrices.map((item: any, i: number) => {
+                      const ch = item.change;
+                      return (
+                        <tr key={i} className="hover:bg-yellow-50/40 transition-colors bg-white">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-bold text-blue-600 text-sm">
+                              {item.buy > 0 ? (item.buy / 1_000_000).toFixed(2) + ' tr' : '—'}
+                            </span>
+                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-bold text-red-500 text-sm">
+                              {item.sell > 0 ? (item.sell / 1_000_000).toFixed(2) + ' tr' : '—'}
+                            </span>
+                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
+                          </td>
+                          <td className="px-4 py-3 text-right hidden sm:table-cell">
+                            {item.sellPerChi > 0 && (
+                              <span className="text-sm text-gray-600">
+                                {(item.sellPerChi / 1_000_000).toFixed(2)} tr<span className="text-xs text-gray-400">/chỉ</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-right text-sm font-medium">
+                            {ch == null || ch === 0
+                              ? <span className="text-gray-300">—</span>
+                              : ch > 0
+                                ? <span className="text-red-500">▲ {(Math.abs(ch) / 1000).toFixed(0)}k</span>
+                                : <span className="text-green-600">▼ {(Math.abs(ch) / 1000).toFixed(0)}k</span>
+                            }
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {goldPrices.length === 0 && (
+                      <tr><td colSpan={5} className="px-4 py-6 text-center text-gray-400 text-sm">Không thể tải giá vàng</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
-          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: sjc.com.vn • Đơn vị triệu đồng/lượng (37.5g) • Chỉ mang tính tham khảo</p>
+          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: webgia.com • sjc.com.vn • 1 lượng = 10 chỉ = 37.5g • Chỉ mang tính tham khảo</p>
         </div>
 
         {/* ── Bảng Giá Hàng Hóa ── */}
