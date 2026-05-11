@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { products as productsApi, uploads } from '../../../lib/api';
+import { auth as _auth } from '../../../lib/api';
 
 const categories = [
   { id: 'NONG_SAN', name: 'Nông sản' },
@@ -15,6 +16,10 @@ const categories = [
 
 export default function CreateProductPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+  }, []);
   const [formData, setFormData] = useState({
     title: '',
     category: '',

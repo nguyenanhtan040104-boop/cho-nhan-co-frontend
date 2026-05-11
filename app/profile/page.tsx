@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { auth } from '../../lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -11,6 +12,13 @@ type Tab = 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'verify-res
 export default function ProfilePage() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('login');
+
+  // Nếu đã đăng nhập rồi → về dashboard
+  useEffect(() => {
+    if (auth.isLoggedIn()) {
+      router.replace('/dashboard');
+    }
+  }, []);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');

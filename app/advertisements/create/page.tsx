@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { advertisements, uploads } from '../../../lib/api';
+import { auth as _auth } from '../../../lib/api';
 
 const CATEGORIES = [
   { value: 'KHAI_TRUONG', label: 'Khai trương' },
@@ -16,6 +17,10 @@ const CATEGORIES = [
 
 export default function CreateAdvertisementPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+  }, []);
   const [form, setForm] = useState({
     title: '', category: 'KHAI_TRUONG', description: '',
     businessName: '', location: '', contactName: '', contactPhone: '',

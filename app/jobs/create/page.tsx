@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { jobs } from '../../../lib/api';
+import { auth as _auth } from '../../../lib/api';
 
 const typeOptions = [
   { value: 'EMPLOYER', label: 'Tuyển dụng' },
@@ -15,6 +16,10 @@ const categoryOptions = [
 
 export default function CreateJobPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+  }, []);
   const [form, setForm] = useState({
     title: '', description: '', type: 'EMPLOYER', category: '',
     salary: '', location: '', experience: '', benefits: '',

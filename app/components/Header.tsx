@@ -2,13 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { auth } from '../../lib/api';
 
 export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showPostMenu, setShowPostMenu] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const postMenuRef = useRef<HTMLDivElement>(null);
+
+  function handlePostMenuToggle() {
+    if (!auth.isLoggedIn()) { router.push('/profile'); return; }
+    setShowPostMenu(!showPostMenu);
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -53,7 +60,7 @@ export default function Header() {
           <div className="flex items-center space-x-2 lg:space-x-4" suppressHydrationWarning>
             <div className="relative" ref={postMenuRef}>
               <button
-                onClick={() => setShowPostMenu(!showPostMenu)}
+                onClick={handlePostMenuToggle}
                 className="bg-green-600 text-white px-3 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-green-700 text-sm lg:text-base flex items-center gap-2"
               >
                 <span className="hidden sm:inline">Đăng tin</span>

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { forum } from '../../../lib/api';
+import { auth as _auth } from '../../../lib/api';
 
 const categoryOptions = [
   { value: 'NONG_NGHIEP', label: 'Nông nghiệp' },
@@ -16,6 +17,10 @@ const categoryOptions = [
 
 export default function CreatePostPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+  }, []);
   const [form, setForm] = useState({
     title: '', content: '', category: 'NONG_NGHIEP',
     tags: '', isAnonymous: false,

@@ -800,7 +800,7 @@ export default function Home() {
               <Link href="/pricing" className="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors cursor-pointer">
                 Xem bảng giá VIP
               </Link>
-              <Link href="/profile" className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors cursor-pointer">
+              <Link href="/products/create" className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors cursor-pointer">
                 Đăng tin VIP ngay
               </Link>
             </div>
@@ -907,7 +907,7 @@ export default function Home() {
               </div>
               <h4 className="text-lg lg:text-xl font-semibold text-white mb-2">Đăng tin miễn phí</h4>
               <p className="text-green-100 mb-4 text-sm lg:text-base">Đăng tối đa 5 tin mỗi tháng hoàn toàn miễn phí</p>
-              <Link href="/profile" className="bg-white text-green-600 px-4 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer text-sm lg:text-base">
+              <Link href="/products/create" className="bg-white text-green-600 px-4 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer text-sm lg:text-base">
                 Đăng tin ngay
               </Link>
             </div>
