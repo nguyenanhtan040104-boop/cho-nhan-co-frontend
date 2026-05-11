@@ -17,6 +17,7 @@ export default function Home() {
   const [featuredItems, setFeaturedItems] = useState<any[]>([]);
   const [latestNews, setLatestNews] = useState<any[]>([]);
   const [liveMarketPrices, setLiveMarketPrices] = useState<any[]>([]);
+  const [featuredAds, setFeaturedAds] = useState<any[]>([]);
 
   useEffect(() => {
     // Load featured posts: mix of products, real-estate, jobs
@@ -56,6 +57,11 @@ export default function Home() {
     // Load market prices
     marketPricesApi.getAll({ limit: 4 }).then((res: any) => {
       setLiveMarketPrices(res.data || []);
+    }).catch(() => {});
+
+    // Load featured ads
+    advertisements.getAll({ limit: 6, sortBy: 'newest' }).then((res: any) => {
+      setFeaturedAds(res.data || []);
     }).catch(() => {});
   }, []);
 
@@ -845,6 +851,121 @@ export default function Home() {
                 </Link>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Advertisements */}
+      <section className="py-8 lg:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
+                <span className="inline-block bg-orange-100 text-orange-600 text-sm font-semibold px-3 py-1 rounded-full mr-3 align-middle">MỚI</span>
+                Quảng cáo & Khuyến mãi
+              </h3>
+              <p className="text-gray-600 text-sm lg:text-base">Khai trương, ưu đãi và sự kiện nổi bật trong khu vực</p>
+            </div>
+            <Link href="/advertisements" className="text-orange-500 hover:text-orange-600 font-medium text-sm lg:text-base">
+              Xem tất cả →
+            </Link>
+          </div>
+
+          {featuredAds.length === 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm animate-pulse">
+                  <div className="h-40 bg-gray-200"></div>
+                  <div className="p-4 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+              {featuredAds.map((ad: any) => {
+                const catColors: any = {
+                  KHAI_TRUONG: 'bg-green-100 text-green-700',
+                  KHUYEN_MAI: 'bg-red-100 text-red-600',
+                  SAN_PHAM_MOI: 'bg-blue-100 text-blue-700',
+                  DICH_VU: 'bg-purple-100 text-purple-700',
+                  SU_KIEN: 'bg-yellow-100 text-yellow-700',
+                  KHAC: 'bg-gray-100 text-gray-600',
+                };
+                const catLabels: any = {
+                  KHAI_TRUONG: 'Khai trương', KHUYEN_MAI: 'Khuyến mãi',
+                  SAN_PHAM_MOI: 'Sản phẩm mới', DICH_VU: 'Dịch vụ',
+                  SU_KIEN: 'Sự kiện', KHAC: 'Khác',
+                };
+                const imgUrl = ad.images?.[0] || null;
+                return (
+                  <Link key={ad.id} href={`/advertisements/${ad.id}`}
+                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group block border border-gray-100 hover:border-orange-200">
+                    {/* Image */}
+                    <div className="relative h-44 bg-orange-50 overflow-hidden">
+                      {imgUrl ? (
+                        <img src={imgUrl} alt={ad.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                          <i className="ri-megaphone-line text-4xl text-orange-300"></i>
+                        </div>
+                      )}
+                      {ad.isVip && (
+                        <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
+                          VIP
+                        </div>
+                      )}
+                      {/* Overlay gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${catColors[ad.category] || 'bg-gray-100 text-gray-600'}`}>
+                          {catLabels[ad.category] || ad.category}
+                        </span>
+                        <span className="text-xs text-gray-400">{new Date(ad.createdAt).toLocaleDateString('vi-VN')}</span>
+                      </div>
+                      <h4 className="font-semibold text-gray-900 group-hover:text-orange-500 transition-colors line-clamp-2 mb-1">
+                        {ad.title}
+                      </h4>
+                      {ad.businessName && (
+                        <p className="text-sm text-orange-600 font-medium truncate">{ad.businessName}</p>
+                      )}
+                      {(ad.startDate || ad.endDate) && (
+                        <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+                          <i className="ri-calendar-event-line text-orange-400"></i>
+                          {ad.startDate && new Date(ad.startDate).toLocaleDateString('vi-VN')}
+                          {ad.startDate && ad.endDate && ' – '}
+                          {ad.endDate && new Date(ad.endDate).toLocaleDateString('vi-VN')}
+                        </p>
+                      )}
+                      {ad.location && (
+                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                          <i className="ri-map-pin-line text-orange-400"></i>
+                          {ad.location}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {/* CTA banner */}
+          <div className="mt-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-white">
+            <div>
+              <h4 className="text-lg font-bold mb-1">Muốn quảng bá cửa hàng của bạn?</h4>
+              <p className="text-sm text-orange-100">Đăng quảng cáo khai trương, khuyến mãi đến hàng nghìn người trong khu vực</p>
+            </div>
+            <Link href="/advertisements/create"
+              className="flex-shrink-0 bg-white text-orange-600 font-semibold px-6 py-2.5 rounded-lg hover:bg-orange-50 transition-colors text-sm whitespace-nowrap">
+              + Đăng quảng cáo ngay
+            </Link>
           </div>
         </div>
       </section>
