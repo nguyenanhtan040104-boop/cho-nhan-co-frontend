@@ -1,77 +1,107 @@
 import { NextResponse } from 'next/server';
 
-// ─── Module-level cache để tính thay đổi giá theo ngày ───
-const priceCache: {
-  date: string;
-  prices: Record<string, number>;
-  prevPrices: Record<string, number>;
-} = { date: '', prices: {}, prevPrices: {} };
+// Mapping tỉnh cũ → tỉnh mới sau sáp nhập
+const PROVINCE_MAP: Record<string, string> = {
+  'đắk lắk': 'Đắk Lắk', 'dak lak': 'Đắk Lắk', 'phú yên': 'Đắk Lắk',
+  'lâm đồng': 'Lâm Đồng', 'lam dong': 'Lâm Đồng',
+  'đắk nông': 'Lâm Đồng', 'dak nong': 'Lâm Đồng',
+  'bình thuận': 'Lâm Đồng', 'binh thuan': 'Lâm Đồng',
+  'đồng nai': 'Đồng Nai', 'dong nai': 'Đồng Nai',
+  'bình phước': 'Đồng Nai', 'binh phuoc': 'Đồng Nai',
+  'bà rịa': 'Đồng Nai', 'ba ria': 'Đồng Nai',
+  'gia lai': 'Gia Lai',
+};
 
-function getChange(key: string, current: number): number | null {
-  const today = new Date().toISOString().slice(0, 10);
-  if (priceCache.date !== today) {
-    priceCache.prevPrices = { ...priceCache.prices };
-    priceCache.date = today;
-    priceCache.prices = {};
+function mapProvince(text: string): string {
+  const t = text.toLowerCase();
+  for (const [key, val] of Object.entries(PROVINCE_MAP)) {
+    if (t.includes(key)) return val;
   }
-  priceCache.prices[key] = current;
-  const prev = priceCache.prevPrices[key];
-  if (prev == null || prev === current) return null;
-  return current - prev;
+  return '';
 }
 
-// ─── Fetch giá cà phê từ giacaphe.com/bang-gia-ca-phe/ ───
-async function fetchCoffee() {
-  const urls = [
-    'https://giacaphe.com/bang-gia-ca-phe/',
-    'https://giacaphe.com/gia-ca-phe-noi-dia/',
-  ];
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
-          'Referer': 'https://giacaphe.com/',
-          'Cache-Control': 'no-cache',
-        },
-        signal: AbortSignal.timeout(7000),
-      });
-      if (!res.ok) continue;
-      const html = await res.text();
+// Parse giá VND từ string (hỗ trợ range "41,000-46,000" → lấy trung bình)
+function parsePrice(s: string): number | null {
+  if (!s) return null;
+  const clean = s.replace(/[₫đ\s]/g, '');
+  if (clean.includes('-')) {
+    const parts = clean.split('-').map(p => parseInt(p.replace(/[,\.]/g, '')));
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parts[0] > 1000 && parts[1] > 1000) {
+      return Math.round((parts[0] + parts[1]) / 2);
+    }
+  }
+  const n = parseInt(clean.replace(/[,\.]/g, ''));
+  return (!isNaN(n) && n > 500) ? n : null;
+}
 
-      // Parse bảng giá theo tỉnh
-      type Row = { name: string; price: number; rawChange: number | null };
-      const rows: Row[] = [];
+// Parse change từ string "+1,000 (+0.71%)" hoặc "-400 (-0.46%)" hoặc số đơn giản
+function parseChange(s: string): number | null {
+  if (!s || s === '0') return 0;
+  const noChange = ['no change', 'không đổi', 'không thay đổi', '—', '-'];
+  if (noChange.some(nc => s.toLowerCase().trim() === nc)) return 0;
+  const m = s.match(/([+-]?\d[\d,\.]*)/);
+  if (m) {
+    const n = parseInt(m[1].replace(/[,\.]/g, ''));
+    return isNaN(n) ? null : n;
+  }
+  return null;
+}
 
-      // Tách từng <tr>
-      const trRe = /<tr[\s\S]*?>([\s\S]*?)<\/tr>/gi;
-      let m;
-      while ((m = trRe.exec(html)) !== null) {
-        const cells = [...m[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
-          .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;|\s+/g, ' ').trim());
-        if (cells.length < 2) continue;
+// ─── Fetch từ banggianongsan.com ───
+async function fetchBangGia() {
+  try {
+    const res = await fetch('https://banggianongsan.com/', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8',
+        'Referer': 'https://banggianongsan.com/',
+      },
+      signal: AbortSignal.timeout(9000),
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
 
-        const name = cells[0];
-        const p = parseInt(cells[1].replace(/[,\.\s]/g, ''));
-        if (!name || isNaN(p) || p < 30000 || p > 300000) continue;
+    type Row = { name: string; price: number; change: number | null; province: string };
+    const rows: Row[] = [];
 
-        let rawChange: number | null = null;
-        if (cells[2]) {
-          const c = parseInt(cells[2].replace(/[,\.\s]/g, ''));
-          if (!isNaN(c)) rawChange = c;
-        }
-        rows.push({ name, price: p, rawChange });
+    const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let m;
+    while ((m = trRe.exec(html)) !== null) {
+      const cells = [...m[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)]
+        .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
+      if (cells.length < 3) continue;
+
+      const name = cells[0];
+      if (!name || name.length < 3) continue;
+
+      // Bỏ qua hàng USD/ton (giá quốc tế)
+      if (/usd|USD/i.test(cells[1]) || /usd|USD/i.test(cells[2])) continue;
+
+      const newPrice = parsePrice(cells[2]) ?? parsePrice(cells[1]);
+      if (!newPrice || newPrice < 1000 || newPrice > 10_000_000) continue;
+
+      // Change: cells[3] hoặc tính từ old/new
+      let change: number | null = null;
+      if (cells[3]) {
+        change = parseChange(cells[3]);
+      } else if (cells[1] && cells[2]) {
+        const oldP = parsePrice(cells[1]);
+        const newP = parsePrice(cells[2]);
+        if (oldP && newP) change = newP - oldP;
       }
 
-      if (rows.length > 0) return { rows, isLive: true };
-    } catch { /* try next url */ }
+      const province = mapProvince(name);
+      rows.push({ name, price: newPrice, change, province });
+    }
+
+    return rows.length > 0 ? rows : null;
+  } catch {
+    return null;
   }
-  return { rows: [], isLive: false };
 }
 
-// ─── Fetch tỷ giá USD từ Vietcombank ───
+// ─── Fetch tỷ giá USD ───
 async function fetchUSDRate(): Promise<number> {
   try {
     const res = await fetch('https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXml.aspx?b=10', {
@@ -90,102 +120,102 @@ async function fetchUSDRate(): Promise<number> {
 }
 
 export async function GET() {
-  const [coffeeResult, usdRate] = await Promise.all([
-    fetchCoffee(),
-    fetchUSDRate(),
-  ]);
+  const [rows, usdRate] = await Promise.all([fetchBangGia(), fetchUSDRate()]);
+  const isLive = !!rows;
 
-  const { rows, isLive: isLiveCoffee } = coffeeResult;
-
-  function findRow(kw: string) {
-    return rows.find(r => r.name.toLowerCase().includes(kw.toLowerCase()));
+  // Helper tìm row theo keyword
+  function find(kw: string) {
+    return rows?.find(r => r.name.toLowerCase().includes(kw.toLowerCase()));
+  }
+  function findAll(kw: string) {
+    return rows?.filter(r => r.name.toLowerCase().includes(kw.toLowerCase())) ?? [];
   }
 
-  // Giá cà phê theo tỉnh
-  const dakLakRow  = findRow('đắk lắk') || findRow('dak lak');
-  const lamDongRow = findRow('lâm đồng') || findRow('lam dong');
-  const giaLaiRow  = findRow('gia lai');
-  const dakNongRow = findRow('đắk nông') || findRow('dak nong');
-  const hoTieuRow  = findRow('hồ tiêu') || findRow('tiêu');
+  // ── Cà phê ──
+  const coffeeRows = [
+    find('đắk lắk') ?? find('dak lak'),
+    find('lâm đồng') ?? find('lam dong'),
+    find('gia lai'),
+    find('đắk nông') ?? find('dak nong'),
+  ].filter(Boolean) as NonNullable<typeof rows>[0][];
 
-  const dakLak  = dakLakRow?.price  ?? 87000;
-  const lamDong = lamDongRow?.price ?? 86300;
-  const giaLai  = giaLaiRow?.price  ?? 87000;
-  const dakNong = dakNongRow?.price ?? 87100;
-  const hoTieu  = hoTieuRow?.price  ?? 143000;
+  const fallbackCoffee = [
+    { name: 'Robusta - Đắk Lắk', price: 87100, change: -400, province: 'Đắk Lắk' },
+    { name: 'Robusta - Lâm Đồng', price: 86700, change: -400, province: 'Lâm Đồng' },
+  ];
 
-  // Tính change: ưu tiên rawChange từ web, fallback module cache
-  function getChangeFinal(key: string, price: number, rawChange: number | null) {
-    if (rawChange != null) return rawChange;
-    return getChange(key, price);
-  }
+  // ── Hồ tiêu ──
+  const pepperRows = findAll('tiêu').filter(r => r.price > 50000 && r.price < 300000);
+  const fallbackPepper = [
+    { name: 'Hồ tiêu Đắk Lắk', price: 144000, change: 0, province: 'Đắk Lắk' },
+    { name: 'Hồ tiêu Đắk Nông', price: 144000, change: 0, province: 'Lâm Đồng' },
+    { name: 'Hồ tiêu Đồng Nai', price: 142500, change: 500, province: 'Đồng Nai' },
+  ];
 
-  // Cao su
+  // ── Sầu riêng ──
+  const durianRows = findAll('sầu riêng').filter(r => r.price > 20000 && r.price < 500000);
+  const fallbackDurian = [
+    { name: 'Sầu riêng Ri6 A', price: 43500, change: 3500, province: 'Đắk Lắk' },
+    { name: 'Sầu riêng Ri6 B', price: 27500, change: 2500, province: 'Lâm Đồng' },
+    { name: 'Sầu riêng Thái VIP A', price: 85000, change: 0, province: 'Đắk Lắk' },
+    { name: 'Sầu riêng Black Thorn A', price: 120000, change: 30000, province: 'Lâm Đồng' },
+  ];
+
+  // ── Cao su ──
   const rubber = Math.round(1.5 * usdRate);
-  const rubberChange = getChange('rubber', rubber);
+  const rubberRows = findAll('cao su').filter(r => r.price > 5000);
+  const fallbackRubber = [
+    { name: 'Cao su SVR 10 (mủ khô)', price: rubber, change: null, province: 'Đồng Nai' },
+    { name: 'Mủ cao su nước DRC 35-45%', price: 13500, change: -1100, province: 'Đồng Nai' },
+  ];
 
-  // Giá xăng dầu — Giá nhà nước áp dụng từ 15:00 ngày 07/05/2026
-  // (cập nhật thủ công khi có điều chỉnh mới)
-  const fuelEffectiveDate = '07/05/2026';
+  function toItems(list: { name: string; price: number; change: number | null; province: string }[], unit = 'kg') {
+    return list.map(r => ({
+      name: r.name,
+      price: r.price,
+      change: r.change,
+      unit,
+      location: r.province || 'Tây Nguyên',
+    }));
+  }
+
+  // Giá xăng — Bộ Công Thương, áp dụng từ 15:00 ngày 07/05/2026
   const fuelItems = [
-    { name: 'Xăng RON 95-III',   price: 20910, prevPrice: 21170, unit: 'lít', location: 'Toàn quốc' },
-    { name: 'Xăng E5 RON 92',    price: 20422, prevPrice: 20670, unit: 'lít', location: 'Toàn quốc' },
-    { name: 'Dầu diesel 0.05S',  price: 18704, prevPrice: 18950, unit: 'lít', location: 'Toàn quốc' },
-    { name: 'Dầu hỏa',           price: 18850, prevPrice: 19090, unit: 'lít', location: 'Toàn quốc' },
-  ].map(i => ({ ...i, change: i.price - i.prevPrice }));
+    { name: 'Xăng RON 95-III', price: 20910, change: -260, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Xăng E5 RON 92',  price: 20422, change: -248, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Dầu diesel 0.05S', price: 18704, change: -246, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Dầu hỏa',          price: 18850, change: -240, unit: 'lít', location: 'Toàn quốc' },
+  ];
 
   const now = new Date();
-  const dateLabel = now.toLocaleDateString('vi-VN', {
-    weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric',
-  });
-
   const categories = [
     {
       category: 'Cà phê',
-      source: isLiveCoffee ? 'giacaphe.com' : 'tham khảo',
-      isLive: isLiveCoffee,
-      items: [
-        { name: 'Robusta - Đắk Lắk',  price: dakLak,  change: getChangeFinal('dakLak', dakLak, dakLakRow?.rawChange ?? null),   unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Robusta - Lâm Đồng', price: lamDong, change: getChangeFinal('lamDong', lamDong, lamDongRow?.rawChange ?? null), unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Robusta - Gia Lai',   price: giaLai,  change: getChangeFinal('giaLai', giaLai, giaLaiRow?.rawChange ?? null),   unit: 'kg', location: 'Gia Lai' },
-        { name: 'Robusta - Đắk Nông', price: dakNong, change: getChangeFinal('dakNong', dakNong, dakNongRow?.rawChange ?? null), unit: 'kg', location: 'Đắk Nông' },
-        { name: 'Arabica (nhân xô)',   price: Math.round((dakLak + lamDong) / 2 * 1.4), change: null, unit: 'kg', location: 'Lâm Đồng' },
-      ],
+      source: isLive ? 'banggianongsan.com' : 'tham khảo',
+      isLive,
+      items: toItems(coffeeRows.length > 0 ? coffeeRows : fallbackCoffee),
     },
     {
       category: 'Hồ tiêu',
-      source: isLiveCoffee ? 'giacaphe.com' : 'tham khảo',
-      isLive: isLiveCoffee,
-      items: [
-        { name: 'Hồ tiêu đen (tiêu sọ)', price: hoTieu, change: getChangeFinal('hoTieu', hoTieu, hoTieuRow?.rawChange ?? null), unit: 'kg', location: 'Bình Phước' },
-        { name: 'Hồ tiêu trắng',          price: Math.round(hoTieu * 1.2), change: null, unit: 'kg', location: 'Bà Rịa - Vũng Tàu' },
-        { name: 'Hồ tiêu xanh tươi',      price: Math.round(hoTieu * 0.45), change: null, unit: 'kg', location: 'Tây Nguyên' },
-      ],
-    },
-    {
-      category: 'Cao su',
-      source: `tỷ giá ${usdRate.toLocaleString('vi-VN')}đ/USD (Vietcombank)`,
-      isLive: true,
-      items: [
-        { name: 'Cao su SVR 10 (mủ khô)', price: rubber, change: rubberChange, unit: 'kg', location: 'Bình Dương' },
-        { name: 'Cao su RSS3',             price: Math.round(rubber * 1.05), change: null, unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Mủ cao su nước',          price: Math.round(rubber * 0.4), change: null, unit: 'kg', location: 'Bình Phước' },
-      ],
+      source: isLive ? 'banggianongsan.com' : 'tham khảo',
+      isLive,
+      items: toItems(pepperRows.length > 0 ? pepperRows : fallbackPepper),
     },
     {
       category: 'Sầu riêng',
-      source: 'tham khảo',
-      isLive: false,
-      items: [
-        { name: 'Sầu riêng Ri6 (tại vườn)',       price: 65000,  change: getChange('sr_ri6', 65000),  unit: 'kg', location: 'Tiền Giang' },
-        { name: 'Sầu riêng Monthong (xuất khẩu)', price: 95000,  change: getChange('sr_mt', 95000),   unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Sầu riêng Musang King',           price: 120000, change: getChange('sr_mk', 120000),  unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Sầu riêng Dona (tại vườn)',       price: 58000,  change: getChange('sr_dona', 58000), unit: 'kg', location: 'Đồng Nai' },
-      ],
+      source: isLive ? 'banggianongsan.com' : 'tham khảo',
+      isLive,
+      items: toItems(durianRows.length > 0 ? durianRows : fallbackDurian),
+    },
+    {
+      category: 'Cao su',
+      source: isLive && rubberRows.length > 0 ? 'banggianongsan.com' : `Vietcombank ${usdRate.toLocaleString('vi-VN')}đ/USD`,
+      isLive: true,
+      items: toItems(rubberRows.length > 0 ? rubberRows : fallbackRubber),
     },
     {
       category: 'Xăng dầu',
-      source: `Bộ Công Thương • Từ ${fuelEffectiveDate}`,
+      source: 'Bộ Công Thương • Từ 15:00 ngày 07/05/2026',
       isLive: true,
       items: fuelItems,
     },
@@ -193,7 +223,9 @@ export async function GET() {
 
   return NextResponse.json({
     updatedAt: now.toISOString(),
-    dateLabel,
+    dateLabel: now.toLocaleDateString('vi-VN', {
+      weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric',
+    }),
     usdRate,
     categories,
   }, {
