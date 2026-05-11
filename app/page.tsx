@@ -7,7 +7,9 @@ import { products as productsApi, realEstate, jobs, forum, advertisements, marke
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchDone, setSearchDone] = useState(false);
 
   // Real data state
   const [featuredItems, setFeaturedItems] = useState<any[]>([]);
@@ -74,7 +76,139 @@ export default function Home() {
     }).catch(() => {});
   }, []);
 
-  // Thêm dữ liệu sản phẩm mẫu
+  // ─── Hàm search thực ───
+  async function handleSearch() {
+    const q = searchQuery.trim();
+    if (!q) return;
+    setSearchLoading(true);
+    setSearchDone(false);
+    setSearchResults([]);
+
+    // Nếu là hashtag, strip # và search theo tag trên forum + keyword chung
+    const isHashtag = q.startsWith('#');
+    const keyword = isHashtag ? q.slice(1) : q;
+
+    try {
+      const [prodRes, reRes, jobRes, forumRes] = await Promise.allSettled([
+        productsApi.getAll({ search: keyword, limit: 4 }),
+        realEstate.getAll({ search: keyword, limit: 4 }),
+        jobs.getAll({ search: keyword, limit: 4 }),
+        // forum: nếu hashtag thì search theo tag, nếu không thì search text
+        isHashtag
+          ? forum.getAll({ tag: keyword, limit: 4 })
+          : forum.getAll({ search: keyword, limit: 4 }),
+      ]);
+
+      const combined: any[] = [];
+
+      if (prodRes.status === 'fulfilled') {
+        (prodRes.value.data || []).forEach((p: any) => combined.push({
+          id: p.id, _type: 'product',
+          title: p.title,
+          price: p.price ? `${Number(p.price).toLocaleString('vi-VN')}đ` : '',
+          location: p.location || '',
+          category: p.category || 'Sản phẩm',
+          image: p.images?.[0]?.url || p.images?.[0] || '',
+          timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'),
+          link: `/products/${p.id}`,
+          tags: p.tags || [],
+        }));
+      }
+      if (reRes.status === 'fulfilled') {
+        (reRes.value.data || []).forEach((p: any) => combined.push({
+          id: p.id, _type: 'real-estate',
+          title: p.title,
+          price: p.price ? `${Number(p.price).toLocaleString('vi-VN')}đ` : '',
+          location: p.location || p.address || '',
+          category: 'Bất động sản',
+          image: p.images?.[0]?.url || p.images?.[0] || '',
+          timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'),
+          link: `/real-estate/${p.id}`,
+          tags: [],
+        }));
+      }
+      if (jobRes.status === 'fulfilled') {
+        (jobRes.value.data || []).forEach((p: any) => combined.push({
+          id: p.id, _type: 'job',
+          title: p.title,
+          price: p.salary || '',
+          location: p.location || '',
+          category: 'Tuyển dụng',
+          image: '',
+          timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'),
+          link: `/jobs/${p.id}`,
+          tags: [],
+        }));
+      }
+      if (forumRes.status === 'fulfilled') {
+        (forumRes.value.data || []).forEach((p: any) => combined.push({
+          id: p.id, _type: 'forum',
+          title: p.title,
+          price: '',
+          location: '',
+          category: 'Diễn đàn',
+          image: p.images?.[0]?.url || p.images?.[0] || '',
+          timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'),
+          link: `/forum/${p.id}`,
+          tags: p.tags || [],
+        }));
+      }
+
+      setSearchResults(combined);
+    } catch { }
+
+    setSearchLoading(false);
+    setSearchDone(true);
+  }
+
+  function handleKeyPress(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') handleSearch();
+  }
+
+  function handleHashtagClick(hashtag: string) {
+    setSearchQuery(hashtag);
+    // trigger search after state update
+    setTimeout(() => {
+      setSearchLoading(true);
+      setSearchDone(false);
+      setSearchResults([]);
+      const keyword = hashtag.startsWith('#') ? hashtag.slice(1) : hashtag;
+      Promise.allSettled([
+        productsApi.getAll({ search: keyword, limit: 4 }),
+        realEstate.getAll({ search: keyword, limit: 4 }),
+        jobs.getAll({ search: keyword, limit: 4 }),
+        forum.getAll({ tag: keyword, limit: 4 }),
+      ]).then(([prodRes, reRes, jobRes, forumRes]) => {
+        const combined: any[] = [];
+        if (prodRes.status === 'fulfilled') (prodRes.value.data || []).forEach((p: any) => combined.push({ id: p.id, _type: 'product', title: p.title, price: p.price ? `${Number(p.price).toLocaleString('vi-VN')}đ` : '', location: p.location || '', category: p.category || 'Sản phẩm', image: p.images?.[0]?.url || p.images?.[0] || '', timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'), link: `/products/${p.id}`, tags: p.tags || [] }));
+        if (reRes.status === 'fulfilled') (reRes.value.data || []).forEach((p: any) => combined.push({ id: p.id, _type: 'real-estate', title: p.title, price: p.price ? `${Number(p.price).toLocaleString('vi-VN')}đ` : '', location: p.location || p.address || '', category: 'Bất động sản', image: p.images?.[0]?.url || p.images?.[0] || '', timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'), link: `/real-estate/${p.id}`, tags: [] }));
+        if (jobRes.status === 'fulfilled') (jobRes.value.data || []).forEach((p: any) => combined.push({ id: p.id, _type: 'job', title: p.title, price: p.salary || '', location: p.location || '', category: 'Tuyển dụng', image: '', timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'), link: `/jobs/${p.id}`, tags: [] }));
+        if (forumRes.status === 'fulfilled') (forumRes.value.data || []).forEach((p: any) => combined.push({ id: p.id, _type: 'forum', title: p.title, price: '', location: '', category: 'Diễn đàn', image: p.images?.[0]?.url || p.images?.[0] || '', timeAgo: new Date(p.createdAt).toLocaleDateString('vi-VN'), link: `/forum/${p.id}`, tags: p.tags || [] }));
+        setSearchResults(combined);
+      }).finally(() => { setSearchLoading(false); setSearchDone(true); });
+    }, 0);
+  }
+
+  function clearSearch() {
+    setSearchQuery('');
+    setSearchResults([]);
+    setSearchDone(false);
+  }
+
+  const TYPE_ICON: Record<string, string> = {
+    product: 'ri-plant-line',
+    'real-estate': 'ri-home-4-line',
+    job: 'ri-briefcase-line',
+    forum: 'ri-chat-3-line',
+  };
+  const TYPE_COLOR: Record<string, string> = {
+    product: 'bg-green-100 text-green-700',
+    'real-estate': 'bg-blue-100 text-blue-700',
+    job: 'bg-indigo-100 text-indigo-700',
+    forum: 'bg-purple-100 text-purple-700',
+  };
+
+  // Thêm dữ liệu sản phẩm mẫu (chỉ dùng cho featured posts, không dùng cho search)
   const mockProducts = [
     {
       id: 1,
@@ -291,8 +425,8 @@ export default function Home() {
     }
   ];
 
-  // Dữ liệu tìm kiếm theo hashtag
-  const searchResultsByHashtag = {
+  // (mock hashtag data đã được xóa - search dùng API thực)
+  const _UNUSED = {
     '#TuyenDungNongNghiep': [
       {
         title: 'Cần thuê 5 người thu hoạch cà phê',
@@ -380,103 +514,8 @@ export default function Home() {
         hashtag: '#BatDongSanNongThon'
       }
     ],
-    '#GiaThiTruong': [
-      {
-        title: 'Giá cà phê tăng mạnh do thời tiết khô hạn',
-        price: 'Tin nóng',
-        location: 'Toàn khu vực',
-        image: 'https://readdy.ai/api/search-image?query=Vietnamese%20coffee%20price%20increase%20news%20display%2C%20coffee%20beans%2C%20price%20charts%2C%20drought%20effects%20on%20coffee%20plantation%2C%20news%20report%20style&width=300&height=200&seq=news1&orientation=landscape',
-        category: 'Tin tức',
-        time: '45 phút trước',
-        hashtag: '#GiaThiTruong'
-      },
-      {
-        title: 'Hồ tiêu đen giá ổn định tuần này',
-        price: 'Thông tin',
-        location: 'Thị trường địa phương',
-        image: 'https://readdy.ai/api/search-image?query=Black%20pepper%20price%20stability%20news%2C%20pepper%20corns%2C%20market%20analysis%2C%20Vietnamese%20spice%20trade%20information&width=300&height=200&seq=pepper1&orientation=landscape',
-        category: 'Tin tức',
-        time: '2 giờ trước',
-        hashtag: '#GiaThiTruong'
-      },
-      {
-        title: 'Cao su khô tăng giá nhẹ',
-        price: 'Cập nhật',
-        location: 'Khu vực trồng cao su',
-        image: 'https://readdy.ai/api/search-image?query=Rubber%20price%20increase%20news%2C%20dried%20rubber%20sheets%2C%20plantation%20background%2C%20Vietnamese%20agricultural%20market%20update&width=300&height=200&seq=rubber1&orientation=landscape',
-        category: 'Tin tức',
-        time: '4 giờ trước',
-        hashtag: '#GiaThiTruong'
-      }
-    ]
+    '#GiaThiTruong': [] as any[]
   };
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      setShowSearchResults(true);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleHashtagClick = (hashtag) => {
-    setSearchQuery(hashtag);
-    setShowSearchResults(true);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery('');
-    setShowSearchResults(false);
-  };
-
-  // Lấy kết quả tìm kiếm dựa trên hashtag
-  const getSearchResults = () => {
-    const normalizedQuery = searchQuery.toLowerCase().replace(/\s+/g, '');
-    
-    // Kiểm tra hashtag chính xác
-    for (const [key, results] of Object.entries(searchResultsByHashtag)) {
-      const normalizedKey = key.toLowerCase().replace(/\s+/g, '');
-      if (normalizedQuery === normalizedKey || normalizedQuery === normalizedKey.substring(1)) {
-        return results;
-      }
-    }
-    
-    // Tìm kiếm theo từ khóa trong hashtag
-    if (normalizedQuery.includes('tuyendung') || normalizedQuery.includes('vieclam')) {
-      return searchResultsByHashtag['#TuyenDungNongNghiep'];
-    }
-    if (normalizedQuery.includes('sanphamdiaphuong') || normalizedQuery.includes('sanpham')) {
-      return searchResultsByHashtag['#SanPhamDiaPhuong'];
-    }
-    if (normalizedQuery.includes('batdongsannongthon') || normalizedQuery.includes('batdongsan')) {
-      return searchResultsByHashtag['#BatDongSanNongThon'];
-    }
-    if (normalizedQuery.includes('giathitruong') || normalizedQuery.includes('gia')) {
-      return searchResultsByHashtag['#GiaThiTruong'];
-    }
-    
-    // Mặc định trả về kết quả sản phẩm địa phương
-    return searchResultsByHashtag['#SanPhamDiaPhuong'];
-  };
-
-  const searchResults = getSearchResults();
-
-  // Cập nhật logic tìm kiếm sản phẩm
-  const filteredProducts = searchQuery 
-    ? mockProducts.filter(product => {
-        const searchLower = searchQuery.toLowerCase().trim();
-        const titleMatch = product.title.toLowerCase().includes(searchLower);
-        const categoryMatch = product.category.toLowerCase().includes(searchLower);
-        const locationMatch = product.location.toLowerCase().includes(searchLower);
-        const hashtagMatch = product.hashtag.toLowerCase().includes(searchLower);
-        const descriptionMatch = product.description && product.description.toLowerCase().includes(searchLower);
-        return titleMatch || categoryMatch || locationMatch || hashtagMatch || descriptionMatch;
-      }).slice(0, 6)
-    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -524,90 +563,97 @@ export default function Home() {
       </section>
 
       {/* Search Results */}
-      {searchQuery && (
-        <section className="py-8 lg:py-16 bg-white border-b border-gray-200">
+      {(searchLoading || searchDone) && searchQuery && (
+        <section className="py-8 bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-6 lg:mb-8">
+            <div className="flex justify-between items-center mb-5">
               <div>
-                <h3 className="text-xl lg:text-2xl font-bold text-gray-900">
-                  Kết quả tìm kiếm cho "{searchQuery}"
+                <h3 className="text-xl font-bold text-gray-900">
+                  Kết quả cho <span className="text-green-600">"{searchQuery}"</span>
                 </h3>
-                <p className="text-gray-600">
-                  {filteredProducts.length > 0 
-                    ? `Tìm thấy ${filteredProducts.length} kết quả${filteredProducts.length === 6 ? ' (hiển thị 6 đầu tiên)' : ''}`
-                    : 'Không tìm thấy kết quả nào'
-                  }
-                </p>
+                {searchDone && !searchLoading && (
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {searchResults.length > 0 ? `Tìm thấy ${searchResults.length} kết quả từ tất cả danh mục` : 'Không tìm thấy kết quả nào'}
+                  </p>
+                )}
               </div>
-              <button 
-                onClick={clearSearch}
-                className="text-gray-600 hover:text-gray-800 cursor-pointer p-2"
-              >
+              <button onClick={clearSearch} className="text-gray-400 hover:text-gray-600 p-2">
                 <i className="ri-close-line text-xl"></i>
               </button>
             </div>
 
-            {filteredProducts.length > 0 ? (
+            {searchLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="bg-gray-100 rounded-xl h-48 animate-pulse"></div>
+                ))}
+              </div>
+            ) : searchResults.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
-                  {filteredProducts.map(product => (
-                    <div key={product.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden cursor-pointer border border-gray-200" data-product-shop>
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="w-full h-40 sm:h-48 object-cover object-top"
-                      />
-                      <div className="p-4 lg:p-6">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                            {product.category}
-                          </span>
-                          <span className="text-gray-500 text-sm">{product.timeAgo}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {searchResults.slice(0, 12).map((item: any) => (
+                    <Link key={`${item._type}-${item.id}`} href={item.link}
+                      className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow overflow-hidden group">
+                      {item.image ? (
+                        <img src={item.image} alt={item.title} className="w-full h-36 object-cover" />
+                      ) : (
+                        <div className={`w-full h-36 flex items-center justify-center ${TYPE_COLOR[item._type] || 'bg-gray-100'}`}>
+                          <i className={`${TYPE_ICON[item._type] || 'ri-file-line'} text-4xl opacity-40`}></i>
                         </div>
-                        <h4 className="text-base lg:text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                          {product.title}
+                      )}
+                      <div className="p-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${TYPE_COLOR[item._type] || 'bg-gray-100 text-gray-600'}`}>
+                          {item.category}
+                        </span>
+                        <h4 className="text-sm font-semibold text-gray-900 mt-1.5 mb-1 line-clamp-2 group-hover:text-green-600 transition-colors">
+                          {item.title}
                         </h4>
-                        <p className="text-lg lg:text-2xl font-bold text-green-600 mb-2">
-                          {product.price}
-                        </p>
-                        <div className="flex items-center text-gray-600 text-sm mb-2">
-                          <i className="ri-map-pin-line text-gray-400 mr-1"></i>
-                          <span className="truncate">{product.location}</span>
-                        </div>
-                        <button className="text-blue-600 hover:text-blue-800 text-sm cursor-pointer">
-                          {product.hashtag}
-                        </button>
+                        {item.price && <p className="text-sm font-bold text-green-600">{item.price}</p>}
+                        {item.location && (
+                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                            <i className="ri-map-pin-line"></i> {item.location}
+                          </p>
+                        )}
+                        {item.tags?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {item.tags.slice(0, 3).map((t: string, i: number) => (
+                              <span key={i} className="text-xs text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">#{t}</span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
-                
-                {filteredProducts.length === 6 && (
-                  <div className="text-center mt-8">
-                    <Link 
-                      href={`/products?search=${encodeURIComponent(searchQuery)}`}
-                      className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium cursor-pointer"
-                    >
-                      Xem tất cả kết quả tìm kiếm
-                    </Link>
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-3 mt-6 justify-center">
+                  <Link href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+                    Xem tất cả Sản phẩm
+                  </Link>
+                  <Link href={`/jobs?search=${encodeURIComponent(searchQuery)}`}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium">
+                    Xem tất cả Tuyển dụng
+                  </Link>
+                  <Link href={`/real-estate?search=${encodeURIComponent(searchQuery)}`}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+                    Xem tất cả BĐS
+                  </Link>
+                  <Link href={`/forum?search=${encodeURIComponent(searchQuery)}`}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium">
+                    Xem tất cả Diễn đàn
+                  </Link>
+                </div>
               </>
             ) : (
-              <div className="text-center py-12">
-                <i className="ri-search-line text-gray-300 text-6xl mb-4 w-16 h-16 flex items-center justify-center mx-auto"></i>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy kết quả</h3>
-                <p className="text-gray-600 mb-6">
-                  Thử tìm kiếm với từ khóa khác hoặc duyệt qua các danh mục sản phẩm
-                </p>
+              <div className="text-center py-10">
+                <i className="ri-search-line text-gray-200 text-5xl mb-3 block"></i>
+                <h3 className="text-base font-medium text-gray-700 mb-1">Không tìm thấy kết quả</h3>
+                <p className="text-sm text-gray-500 mb-4">Thử từ khóa khác hoặc hashtag như #NongSan, #TuyenDung</p>
                 <div className="flex flex-wrap justify-center gap-2">
-                  {['Nông sản', 'Thực phẩm', 'Nhà ở', 'Đất nền', 'Tuyển dụng'].map(keyword => (
-                    <button
-                      key={keyword}
-                      onClick={() => setSearchQuery(keyword)}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm cursor-pointer"
-                    >
-                      {keyword}
+                  {['cà phê', 'hồ tiêu', 'đất vườn', 'tuyển dụng', '#NongSan'].map(kw => (
+                    <button key={kw} onClick={() => handleHashtagClick(kw)}
+                      className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 text-sm">
+                      {kw}
                     </button>
                   ))}
                 </div>
