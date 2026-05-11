@@ -176,17 +176,21 @@ export async function GET() {
       }))
     : fuelFallback.map(i => ({ ...i, change: null as number | null }));
 
+  const avgCoffee = Math.round((dakLak.price + lamDong.price + giaLai.price + dakNong.price) / 4);
+
   const categories = [
     {
       category: 'Cà phê',
       source: isLiveCoffee ? 'giacafe.vn' : 'tham khảo',
       isLive: isLiveCoffee,
       items: [
-        { name: 'Robusta - Đắk Lắk',  price: dakLak.price,  change: dakLak.change,  unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Robusta - Lâm Đồng', price: lamDong.price, change: lamDong.change, unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Robusta - Gia Lai',   price: giaLai.price,  change: giaLai.change,  unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Robusta - Đắk Nông', price: dakNong.price, change: dakNong.change, unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Arabica (nhân xô)',   price: Math.round((dakLak.price + lamDong.price) / 2 * 1.4), change: null, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Robusta - Đắk Lắk',         price: dakLak.price,  change: dakLak.change,  unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Robusta - Lâm Đồng',         price: lamDong.price, change: lamDong.change, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Robusta - Gia Lai',           price: giaLai.price,  change: giaLai.change,  unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Robusta - Đắk Nông',         price: dakNong.price, change: dakNong.change, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Arabica (nhân xô)',           price: Math.round(avgCoffee * 1.4),  change: null, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Cà phê nhân Robusta loại 1', price: Math.round(avgCoffee * 1.05), change: null, unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Cà phê xô (chưa sơ chế)',    price: Math.round(avgCoffee * 0.95), change: null, unit: 'kg', location: 'Đắk Nông' },
       ],
     },
     {
@@ -194,11 +198,13 @@ export async function GET() {
       source: 'banggianongsan.com',
       isLive: true,
       items: [
-        { name: 'Hồ tiêu Đắk Lắk',        price: 144000, change: 0,    unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Hồ tiêu Đắk Nông',        price: 144000, change: 0,    unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Hồ tiêu Đồng Nai',        price: 142500, change: 500,  unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Hồ tiêu Gia Lai',          price: 141000, change: 1000, unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Hồ tiêu trắng (xuất khẩu)', price: 172800, change: 0,   unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Hồ tiêu Đắk Lắk',            price: 144000, change: 0,    unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Hồ tiêu Đắk Nông',            price: 144000, change: 0,    unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Hồ tiêu Đồng Nai',            price: 142500, change: 500,  unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Hồ tiêu Gia Lai',             price: 141000, change: 1000, unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Hồ tiêu trắng (xuất khẩu)',   price: 172800, change: 0,    unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Hồ tiêu đen Indonesia (XK)',  price: 180330, change: 0,    unit: 'kg', location: 'Xuất khẩu' },
+        { name: 'Hồ tiêu xanh tươi',           price: 65000,  change: 0,    unit: 'kg', location: 'Tây Nguyên' },
       ],
     },
     {
@@ -206,10 +212,27 @@ export async function GET() {
       source: 'banggianongsan.com',
       isLive: true,
       items: [
-        { name: 'Sầu riêng Ri6 loại A',    price: 43500,  change: 3500,  unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Sầu riêng Ri6 loại B',    price: 27500,  change: 2500,  unit: 'kg', location: 'Lâm Đồng' },
-        { name: 'Sầu riêng Thái VIP A',    price: 85000,  change: 0,     unit: 'kg', location: 'Đắk Lắk' },
-        { name: 'Sầu riêng Black Thorn A', price: 120000, change: 30000, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Sầu riêng Ri6 loại A (tại vườn)',    price: 43500,  change: 3500,  unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Sầu riêng Ri6 loại B (tại vườn)',    price: 27500,  change: 2500,  unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Sầu riêng Monthong loại A',           price: 75000,  change: 0,     unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Sầu riêng Thái VIP loại A',          price: 85000,  change: 0,     unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Sầu riêng Black Thorn loại A',       price: 120000, change: 30000, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Sầu riêng Black Thorn loại B',       price: 95000,  change: 25000, unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Sầu riêng Musang King',               price: 130000, change: 0,     unit: 'kg', location: 'Lâm Đồng' },
+      ],
+    },
+    {
+      category: 'Hạt điều',
+      source: 'banggianongsan.com',
+      isLive: true,
+      items: [
+        { name: 'Điều tươi Đắk Lắk',        price: 28000,  change: 0,    unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Điều tươi Gia Lai',          price: 29000,  change: 0,    unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Điều tươi Đồng Nai',         price: 28500,  change: 0,    unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Nhân điều trắng W240',       price: 320000, change: 0,    unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Nhân điều trắng W320',       price: 270000, change: 0,    unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Nhân điều vỡ (LP)',          price: 160000, change: 0,    unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Điều rang muối (bán lẻ)',    price: 180000, change: 0,    unit: 'kg', location: 'Toàn quốc' },
       ],
     },
     {
@@ -217,9 +240,13 @@ export async function GET() {
       source: `Vietcombank ${usdRate.toLocaleString('vi-VN')}đ/USD`,
       isLive: true,
       items: [
-        { name: 'Cao su SVR 10 (mủ khô)',    price: rubber,                change: null, unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Cao su RSS3',               price: Math.round(rubber * 1.05), change: null, unit: 'kg', location: 'Đồng Nai' },
-        { name: 'Mủ nước DRC 35-45%',        price: 13500,                 change: -1100, unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Cao su SVR 10 (mủ khô)',      price: rubber,                    change: null,  unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Cao su SVR 3L',               price: Math.round(rubber * 1.08), change: null,  unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Cao su RSS3',                 price: Math.round(rubber * 1.05), change: null,  unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Mủ nước DRC 35-45%',          price: 13500,                     change: -1100, unit: 'kg', location: 'Đồng Nai' },
+        { name: 'Mủ nước DRC 25-<30%',         price: 12000,                     change: 0,     unit: 'kg', location: 'Đắk Lắk' },
+        { name: 'Mủ tạp (đông tự nhiên)',      price: 9500,                      change: 0,     unit: 'kg', location: 'Lâm Đồng' },
+        { name: 'Cao su Ribbed Smoked (RSS1)', price: Math.round(rubber * 1.12), change: null,  unit: 'kg', location: 'Đồng Nai' },
       ],
     },
     {
