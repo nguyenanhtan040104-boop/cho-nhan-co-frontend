@@ -8,10 +8,6 @@ import { products as productsApi, realEstate, jobs, forum, advertisements, marke
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
 
   // Real data state
   const [featuredItems, setFeaturedItems] = useState<any[]>([]);
@@ -41,15 +37,11 @@ export default function Home() {
 
     // Load latest news: mix of forum + ads
     Promise.allSettled([
-      forum.getAll({ limit: 2 }),
-      advertisements.getAll({ limit: 1 }),
-    ]).then(([forumRes, adsRes]) => {
+      forum.getAll({ limit: 3 }),
+    ]).then(([forumRes]) => {
       const news: any[] = [];
       if (forumRes.status === 'fulfilled') {
         (forumRes.value.data || []).forEach((p: any) => news.push({ ...p, _type: 'forum', _category: 'Diễn đàn', _link: `/forum/${p.id}` }));
-      }
-      if (adsRes.status === 'fulfilled') {
-        (adsRes.value.data || []).forEach((p: any) => news.push({ ...p, _type: 'ad', _category: 'Quảng cáo', _link: `/advertisements/${p.id}` }));
       }
       setLatestNews(news);
     });
@@ -468,40 +460,6 @@ export default function Home() {
         return titleMatch || categoryMatch || locationMatch || hashtagMatch || descriptionMatch;
       }).slice(0, 6)
     : [];
-
-  const handleNotificationSubmit = async (e) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-
-    setIsSubmitting(true);
-    setSubmitMessage('');
-
-    try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('notification_type', 'all');
-
-      const response = await fetch('https://readdy.ai/api/form/submit/newsletter-subscription', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        setSubmitMessage('Đăng ký thành công! Bạn sẽ nhận được thông báo qua email.');
-        setEmail('');
-        setTimeout(() => {
-          setShowNotificationModal(false);
-          setSubmitMessage('');
-        }, 2000);
-      } else {
-        setSubmitMessage('Có lỗi xảy ra. Vui lòng thử lại.');
-      }
-    } catch (error) {
-      setSubmitMessage('Có lỗi xảy ra. Vui lòng thử lại.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1013,158 +971,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quick Actions */}
-      <section className="py-12 lg:py-16 bg-green-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 lg:mb-12">
-            <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2 lg:mb-4">Bắt đầu ngay hôm nay</h3>
-            <p className="text-green-100 text-base lg:text-lg">Tham gia cộng đồng và kết nối với hàng nghìn người dân</p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="ri-add-circle-line text-2xl lg:text-3xl text-green-600"></i>
-              </div>
-              <h4 className="text-lg lg:text-xl font-semibold text-white mb-2">Đăng tin miễn phí</h4>
-              <p className="text-green-100 mb-4 text-sm lg:text-base">Đăng tối đa 5 tin mỗi tháng hoàn toàn miễn phí</p>
-              <Link href="/products/create" className="bg-white text-green-600 px-4 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer text-sm lg:text-base">
-                Đăng tin ngay
-              </Link>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="ri-chat-3-line text-2xl lg:text-3xl text-green-600"></i>
-              </div>
-              <h4 className="text-lg lg:text-xl font-semibold text-white mb-2">Tham gia diễn đàn</h4>
-              <p className="text-green-100 mb-4 text-sm lg:text-base">Trao đổi kinh nghiệm và học hỏi từ cộng đồng</p>
-              <Link href="/forum" className="bg-white text-green-600 px-4 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer text-sm lg:text-base">
-                Vào diễn đàn
-              </Link>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="ri-notification-line text-2xl lg:text-3xl text-green-600"></i>
-              </div>
-              <h4 className="text-lg lg:text-xl font-semibold text-white mb-2">Nhận thông báo</h4>
-              <p className="text-green-100 mb-4 text-sm lg:text-base">Cập nhật tin tức và cơ hội mới mỗi ngày</p>
-              <button 
-                onClick={() => setShowNotificationModal(true)}
-                className="bg-white text-green-600 px-4 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer text-sm lg:text-base"
-                suppressHydrationWarning={true}
-              >
-                Đăng ký
-              </button>
-            </div>
+      {/* CTA */}
+      <section className="py-10 lg:py-14 bg-green-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">Bắt đầu ngay hôm nay</h3>
+          <p className="text-green-100 mb-6 text-sm lg:text-base">Tham gia cộng đồng và kết nối với hàng nghìn người dân</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/products/create" className="bg-white text-green-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+              <i className="ri-add-circle-line mr-2"></i>Đăng tin miễn phí
+            </Link>
+            <Link href="/forum" className="border-2 border-white text-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition-colors">
+              <i className="ri-chat-3-line mr-2"></i>Tham gia diễn đàn
+            </Link>
           </div>
         </div>
       </section>
-
-      {/* Notification Modal */}
-      {showNotificationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">Đăng ký nhận thông báo</h3>
-              <button
-                onClick={() => setShowNotificationModal(false)}
-                className="text-gray-400 hover:text-gray-600 cursor-pointer"
-              >
-                <i className="ri-close-line text-xl"></i>
-              </button>
-            </div>
-            
-            <p className="text-gray-600 mb-6">
-              Nhận thông báo về giá thị trường, tin tức mới và cơ hội kinh doanh qua email.
-            </p>
-            
-            <form onSubmit={handleNotificationSubmit} data-readdy-form id="newsletter-subscription">
-              <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email của bạn
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Nhập địa chỉ email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Loại thông báo
-                </label>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="notification_type"
-                      value="market_prices"
-                      className="rounded border-gray-300 text-green-600"
-                      defaultChecked
-                    />
-                    <span className="ml-2 text-sm text-gray-600">Giá thị trường</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="notification_type"
-                      value="news"
-                      className="rounded border-gray-300 text-green-600"
-                      defaultChecked
-                    />
-                    <span className="ml-2 text-sm text-gray-600">Tin mới</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="notification_type"
-                      value="events"
-                      className="rounded border-gray-300 text-green-600"
-                      defaultChecked
-                    />
-                    <span className="ml-2 text-sm text-gray-600">Sự kiện</span>
-                  </label>
-                </div>
-              </div>
-              
-              {submitMessage && (
-                <div className={`mb-4 p-3 rounded-lg text-sm ${
-                  submitMessage.includes('thành công') 
-                    ? 'bg-green-100 text-green-700' 
-                    : 'bg-red-100 text-red-700'
-                }`}>
-                  {submitMessage}
-                </div>
-              )}
-              
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowNotificationModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Đang xử lý...' : 'Đăng ký'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 lg:py-16">
