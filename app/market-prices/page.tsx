@@ -198,7 +198,7 @@ export default function MarketPricesPage() {
               <div className="flex flex-wrap gap-1.5 px-5 py-3 border-b bg-gray-50">
                 {agriCategories.map(cat => (
                   <button key={cat.category}
-                    onClick={() => setOpenCat(openCat === cat.category ? '' : cat.category)}
+                    onClick={() => setOpenCat(cat.category)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${openCat === cat.category ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
                     {cat.category}
                     {cat.isLive && (
