@@ -487,7 +487,7 @@ export default function MarketPricesPage() {
               </div>
             ))}
           </div>
-        )}
+        ) : null}
 
         {page < totalPages && (
           <div className="text-center mt-8">
