@@ -72,6 +72,16 @@ async function fetchCoffee() {
   }
 }
 
+// Tên sản phẩm xăng dầu theo thứ tự webgia.com
+const FUEL_NAMES = [
+  'Xăng RON 95-V',
+  'Xăng RON 95-III',
+  'Xăng E5 RON 92-II',
+  'Dầu diesel DO 0,001S-V',
+  'Dầu diesel DO 0,05S-II',
+  'Dầu hỏa 2-K',
+];
+
 // ─── Fetch giá xăng từ webgia.com ───
 async function fetchFuel() {
   try {
@@ -82,6 +92,8 @@ async function fetchFuel() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
 
+    // webgia dùng dấu . là phân cách nghìn: "24.350" → 24350
+    // Mỗi hàng có 2 cột giá (Vùng 1 | Vùng 2) — lấy Vùng 1
     type FuelRow = { name: string; price: number };
     const items: FuelRow[] = [];
 
@@ -90,17 +102,16 @@ async function fetchFuel() {
     while ((m = trRe.exec(html)) !== null) {
       const cells = [...m[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)]
         .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim());
-      if (cells.length < 2) continue;
+      if (cells.length < 1) continue;
 
-      const name = cells[0];
-      if (!name || name.length < 3) continue;
-
-      // webgia dùng dấu . là phân cách nghìn: "24.350" → 24350
-      const priceRaw = cells[1].replace(/\./g, '').replace(/,/g, '');
+      // Tìm cell đầu tiên là số giá hợp lệ (Vùng 1)
+      const priceRaw = cells[0].replace(/\./g, '').replace(/,/g, '');
       const price = parseInt(priceRaw);
       if (isNaN(price) || price < 10000 || price > 100000) continue;
 
-      items.push({ name, price });
+      const idx = items.length;
+      if (idx >= FUEL_NAMES.length) break;
+      items.push({ name: FUEL_NAMES[idx], price });
     }
 
     return items.length > 0 ? { items, isLive: true } : null;
