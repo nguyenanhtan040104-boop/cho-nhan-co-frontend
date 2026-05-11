@@ -1005,7 +1005,7 @@ export default function Home() {
                 <a href="https://www.facebook.com/trungnguyenanhtan" className="text-gray-400 hover:text-green-400 cursor-pointer">
                   <i className="ri-facebook-circle-line text-2xl"></i>
                 </a>
-                <a href="tel:0888317289" className="text-gray-400 hover:text-green-400 cursor-pointer">
+                <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-400 cursor-pointer">
                   <i className="ri-phone-line text-2xl"></i>
                 </a>
               </div>
@@ -1027,7 +1027,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Liên hệ</h4>
               <div className="space-y-3 text-gray-400">
-                <a href="tel:0888317289" className="flex items-center space-x-2 hover:text-green-400 transition-colors">
+                <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 hover:text-green-400 transition-colors">
                   <i className="ri-phone-line"></i>
                   <span>0888.317.289</span>
                 </a>
