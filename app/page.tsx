@@ -1027,10 +1027,10 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Liên hệ</h4>
               <div className="space-y-3 text-gray-400">
-                <div className="flex items-center space-x-2">
+                <a href="tel:0888317289" className="flex items-center space-x-2 hover:text-green-400 transition-colors">
                   <i className="ri-phone-line"></i>
                   <span>0888.317.289</span>
-                </div>
+                </a>
                 <div className="flex items-center space-x-2">
                   <i className="ri-mail-line"></i>
                   <span>chonhanco41@gmail.com</span>
