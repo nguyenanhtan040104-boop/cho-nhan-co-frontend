@@ -2,8 +2,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { products as productsApi, realEstate, jobs, forum, advertisements, marketPrices as marketPricesApi } from '../lib/api';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,6 +12,52 @@ export default function Home() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+
+  // Real data state
+  const [featuredItems, setFeaturedItems] = useState<any[]>([]);
+  const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [liveMarketPrices, setLiveMarketPrices] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load featured posts: mix of products, real-estate, jobs
+    Promise.allSettled([
+      productsApi.getAll({ limit: 2, sortBy: 'popular' }),
+      realEstate.getAll({ limit: 1 }),
+      jobs.getAll({ limit: 1 }),
+    ]).then(([prodRes, reRes, jobRes]) => {
+      const items: any[] = [];
+      if (prodRes.status === 'fulfilled') {
+        (prodRes.value.data || []).forEach((p: any) => items.push({ ...p, _type: 'product' }));
+      }
+      if (reRes.status === 'fulfilled') {
+        (reRes.value.data || []).forEach((p: any) => items.push({ ...p, _type: 'real-estate' }));
+      }
+      if (jobRes.status === 'fulfilled') {
+        (jobRes.value.data || []).forEach((p: any) => items.push({ ...p, _type: 'job' }));
+      }
+      setFeaturedItems(items);
+    });
+
+    // Load latest news: mix of forum + ads
+    Promise.allSettled([
+      forum.getAll({ limit: 2 }),
+      advertisements.getAll({ limit: 1 }),
+    ]).then(([forumRes, adsRes]) => {
+      const news: any[] = [];
+      if (forumRes.status === 'fulfilled') {
+        (forumRes.value.data || []).forEach((p: any) => news.push({ ...p, _type: 'forum', _category: 'Diễn đàn', _link: `/forum/${p.id}` }));
+      }
+      if (adsRes.status === 'fulfilled') {
+        (adsRes.value.data || []).forEach((p: any) => news.push({ ...p, _type: 'ad', _category: 'Quảng cáo', _link: `/advertisements/${p.id}` }));
+      }
+      setLatestNews(news);
+    });
+
+    // Load market prices
+    marketPricesApi.getAll({ limit: 4 }).then((res: any) => {
+      setLiveMarketPrices(res.data || []);
+    }).catch(() => {});
+  }, []);
 
   // Thêm dữ liệu sản phẩm mẫu
   const mockProducts = [
@@ -654,121 +700,74 @@ export default function Home() {
               Xem tất cả →
             </Link>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
-            {featuredPosts.map((post) => (
-              <Link
-                key={post.id}
-                href={post.link}
-                className={`bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer block group relative ${
-                  post.isVip ? 'transform hover:scale-105' : ''
-                }`}
-                data-product-shop="true"
-              >
-                {/* VIP Badge */}
-                {post.isVip && (
-                  <div className="absolute top-3 left-3 z-10">
-                    {post.vipType === 'premium' && (
-                      <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                        <i className="ri-vip-crown-2-fill w-3 h-3 flex items-center justify-center"></i>
-                        PREMIUM
-                      </div>
-                    )}
-                    {post.vipType === 'vip' && (
-                      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                        <i className="ri-vip-crown-fill w-3 h-3 flex items-center justify-center"></i>
-                        VIP
-                      </div>
-                    )}
-                    {post.vipType === 'hot' && (
-                      <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                        <i className="ri-fire-fill w-3 h-3 flex items-center justify-center"></i>
-                        HOT
-                      </div>
-                    )}
+            {featuredItems.length === 0 ? (
+              // Skeleton loading
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
+                  <div className="h-40 bg-gray-200"></div>
+                  <div className="p-4 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </div>
-                )}
-
-                {/* Sparkle Effect for VIP */}
-                {post.isVip && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    <div className="absolute top-4 right-4 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                    <div className="absolute top-8 right-8 w-1 h-1 bg-white rounded-full animate-pulse delay-300"></div>
-                    <div className="absolute top-6 right-12 w-1.5 h-1.5 bg-white rounded-full animate-pulse delay-700"></div>
-                  </div>
-                )}
-                
-                <div className={`relative ${post.isVip ? 'border-2 border-transparent bg-gradient-to-br from-yellow-50 via-white to-orange-50' : ''}`}>
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-40 sm:h-48 object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                  />
-                  
-                  {/* VIP Glow Effect */}
-                  {post.isVip && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  )}
                 </div>
+              ))
+            ) : (
+              featuredItems.map((post) => {
+                const link = post._type === 'product' ? `/products/${post.id}`
+                  : post._type === 'real-estate' ? `/real-estate/${post.id}`
+                  : `/jobs/${post.id}`;
+                const categoryLabel = post._type === 'product' ? 'Sản phẩm'
+                  : post._type === 'real-estate' ? 'Bất động sản' : 'Tuyển dụng';
+                const categoryColor = post._type === 'product' ? 'bg-green-100 text-green-800'
+                  : post._type === 'real-estate' ? 'bg-blue-100 text-blue-800' : 'bg-indigo-100 text-indigo-800';
+                const priceText = post._type === 'product'
+                  ? `${Number(post.price).toLocaleString('vi-VN')}đ/${post.unit}`
+                  : post._type === 'real-estate'
+                  ? (Number(post.price) >= 1e9 ? (Number(post.price)/1e9).toFixed(1)+' tỷ' : (Number(post.price)/1e6).toFixed(0)+' triệu')
+                  : post.salary || 'Thỏa thuận';
+                const imgUrl = post.images?.[0]?.url || post.images?.[0] || null;
+                const timeAgo = post.createdAt ? new Date(post.createdAt).toLocaleDateString('vi-VN') : '';
 
-                <div className={`p-4 lg:p-6 ${post.isVip ? 'bg-gradient-to-br from-yellow-50/30 via-white to-orange-50/30' : ''}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      post.isVip 
-                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {post.category}
-                    </span>
-                    <span className="text-gray-500 text-xs lg:text-sm">{post.timeAgo}</span>
-                  </div>
-                  
-                  <h4 className={`text-base lg:text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors ${
-                    post.isVip ? 'font-bold' : ''
-                  }`}>
-                    {post.title}
-                  </h4>
-                  
-                  <p className={`text-lg lg:text-2xl font-bold text-green-600 mb-2 ${
-                    post.isVip ? 'text-2xl lg:text-3xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent' : ''
-                  }`}>
-                    {post.urgency}
-                  </p>
-                  
-                  <div className="flex items-center text-gray-600 text-sm mb-2">
-                    <i className="ri-map-pin-line text-gray-400 mr-1 w-4 h-4 flex items-center justify-center"></i>
-                    <span className="truncate">{post.location}</span>
-                  </div>
-
-                  {/* VIP Stats */}
-                  {post.isVip && (
-                    <div className="flex items-center justify-between mb-2 text-xs text-gray-500">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          <i className="ri-eye-line w-3 h-3 flex items-center justify-center"></i>
-                          <span>{post.viewCount}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <i className="ri-phone-line w-3 h-3 flex items-center justify-center"></i>
-                          <span>{post.contactCount}</span>
+                return (
+                  <Link key={post.id} href={link}
+                    className={`bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer block group relative ${post.isVip ? 'transform hover:scale-105' : ''}`}>
+                    {post.isVip && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+                          <i className="ri-vip-crown-fill"></i> VIP
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 text-orange-500">
-                        <i className="ri-star-fill w-3 h-3 flex items-center justify-center"></i>
-                        <span className="font-medium">Ưu tiên</span>
-                      </div>
+                    )}
+                    <div className="relative h-40 sm:h-48 bg-gray-100">
+                      {imgUrl ? (
+                        <img src={imgUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <i className={`text-5xl text-gray-300 ${post._type === 'product' ? 'ri-plant-line' : post._type === 'real-estate' ? 'ri-home-4-line' : 'ri-briefcase-line'}`}></i>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  
-                  <button className={`text-blue-600 hover:text-blue-800 text-sm cursor-pointer font-medium ${
-                    post.isVip ? 'bg-blue-50 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors' : ''
-                  }`}
-                  suppressHydrationWarning={true}>
-                    {post.hashtag}
-                  </button>
-                </div>
-              </Link>
-            ))}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${categoryColor}`}>{categoryLabel}</span>
+                        <span className="text-gray-400 text-xs">{timeAgo}</span>
+                      </div>
+                      <h4 className="text-sm lg:text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">{post.title}</h4>
+                      <p className="text-base lg:text-lg font-bold text-green-600 mb-1">{priceText}</p>
+                      {(post.location || post.address) && (
+                        <div className="flex items-center text-gray-500 text-xs">
+                          <i className="ri-map-pin-line mr-1"></i>
+                          <span className="truncate">{post.location || post.address}</span>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })
+            )}
           </div>
 
           {/* VIP Benefits Banner */}
@@ -823,24 +822,29 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {marketPrices.map((item, index) => (
-              <div key={index} className="bg-gray-50 rounded-xl p-4 lg:p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-gray-900 text-sm lg:text-base">{item.product}</h4>
-                  <div className={`flex items-center space-x-1 ${
-                    item.trend === 'up' ? 'text-green-600' : 
-                    item.trend === 'down' ? 'text-red-600' : 'text-gray-600'
-                  }`}>
-                    <i className={`${
-                      item.trend === 'up' ? 'ri-arrow-up-line' : 
-                      item.trend === 'down' ? 'ri-arrow-down-line' : 'ri-subtract-line'
-                    } text-sm`}></i>
-                    <span className="text-sm">{item.change}</span>
+            {(liveMarketPrices.length > 0 ? liveMarketPrices : [
+              { productName: 'Cà phê Robusta', price: 45000, unit: 'kg', trend: 'up', changePercent: 2 },
+              { productName: 'Hồ tiêu đen', price: 85000, unit: 'kg', trend: 'down', changePercent: -1 },
+              { productName: 'Cao su khô', price: 28000, unit: 'kg', trend: 'up', changePercent: 3 },
+              { productName: 'Lúa tẻ', price: 8500, unit: 'kg', trend: 'stable', changePercent: 0 },
+            ]).map((item: any, index: number) => {
+              const trend = item.trend || (item.changePercent > 0 ? 'up' : item.changePercent < 0 ? 'down' : 'stable');
+              const priceDisplay = item.price ? `${Number(item.price).toLocaleString('vi-VN')}đ/${item.unit || 'kg'}` : item.priceDisplay || '—';
+              const changePct = item.changePercent != null ? (item.changePercent > 0 ? `+${item.changePercent}%` : `${item.changePercent}%`) : item.change || '0%';
+              return (
+                <Link key={index} href="/market-prices" className="bg-gray-50 rounded-xl p-4 lg:p-6 hover:shadow-md hover:bg-white transition-all block">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-gray-900 text-sm lg:text-base">{item.productName || item.product}</h4>
+                    <div className={`flex items-center space-x-1 ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
+                      <i className={`${trend === 'up' ? 'ri-arrow-up-line' : trend === 'down' ? 'ri-arrow-down-line' : 'ri-subtract-line'} text-sm`}></i>
+                      <span className="text-sm">{changePct}</span>
+                    </div>
                   </div>
-                </div>
-                <p className="text-xl lg:text-2xl font-bold text-gray-900">{item.price}</p>
-              </div>
-            ))}
+                  <p className="text-xl lg:text-2xl font-bold text-gray-900">{priceDisplay}</p>
+                  <p className="text-xs text-gray-400 mt-1">Nhấn để xem chi tiết →</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -854,23 +858,36 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-            {news.map((item, index) => (
-              <Link
-                key={index}
-                href={item.link}
-                className="bg-white rounded-xl p-4 lg:p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer block"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    {item.category}
-                  </span>
-                  <span className="text-gray-500 text-sm">{item.time}</span>
+            {latestNews.length === 0 ? (
+              // Fallback static + skeleton
+              [...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl p-4 lg:p-6 shadow-sm animate-pulse">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-5 w-20 bg-gray-200 rounded-full"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded ml-auto"></div>
+                  </div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 </div>
-                <h4 className="text-base lg:text-lg font-semibold text-gray-900 hover:text-green-600 transition-colors">
-                  {item.title}
-                </h4>
-              </Link>
-            ))}
+              ))
+            ) : (
+              latestNews.map((item: any, index: number) => {
+                const catColor = item._type === 'forum' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800';
+                const timeDisplay = item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '';
+                return (
+                  <Link key={index} href={item._link}
+                    className="bg-white rounded-xl p-4 lg:p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer block group">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`text-xs px-2 py-1 rounded-full ${catColor}`}>{item._category}</span>
+                      <span className="text-gray-500 text-sm">{timeDisplay}</span>
+                    </div>
+                    <h4 className="text-base lg:text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors line-clamp-2">
+                      {item.title}
+                    </h4>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </div>
       </section>
