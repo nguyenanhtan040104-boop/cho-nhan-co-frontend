@@ -339,7 +339,6 @@ export default function MarketPricesPage() {
                   <button key={cat.category}
                     onClick={() => setOpenCat(openCat === cat.category ? '' : cat.category)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${openCat === cat.category ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                    <span>{cat.icon}</span>
                     <span>{cat.category}</span>
                     {cat.isLive && <span className={`w-1.5 h-1.5 rounded-full ${openCat === cat.category ? 'bg-green-200' : 'bg-green-500'}`}></span>}
                   </button>
@@ -398,19 +397,13 @@ export default function MarketPricesPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {loading && items.length === 0 ? (
-          <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+        {loading && items.length > 0 ? (
+          <div className="flex justify-center py-10">
+            <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : items.length === 0 ? (
-          <div className="bg-white rounded-xl p-16 text-center shadow-sm">
-            <i className="ri-line-chart-line text-6xl text-gray-300 block mb-3"></i>
-            <p className="text-gray-500 mb-4">Chưa có dữ liệu giá nào</p>
-            {isAdmin && (
-              <button onClick={() => setShowForm(true)} className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 text-sm">
-                Thêm giá đầu tiên
-              </button>
-            )}
+        ) : (category || search || location) && items.length === 0 ? (
+          <div className="bg-white rounded-xl p-10 text-center shadow-sm">
+            <p className="text-gray-400 text-sm">Không tìm thấy kết quả</p>
           </div>
         ) : category || search || location ? (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -456,7 +449,7 @@ export default function MarketPricesPage() {
               </table>
             </div>
           </div>
-        ) : (
+        ) : items.length > 0 ? (
           <div className="space-y-6">
             {Object.entries(grouped).map(([cat, catItems]: [string, any]) => (
               <div key={cat} className="bg-white rounded-xl shadow-sm overflow-hidden">
