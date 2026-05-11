@@ -47,6 +47,12 @@ export default function MarketPricesPage() {
   const [goldSource, setGoldSource] = useState('');
   const [goldLoading, setGoldLoading] = useState(true);
 
+  // Giá nông sản tham khảo
+  const [agriCategories, setAgriCategories] = useState<any[]>([]);
+  const [agriLoading, setAgriLoading] = useState(true);
+  const [agriUpdatedAt, setAgriUpdatedAt] = useState('');
+  const [openCat, setOpenCat] = useState<string>('');
+
   // Form thêm giá
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ productName: '', category: 'Cà phê', unit: 'kg', price: '', location: '', note: '', source: '' });
@@ -89,6 +95,17 @@ export default function MarketPricesPage() {
       })
       .catch(() => {})
       .finally(() => setGoldLoading(false));
+
+    // Fetch giá nông sản
+    fetch('/api/agri-prices')
+      .then(r => r.json())
+      .then(d => {
+        setAgriCategories(d.categories || []);
+        setAgriUpdatedAt(d.updatedAt || '');
+        if (d.categories?.length > 0) setOpenCat(d.categories[0].category);
+      })
+      .catch(() => {})
+      .finally(() => setAgriLoading(false));
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -279,6 +296,103 @@ export default function MarketPricesPage() {
 
           <p className="text-xs text-gray-400 mt-3 text-center">
             Nguồn: sjc.com.vn • Giá đơn vị triệu đồng/lượng (37.5g) • Chỉ mang tính tham khảo
+          </p>
+        </div>
+
+        {/* Giá nông sản tham khảo */}
+        <div className="mt-6 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-green-50 to-emerald-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
+                <span className="text-lg">🌾</span>
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Nông Sản Tham Khảo</h2>
+                <p className="text-xs text-gray-500">
+                  🟡 Giá tham khảo thị trường
+                  {agriUpdatedAt && ` • Cập nhật: ${new Date(agriUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                </p>
+              </div>
+            </div>
+            <button onClick={() => {
+              setAgriLoading(true);
+              fetch('/api/agri-prices').then(r => r.json()).then(d => {
+                setAgriCategories(d.categories || []);
+                setAgriUpdatedAt(d.updatedAt || '');
+              }).finally(() => setAgriLoading(false));
+            }} className="text-green-600 hover:text-green-700 p-2 rounded-lg hover:bg-green-100 transition-colors" title="Làm mới">
+              <i className={`ri-refresh-line text-lg ${agriLoading ? 'animate-spin' : ''}`}></i>
+            </button>
+          </div>
+
+          {agriLoading ? (
+            <div className="p-6 space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse"></div>
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Category tabs */}
+              <div className="flex flex-wrap gap-1.5 px-5 py-3 border-b bg-gray-50">
+                {agriCategories.map(cat => (
+                  <button key={cat.category}
+                    onClick={() => setOpenCat(openCat === cat.category ? '' : cat.category)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${openCat === cat.category ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                    <span>{cat.icon}</span>
+                    <span>{cat.category}</span>
+                    {cat.isLive && <span className={`w-1.5 h-1.5 rounded-full ${openCat === cat.category ? 'bg-green-200' : 'bg-green-500'}`}></span>}
+                  </button>
+                ))}
+              </div>
+
+              {/* Selected category table */}
+              {agriCategories.filter(cat => cat.category === openCat).map(cat => (
+                <div key={cat.category}>
+                  <div className="px-5 py-2.5 bg-gray-50 border-b flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">
+                      {cat.icon} {cat.category}
+                      {cat.isLive
+                        ? <span className="ml-2 text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🟢 Dữ liệu thực ({cat.source})</span>
+                        : <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Tham khảo</span>}
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b">
+                        <tr>
+                          <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
+                          <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Giá</th>
+                          <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Địa điểm</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {cat.items.map((item: any, i: number) => (
+                          <tr key={i} className="hover:bg-green-50/30 transition-colors">
+                            <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
+                            <td className="px-5 py-3 text-right">
+                              <span className="font-bold text-green-600">{item.price.toLocaleString('vi-VN')}đ</span>
+                              <span className="text-xs text-gray-400">/{item.unit}</span>
+                            </td>
+                            <td className="px-5 py-3 text-sm text-gray-500 hidden sm:table-cell">{item.location}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+
+              {!openCat && (
+                <div className="px-5 py-8 text-center text-gray-400 text-sm">
+                  Chọn một danh mục để xem bảng giá chi tiết
+                </div>
+              )}
+            </>
+          )}
+
+          <p className="text-xs text-gray-400 px-5 py-3 border-t text-center">
+            Giá mang tính tham khảo, cập nhật theo dữ liệu thị trường • giacaphe.com, Vietcombank
           </p>
         </div>
       </div>
