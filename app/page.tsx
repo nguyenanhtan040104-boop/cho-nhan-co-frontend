@@ -14,6 +14,7 @@ export default function Home() {
   const [latestNews, setLatestNews] = useState<any[]>([]);
   const [liveMarketPrices, setLiveMarketPrices] = useState<any[]>([]);
   const [featuredAds, setFeaturedAds] = useState<any[]>([]);
+  const [homeMarketCards, setHomeMarketCards] = useState<any[]>([]);
 
   useEffect(() => {
     // Load featured posts: mix of products, real-estate, jobs
@@ -46,9 +47,25 @@ export default function Home() {
       setLatestNews(news);
     });
 
-    // Load market prices
+    // Load market prices từ DB (legacy)
     marketPricesApi.getAll({ limit: 4 }).then((res: any) => {
       setLiveMarketPrices(res.data || []);
+    }).catch(() => {});
+
+    // Load giá hàng hóa thực từ API
+    fetch('/api/agri-prices').then(r => r.json()).then(d => {
+      const cats = d.categories || [];
+      const find = (cat: string, kw: string) => {
+        const c = cats.find((c: any) => c.category === cat);
+        return c?.items?.find((i: any) => i.name.toLowerCase().includes(kw.toLowerCase()));
+      };
+      const cards = [
+        { label: 'Cà phê Robusta', item: find('Cà phê', 'Đắk Lắk'), icon: '☕', color: 'brown' },
+        { label: 'Hồ tiêu đen',    item: find('Hồ tiêu', 'Đắk Lắk'), icon: '🌶', color: 'red' },
+        { label: 'Sầu riêng Ri6',  item: find('Sầu riêng', 'Ri6 loại A'), icon: '🍈', color: 'yellow' },
+        { label: 'Xăng RON 95',    item: find('Xăng dầu', 'RON 95-III'), icon: '⛽', color: 'blue' },
+      ].filter(c => c.item);
+      setHomeMarketCards(cards);
     }).catch(() => {});
 
     // Load featured ads
@@ -786,29 +803,41 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {(liveMarketPrices.length > 0 ? liveMarketPrices : [
-              { productName: 'Cà phê Robusta', price: 45000, unit: 'kg', trend: 'up', changePercent: 2 },
-              { productName: 'Hồ tiêu đen', price: 85000, unit: 'kg', trend: 'down', changePercent: -1 },
-              { productName: 'Cao su khô', price: 28000, unit: 'kg', trend: 'up', changePercent: 3 },
-              { productName: 'Lúa tẻ', price: 8500, unit: 'kg', trend: 'stable', changePercent: 0 },
-            ]).map((item: any, index: number) => {
-              const trend = item.trend || (item.changePercent > 0 ? 'up' : item.changePercent < 0 ? 'down' : 'stable');
-              const priceDisplay = item.price ? `${Number(item.price).toLocaleString('vi-VN')}đ/${item.unit || 'kg'}` : item.priceDisplay || '—';
-              const changePct = item.changePercent != null ? (item.changePercent > 0 ? `+${item.changePercent}%` : `${item.changePercent}%`) : item.change || '0%';
-              return (
-                <Link key={index} href="/market-prices" className="bg-gray-50 rounded-xl p-4 lg:p-6 hover:shadow-md hover:bg-white transition-all block">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-gray-900 text-sm lg:text-base">{item.productName || item.product}</h4>
-                    <div className={`flex items-center space-x-1 ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
-                      <i className={`${trend === 'up' ? 'ri-arrow-up-line' : trend === 'down' ? 'ri-arrow-down-line' : 'ri-subtract-line'} text-sm`}></i>
-                      <span className="text-sm">{changePct}</span>
+            {homeMarketCards.length === 0 ? (
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="bg-gray-50 rounded-xl p-5 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-3"></div>
+                  <div className="h-7 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                </div>
+              ))
+            ) : (
+              homeMarketCards.map((card: any, index: number) => {
+                const { item } = card;
+                const ch = item.change;
+                const isUp = ch > 0;
+                const isDown = ch < 0;
+                return (
+                  <Link key={index} href="/market-prices" className="bg-gray-50 rounded-xl p-4 lg:p-5 hover:shadow-md hover:bg-white transition-all block border border-transparent hover:border-green-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-gray-700 text-sm">{card.label}</h4>
+                      {ch != null && ch !== 0 ? (
+                        <span className={`text-xs font-semibold flex items-center gap-0.5 ${isUp ? 'text-red-500' : 'text-green-600'}`}>
+                          {isUp ? '▲' : '▼'} {Math.abs(ch).toLocaleString('vi-VN')}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">— 0</span>
+                      )}
                     </div>
-                  </div>
-                  <p className="text-xl lg:text-2xl font-bold text-gray-900">{priceDisplay}</p>
-                  <p className="text-xs text-gray-400 mt-1">Nhấn để xem chi tiết →</p>
-                </Link>
-              );
-            })}
+                    <p className="text-xl lg:text-2xl font-bold text-gray-900">
+                      {item.price.toLocaleString('vi-VN')}đ
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">/{item.unit} • {item.location}</p>
+                    <p className="text-xs text-green-600 mt-2">Xem chi tiết →</p>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </div>
       </section>
