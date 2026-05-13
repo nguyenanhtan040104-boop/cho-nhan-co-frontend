@@ -134,9 +134,15 @@ export default function ProfilePage() {
 
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
 
-      const isAdmin = data.user?.role?.toLowerCase() === 'admin';
+      // Gọi /users/me để lấy role chính xác
+      const meRes = await fetch(`${API_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${data.accessToken}` },
+      });
+      const me = meRes.ok ? await meRes.json() : (data.user || {});
+      localStorage.setItem('user', JSON.stringify(me));
+
+      const isAdmin = me?.role?.toLowerCase() === 'admin';
       setMessage(isAdmin ? 'Đăng nhập Admin thành công!' : 'Đăng nhập thành công!');
       setTimeout(() => router.push(isAdmin ? '/admin/dashboard' : '/dashboard'), 1500);
     } catch (err: any) {
