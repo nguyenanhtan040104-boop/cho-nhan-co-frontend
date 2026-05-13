@@ -65,11 +65,66 @@ async function fetchCoffee() {
   }
 }
 
-// ─── Fetch giá xăng từ giaxang.com.vn (thuần HTML, không JS render) ───
+// ─── Fetch giá xăng từ petrolimex.com.vn ───
 async function fetchFuel() {
-  // Thử lần lượt các nguồn
-  const result = await fetchFuelGiaxang() || await fetchFuelGovApi();
-  return result;
+  return await fetchFuelPetrolimex() || await fetchFuelGiaxang() || await fetchFuelGovApi();
+}
+
+async function fetchFuelPetrolimex() {
+  try {
+    const res = await fetch('https://www.petrolimex.com.vn/nd/gia-ban-le-xang-dau.html', {
+      headers: {
+        ...BROWSER_HEADERS,
+        'Referer': 'https://www.petrolimex.com.vn/',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+
+    type FuelRow = { name: string; price: number };
+    const items: FuelRow[] = [];
+
+    // Parse table rows
+    const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let m;
+    while ((m = trRe.exec(html)) !== null) {
+      const cells = [...m[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
+        .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim());
+      if (cells.length < 2) continue;
+
+      const name = cells[0];
+      if (!name || name.length < 4) continue;
+
+      // Tên chứa từ khóa xăng/dầu/diesel
+      if (!/(xăng|dầu|diesel|hỏa|RON|E5)/i.test(name)) continue;
+
+      // Tìm giá: số 5 chữ số trong khoảng 10000-100000
+      let price = 0;
+      for (let i = 1; i < cells.length; i++) {
+        const raw = cells[i].replace(/[,\.\s]/g, '');
+        const n = parseInt(raw);
+        if (n >= 10000 && n <= 100000) { price = n; break; }
+      }
+      if (!price) {
+        // Tìm giá trong cả row string (pattern như 20,620 hoặc 20.620)
+        const priceMatch = m[1].match(/(\d{2})[,\.](\d{3})\b/g);
+        if (priceMatch) {
+          const n = parseInt(priceMatch[0].replace(/[,\.]/g, ''));
+          if (n >= 10000 && n <= 100000) price = n;
+        }
+      }
+      if (!price) continue;
+
+      items.push({ name, price });
+      if (items.length >= 6) break;
+    }
+
+    return items.length > 0 ? { items, isLive: true, src: 'petrolimex.com.vn' } : null;
+  } catch {
+    return null;
+  }
 }
 
 async function fetchFuelGiaxang() {
@@ -84,7 +139,6 @@ async function fetchFuelGiaxang() {
     type FuelRow = { name: string; price: number };
     const items: FuelRow[] = [];
 
-    // Parse tất cả <tr> trong bảng
     const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
     let m;
     while ((m = trRe.exec(html)) !== null) {
@@ -96,7 +150,6 @@ async function fetchFuelGiaxang() {
       if (!name || name.length < 5) continue;
       if (!/(xăng|dầu|diesel|hỏa|RON|E5)/i.test(name)) continue;
 
-      // Tìm giá trong các cột (số 10000-100000)
       let price = 0;
       for (let i = 1; i < cells.length; i++) {
         const raw = cells[i].replace(/[,\.\s]/g, '');
