@@ -449,6 +449,15 @@ export const forum = {
   async bulkReject(ids: string[], reason?: string) {
     return request('/forum/admin/posts/bulk-reject', { method: 'POST', body: JSON.stringify({ ids, reason }) });
   },
+  async hidePost(id: string) {
+    return request(`/forum/admin/posts/${id}/hide`, { method: 'POST' });
+  },
+  async unhidePost(id: string) {
+    return request(`/forum/admin/posts/${id}/unhide`, { method: 'POST' });
+  },
+  async adminDeletePost(id: string) {
+    return request(`/forum/admin/posts/${id}`, { method: 'DELETE' });
+  },
 };
 
 // =================== MESSAGES ===================

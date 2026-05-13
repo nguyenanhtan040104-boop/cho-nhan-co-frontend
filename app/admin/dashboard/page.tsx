@@ -48,7 +48,7 @@ export default function AdminDashboard() {
   async function loadAdmin() {
     try {
       const me = await users.getMe();
-      if (me.role !== 'ADMIN') {
+      if (me.role?.toLowerCase() !== 'admin') {
         alert('Bạn không có quyền truy cập trang này');
         router.push('/dashboard');
         return;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { jobs } from '../../lib/api';
+import { jobs, auth } from '../../lib/api';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -22,6 +22,27 @@ export default function JobsPage() {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [urgentOnly, setUrgentOnly] = useState(false);
+
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+
+  function toggleSelect(id: string) {
+    setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  }
+
+  async function handleBulkDelete() {
+    if (!selected.size || !confirm(`Xóa ${selected.size} tin đã chọn?`)) return;
+    setDeleting(true);
+    try {
+      await Promise.all([...selected].map(id => jobs.delete(id)));
+      setItems(prev => prev.filter(p => !selected.has(p.id)));
+      setTotal(prev => prev - selected.size);
+      setSelected(new Set()); setBulkMode(false);
+    } catch (e: any) { alert(e.message || 'Xóa thất bại'); }
+    finally { setDeleting(false); }
+  }
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -57,7 +78,14 @@ export default function JobsPage() {
               <h1 className="text-2xl font-bold text-gray-900">Tuyển dụng</h1>
               <p className="text-gray-500 text-sm mt-1">{total} tin tuyển dụng</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              {isLoggedIn && (
+                <button onClick={() => { setBulkMode(!bulkMode); setSelected(new Set()); }}
+                  className={`border px-3 py-2 rounded-lg text-sm flex items-center gap-1 ${bulkMode ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}>
+                  <i className="ri-checkbox-multiple-line"></i>
+                  <span className="hidden sm:inline">Chọn nhiều</span>
+                </button>
+              )}
               <Link href="/jobs/seek" className="border border-indigo-600 text-indigo-600 px-4 py-2.5 rounded-lg hover:bg-indigo-50 text-sm font-medium whitespace-nowrap">
                 Tìm việc
               </Link>
@@ -90,6 +118,21 @@ export default function JobsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {bulkMode && (
+          <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center gap-3 flex-wrap">
+            <span className="text-sm text-indigo-700 font-medium">
+              {selected.size > 0 ? `Đã chọn ${selected.size} tin` : 'Nhấn vào tin để chọn'}
+            </span>
+            <div className="ml-auto flex gap-2">
+              <button onClick={handleBulkDelete} disabled={selected.size === 0 || deleting}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-40 text-sm flex items-center gap-1">
+                <i className="ri-delete-bin-line"></i>{deleting ? 'Đang xóa...' : `Xóa (${selected.size})`}
+              </button>
+              <button onClick={() => { setBulkMode(false); setSelected(new Set()); }}
+                className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50">Hủy</button>
+            </div>
+          </div>
+        )}
         {loading && items.length === 0 ? (
           <div className="flex justify-center py-20">
             <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
@@ -106,8 +149,16 @@ export default function JobsPage() {
           <>
             <div className="space-y-4">
               {items.map(job => (
-                <Link key={job.id} href={`/jobs/${job.id}`}
-                  className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex gap-4 items-start">
+                <div key={job.id} className="flex gap-3 items-stretch">
+                  {bulkMode && (
+                    <div className="flex items-center">
+                      <input type="checkbox" checked={selected.has(job.id)} onChange={() => toggleSelect(job.id)}
+                        className="rounded w-4 h-4 cursor-pointer" />
+                    </div>
+                  )}
+                <Link href={bulkMode ? '#' : `/jobs/${job.id}`}
+                  onClick={bulkMode ? (e) => { e.preventDefault(); toggleSelect(job.id); } : undefined}
+                  className={`flex-1 bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex gap-4 items-start ${bulkMode && selected.has(job.id) ? 'ring-2 ring-indigo-500' : ''}`}>
                   <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i className="ri-briefcase-line text-indigo-600 text-xl"></i>
                   </div>
@@ -144,6 +195,7 @@ export default function JobsPage() {
                     </div>
                   </div>
                 </Link>
+                </div>
               ))}
             </div>
 
