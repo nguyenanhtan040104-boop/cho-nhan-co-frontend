@@ -128,6 +128,10 @@ export default function AdminDashboard() {
     { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line', count: overview?.totalPosts },
   ];
 
+  const quickLinks = [
+    { href: '/admin/moderation', label: 'Kiểm duyệt bài viết', icon: 'ri-shield-check-line', color: 'text-orange-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -176,6 +180,17 @@ export default function AdminDashboard() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Quick links */}
+          <div className="bg-white rounded-xl shadow-sm p-2 mt-2">
+            {quickLinks.map(link => (
+              <Link key={link.href} href={link.href}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <i className={`${link.icon} text-lg ${link.color}`}></i>
+                <span className="text-sm text-gray-700">{link.label}</span>
+              </Link>
+            ))}
           </div>
 
           {/* Main Content */}
