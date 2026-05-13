@@ -13,10 +13,16 @@ export default function ProfilePage() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('login');
 
-  // Nếu đã đăng nhập rồi → về dashboard
+  // Nếu đã đăng nhập rồi → về dashboard (hoặc admin nếu là admin)
   useEffect(() => {
     if (auth.isLoggedIn()) {
-      router.replace('/dashboard');
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const dest = user?.role?.toLowerCase() === 'admin' ? '/admin/dashboard' : '/dashboard';
+        router.replace(dest);
+      } catch {
+        router.replace('/dashboard');
+      }
     }
   }, []);
   const [loading, setLoading] = useState(false);
@@ -130,8 +136,9 @@ export default function ProfilePage() {
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      setMessage('Đăng nhập thành công!');
-      setTimeout(() => router.push('/dashboard'), 1500);
+      const isAdmin = data.user?.role?.toLowerCase() === 'admin';
+      setMessage(isAdmin ? 'Đăng nhập Admin thành công!' : 'Đăng nhập thành công!');
+      setTimeout(() => router.push(isAdmin ? '/admin/dashboard' : '/dashboard'), 1500);
     } catch (err: any) {
       setError(err.message || 'Có lỗi xảy ra');
     } finally {
