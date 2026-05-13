@@ -65,84 +65,77 @@ async function fetchCoffee() {
   }
 }
 
-// ─── Giải mã hex webgia (hàm gm() của họ) ───
-function decodeWebgiaHex(hex: string): string {
-  // Xóa các ký tự hoa (noise obfuscation), sau đó decode hex → string
-  const clean = hex.replace(/[A-Z]/g, '');
-  const bytes: number[] = [];
-  for (let i = 0; i < clean.length - 1; i += 2) {
-    bytes.push(parseInt(clean.substr(i, 2), 16));
-  }
-  return String.fromCharCode(...bytes);
+// ─── Fetch giá xăng từ giaxang.com.vn (thuần HTML, không JS render) ───
+async function fetchFuel() {
+  // Thử lần lượt các nguồn
+  const result = await fetchFuelGiaxang() || await fetchFuelGovApi();
+  return result;
 }
 
-// ─── Fetch giá xăng từ webgia.com/gia-xang-dau/petrolimex/ ───
-async function fetchFuel() {
+async function fetchFuelGiaxang() {
   try {
-    const res = await fetch('https://webgia.com/gia-xang-dau/petrolimex/', {
-      headers: { ...BROWSER_HEADERS, 'Referer': 'https://webgia.com/gia-xang-dau/' },
-      signal: AbortSignal.timeout(10000),
+    const res = await fetch('https://giaxang.com.vn/', {
+      headers: { ...BROWSER_HEADERS, 'Referer': 'https://giaxang.com.vn/' },
+      signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
 
-    // Tên sản phẩm nằm trong <th><a ...>Xăng RON 95-V</a></th>
-    // Giá Vùng 1 nằm trong <td class="text-right bnxd" nb="HEX"></td>
-    // Mỗi <tr> chứa 1 <th> (tên) và 2 <td class="bnxd"> (Vùng 1, Vùng 2)
-    type FuelRow = { name: string; price: number; priceZone2: number };
+    type FuelRow = { name: string; price: number };
     const items: FuelRow[] = [];
 
+    // Parse tất cả <tr> trong bảng
     const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
     let m;
     while ((m = trRe.exec(html)) !== null) {
-      const rowHtml = m[1];
+      const cells = [...m[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
+        .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim());
+      if (cells.length < 2) continue;
 
-      // Lấy tên sản phẩm từ <th>
-      const thMatch = rowHtml.match(/<th[^>]*>([\s\S]*?)<\/th>/i);
-      if (!thMatch) continue;
-      const name = thMatch[1].replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ').trim();
-      if (!name || name.length < 3) continue;
+      const name = cells[0];
+      if (!name || name.length < 5) continue;
+      if (!/(xăng|dầu|diesel|hỏa|RON|E5)/i.test(name)) continue;
 
-      // Lấy tất cả <td class="bnxd" nb="...">
-      const tdMatches = [...rowHtml.matchAll(/<td[^>]+class="[^"]*bnxd[^"]*"[^>]+nb="([^"]+)"/gi)];
-      if (tdMatches.length < 1) {
-        // Thử chiều ngược lại: nb trước class
-        const tdMatches2 = [...rowHtml.matchAll(/<td[^>]+nb="([^"]+)"[^>]+class="[^"]*bnxd[^"]*"/gi)];
-        if (tdMatches2.length < 1) continue;
-        tdMatches.push(...tdMatches2);
+      // Tìm giá trong các cột (số 10000-100000)
+      let price = 0;
+      for (let i = 1; i < cells.length; i++) {
+        const raw = cells[i].replace(/[,\.\s]/g, '');
+        const n = parseInt(raw);
+        if (n >= 10000 && n <= 100000) { price = n; break; }
       }
+      if (!price) continue;
 
-      // Decode hex → giá dạng "24.350"
-      const priceStr1 = decodeWebgiaHex(tdMatches[0][1]);
-      const priceStr2 = tdMatches[1] ? decodeWebgiaHex(tdMatches[1][1]) : priceStr1;
-
-      // Chuyển "24.350" → 24350 (dấu . là phân cách nghìn của webgia)
-      const price      = parseInt(priceStr1.replace(/\./g, '').replace(/,/g, ''));
-      const priceZone2 = parseInt(priceStr2.replace(/\./g, '').replace(/,/g, ''));
-
-      if (isNaN(price) || price < 10000 || price > 100000) continue;
-
-      items.push({ name, price, priceZone2 });
-      if (items.length >= 6) break; // Chỉ lấy 6 loại chính
+      items.push({ name, price });
+      if (items.length >= 6) break;
     }
 
-    // Fallback: thử tìm giá trong các script JSON nếu parse HTML thất bại
-    if (items.length === 0) {
-      const scriptMatch = html.match(/var\s+(?:xangData|priceData|fuelData)\s*=\s*(\[[\s\S]*?\])/);
-      if (scriptMatch) {
-        try {
-          const data = JSON.parse(scriptMatch[1]);
-          for (const item of data) {
-            if (item.name && item.price) {
-              items.push({ name: item.name, price: item.price, priceZone2: item.price2 ?? item.price });
-              if (items.length >= 6) break;
-            }
-          }
-        } catch { /* ignore */ }
-      }
-    }
+    return items.length > 0 ? { items, isLive: true, src: 'giaxang.com.vn' } : null;
+  } catch {
+    return null;
+  }
+}
 
-    return items.length > 0 ? { items, isLive: true } : null;
+// Fallback: lấy từ API Bộ Công Thương (msprice.gov.vn)
+async function fetchFuelGovApi() {
+  try {
+    const res = await fetch('https://msprice.gov.vn/api/public/fuelprices', {
+      headers: { ...BROWSER_HEADERS },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    type FuelRow = { name: string; price: number };
+    const items: FuelRow[] = [];
+    const list = Array.isArray(json) ? json : (json?.data || json?.items || []);
+    for (const item of list) {
+      const name = item.name || item.tenSanPham || '';
+      const price = Number(item.price || item.gia || 0);
+      if (!name || price < 10000 || price > 100000) continue;
+      items.push({ name, price });
+      if (items.length >= 6) break;
+    }
+    return items.length > 0 ? { items, isLive: true, src: 'msprice.gov.vn' } : null;
   } catch {
     return null;
   }
@@ -186,24 +179,24 @@ export async function GET() {
   // Cao su từ USD rate
   const rubber = Math.round(1.5 * usdRate);
 
-  // Xăng — webgia.com hoặc fallback Bộ Công Thương 07/05/2026
+  // Xăng — live hoặc fallback Bộ Công Thương 13/05/2026
   const fuelFallback = [
-    { name: 'Xăng RON 95-III',  price: 24350, unit: 'lít', location: 'Toàn quốc' },
-    { name: 'Xăng E5 RON 92-II', price: 23790, unit: 'lít', location: 'Toàn quốc' },
-    { name: 'Dầu diesel DO 0,05S', price: 27490, unit: 'lít', location: 'Toàn quốc' },
-    { name: 'Dầu hỏa 2-K',        price: 30450, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Xăng RON 95-III',      price: 20620, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Xăng E5 RON 92-II',    price: 19990, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Dầu diesel DO 0,05S',   price: 18800, unit: 'lít', location: 'Toàn quốc' },
+    { name: 'Dầu hỏa 2-K',          price: 19290, unit: 'lít', location: 'Toàn quốc' },
   ];
 
+  const fuelSrc = (fuelResult as any)?.src || 'webgia.com';
   const fuelItems = fuelResult?.isLive
-    ? fuelResult.items.slice(0, 6).map(i => ({
+    ? fuelResult.items.slice(0, 6).map((i: any) => ({
         name: i.name,
         price: i.price,
-        priceZone2: i.priceZone2,
         change: null as number | null,
         unit: 'lít',
-        location: 'Vùng 1',
+        location: 'Toàn quốc',
       }))
-    : fuelFallback.map(i => ({ ...i, priceZone2: undefined, change: null as number | null }));
+    : fuelFallback.map(i => ({ ...i, change: null as number | null }));
 
   const avgCoffee = Math.round((dakLak.price + lamDong.price + giaLai.price + dakNong.price) / 4);
 
@@ -280,7 +273,7 @@ export async function GET() {
     },
     {
       category: 'Xăng dầu',
-      source: fuelResult?.isLive ? 'webgia.com (Petrolimex)' : 'Bộ Công Thương • 07/05/2026',
+      source: fuelResult?.isLive ? fuelSrc : 'Bộ Công Thương • 13/05/2026',
       isLive: !!fuelResult?.isLive,
       items: fuelItems,
     },
