@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import MessengerModal from '../../../components/MessengerModal';
 import { products as productsApi, messages as messagesApi, auth } from '../../../lib/api';
 
@@ -16,6 +17,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [showMessengerModal, setShowMessengerModal] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     async function loadProduct() {
@@ -23,6 +28,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
         const data = await res.json();
         setProduct(data);
+        setLikeCount(data.likeCount || 0);
       } catch (e) {
         console.error('Lỗi tải sản phẩm:', e);
       } finally {
@@ -72,13 +78,39 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     }).format(price);
   };
 
+  const currentUser = auth.getCurrentUser?.() || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
+  const isOwner = currentUser && product && currentUser.id === product.userId;
+
   const handleContactClick = () => {
     setShowContactModal(true);
   };
 
-  const handleCallClick = () => {
-    const phoneNumber = product.user?.phone?.replace(/\D/g, '') || '';
-    if (phoneNumber) window.open(`tel:${phoneNumber}`, '_self');
+  const handleLikeClick = () => {
+    if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+    setLiked(l => !l);
+    setLikeCount(c => liked ? c - 1 : c + 1);
+  };
+
+  const handleShareClick = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: product.title, url }); } catch { /* cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      alert('Đã sao chép liên kết!');
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+    setDeleting(true);
+    try {
+      await productsApi.delete(productId);
+      router.push('/products');
+    } catch {
+      alert('Xóa thất bại');
+      setDeleting(false);
+    }
   };
 
   const handleMessageClick = async () => {
@@ -214,20 +246,27 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2 md:gap-4">
+            <div className="flex gap-2 md:gap-4 flex-wrap">
               <button
                 onClick={handleContactClick}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium text-sm md:text-base"
               >
-                <i className="ri-phone-line"></i>
+                <i className="ri-message-line"></i>
                 Liên hệ mua hàng
               </button>
-              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <i className="ri-heart-line"></i>
+              <button onClick={handleLikeClick} className={`px-4 py-3 border rounded-lg transition-colors flex items-center gap-1 ${liked ? 'border-red-400 bg-red-50 text-red-500' : 'border-gray-300 hover:bg-gray-50'}`}>
+                <i className={liked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
+                {likeCount > 0 && <span className="text-sm">{likeCount}</span>}
               </button>
-              <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button onClick={handleShareClick} className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <i className="ri-share-line"></i>
               </button>
+              {isOwner && (
+                <button onClick={handleDeleteClick} disabled={deleting}
+                  className="px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50">
+                  <i className="ri-delete-bin-line"></i>
+                </button>
+              )}
             </div>
 
             {/* Seller Info */}
@@ -313,16 +352,6 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                 </div>
                 
                 <div className="space-y-3">
-                  {product.user.phone && (
-                    <button
-                      onClick={handleCallClick}
-                      className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <i className="ri-phone-line"></i>
-                      Gọi điện ngay
-                    </button>
-                  )}
-                  
                   <button
                     onClick={handleMessageClick}
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
