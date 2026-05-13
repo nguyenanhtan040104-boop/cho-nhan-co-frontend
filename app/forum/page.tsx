@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { forum } from '../../lib/api';
+import { forum, auth } from '../../lib/api';
 
 const categoryOptions = [
   { value: '', label: 'Tất cả' },
@@ -31,6 +31,13 @@ export default function ForumPage() {
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
+  // Bulk state
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+
+  const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
     try {
@@ -52,6 +59,40 @@ export default function ForumPage() {
 
   useEffect(() => { loadData(1); }, [loadData]);
 
+  function toggleSelect(id: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    if (selected.size === posts.length) setSelected(new Set());
+    else setSelected(new Set(posts.map(p => p.id)));
+  }
+
+  function exitBulkMode() {
+    setBulkMode(false);
+    setSelected(new Set());
+  }
+
+  async function handleBulkDelete() {
+    if (selected.size === 0 || !confirm(`Xóa ${selected.size} bài viết đã chọn?`)) return;
+    setDeleting(true);
+    try {
+      await forum.bulkDelete([...selected]);
+      setPosts(prev => prev.filter(p => !selected.has(p.id)));
+      setTotal(prev => prev - selected.size);
+      setSelected(new Set());
+      setBulkMode(false);
+    } catch (e: any) {
+      alert(e.message || 'Xóa thất bại');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm border-b">
@@ -61,9 +102,27 @@ export default function ForumPage() {
               <h1 className="text-2xl font-bold text-gray-900">Diễn đàn</h1>
               <p className="text-gray-500 text-sm mt-1">{total} bài viết</p>
             </div>
-            <Link href="/forum/create" className="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 text-sm font-medium whitespace-nowrap">
-              + Viết bài
-            </Link>
+            <div className="flex items-center gap-2">
+              {isLoggedIn && (
+                <>
+                  <Link href="/forum/drafts"
+                    className="border border-gray-300 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-1">
+                    <i className="ri-draft-line"></i>
+                    <span className="hidden sm:inline">Bản nháp</span>
+                  </Link>
+                  <button
+                    onClick={() => { setBulkMode(!bulkMode); setSelected(new Set()); }}
+                    className={`border px-3 py-2 rounded-lg text-sm flex items-center gap-1 ${bulkMode ? 'border-purple-400 bg-purple-50 text-purple-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    <i className="ri-checkbox-multiple-line"></i>
+                    <span className="hidden sm:inline">Chọn nhiều</span>
+                  </button>
+                </>
+              )}
+              <Link href="/forum/create" className="bg-purple-600 text-white px-5 py-2.5 rounded-lg hover:bg-purple-700 text-sm font-medium whitespace-nowrap">
+                + Viết bài
+              </Link>
+            </div>
           </div>
 
           <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2 mb-4">
@@ -92,6 +151,32 @@ export default function ForumPage() {
             <i className="ri-error-warning-line mr-2"></i>{error}
           </div>
         )}
+
+        {/* Bulk action bar */}
+        {bulkMode && (
+          <div className="mb-4 bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-3 flex-wrap">
+            <input type="checkbox" checked={selected.size === posts.length && posts.length > 0}
+              onChange={toggleAll} className="rounded w-4 h-4 cursor-pointer" />
+            <span className="text-sm text-purple-700 font-medium">
+              {selected.size > 0 ? `Đã chọn ${selected.size} bài` : 'Chọn bài viết'}
+            </span>
+            <div className="ml-auto flex gap-2">
+              <button
+                onClick={handleBulkDelete}
+                disabled={selected.size === 0 || deleting}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-40 text-sm flex items-center gap-1"
+              >
+                <i className="ri-delete-bin-line"></i>
+                {deleting ? 'Đang xóa...' : `Xóa (${selected.size})`}
+              </button>
+              <button onClick={exitBulkMode}
+                className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 text-sm">
+                Hủy
+              </button>
+            </div>
+          </div>
+        )}
+
         {loading && posts.length === 0 ? (
           <div className="flex justify-center py-20">
             <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
@@ -108,40 +193,49 @@ export default function ForumPage() {
           <>
             <div className="space-y-3">
               {posts.map(post => (
-                <Link key={post.id} href={`/forum/${post.id}`}
-                  className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex gap-4">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
-                    {post.isAnonymous ? (
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                        <i className="ri-user-line text-gray-500"></i>
+                <div key={post.id} className="flex gap-3 items-stretch">
+                  {bulkMode && (
+                    <div className="flex items-center">
+                      <input type="checkbox" checked={selected.has(post.id)}
+                        onChange={() => toggleSelect(post.id)}
+                        className="rounded w-4 h-4 cursor-pointer" />
+                    </div>
+                  )}
+                  <Link href={`/forum/${post.id}`}
+                    className="flex-1 bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex gap-4">
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      {post.isAnonymous ? (
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                          <i className="ri-user-line text-gray-500"></i>
+                        </div>
+                      ) : post.user?.avatarUrl ? (
+                        <img src={post.user.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-700 font-bold">
+                          {post.user?.fullName?.[0] || 'U'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1">
+                          {post.isPinned && <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded mr-2">Ghim</span>}
+                          <h3 className="font-semibold text-gray-900 inline">{post.title}</h3>
+                        </div>
                       </div>
-                    ) : post.user?.avatarUrl ? (
-                      <img src={post.user.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
-                    ) : (
-                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-700 font-bold">
-                        {post.user?.fullName?.[0] || 'U'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1">
-                        {post.isPinned && <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded mr-2">Ghim</span>}
-                        <h3 className="font-semibold text-gray-900 inline">{post.title}</h3>
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">{post.content?.replace(/<[^>]+>/g, '')}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                        <span>{post.isAnonymous ? 'Ẩn danh' : post.user?.fullName}</span>
+                        {post.category && <span className="bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">{post.category}</span>}
+                        <span><i className="ri-heart-line mr-0.5"></i>{post.likeCount}</span>
+                        <span><i className="ri-chat-1-line mr-0.5"></i>{post._count?.comments || 0}</span>
+                        <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount}</span>
+                        <span className="ml-auto">{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{post.content?.replace(/<[^>]+>/g, '')}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                      <span>{post.isAnonymous ? 'Ẩn danh' : post.user?.fullName}</span>
-                      {post.category && <span className="bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">{post.category}</span>}
-                      <span><i className="ri-heart-line mr-0.5"></i>{post.likeCount}</span>
-                      <span><i className="ri-chat-1-line mr-0.5"></i>{post._count?.comments || 0}</span>
-                      <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount}</span>
-                      <span className="ml-auto">{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
-                    </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               ))}
             </div>
 

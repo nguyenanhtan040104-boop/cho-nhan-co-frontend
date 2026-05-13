@@ -415,6 +415,40 @@ export const forum = {
   async pinComment(commentId: string) {
     return request(`/forum/comments/${commentId}/pin`, { method: 'POST' });
   },
+  async delete(id: string) {
+    return request(`/forum/posts/${id}`, { method: 'DELETE' });
+  },
+
+  // Draft management
+  async getMyDrafts() {
+    return request<any[]>('/forum/my-drafts');
+  },
+  async publishDraft(id: string) {
+    return request(`/forum/posts/${id}/publish`, { method: 'POST' });
+  },
+
+  // Bulk operations
+  async bulkDelete(ids: string[]) {
+    return request('/forum/posts/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) });
+  },
+
+  // Admin approval
+  async getPendingPosts(params?: any) {
+    const query = new URLSearchParams(params || {});
+    return request<any>(`/forum/admin/pending?${query}`);
+  },
+  async approvePost(id: string) {
+    return request(`/forum/admin/posts/${id}/approve`, { method: 'POST' });
+  },
+  async rejectPost(id: string, reason?: string) {
+    return request(`/forum/admin/posts/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) });
+  },
+  async bulkApprove(ids: string[]) {
+    return request('/forum/admin/posts/bulk-approve', { method: 'POST', body: JSON.stringify({ ids }) });
+  },
+  async bulkReject(ids: string[], reason?: string) {
+    return request('/forum/admin/posts/bulk-reject', { method: 'POST', body: JSON.stringify({ ids, reason }) });
+  },
 };
 
 // =================== MESSAGES ===================

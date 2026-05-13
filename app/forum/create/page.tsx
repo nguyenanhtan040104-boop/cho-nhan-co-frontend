@@ -19,24 +19,28 @@ export default function CreatePostPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+    if (!_auth.isLoggedIn()) { router.replace('/profile'); }
   }, []);
+
   const [form, setForm] = useState({
     title: '', content: '', category: 'NONG_NGHIEP',
-    tags: '', isAnonymous: false,
+    tags: '', isAnonymous: false, scheduledAt: '',
   });
   const [loading, setLoading] = useState(false);
+  const [draftLoading, setDraftLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [savedAsDraft, setSavedAsDraft] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent, publishStatus: 'PUBLISHED' | 'DRAFT' = 'PUBLISHED') {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    const isDraft = publishStatus === 'DRAFT';
+    if (isDraft) setDraftLoading(true); else setLoading(true);
     try {
       const tags = form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
       await forum.create({
@@ -45,13 +49,21 @@ export default function CreatePostPage() {
         category: form.category,
         tags,
         isAnonymous: form.isAnonymous,
+        publishStatus,
+        ...(form.scheduledAt && { scheduledAt: new Date(form.scheduledAt).toISOString() }),
       });
-      setSuccess(true);
-      setTimeout(() => router.push('/forum'), 2000);
+      if (isDraft) {
+        setSavedAsDraft(true);
+        setTimeout(() => router.push('/forum/drafts'), 1500);
+      } else {
+        setSuccess(true);
+        setTimeout(() => router.push('/forum'), 2000);
+      }
     } catch (e: any) {
-      setError(e.message || 'Đăng bài thất bại. Vui lòng xác thực email trước.');
+      setError(e.message || 'Thao tác thất bại. Vui lòng xác thực email trước.');
     } finally {
       setLoading(false);
+      setDraftLoading(false);
     }
   }
 
@@ -66,11 +78,16 @@ export default function CreatePostPage() {
             <h1 className="text-2xl font-bold text-gray-900">Viết bài mới</h1>
             <p className="text-gray-500 text-sm">Chia sẻ kiến thức, kinh nghiệm với cộng đồng</p>
           </div>
+          <div className="ml-auto">
+            <Link href="/forum/drafts" className="text-sm text-purple-600 hover:underline flex items-center gap-1">
+              <i className="ri-draft-line"></i> Bản nháp của tôi
+            </Link>
+          </div>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+        <form onSubmit={(e) => handleSubmit(e, 'PUBLISHED')} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
           {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
 
           <div>
@@ -104,17 +121,39 @@ export default function CreatePostPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <i className="ri-calendar-schedule-line mr-1"></i>
+              Lên lịch đăng (tùy chọn)
+            </label>
+            <input type="datetime-local" name="scheduledAt" value={form.scheduledAt} onChange={handleChange}
+              min={new Date().toISOString().slice(0, 16)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
+            <p className="text-xs text-gray-400 mt-1">Để trống nếu muốn đăng ngay. Nếu chọn thời gian, bài sẽ lưu nháp cho đến lúc đó.</p>
+          </div>
+
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.isAnonymous}
               onChange={e => setForm(prev => ({ ...prev, isAnonymous: e.target.checked }))} className="rounded" />
             <span className="text-sm text-gray-700">Đăng ẩn danh</span>
           </label>
 
-          <div className="flex gap-4 pt-4 border-t">
-            <Link href="/forum" className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-center">Hủy</Link>
+          <div className="flex gap-3 pt-4 border-t">
+            <Link href="/forum" className="px-5 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+              Hủy
+            </Link>
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e as any, 'DRAFT')}
+              disabled={draftLoading || !form.title}
+              className="px-5 py-3 border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 disabled:opacity-50 text-sm flex items-center gap-2"
+            >
+              <i className="ri-save-line"></i>
+              {draftLoading ? 'Đang lưu...' : 'Lưu nháp'}
+            </button>
             <button type="submit" disabled={loading}
-              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50">
-              {loading ? 'Đang đăng...' : 'Đăng bài'}
+              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm">
+              {loading ? 'Đang đăng...' : form.scheduledAt ? 'Lên lịch đăng' : 'Đăng bài'}
             </button>
           </div>
         </form>
@@ -128,6 +167,18 @@ export default function CreatePostPage() {
             </div>
             <h3 className="text-lg font-semibold mb-2">Đăng bài thành công!</h3>
             <p className="text-gray-500 text-sm">Đang chuyển trang...</p>
+          </div>
+        </div>
+      )}
+
+      {savedAsDraft && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-draft-line text-purple-600 text-2xl"></i>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Đã lưu nháp!</h3>
+            <p className="text-gray-500 text-sm">Đang chuyển đến trang quản lý nháp...</p>
           </div>
         </div>
       )}
