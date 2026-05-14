@@ -611,6 +611,12 @@ export const wallet = {
   async requestTopUp(amount: number, note?: string) {
     return request('/wallet/top-up', { method: 'POST', body: JSON.stringify({ amount, note }) });
   },
+  async createPayment(amount: number) {
+    return request('/wallet/create-payment', { method: 'POST', body: JSON.stringify({ amount }) });
+  },
+  async checkPaymentStatus(orderCode: string) {
+    return request<any>(`/wallet/payment-status/${orderCode}`);
+  },
   async buyVip(refType: 'product' | 'job' | 'real_estate', refId: string, durationDays = 30) {
     return request('/wallet/buy-vip', { method: 'POST', body: JSON.stringify({ refType, refId, durationDays }) });
   },
