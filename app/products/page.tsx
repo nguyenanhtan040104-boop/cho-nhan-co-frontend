@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { products as productsApi, auth } from '../../lib/api';
 
 const categories = [
-  { value: '', name: 'Tất cả', icon: '🌾' },
-  { value: 'NONG_SAN', name: 'Nông sản', icon: '🥬' },
-  { value: 'VAT_NUOI', name: 'Vật nuôi', icon: '🐖' },
-  { value: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng', icon: '🏠' },
-  { value: 'HANG_TIEU_DUNG', name: 'Tiêu dùng', icon: '🛒' },
-  { value: 'DICH_VU', name: 'Dịch vụ', icon: '🔧' },
+  { value: '', name: 'Tất cả', icon: '' },
+  { value: 'NONG_SAN', name: 'Nông sản', icon: '' },
+  { value: 'VAT_NUOI', name: 'Vật nuôi', icon: '' },
+  { value: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng', icon: '' },
+  { value: 'HANG_TIEU_DUNG', name: 'Tiêu dùng', icon: '' },
+  { value: 'DICH_VU', name: 'Dịch vụ', icon: '' },
 ];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
@@ -76,7 +76,6 @@ export default function ProductsPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">🌾</span>
                 <span className="text-green-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
               <h1 className="text-3xl font-bold text-white mb-1">Sản phẩm nông nghiệp</h1>
@@ -122,8 +121,7 @@ export default function ProductsPage() {
                     : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur'
                 }`}
               >
-                <span>{cat.icon}</span>
-                <span>{cat.name}</span>
+                      <span>{cat.name}</span>
               </button>
             ))}
           </div>
@@ -138,9 +136,9 @@ export default function ProductsPage() {
             <span className="text-sm text-gray-500">Sắp xếp:</span>
             {[
               { value: 'newest', label: 'Mới nhất' },
-              { value: 'price_asc', label: '💰 Giá thấp' },
-              { value: 'price_desc', label: '💎 Giá cao' },
-              { value: 'popular', label: '🔥 Phổ biến' },
+              { value: 'price_asc', label: 'Giá thấp' },
+              { value: 'price_desc', label: 'Giá cao' },
+              { value: 'popular', label: 'Phổ biến' },
             ].map(opt => (
               <button key={opt.value} onClick={() => { setSortBy(opt.value); setPage(1); }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
@@ -167,7 +165,7 @@ export default function ProductsPage() {
             <span className="text-sm text-red-700 font-medium">Đã chọn {selected.size} sản phẩm</span>
             <button onClick={handleBulkDelete} disabled={deleting}
               className="ml-auto px-4 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 disabled:opacity-50">
-              {deleting ? 'Đang xóa...' : `🗑 Xóa (${selected.size})`}
+              {deleting ? 'Đang xóa...' : `Xóa (${selected.size})`}
             </button>
             <button onClick={() => { setBulkMode(false); setSelected(new Set()); }}
               className="px-4 py-1.5 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-50">Hủy</button>
@@ -189,7 +187,9 @@ export default function ProductsPage() {
           </div>
         ) : items.length === 0 ? (
           <div className="bg-white rounded-2xl p-16 text-center shadow-sm border border-gray-100">
-            <div className="text-6xl mb-4">🌱</div>
+            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <i className="ri-inbox-line text-3xl text-gray-300"></i>
+            </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Chưa có sản phẩm nào</h3>
             <p className="text-gray-500 text-sm mb-6">Hãy là người đầu tiên đăng sản phẩm lên chợ!</p>
             <Link href="/products/create" className="inline-block bg-green-700 text-white px-6 py-2.5 rounded-xl hover:bg-green-800 font-medium text-sm">
@@ -279,7 +279,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle }: {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-              <span className="text-4xl">🌾</span>
+              <i className="ri-image-line text-4xl text-gray-300"></i>
               <span className="text-xs text-gray-400">Chưa có ảnh</span>
             </div>
           )}
@@ -292,7 +292,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle }: {
           {/* Category tag */}
           {product.category && (
             <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full">
-              {categories.find(c => c.value === product.category)?.icon} {categories.find(c => c.value === product.category)?.name}
+              {categories.find(c => c.value === product.category)?.name}
             </div>
           )}
         </div>
