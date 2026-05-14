@@ -51,22 +51,6 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50" suppressHydrationWarning>
 
-      {/* Top bar - hashtags */}
-      <div style={{ backgroundColor: '#1b4332' }} className="hidden lg:block">
-        <div className="max-w-screen-xl mx-auto px-6 py-1.5 flex items-center gap-1 overflow-x-auto">
-          <span className="text-green-400 text-xs mr-2 whitespace-nowrap font-medium">Tìm nhanh:</span>
-          {hashtags.map(tag => (
-            <Link
-              key={tag.label}
-              href={tag.href}
-              className="text-green-300 text-xs px-2.5 py-0.5 rounded-full border border-green-700 hover:bg-green-700 hover:text-white transition whitespace-nowrap"
-            >
-              {tag.label}
-            </Link>
-          ))}
-        </div>
-      </div>
-
       {/* Main nav */}
       <div className="bg-white border-b border-gray-100 shadow-sm" suppressHydrationWarning>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 flex justify-between items-center py-3" suppressHydrationWarning>
@@ -155,6 +139,22 @@ export default function Header() {
               className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50">
               <i className={`text-lg ${showMobileMenu ? 'ri-close-line' : 'ri-menu-line'}`}></i>
             </button>
+          </div>
+        </div>
+
+        {/* Hashtag bar - dưới nav */}
+        <div className="hidden lg:block border-t border-gray-100">
+          <div className="max-w-screen-xl mx-auto px-6 py-1.5 flex items-center gap-1.5 overflow-x-auto">
+            <span className="text-gray-400 text-xs mr-1 whitespace-nowrap">Tìm nhanh:</span>
+            {hashtags.map(tag => (
+              <Link
+                key={tag.label}
+                href={tag.href}
+                className="text-xs px-2.5 py-0.5 rounded-full border border-gray-200 text-gray-500 hover:border-green-500 hover:text-green-700 hover:bg-green-50 transition whitespace-nowrap"
+              >
+                {tag.label}
+              </Link>
+            ))}
           </div>
         </div>
 
