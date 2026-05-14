@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
 
 const categories = [
@@ -16,10 +17,11 @@ const categories = [
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -29,6 +31,15 @@ export default function ProductsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+
+  // Đồng bộ khi URL params thay đổi (vd: từ hashtag search)
+  useEffect(() => {
+    const cat = searchParams.get('category') || '';
+    const q = searchParams.get('search') || '';
+    setCategory(cat);
+    setSearch(q);
+    setPage(1);
+  }, [searchParams]);
 
   useEffect(() => { loadProducts(); }, [category, sortBy, page]);
   useEffect(() => { if (search === '') { setPage(1); loadProducts(''); } }, [search]);
