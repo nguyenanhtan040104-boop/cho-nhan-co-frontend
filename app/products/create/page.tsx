@@ -14,6 +14,53 @@ const categories = [
   { id: 'DICH_VU', name: 'Dịch vụ' },
 ];
 
+const TEMPLATES = [
+  {
+    id: 'lua_gao',
+    icon: '🌾',
+    name: 'Lúa / Gạo',
+    data: {
+      title: 'Gạo ST25 nguyên chất - thơm ngon, sạch',
+      category: 'NONG_SAN',
+      unit: 'kg',
+      description: 'Gạo ST25 được trồng và thu hoạch đúng mùa vụ, không dùng thuốc trừ sâu hóa học.\n- Hạt gạo dài, trong, thơm\n- Cơm mềm, dẻo, vị ngọt tự nhiên\n- Đóng gói hút chân không 5kg/10kg\nLiên hệ để được tư vấn và báo giá tốt nhất!',
+    },
+  },
+  {
+    id: 'vat_nuoi',
+    icon: '🐖',
+    name: 'Vật nuôi',
+    data: {
+      title: 'Heo thịt / Gà thả vườn - xuất chuồng',
+      category: 'VAT_NUOI',
+      unit: 'kg',
+      description: 'Heo/Gà được nuôi tự nhiên, ăn cám ngô, không dùng chất tăng trọng.\n- Thịt chắc, ngon, an toàn\n- Xuất chuồng trọng lượng từ ..kg\n- Giao hàng tận nơi trong bán kính 30km\nĐặt hàng trước để đảm bảo số lượng!',
+    },
+  },
+  {
+    id: 'rau_cu',
+    icon: '🥬',
+    name: 'Rau / Củ / Quả',
+    data: {
+      title: 'Rau sạch VietGAP - tươi mỗi ngày',
+      category: 'NONG_SAN',
+      unit: 'kg',
+      description: 'Rau trồng theo tiêu chuẩn VietGAP, thu hoạch buổi sáng, giao hàng trong ngày.\n- Đảm bảo tươi ngon, không hóa chất\n- Đủ loại rau theo mùa vụ\n- Bán lẻ và sỉ số lượng lớn\nGiao hàng tận nhà khu vực ...',
+    },
+  },
+  {
+    id: 'dich_vu',
+    icon: '🔧',
+    name: 'Dịch vụ',
+    data: {
+      title: 'Dịch vụ [tên dịch vụ] - uy tín, chuyên nghiệp',
+      category: 'DICH_VU',
+      unit: 'lần',
+      description: 'Cung cấp dịch vụ ... với nhiều năm kinh nghiệm.\n- Thợ lành nghề, có chứng chỉ\n- Báo giá minh bạch trước khi làm\n- Bảo hành ... tháng\n- Phục vụ khu vực ...\nGọi ngay để được báo giá miễn phí!',
+    },
+  },
+];
+
 export default function CreateProductPage() {
   const router = useRouter();
 
@@ -35,6 +82,12 @@ export default function CreateProductPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(true);
+
+  function applyTemplate(tpl: typeof TEMPLATES[0]) {
+    setFormData(prev => ({ ...prev, ...tpl.data }));
+    setShowTemplates(false);
+  }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target;
@@ -114,6 +167,30 @@ export default function CreateProductPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Template Picker */}
+        {showTemplates && (
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-semibold text-gray-900">Chọn mẫu có sẵn</h2>
+                <p className="text-sm text-gray-500">Bắt đầu nhanh hơn với template phù hợp</p>
+              </div>
+              <button type="button" onClick={() => setShowTemplates(false)} className="text-sm text-gray-400 hover:text-gray-600">
+                Bỏ qua →
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {TEMPLATES.map(tpl => (
+                <button key={tpl.id} type="button" onClick={() => applyTemplate(tpl)}
+                  className="flex flex-col items-center gap-2 p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all group">
+                  <span className="text-3xl">{tpl.icon}</span>
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-green-700">{tpl.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-sm border">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
 

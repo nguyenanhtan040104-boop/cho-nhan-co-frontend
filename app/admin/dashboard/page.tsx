@@ -130,6 +130,7 @@ export default function AdminDashboard() {
 
   const quickLinks = [
     { href: '/admin/moderation', label: 'Kiểm duyệt bài viết', icon: 'ri-shield-check-line', color: 'text-orange-600' },
+    { href: '/admin/vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', color: 'text-yellow-500' },
   ];
 
   return (

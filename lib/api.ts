@@ -261,6 +261,10 @@ export const products = {
   async upgradeVip(id: string, durationDays = 30) {
     return request(`/products/${id}/vip`, { method: 'POST', body: JSON.stringify({ durationDays }) });
   },
+
+  async adminToggleVip(id: string, isVip: boolean) {
+    return request(`/products/${id}/vip`, { method: 'POST', body: JSON.stringify({ durationDays: isVip ? 30 : 0 }) });
+  },
 };
 
 // =================== REAL ESTATE ===================
@@ -303,6 +307,10 @@ export const realEstate = {
   async addImages(id: string, images: { url: string; caption?: string }[]) {
     return request(`/real-estates/${id}/images`, { method: 'POST', body: JSON.stringify({ images }) });
   },
+
+  async adminToggleVip(id: string, isVip: boolean) {
+    return request(`/real-estate/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) });
+  },
 };
 
 // =================== JOBS ===================
@@ -340,6 +348,10 @@ export const jobs = {
 
   async markUrgent(id: string) {
     return request(`/jobs/${id}/urgent`, { method: 'POST' });
+  },
+
+  async adminToggleVip(id: string, isVip: boolean) {
+    return request(`/jobs/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) });
   },
 };
 
