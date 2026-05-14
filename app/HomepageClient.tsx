@@ -2,6 +2,46 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Map hashtag → đúng trang
+const HASHTAG_ROUTES: Record<string, string> = {
+  batdongsan: '/real-estate',
+  bds: '/real-estate',
+  phongtro: '/real-estate',
+  nhadat: '/real-estate',
+  tuyendung: '/jobs',
+  timviec: '/jobs',
+  vieclan: '/jobs',
+  nhancong: '/jobs',
+  dienddan: '/forum',
+  forum: '/forum',
+  canhbao: '/canh-bao',
+  luadao: '/canh-bao',
+  tromcap: '/canh-bao',
+  matdo: '/canh-bao',
+  quangcao: '/advertisements',
+  nongsan: '/products?category=NONG_SAN',
+  vatnuoi: '/products?category=VAT_NUOI',
+  dichvu: '/products?category=DICH_VU',
+  muaban: '/products',
+};
+
+function resolveSearch(q: string): string {
+  if (q.startsWith('#')) {
+    const tag = q.slice(1).toLowerCase().replace(/\s/g, '');
+    if (HASHTAG_ROUTES[tag]) return HASHTAG_ROUTES[tag];
+    // hashtag không có trong map → tìm kiếm chung trên products
+    return `/products?search=${encodeURIComponent(tag)}`;
+  }
+  return `/products?search=${encodeURIComponent(q)}`;
+}
+
+const QUICK_TAGS = [
+  { label: '#nongsan', route: '/products?category=NONG_SAN' },
+  { label: '#batdongsan', route: '/real-estate' },
+  { label: '#tuyendung', route: '/jobs' },
+  { label: '#cafferobusta', route: '/products?search=robusta' },
+];
+
 export default function HomepageClient() {
   const [query, setQuery] = useState('');
   const router = useRouter();
@@ -10,11 +50,7 @@ export default function HomepageClient() {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    if (q.startsWith('#')) {
-      router.push(`/products?search=${encodeURIComponent(q.slice(1))}`);
-    } else {
-      router.push(`/products?search=${encodeURIComponent(q)}`);
-    }
+    router.push(resolveSearch(q));
   }
 
   return (
@@ -36,14 +72,14 @@ export default function HomepageClient() {
         </button>
       </div>
       <div className="flex flex-wrap justify-center gap-2 mt-4">
-        {['#nongsan', '#batdongsan', '#tuyendung', '#cafferobusta'].map(tag => (
+        {QUICK_TAGS.map(tag => (
           <button
-            key={tag}
+            key={tag.label}
             type="button"
-            onClick={() => { setQuery(tag); router.push(`/products?search=${encodeURIComponent(tag.slice(1))}`); }}
+            onClick={() => router.push(tag.route)}
             className="text-xs px-3 py-1 rounded-full border border-white/30 text-green-200 hover:bg-white/10 transition"
           >
-            {tag}
+            {tag.label}
           </button>
         ))}
       </div>
