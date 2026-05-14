@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { forum, auth } from '../../lib/api';
+import PostOptionsMenu from '../components/PostOptionsMenu';
 
 const categoryOptions = [
   { value: '', label: 'Tất cả' },
@@ -50,6 +51,7 @@ export default function ForumPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -163,7 +165,7 @@ export default function ForumPage() {
           <>
             <div className="space-y-3">
               {posts.map(post => (
-                <ForumCard key={post.id} post={post} bulkMode={bulkMode} selected={selected.has(post.id)} onToggle={() => toggleSelect(post.id)} />
+                <ForumCard key={post.id} post={post} bulkMode={bulkMode} selected={selected.has(post.id)} onToggle={() => toggleSelect(post.id)} currentUserId={currentUserId} onDeleted={id => setPosts(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
             {totalPages > 1 && (
@@ -183,7 +185,7 @@ export default function ForumPage() {
   );
 }
 
-function ForumCard({ post, bulkMode, selected, onToggle }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void }) {
+function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDeleted }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId: string | null; onDeleted: (id: string) => void }) {
   const cat = catColors[post.category] || catColors.KHAC;
   const hasImage = post.images?.[0]?.url;
 
@@ -208,6 +210,9 @@ function ForumCard({ post, bulkMode, selected, onToggle }: { post: any; bulkMode
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: cat.bg, color: cat.color }}>{cat.label}</span>
               )}
               {post.isPinned && <span className="text-xs bg-yellow-100 text-yellow-700 font-semibold px-2 py-0.5 rounded-full">Ghim</span>}
+              <div className="ml-auto">
+                <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
+              </div>
             </div>
             <h3 className="font-semibold text-gray-800 hover:text-green-700 transition-colors line-clamp-2 mb-1">{post.title}</h3>
             {post.content && (

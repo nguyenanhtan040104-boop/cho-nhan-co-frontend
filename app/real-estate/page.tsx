@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { realEstate, auth } from '../../lib/api';
+import PostOptionsMenu from '../components/PostOptionsMenu';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -31,6 +32,7 @@ export default function RealEstatePage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -151,13 +153,13 @@ export default function RealEstatePage() {
                   <div className="h-px flex-1 bg-gradient-to-l from-yellow-300 to-transparent"></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {vipItems.map(item => <RECard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} />)}
+                  {vipItems.map(item => <RECard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />)}
                 </div>
                 {normalItems.length > 0 && <div className="flex items-center gap-3 mt-8 mb-2"><div className="h-px flex-1 bg-gray-200"></div><span className="text-xs text-gray-400 uppercase tracking-wider">Tất cả tin đăng</span><div className="h-px flex-1 bg-gray-200"></div></div>}
               </div>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {normalItems.map(item => <RECard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} />)}
+              {normalItems.map(item => <RECard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />)}
             </div>
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-10">
@@ -176,7 +178,7 @@ export default function RealEstatePage() {
   );
 }
 
-function RECard({ item, bulkMode, selected, onToggle }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void }) {
+function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId: string | null; onDeleted: (id: string) => void }) {
   const typeLabel: any = { NHA_O: 'Nhà ở', DAT_NEN: 'Đất nền', PHONG_TRO: 'Phòng trọ', MAT_BANG: 'Mặt bằng' };
   return (
     <div className="relative group">
@@ -203,13 +205,14 @@ function RECard({ item, bulkMode, selected, onToggle }: { item: any; bulkMode: b
             {item.area && <span><i className="ri-map-2-line mr-0.5"></i>{item.area}m²</span>}
             <span className="truncate flex-1"><i className="ri-map-pin-line mr-0.5"></i>{item.address || item.location}</span>
           </div>
-          {item.user?.fullName && (
-            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+            {item.user?.fullName && <>
               <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs text-blue-700 font-bold flex-shrink-0">{item.user.fullName[0]}</div>
               <span className="text-xs text-gray-400 truncate flex-1">{item.user.fullName}</span>
               <span className="text-xs text-gray-400 flex items-center gap-0.5"><i className="ri-eye-line"></i>{item.viewCount || 0}</span>
-            </div>
-          )}
+            </>}
+            <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await realEstate.delete(id); onDeleted(id); }} editHref={`/real-estate/${item.id}/edit`} />
+          </div>
         </div>
       </Link>
     </div>

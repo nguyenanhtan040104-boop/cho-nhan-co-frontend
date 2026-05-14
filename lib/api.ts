@@ -159,6 +159,15 @@ export const auth = {
   isLoggedIn(): boolean {
     return !!getToken();
   },
+
+  getCurrentUserId(): string | null {
+    const token = getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return payload.sub || payload.userId || payload.id || null;
+    } catch { return null; }
+  },
 };
 
 // =================== USERS ===================

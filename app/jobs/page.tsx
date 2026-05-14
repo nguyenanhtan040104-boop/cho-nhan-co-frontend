@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { jobs, auth } from '../../lib/api';
+import PostOptionsMenu from '../components/PostOptionsMenu';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -31,6 +32,7 @@ export default function JobsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -140,7 +142,7 @@ export default function JobsPage() {
           <>
             <div className="space-y-3">
               {items.map(item => (
-                <JobCard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} />
+                <JobCard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
             {totalPages > 1 && (
@@ -160,7 +162,7 @@ export default function JobsPage() {
   );
 }
 
-function JobCard({ item, bulkMode, selected, onToggle }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void }) {
+function JobCard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId: string | null; onDeleted: (id: string) => void }) {
   const isEmployer = item.type === 'EMPLOYER';
   const categoryLabel: any = {
     NONG_NGHIEP: 'Nông nghiệp', CHAN_NUOI: 'Chăn nuôi',
@@ -196,6 +198,7 @@ function JobCard({ item, bulkMode, selected, onToggle }: { item: any; bulkMode: 
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isEmployer ? 'bg-indigo-50 text-indigo-700' : 'bg-sky-50 text-sky-700'}`}>
                   {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
                 </span>
+                <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
               </div>
             </div>
             <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">

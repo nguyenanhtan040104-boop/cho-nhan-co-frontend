@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { advertisements } from '../../lib/api';
+import { advertisements, auth } from '../../lib/api';
+import PostOptionsMenu from '../components/PostOptionsMenu';
 
 const CATEGORIES = [
   { value: '', label: 'Tất cả' },
@@ -30,6 +31,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function AdvertisementsPage() {
+  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
   const [items, setItems] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -111,7 +113,7 @@ export default function AdvertisementsPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {items.map(item => (
-                <AdCard key={item.id} item={item} />
+                <AdCard key={item.id} item={item} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
             {totalPages > 1 && (
@@ -131,7 +133,7 @@ export default function AdvertisementsPage() {
   );
 }
 
-function AdCard({ item }: { item: any }) {
+function AdCard({ item, currentUserId, onDeleted }: { item: any; currentUserId: string | null; onDeleted: (id: string) => void }) {
   const active = isActive(item);
   const hasImage = item.images?.[0]?.url || item.image;
 
@@ -163,14 +165,15 @@ function AdCard({ item }: { item: any }) {
         {item.endDate && (
           <p className="text-xs text-gray-400">Hết hạn: {formatDate(item.endDate)}</p>
         )}
-        {item.user?.fullName && (
-          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+        <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+          {item.user?.fullName && <>
             <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-xs text-orange-700 font-bold flex-shrink-0">
               {item.user.fullName[0]}
             </div>
-            <span className="text-xs text-gray-400 truncate">{item.user.fullName}</span>
-          </div>
-        )}
+            <span className="text-xs text-gray-400 truncate flex-1">{item.user.fullName}</span>
+          </>}
+          <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await advertisements.delete(id); onDeleted(id); }} editHref={`/advertisements/${item.id}/edit`} />
+        </div>
       </div>
     </Link>
   );

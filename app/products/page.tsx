@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
+import PostOptionsMenu from '../components/PostOptionsMenu';
 
 const categories = [
   { value: '', name: 'Tất cả', icon: '' },
@@ -39,6 +40,7 @@ function ProductsInner() {
   const [deleting, setDeleting] = useState(false);
 
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
+  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
 
   // Đồng bộ khi URL params thay đổi (vd: từ hashtag search)
   useEffect(() => {
@@ -229,7 +231,7 @@ function ProductsInner() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {vipItems.slice(0, 8).map(product => (
-                    <ProductCard key={product.id} product={product} isVip bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} />
+                    <ProductCard key={product.id} product={product} isVip bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
                   ))}
                 </div>
                 {normalItems.length > 0 && (
@@ -245,7 +247,7 @@ function ProductsInner() {
             {/* Normal products */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {normalItems.map(product => (
-                <ProductCard key={product.id} product={product} isVip={false} bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} />
+                <ProductCard key={product.id} product={product} isVip={false} bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
 
@@ -275,8 +277,9 @@ function ProductsInner() {
   );
 }
 
-function ProductCard({ product, isVip, bulkMode, selected, onToggle }: {
+function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUserId, onDeleted }: {
   product: any; isVip: boolean; bulkMode: boolean; selected: boolean; onToggle: () => void;
+  currentUserId: string | null; onDeleted: (id: string) => void;
 }) {
   return (
     <div className="relative group">
@@ -337,14 +340,17 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle }: {
               <span>{product.viewCount || 0}</span>
             </div>
           </div>
-          {product.user?.fullName && (
-            <div className="flex items-center gap-1 mt-1.5 text-xs text-gray-400">
-              <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <i className="ri-user-fill text-green-600" style={{ fontSize: '9px' }}></i>
+          <div className="flex items-center justify-between mt-1.5">
+            {product.user?.fullName && (
+              <div className="flex items-center gap-1 text-xs text-gray-400 min-w-0">
+                <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <i className="ri-user-fill text-green-600" style={{ fontSize: '9px' }}></i>
+                </div>
+                <span className="truncate">{product.user.fullName}</span>
               </div>
-              <span className="truncate">{product.user.fullName}</span>
-            </div>
-          )}
+            )}
+            <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
+          </div>
         </div>
       </Link>
     </div>
