@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { advertisements } from '../../lib/api';
 
 const CATEGORIES = [
-  { value: '', label: 'Tất cả', icon: 'ri-apps-line' },
-  { value: 'KHAI_TRUONG', label: 'Khai trương', icon: 'ri-store-3-line' },
-  { value: 'KHUYEN_MAI', label: 'Khuyến mãi', icon: 'ri-price-tag-3-line' },
-  { value: 'SAN_PHAM_MOI', label: 'Sản phẩm mới', icon: 'ri-star-line' },
-  { value: 'DICH_VU', label: 'Dịch vụ', icon: 'ri-customer-service-2-line' },
-  { value: 'SU_KIEN', label: 'Sự kiện', icon: 'ri-calendar-event-line' },
-  { value: 'KHAC', label: 'Khác', icon: 'ri-more-line' },
+  { value: '', label: 'Tất cả' },
+  { value: 'KHAI_TRUONG', label: 'Khai trương' },
+  { value: 'KHUYEN_MAI', label: 'Khuyến mãi' },
+  { value: 'SAN_PHAM_MOI', label: 'Sản phẩm mới' },
+  { value: 'DICH_VU', label: 'Dịch vụ' },
+  { value: 'SU_KIEN', label: 'Sự kiện' },
+  { value: 'KHAC', label: 'Khác' },
 ];
 
 function getCategoryLabel(val: string) {
@@ -23,6 +23,10 @@ function isActive(ad: any) {
   const now = new Date();
   if (ad.endDate && new Date(ad.endDate) < now) return false;
   return true;
+}
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('vi-VN');
 }
 
 export default function AdvertisementsPage() {
@@ -41,132 +45,133 @@ export default function AdvertisementsPage() {
       if (category) params.category = category;
       if (search) params.search = search;
       const res = await advertisements.getAll(params);
-      if (p === 1) setItems(res.data || []);
-      else setItems(prev => [...prev, ...(res.data || [])]);
+      setItems(res.data || []);
       setTotal(res.total || 0);
       setTotalPages(res.totalPages || 1);
       setPage(p);
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
+    } catch { } finally { setLoading(false); }
   }, [category, search]);
 
   useEffect(() => { loadData(1); }, [loadData]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+      {/* Banner */}
+      <div style={{ background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)' }} className="py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Quảng cáo & Thông báo</h1>
-              <p className="text-gray-500 text-sm mt-1">{total} tin quảng cáo</p>
+              <p className="text-orange-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ</p>
+              <h1 className="text-2xl font-bold text-white">Quảng cáo &amp; Thông báo</h1>
+              <p className="text-orange-200 text-sm mt-1">{total} tin quảng cáo từ cửa hàng địa phương</p>
             </div>
-            <Link href="/advertisements/create"
-              className="bg-orange-500 text-white px-5 py-2.5 rounded-lg hover:bg-orange-600 text-sm font-medium whitespace-nowrap">
-              + Đăng quảng cáo
-            </Link>
+            <div className="flex gap-2">
+              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2">
+                <input type="text" placeholder="Tìm cửa hàng, sự kiện..." value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-orange-200 focus:outline-none focus:bg-white/20 w-52" />
+                <button type="submit" className="bg-white text-orange-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-orange-50">Tìm</button>
+              </form>
+              <Link href="/advertisements/create" className="bg-orange-400 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-orange-300 whitespace-nowrap">
+                + Đăng quảng cáo
+              </Link>
+            </div>
           </div>
-
-          {/* Search */}
-          <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2 mb-4">
-            <input type="text" placeholder="Tìm kiếm quảng cáo, tên cửa hàng..." value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400" />
-            <button type="submit" className="bg-orange-500 text-white px-5 py-2 rounded-lg hover:bg-orange-600 text-sm">Tìm</button>
-          </form>
-
-          {/* Category tabs */}
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map(c => (
-              <button key={c.value} onClick={() => setCategory(c.value)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors ${category === c.value ? 'bg-orange-500 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
-                <i className={c.icon}></i> {c.label}
+          <div className="flex gap-2 mt-4 flex-wrap">
+            {CATEGORIES.map(o => (
+              <button key={o.value} onClick={() => setCategory(o.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-white text-orange-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
+                {o.label}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-6">
         {loading && items.length === 0 ? (
-          <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
+                <div className="h-44 bg-gray-200"></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-xl p-16 text-center shadow-sm">
-            <i className="ri-megaphone-line text-6xl text-gray-300 block mb-3"></i>
+          <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
+            <i className="ri-megaphone-line text-5xl text-gray-200 block mb-3"></i>
             <p className="text-gray-500 mb-4">Chưa có quảng cáo nào</p>
-            <Link href="/advertisements/create" className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 text-sm">
-              Đăng quảng cáo đầu tiên
-            </Link>
+            <Link href="/advertisements/create" className="inline-block bg-orange-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-orange-700">+ Đăng quảng cáo đầu tiên</Link>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {items.map(ad => (
-                <Link key={ad.id} href={`/advertisements/${ad.id}`}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
-                  {/* Image */}
-                  <div className="relative h-48 bg-gradient-to-br from-orange-50 to-yellow-50">
-                    {ad.images?.[0] ? (
-                      <img src={ad.images[0]} alt={ad.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <i className="ri-megaphone-line text-5xl text-orange-200"></i>
-                      </div>
-                    )}
-                    {ad.isVip && (
-                      <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded">VIP</span>
-                    )}
-                    <span className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded">
-                      {getCategoryLabel(ad.category)}
-                    </span>
-                  </div>
-
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">{ad.title}</h3>
-                    {ad.businessName && (
-                      <p className="text-sm text-orange-600 font-medium mb-1">{ad.businessName}</p>
-                    )}
-                    <p className="text-sm text-gray-500 line-clamp-2 mb-3">{ad.description}</p>
-
-                    <div className="flex items-center justify-between text-xs text-gray-400">
-                      {ad.location && (
-                        <span className="flex items-center gap-1 truncate">
-                          <i className="ri-map-pin-line"></i> {ad.location}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1 ml-auto">
-                        <i className="ri-eye-line"></i> {ad.viewCount}
-                      </span>
-                    </div>
-
-                    {(ad.startDate || ad.endDate) && (
-                      <div className="mt-2 pt-2 border-t text-xs text-gray-400">
-                        {ad.startDate && <span>{new Date(ad.startDate).toLocaleDateString('vi-VN')}</span>}
-                        {ad.startDate && ad.endDate && <span> – </span>}
-                        {ad.endDate && <span>{new Date(ad.endDate).toLocaleDateString('vi-VN')}</span>}
-                      </div>
-                    )}
-                  </div>
-                </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {items.map(item => (
+                <AdCard key={item.id} item={item} />
               ))}
             </div>
-
-            {page < totalPages && (
-              <div className="text-center mt-10">
-                <button onClick={() => loadData(page + 1)} disabled={loading}
-                  className="bg-white border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 disabled:opacity-50">
-                  {loading ? 'Đang tải...' : 'Xem thêm'}
-                </button>
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-10">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button key={i} onClick={() => loadData(i + 1)}
+                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-orange-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                    {i + 1}
+                  </button>
+                ))}
               </div>
             )}
           </>
         )}
       </div>
     </div>
+  );
+}
+
+function AdCard({ item }: { item: any }) {
+  const active = isActive(item);
+  const hasImage = item.images?.[0]?.url || item.image;
+
+  return (
+    <Link href={`/advertisements/${item.id}`}
+      className="block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
+      <div className="relative h-44 bg-gray-50">
+        {hasImage ? (
+          <img src={hasImage} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <i className="ri-megaphone-line text-4xl text-gray-200"></i>
+          </div>
+        )}
+        <div className="absolute top-2 right-2 flex gap-1">
+          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+            {active ? 'Đang chạy' : 'Hết hạn'}
+          </span>
+        </div>
+        {item.category && (
+          <span className="absolute bottom-2 left-2 bg-orange-500/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            {getCategoryLabel(item.category)}
+          </span>
+        )}
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1 group-hover:text-orange-700 transition-colors">{item.title}</h3>
+        {item.description && <p className="text-xs text-gray-400 line-clamp-2 mb-2">{item.description}</p>}
+        {item.endDate && (
+          <p className="text-xs text-gray-400">Hết hạn: {formatDate(item.endDate)}</p>
+        )}
+        {item.user?.fullName && (
+          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
+            <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-xs text-orange-700 font-bold flex-shrink-0">
+              {item.user.fullName[0]}
+            </div>
+            <span className="text-xs text-gray-400 truncate">{item.user.fullName}</span>
+          </div>
+        )}
+      </div>
+    </Link>
   );
 }
