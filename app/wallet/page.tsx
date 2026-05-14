@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { wallet as walletApi, products as productsApi, jobs as jobsApi, realEstate as reApi, auth } from '../../lib/api';
@@ -12,6 +12,14 @@ const statusColor: Record<string, string> = { pending: 'text-yellow-600 bg-yello
 const statusLabel: Record<string, string> = { pending: 'Đang xử lý', completed: 'Thành công', rejected: 'Từ chối' };
 
 export default function WalletPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">Đang tải...</div>}>
+      <WalletContent />
+    </Suspense>
+  );
+}
+
+function WalletContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -442,3 +450,4 @@ export default function WalletPage() {
     </div>
   );
 }
+
