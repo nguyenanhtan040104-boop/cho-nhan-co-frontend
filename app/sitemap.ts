@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://chonhanco.com';
+const BASE_URL = 'https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app';
 
 const staticRoutes = [
   { url: '/', priority: 1.0, changeFrequency: 'daily' },

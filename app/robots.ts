@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/profile/', '/messages/'],
     },
-    sitemap: 'https://chonhanco.com/sitemap.xml',
+    sitemap: 'https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app/sitemap.xml',
   };
 }
