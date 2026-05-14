@@ -340,19 +340,19 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
               <span>{product.viewCount || 0}</span>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-1.5">
-            {product.user?.fullName && (
-              <div className="flex items-center gap-1 text-xs text-gray-400 min-w-0">
-                <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <i className="ri-user-fill text-green-600" style={{ fontSize: '9px' }}></i>
-                </div>
-                <span className="truncate">{product.user.fullName}</span>
+          {product.user?.fullName && (
+            <div className="flex items-center gap-1 mt-1.5 text-xs text-gray-400 min-w-0">
+              <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <i className="ri-user-fill text-green-600" style={{ fontSize: '9px' }}></i>
               </div>
-            )}
-            <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
-          </div>
+              <span className="truncate">{product.user.fullName}</span>
+            </div>
+          )}
         </div>
       </Link>
+      <div className="absolute top-2 right-2 z-10">
+        <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
+      </div>
     </div>
   );
 }

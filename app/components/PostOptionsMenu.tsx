@@ -46,9 +46,9 @@ export default function PostOptionsMenu({ postId, ownerId, currentUserId, onDele
   }
 
   return (
-    <div ref={ref} className="relative" onClick={e => e.preventDefault()}>
+    <div ref={ref} className="relative" onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
       <button
-        onClick={e => { e.stopPropagation(); setOpen(o => !o); setConfirming(false); }}
+        onClick={e => { e.preventDefault(); e.stopPropagation(); setOpen(o => !o); setConfirming(false); }}
         className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
         title="Tùy chọn"
       >

@@ -198,7 +198,6 @@ function JobCard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted 
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isEmployer ? 'bg-indigo-50 text-indigo-700' : 'bg-sky-50 text-sky-700'}`}>
                   {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
                 </span>
-                <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
               </div>
             </div>
             <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
@@ -210,6 +209,9 @@ function JobCard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted 
           </div>
         </div>
       </Link>
+      <div className="absolute top-3 right-3 z-10">
+        <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
+      </div>
     </div>
   );
 }

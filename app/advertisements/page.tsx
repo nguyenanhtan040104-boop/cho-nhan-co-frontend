@@ -138,6 +138,7 @@ function AdCard({ item, currentUserId, onDeleted }: { item: any; currentUserId: 
   const hasImage = item.images?.[0]?.url || item.image;
 
   return (
+    <div className="relative group">
     <Link href={`/advertisements/${item.id}`}
       className="block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
       <div className="relative h-44 bg-gray-50">
@@ -165,16 +166,19 @@ function AdCard({ item, currentUserId, onDeleted }: { item: any; currentUserId: 
         {item.endDate && (
           <p className="text-xs text-gray-400">Hết hạn: {formatDate(item.endDate)}</p>
         )}
-        <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-          {item.user?.fullName && <>
+        {item.user?.fullName && (
+          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
             <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-xs text-orange-700 font-bold flex-shrink-0">
               {item.user.fullName[0]}
             </div>
-            <span className="text-xs text-gray-400 truncate flex-1">{item.user.fullName}</span>
-          </>}
-          <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await advertisements.delete(id); onDeleted(id); }} editHref={`/advertisements/${item.id}/edit`} />
-        </div>
+            <span className="text-xs text-gray-400 truncate">{item.user.fullName}</span>
+          </div>
+        )}
       </div>
     </Link>
+    <div className="absolute top-2 right-2 z-10">
+      <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await advertisements.delete(id); onDeleted(id); }} editHref={`/advertisements/${item.id}/edit`} />
+    </div>
+    </div>
   );
 }

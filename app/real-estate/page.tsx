@@ -205,16 +205,18 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
             {item.area && <span><i className="ri-map-2-line mr-0.5"></i>{item.area}m²</span>}
             <span className="truncate flex-1"><i className="ri-map-pin-line mr-0.5"></i>{item.address || item.location}</span>
           </div>
-          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-            {item.user?.fullName && <>
+          {item.user?.fullName && (
+            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
               <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs text-blue-700 font-bold flex-shrink-0">{item.user.fullName[0]}</div>
               <span className="text-xs text-gray-400 truncate flex-1">{item.user.fullName}</span>
               <span className="text-xs text-gray-400 flex items-center gap-0.5"><i className="ri-eye-line"></i>{item.viewCount || 0}</span>
-            </>}
-            <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await realEstate.delete(id); onDeleted(id); }} editHref={`/real-estate/${item.id}/edit`} />
-          </div>
+            </div>
+          )}
         </div>
       </Link>
+      <div className="absolute top-2 right-2 z-10">
+        <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await realEstate.delete(id); onDeleted(id); }} editHref={`/real-estate/${item.id}/edit`} />
+      </div>
     </div>
   );
 }

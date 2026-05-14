@@ -210,9 +210,6 @@ function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDelete
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: cat.bg, color: cat.color }}>{cat.label}</span>
               )}
               {post.isPinned && <span className="text-xs bg-yellow-100 text-yellow-700 font-semibold px-2 py-0.5 rounded-full">Ghim</span>}
-              <div className="ml-auto">
-                <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
-              </div>
             </div>
             <h3 className="font-semibold text-gray-800 hover:text-green-700 transition-colors line-clamp-2 mb-1">{post.title}</h3>
             {post.content && (
@@ -236,6 +233,9 @@ function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDelete
           </div>
         </div>
       </Link>
+      <div className="absolute top-3 right-3 z-10">
+        <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
+      </div>
     </div>
   );
 }
