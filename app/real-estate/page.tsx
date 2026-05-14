@@ -214,7 +214,7 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
           )}
         </div>
       </Link>
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-2 left-2 z-10">
         <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} onDelete={async (id) => { await realEstate.delete(id); onDeleted(id); }} editHref={`/real-estate/${item.id}/edit`} />
       </div>
     </div>

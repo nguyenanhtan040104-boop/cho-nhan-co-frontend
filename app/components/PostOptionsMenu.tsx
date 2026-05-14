@@ -62,7 +62,7 @@ export default function PostOptionsMenu({ postId, ownerId, onDelete, editHref }:
       </button>
 
       {open && (
-        <div className="absolute right-0 top-9 w-44 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50"
+        <div className="absolute left-0 top-9 w-44 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50"
           onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
           {editHref && (
             <button

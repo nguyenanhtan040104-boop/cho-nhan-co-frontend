@@ -350,7 +350,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
           )}
         </div>
       </Link>
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-2 left-2 z-10">
         <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
       </div>
     </div>

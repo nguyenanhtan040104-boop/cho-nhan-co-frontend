@@ -233,7 +233,7 @@ function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDelete
           </div>
         </div>
       </Link>
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3 left-3 z-10">
         <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
       </div>
     </div>

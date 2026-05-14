@@ -209,7 +209,7 @@ function JobCard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted 
           </div>
         </div>
       </Link>
-      <div className="absolute top-3 right-3 z-10">
+      <div className="absolute top-3 left-3 z-10">
         <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
       </div>
     </div>
