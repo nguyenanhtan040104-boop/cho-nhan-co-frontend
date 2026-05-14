@@ -285,7 +285,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
     <div className="relative group">
       {bulkMode && (
         <button onClick={onToggle}
-          className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow transition-all ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
+          className={`absolute bottom-2 right-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow transition-all ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}

@@ -193,7 +193,7 @@ function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDelete
     <div className="relative">
       {bulkMode && (
         <button onClick={onToggle}
-          className={`absolute top-4 left-4 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
+          className={`absolute bottom-3 right-3 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}

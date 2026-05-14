@@ -183,7 +183,7 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
   return (
     <div className="relative group">
       {bulkMode && (
-        <button onClick={onToggle} className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}>
+        <button onClick={onToggle} className={`absolute bottom-2 right-2 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}
