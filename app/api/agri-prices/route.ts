@@ -186,31 +186,38 @@ function buildCoffeeFallback(): ProvinceHistory[] {
   ];
 }
 
-// ─── Fetch giá xăng từ petrolimex ───
+// ─── Fetch giá xăng từ webgia.com (nguồn: Petrolimex/Bộ Công Thương) ───
 async function fetchFuel() {
   try {
-    const res = await fetch('https://www.petrolimex.com.vn/nd/gia-ban-le-xang-dau.html', {
-      headers: { ...BROWSER_HEADERS, 'Referer': 'https://www.petrolimex.com.vn/' },
+    const res = await fetch('https://webgia.com/gia-xang-dau/', {
+      headers: { ...BROWSER_HEADERS, 'Referer': 'https://webgia.com/' },
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) throw new Error('');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const html = await res.text();
-    const items: { name: string; price: number }[] = [];
+
+    const items: { name: string; price: number; price2?: number }[] = [];
     const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
     let m;
     while ((m = trRe.exec(html)) !== null) {
       const cells = [...m[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
-        .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
+        .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
       if (cells.length < 2) continue;
+
       const name = cells[0];
-      if (!/(xăng|dầu|diesel|RON|E5)/i.test(name)) continue;
-      for (let i = 1; i < cells.length; i++) {
-        const n = parseInt(cells[i].replace(/[,.\s]/g, ''));
-        if (n >= 10000 && n <= 100000) { items.push({ name, price: n }); break; }
+      if (!/(xăng|dầu|DO|RON|E5|E10|hỏa)/i.test(name)) continue;
+
+      // Lấy giá Vùng 1 (cột 2) và Vùng 2 (cột 3)
+      const price1 = parseInt(cells[1]?.replace(/[.\s]/g, '').replace(',', '.').replace(/[^\d]/g, ''));
+      const price2 = parseInt(cells[2]?.replace(/[.\s]/g, '').replace(',', '.').replace(/[^\d]/g, ''));
+
+      if (price1 >= 10000 && price1 <= 50000) {
+        items.push({ name, price: price1, price2: price2 >= 10000 ? price2 : undefined });
       }
-      if (items.length >= 5) break;
+      if (items.length >= 7) break;
     }
-    return items.length > 0 ? { items, isLive: true, src: 'petrolimex.com.vn' } : null;
+
+    return items.length > 0 ? { items, isLive: true, src: 'webgia.com (Petrolimex)', hasRegions: true } : null;
   } catch { return null; }
 }
 
@@ -253,12 +260,21 @@ export async function GET() {
   const rubber = Math.round(1.5 * usdRate);
 
   const fuelFallback = [
-    { name: 'Xăng RON 95-III', price: 20620 }, { name: 'Xăng E5 RON 92-II', price: 19990 },
-    { name: 'Dầu diesel DO 0,05S', price: 18800 }, { name: 'Dầu hỏa 2-K', price: 19290 },
+    { name: 'Xăng RON 95-V', price: 25250, price2: 25750 },
+    { name: 'Xăng RON 95-III', price: 24350, price2: 24830 },
+    { name: 'Xăng E5 RON 92-II (E10)', price: 23790, price2: 24260 },
+    { name: 'Dầu DO 0,05S-II', price: 27490, price2: 28030 },
+    { name: 'Dầu hỏa 2-K', price: 30450, price2: 31050 },
   ];
   const fuelItems = fuelResult?.isLive
-    ? fuelResult.items.slice(0, 5).map((i: any) => ({ name: i.name, price: i.price, change: null, unit: 'lít', location: 'Toàn quốc' }))
-    : fuelFallback.map(i => ({ ...i, change: null, unit: 'lít', location: 'Toàn quốc' }));
+    ? fuelResult.items.slice(0, 7).map((i: any) => ({
+        name: i.name, price: i.price, price2: i.price2 ?? null,
+        change: null, unit: 'lít', location: i.price2 ? `Vùng 1: ${i.price.toLocaleString('vi-VN')}đ` : 'Toàn quốc',
+      }))
+    : fuelFallback.map(i => ({
+        ...i, change: null, unit: 'lít',
+        location: `Vùng 1: ${i.price.toLocaleString('vi-VN')}đ`,
+      }));
 
   const categories = [
     {
@@ -312,7 +328,7 @@ export async function GET() {
     },
     {
       category: 'Xăng dầu',
-      source: fuelResult?.isLive ? (fuelResult as any).src : 'Bộ Công Thương', isLive: !!fuelResult?.isLive, type: 'table',
+      source: fuelResult?.isLive ? (fuelResult as any).src : 'Petrolimex/Bộ Công Thương', isLive: !!fuelResult?.isLive, type: 'fuel_table',
       items: fuelItems,
     },
   ];

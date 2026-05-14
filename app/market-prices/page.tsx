@@ -182,11 +182,41 @@ export default function MarketPricesPage() {
                     </span>
                   </div>
 
-                  {/* Cà phê nội địa — hiển thị bảng lịch sử theo tỉnh */}
+                  {/* Cà phê nội địa — bảng lịch sử theo tỉnh */}
                   {currentCat.type === 'coffee_history' && currentCat.provinces?.length > 0 ? (
                     <CoffeeHistoryTable provinces={currentCat.provinces} openProvince={openProvince} setOpenProvince={setOpenProvince} />
+                  ) : currentCat.type === 'fuel_table' ? (
+                    /* Bảng xăng dầu Vùng 1 / Vùng 2 */
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 border-b">
+                          <tr>
+                            <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
+                            <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Vùng 1</th>
+                            <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Vùng 2</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {currentCat.items?.map((item: any, i: number) => (
+                            <tr key={i} className="hover:bg-blue-50/20 transition-colors">
+                              <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
+                              <td className="px-5 py-3 text-right">
+                                <span className="font-bold text-blue-700">{item.price.toLocaleString('vi-VN')}đ</span>
+                                <span className="text-xs text-gray-400 ml-0.5">/{item.unit}</span>
+                              </td>
+                              <td className="px-5 py-3 text-right">
+                                {item.price2
+                                  ? <><span className="font-semibold text-gray-700">{item.price2.toLocaleString('vi-VN')}đ</span><span className="text-xs text-gray-400 ml-0.5">/{item.unit}</span></>
+                                  : <span className="text-gray-300">—</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-xs text-gray-400 px-5 py-2 border-t bg-gray-50/50">Vùng 1: đồng bằng · Vùng 2: miền núi, hải đảo · Nguồn: Petrolimex/Bộ Công Thương</p>
+                    </div>
                   ) : (
-                    /* Bảng thông thường cho các loại khác */
+                    /* Bảng thông thường */
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-gray-50 border-b">
