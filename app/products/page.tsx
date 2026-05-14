@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
@@ -17,6 +17,14 @@ const categories = [
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }} />}>
+      <ProductsInner />
+    </Suspense>
+  );
+}
+
+function ProductsInner() {
   const searchParams = useSearchParams();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
