@@ -58,12 +58,13 @@ export default function MarketPricesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-5xl mx-auto px-4 py-5">
-          <h1 className="text-2xl font-bold text-gray-900">Giá thị trường</h1>
-          <p className="text-gray-500 text-sm mt-1">
+    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+      {/* Banner */}
+      <div style={{ background: 'linear-gradient(135deg, #713f12 0%, #ca8a04 100%)' }} className="py-8">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-yellow-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ</p>
+          <h1 className="text-2xl font-bold text-white">Giá thị trường</h1>
+          <p className="text-yellow-200 text-sm mt-1">
             {agriDateLabel || new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
           </p>
         </div>
@@ -81,7 +82,7 @@ export default function MarketPricesPage() {
               <div>
                 <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
                 <p className="text-xs text-gray-500">
-                  {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? '🟢 Dữ liệu thực' : '🟡 Dữ liệu tham khảo'}
+                  {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? 'Dữ liệu thực' : 'Dữ liệu tham khảo'}
                   {goldUpdatedAt && ` • ${new Date(goldUpdatedAt).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })} ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
                 </p>
               </div>
@@ -102,7 +103,7 @@ export default function MarketPricesPage() {
               {/* Giá vàng thế giới */}
               {goldData?.worldPrice && (
                 <div className="bg-yellow-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">🌍 Vàng thế giới (XAU/USD)</span>
+                  <span className="text-sm font-medium text-gray-700">Vàng thế giới (XAU/USD)</span>
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-gray-900">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</span>
                     {goldData.worldChange != null && (
@@ -214,7 +215,7 @@ export default function MarketPricesPage() {
                   <div className="px-5 py-2.5 bg-gray-50 border-b flex items-center gap-2 text-sm">
                     <span className="font-medium text-gray-700">{cat.category}</span>
                     {cat.isLive
-                      ? <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">🟢 {cat.source}</span>
+                      ? <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">{cat.source}</span>
                       : <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{cat.source}</span>
                     }
                   </div>
