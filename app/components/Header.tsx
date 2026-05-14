@@ -113,7 +113,6 @@ export default function Header() {
               >
                 <i className="ri-add-line text-base"></i>
                 <span className="hidden sm:inline">Đăng tin</span>
-                <i className="ri-arrow-down-s-line hidden sm:inline text-base"></i>
               </button>
 
               {showPostMenu && (
