@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { jobs } from '../../../lib/api';
+import { jobs, uploads } from '../../../lib/api';
 import { auth as _auth } from '../../../lib/api';
 
 const typeOptions = [
@@ -28,6 +28,21 @@ export default function CreateJobPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (files.length + imageFiles.length > 6) { alert('Tối đa 6 ảnh'); return; }
+    setImageFiles(prev => [...prev, ...files]);
+    setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+    e.target.value = '';
+  }
+
+  function removeImage(i: number) {
+    setImageFiles(prev => prev.filter((_, idx) => idx !== i));
+    setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value, type } = e.target;
@@ -39,6 +54,11 @@ export default function CreateJobPage() {
     setError('');
     setLoading(true);
     try {
+      let imageUrls: string[] = [];
+      if (imageFiles.length > 0) {
+        const uploaded = await uploads.uploadImages(imageFiles);
+        imageUrls = uploaded.map(u => u.url);
+      }
       await jobs.create({
         title: form.title,
         description: form.description,
@@ -50,6 +70,7 @@ export default function CreateJobPage() {
         benefits: form.benefits || undefined,
         deadline: form.deadline ? new Date(form.deadline) : undefined,
         isUrgent: form.isUrgent,
+        images: imageUrls,
       });
       setSuccess(true);
       setTimeout(() => router.push('/jobs'), 2000);
@@ -146,6 +167,29 @@ export default function CreateJobPage() {
             <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange}
               placeholder="Ăn ở, xe đưa đón, bảo hiểm..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none" />
+          </div>
+
+          {/* Upload ảnh */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh đính kèm (tối đa 6 ảnh)</label>
+            <div className="flex flex-wrap gap-2">
+              {imagePreviews.map((src, i) => (
+                <div key={i} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
+                    <i className="ri-close-line text-xs"></i>
+                  </button>
+                </div>
+              ))}
+              {imagePreviews.length < 6 && (
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition-colors">
+                  <i className="ri-image-add-line text-2xl text-gray-400"></i>
+                  <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
+                  <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                </label>
+              )}
+            </div>
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { forum, auth } from '../../../lib/api';
+import { forum, auth, uploads } from '../../../lib/api';
 
 const REPORT_TYPES = [
   {
@@ -110,6 +110,21 @@ export default function CreateReportPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (files.length + imageFiles.length > 6) { alert('Tối đa 6 ảnh'); return; }
+    setImageFiles(prev => [...prev, ...files]);
+    setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+    e.target.value = '';
+  }
+
+  function removeImage(i: number) {
+    setImageFiles(prev => prev.filter((_, idx) => idx !== i));
+    setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, type, value } = e.target;
@@ -144,10 +159,16 @@ export default function CreateReportPage() {
 
       const title = `${prefix} ${form.subject}`;
 
+      let imageUrls: string[] = [];
+      if (imageFiles.length > 0) {
+        const uploaded = await uploads.uploadImages(imageFiles);
+        imageUrls = uploaded.map(u => u.url);
+      }
       await forum.create({
         title,
         content,
         category: 'CANH_BAO',
+        images: imageUrls,
         isAnonymous: form.isAnonymous,
         status: 'PUBLISHED',
       });
@@ -298,6 +319,29 @@ export default function CreateReportPage() {
                 'Mô tả chi tiết sự việc, cách thức, bằng chứng bạn có...'
               }
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none" />
+
+            {/* Upload ảnh bằng chứng */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh bằng chứng (tối đa 6 ảnh)</label>
+              <div className="flex flex-wrap gap-2">
+                {imagePreviews.map((src, i) => (
+                  <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                    <img src={src} alt="" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
+                      <i className="ri-close-line text-xs"></i>
+                    </button>
+                  </div>
+                ))}
+                {imagePreviews.length < 6 && (
+                  <label className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-red-400 hover:bg-red-50 transition-colors">
+                    <i className="ri-camera-line text-xl text-gray-400"></i>
+                    <span className="text-xs text-gray-400 mt-0.5">Thêm ảnh</span>
+                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                  </label>
+                )}
+              </div>
+            </div>
 
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" name="isAnonymous" checked={form.isAnonymous}

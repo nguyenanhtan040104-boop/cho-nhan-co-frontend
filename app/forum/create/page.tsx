@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { forum } from '../../../lib/api';
+import { forum, uploads } from '../../../lib/api';
 import { auth as _auth } from '../../../lib/api';
 
 const categoryOptions = [
@@ -31,6 +31,22 @@ export default function CreatePostPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [savedAsDraft, setSavedAsDraft] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (files.length + imageFiles.length > 8) { alert('Tối đa 8 ảnh'); return; }
+    const newPreviews = files.map(f => URL.createObjectURL(f));
+    setImageFiles(prev => [...prev, ...files]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+    e.target.value = '';
+  }
+
+  function removeImage(i: number) {
+    setImageFiles(prev => prev.filter((_, idx) => idx !== i));
+    setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -43,11 +59,17 @@ export default function CreatePostPage() {
     if (isDraft) setDraftLoading(true); else setLoading(true);
     try {
       const tags = form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+      let imageUrls: string[] = [];
+      if (imageFiles.length > 0) {
+        const uploaded = await uploads.uploadImages(imageFiles);
+        imageUrls = uploaded.map(u => u.url);
+      }
       await forum.create({
         title: form.title,
         content: form.content,
         category: form.category,
         tags,
+        images: imageUrls,
         isAnonymous: form.isAnonymous,
         publishStatus,
         ...(form.scheduledAt && { scheduledAt: new Date(form.scheduledAt).toISOString() }),
@@ -112,6 +134,29 @@ export default function CreatePostPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"
               maxLength={5000} />
             <p className="text-xs text-gray-400 mt-1">{form.content.length}/5000</p>
+          </div>
+
+          {/* Upload ảnh */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh đính kèm (tối đa 8 ảnh)</label>
+            <div className="flex flex-wrap gap-2">
+              {imagePreviews.map((src, i) => (
+                <div key={i} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">
+                    <i className="ri-close-line text-xs"></i>
+                  </button>
+                </div>
+              ))}
+              {imagePreviews.length < 8 && (
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                  <i className="ri-image-add-line text-2xl text-gray-400"></i>
+                  <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
+                  <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
+                </label>
+              )}
+            </div>
           </div>
 
           <div>
