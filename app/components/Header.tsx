@@ -5,6 +5,27 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
 
+const navLinks = [
+  { href: '/', label: 'Trang chủ' },
+  { href: '/products', label: 'Sản phẩm' },
+  { href: '/real-estate', label: 'Bất động sản' },
+  { href: '/forum', label: 'Diễn đàn' },
+  { href: '/market-prices', label: 'Giá thị trường' },
+  { href: '/advertisements', label: 'Quảng cáo' },
+  { href: '/jobs', label: 'Tuyển dụng' },
+  { href: '/pricing', label: 'Bảng giá' },
+];
+
+const hashtags = [
+  { label: '#nongsan', href: '/products?category=NONG_SAN' },
+  { label: '#vatnuoi', href: '/products?category=VAT_NUOI' },
+  { label: '#dichvu', href: '/products?category=DICH_VU' },
+  { label: '#batdongsan', href: '/real-estate' },
+  { label: '#tuyendung', href: '/jobs' },
+  { label: '#muaban', href: '/products' },
+  { label: '#dienddan', href: '/forum' },
+];
+
 export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showPostMenu, setShowPostMenu] = useState(false);
@@ -19,109 +40,151 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (postMenuRef.current && !postMenuRef.current.contains(e.target as Node)) {
-        setShowPostMenu(false);
-      }
+      if (postMenuRef.current && !postMenuRef.current.contains(e.target as Node)) setShowPostMenu(false);
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    setShowMobileMenu(false);
-    setShowPostMenu(false);
-  }, [pathname]);
+  useEffect(() => { setShowMobileMenu(false); setShowPostMenu(false); }, [pathname]);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" suppressHydrationWarning>
-      <div className="w-full px-4 sm:px-6 lg:px-8" suppressHydrationWarning>
-        <div className="flex justify-between items-center py-3 lg:py-4" suppressHydrationWarning>
-          <Link href="/" className="flex items-center space-x-2 lg:space-x-3">
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-green-600 rounded-lg flex items-center justify-center" suppressHydrationWarning>
-              <i className="ri-store-2-line text-white text-lg lg:text-xl"></i>
+    <header className="sticky top-0 z-50" suppressHydrationWarning>
+
+      {/* Top bar - hashtags */}
+      <div style={{ backgroundColor: '#1b4332' }} className="hidden lg:block">
+        <div className="max-w-screen-xl mx-auto px-6 py-1.5 flex items-center gap-1 overflow-x-auto">
+          <span className="text-green-400 text-xs mr-2 whitespace-nowrap font-medium">Tìm nhanh:</span>
+          {hashtags.map(tag => (
+            <Link
+              key={tag.label}
+              href={tag.href}
+              className="text-green-300 text-xs px-2.5 py-0.5 rounded-full border border-green-700 hover:bg-green-700 hover:text-white transition whitespace-nowrap"
+            >
+              {tag.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Main nav */}
+      <div className="bg-white border-b border-gray-100 shadow-sm" suppressHydrationWarning>
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 flex justify-between items-center py-3" suppressHydrationWarning>
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#2d6a4f' }}>
+              <i className="ri-store-2-line text-white text-lg"></i>
             </div>
             <div suppressHydrationWarning>
-              <h1 className="font-['Pacifico'] text-lg lg:text-2xl text-green-700">Chợ Nhân Cơ</h1>
-              <p className="text-xs lg:text-sm text-gray-600 hidden sm:block">Kết nối giao thương, gắn kết cộng đồng</p>
+              <h1 className="font-['Pacifico'] text-xl leading-tight" style={{ color: '#2d6a4f' }}>Chợ Nhân Cơ</h1>
+              <p className="text-xs text-gray-400 hidden sm:block leading-none">Kết nối giao thương, gắn kết cộng đồng</p>
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center space-x-6" suppressHydrationWarning>
-            <Link href="/" className="text-green-600 font-medium hover:text-green-700">Trang chủ</Link>
-            <Link href="/products" className="text-gray-700 hover:text-green-600">Sản phẩm</Link>
-            <Link href="/real-estate" className="text-gray-700 hover:text-green-600">Bất động sản</Link>
-            <Link href="/forum" className="text-gray-700 hover:text-green-600">Diễn đàn</Link>
-            <Link href="/market-prices" className="text-gray-700 hover:text-green-600">Giá thị trường</Link>
-            <Link href="/advertisements" className="text-gray-700 hover:text-green-600">Quảng cáo</Link>
-            <Link href="/jobs" className="text-gray-700 hover:text-green-600">Tuyển dụng</Link>
-            <Link href="/pricing" className="text-gray-700 hover:text-green-600">Bảng giá</Link>
+          {/* Nav links */}
+          <nav className="hidden lg:flex items-center gap-1" suppressHydrationWarning>
+            {navLinks.map(link => {
+              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isActive
+                      ? 'text-green-700 bg-green-50'
+                      : 'text-gray-600 hover:text-green-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
-          <div className="flex items-center space-x-2 lg:space-x-4" suppressHydrationWarning>
+          {/* Right side */}
+          <div className="flex items-center gap-2" suppressHydrationWarning>
+            {/* Post button */}
             <div className="relative" ref={postMenuRef}>
               <button
                 onClick={handlePostMenuToggle}
-                className="bg-green-600 text-white px-3 py-2 lg:px-6 lg:py-2 rounded-lg hover:bg-green-700 text-sm lg:text-base flex items-center gap-2"
+                className="flex items-center gap-1.5 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:opacity-90"
+                style={{ backgroundColor: '#2d6a4f' }}
               >
+                <i className="ri-add-line text-base"></i>
                 <span className="hidden sm:inline">Đăng tin</span>
-                <i className="ri-add-line sm:hidden"></i>
-                <i className="ri-arrow-down-s-line hidden sm:inline"></i>
+                <i className="ri-arrow-down-s-line hidden sm:inline text-base"></i>
               </button>
 
               {showPostMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <Link href="/products/create" className="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50" onClick={() => setShowPostMenu(false)}>
-                    <i className="ri-plant-line text-green-600 mr-3 text-lg"></i>
-                    <div><div className="font-medium">Đăng sản phẩm</div><div className="text-xs text-gray-500">Nông sản, thực phẩm</div></div>
-                  </Link>
-                  <Link href="/real-estate/create" className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50" onClick={() => setShowPostMenu(false)}>
-                    <i className="ri-home-4-line text-blue-600 mr-3 text-lg"></i>
-                    <div><div className="font-medium">Đăng bất động sản</div><div className="text-xs text-gray-500">Nhà đất, phòng trọ</div></div>
-                  </Link>
-                  <Link href="/forum/create" className="flex items-center px-4 py-3 text-gray-700 hover:bg-purple-50" onClick={() => setShowPostMenu(false)}>
-                    <i className="ri-chat-3-line text-purple-600 mr-3 text-lg"></i>
-                    <div><div className="font-medium">Viết bài diễn đàn</div><div className="text-xs text-gray-500">Chia sẻ kinh nghiệm</div></div>
-                  </Link>
-                  <Link href="/advertisements/create" className="flex items-center px-4 py-3 text-gray-700 hover:bg-orange-50" onClick={() => setShowPostMenu(false)}>
-                    <i className="ri-megaphone-line text-orange-600 mr-3 text-lg"></i>
-                    <div><div className="font-medium">Đăng quảng cáo</div><div className="text-xs text-gray-500">Khai trương, khuyến mãi</div></div>
-                  </Link>
-                  <Link href="/jobs/create" className="flex items-center px-4 py-3 text-gray-700 hover:bg-indigo-50" onClick={() => setShowPostMenu(false)}>
-                    <i className="ri-briefcase-line text-indigo-600 mr-3 text-lg"></i>
-                    <div><div className="font-medium">Đăng tuyển dụng</div><div className="text-xs text-gray-500">Tìm việc, thuê nhân công</div></div>
-                  </Link>
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden">
+                  <div className="px-4 py-2 border-b border-gray-50">
+                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Chọn loại đăng tin</p>
+                  </div>
+                  {[
+                    { href: '/products/create', icon: 'ri-leaf-line', color: '#2d6a4f', bg: '#f0fdf4', label: 'Đăng sản phẩm', sub: 'Nông sản, thực phẩm, vật nuôi' },
+                    { href: '/real-estate/create', icon: 'ri-home-4-line', color: '#1d4ed8', bg: '#eff6ff', label: 'Bất động sản', sub: 'Nhà đất, phòng trọ' },
+                    { href: '/forum/create', icon: 'ri-chat-3-line', color: '#7c3aed', bg: '#f5f3ff', label: 'Bài diễn đàn', sub: 'Chia sẻ kinh nghiệm' },
+                    { href: '/advertisements/create', icon: 'ri-megaphone-line', color: '#ea580c', bg: '#fff7ed', label: 'Quảng cáo', sub: 'Khai trương, khuyến mãi' },
+                    { href: '/jobs/create', icon: 'ri-briefcase-line', color: '#0369a1', bg: '#f0f9ff', label: 'Tuyển dụng', sub: 'Tìm việc, thuê nhân công' },
+                  ].map(item => (
+                    <Link key={item.href} href={item.href}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowPostMenu(false)}>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: item.bg }}>
+                        <i className={`${item.icon} text-base`} style={{ color: item.color }}></i>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-800">{item.label}</div>
+                        <div className="text-xs text-gray-400">{item.sub}</div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
 
-            <Link href="/dashboard" className="text-gray-700 hover:text-green-600 p-2" title="Dashboard">
-              <i className="ri-user-line text-lg lg:text-xl"></i>
+            {/* User icon */}
+            <Link href="/dashboard"
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:text-green-700 hover:border-green-300 hover:bg-green-50 transition-all"
+              title="Tài khoản">
+              <i className="ri-user-line text-lg"></i>
             </Link>
 
-            <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="lg:hidden text-gray-700 hover:text-green-600 p-2">
-              <i className="ri-menu-line text-xl"></i>
+            {/* Mobile menu toggle */}
+            <button onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50">
+              <i className={`text-lg ${showMobileMenu ? 'ri-close-line' : 'ri-menu-line'}`}></i>
             </button>
           </div>
         </div>
 
+        {/* Mobile menu */}
         {showMobileMenu && (
-          <div className="lg:hidden border-t border-gray-200 py-4">
-            <nav className="space-y-1">
-              {[
-                { href: '/', label: 'Trang chủ' },
-                { href: '/products', label: 'Sản phẩm' },
-                { href: '/real-estate', label: 'Bất động sản' },
-                { href: '/forum', label: 'Diễn đàn' },
-                { href: '/market-prices', label: 'Giá thị trường' },
-                { href: '/advertisements', label: 'Quảng cáo' },
-                { href: '/jobs', label: 'Tuyển dụng' },
-                { href: '/pricing', label: 'Bảng giá' },
-                { href: '/dashboard', label: 'Dashboard' },
-              ].map(item => (
-                <Link key={item.href} href={item.href} className="block px-4 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg" onClick={() => setShowMobileMenu(false)}>
+          <div className="lg:hidden border-t border-gray-100 px-4 py-3">
+            {/* Hashtags mobile */}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {hashtags.map(tag => (
+                <Link key={tag.label} href={tag.href}
+                  className="text-xs px-2.5 py-1 rounded-full border text-green-700 border-green-200 bg-green-50"
+                  onClick={() => setShowMobileMenu(false)}>
+                  {tag.label}
+                </Link>
+              ))}
+            </div>
+            <nav className="space-y-0.5">
+              {navLinks.map(item => (
+                <Link key={item.href} href={item.href}
+                  className="block px-3 py-2.5 text-sm text-gray-700 hover:text-green-700 hover:bg-green-50 rounded-xl"
+                  onClick={() => setShowMobileMenu(false)}>
                   {item.label}
                 </Link>
               ))}
+              <Link href="/dashboard"
+                className="block px-3 py-2.5 text-sm text-gray-700 hover:text-green-700 hover:bg-green-50 rounded-xl"
+                onClick={() => setShowMobileMenu(false)}>
+                Tài khoản
+              </Link>
             </nav>
           </div>
         )}
