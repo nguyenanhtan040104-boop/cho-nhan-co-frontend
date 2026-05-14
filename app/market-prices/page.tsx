@@ -62,86 +62,6 @@ export default function MarketPricesPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
 
-        {/* ── Giá Vàng SJC ── */}
-        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow">
-                <span className="text-base font-bold text-white">Au</span>
-              </div>
-              <div>
-                <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
-                <p className="text-xs text-gray-500">
-                  {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? 'Dữ liệu thực' : 'Dữ liệu tham khảo'}
-                  {goldUpdatedAt && ` · ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
-                </p>
-              </div>
-            </div>
-            <button onClick={refreshGold} className="text-yellow-600 hover:text-yellow-700 p-2 rounded-lg hover:bg-yellow-100 transition-colors">
-              <i className={`ri-refresh-line text-lg ${goldLoading ? 'animate-spin' : ''}`}></i>
-            </button>
-          </div>
-
-          {goldLoading ? (
-            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-xl p-3 animate-pulse h-14"></div>)}</div>
-          ) : (
-            <>
-              {goldData?.worldPrice && (
-                <div className="bg-yellow-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Vàng thế giới (XAU/USD)</span>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-gray-900">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</span>
-                    {goldData.worldChange != null && (
-                      <span className={`text-sm font-semibold ${goldData.worldChange >= 0 ? 'text-red-500' : 'text-green-600'}`}>
-                        {goldData.worldChange >= 0 ? '▲' : '▼'} {Math.abs(goldData.worldChange).toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-              <div className="overflow-x-auto rounded-xl border border-yellow-100">
-                <table className="w-full">
-                  <thead className="bg-yellow-50 border-b border-yellow-100">
-                    <tr>
-                      <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thương hiệu</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Mua vào</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Bán ra</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-yellow-50">
-                    {goldPrices.map((item: any, i: number) => {
-                      const ch = item.change;
-                      return (
-                        <tr key={i} className="hover:bg-yellow-50/40 transition-colors bg-white">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-bold text-blue-600 text-sm">{item.buy > 0 ? (item.buy / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
-                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-bold text-red-500 text-sm">{item.sell > 0 ? (item.sell / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
-                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right text-sm font-medium">
-                            {ch == null || ch === 0 ? <span className="text-gray-300">—</span>
-                              : ch > 0 ? <span className="text-red-500">▲ {(Math.abs(ch) / 1000).toFixed(0)}k</span>
-                              : <span className="text-green-600">▼ {(Math.abs(ch) / 1000).toFixed(0)}k</span>}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    {goldPrices.length === 0 && (
-                      <tr><td colSpan={4} className="px-4 py-6 text-center text-gray-400 text-sm">Không thể tải giá vàng</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: webgia.com · sjc.com.vn · 1 lượng = 10 chỉ = 37.5g · Chỉ mang tính tham khảo</p>
-        </div>
-
         {/* ── Bảng Giá Hàng Hóa ── */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-green-50 to-emerald-50">
@@ -258,6 +178,86 @@ export default function MarketPricesPage() {
           <p className="text-xs text-gray-400 px-5 py-3 border-t text-center">
             Nguồn: giacafe.vn · banggianongsan.com · Vietcombank · Chỉ mang tính tham khảo
           </p>
+        </div>
+
+        {/* ── Giá Vàng SJC ── */}
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow">
+                <span className="text-base font-bold text-white">Au</span>
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
+                <p className="text-xs text-gray-500">
+                  {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? 'Dữ liệu thực' : 'Dữ liệu tham khảo'}
+                  {goldUpdatedAt && ` · ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                </p>
+              </div>
+            </div>
+            <button onClick={refreshGold} className="text-yellow-600 hover:text-yellow-700 p-2 rounded-lg hover:bg-yellow-100 transition-colors">
+              <i className={`ri-refresh-line text-lg ${goldLoading ? 'animate-spin' : ''}`}></i>
+            </button>
+          </div>
+
+          {goldLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-xl p-3 animate-pulse h-14"></div>)}</div>
+          ) : (
+            <>
+              {goldData?.worldPrice && (
+                <div className="bg-yellow-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Vàng thế giới (XAU/USD)</span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-gray-900">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</span>
+                    {goldData.worldChange != null && (
+                      <span className={`text-sm font-semibold ${goldData.worldChange >= 0 ? 'text-red-500' : 'text-green-600'}`}>
+                        {goldData.worldChange >= 0 ? '▲' : '▼'} {Math.abs(goldData.worldChange).toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className="overflow-x-auto rounded-xl border border-yellow-100">
+                <table className="w-full">
+                  <thead className="bg-yellow-50 border-b border-yellow-100">
+                    <tr>
+                      <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thương hiệu</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Mua vào</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Bán ra</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-yellow-50">
+                    {goldPrices.map((item: any, i: number) => {
+                      const ch = item.change;
+                      return (
+                        <tr key={i} className="hover:bg-yellow-50/40 transition-colors bg-white">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-bold text-blue-600 text-sm">{item.buy > 0 ? (item.buy / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
+                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="font-bold text-red-500 text-sm">{item.sell > 0 ? (item.sell / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
+                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
+                          </td>
+                          <td className="px-4 py-3 text-right text-sm font-medium">
+                            {ch == null || ch === 0 ? <span className="text-gray-300">—</span>
+                              : ch > 0 ? <span className="text-red-500">▲ {(Math.abs(ch) / 1000).toFixed(0)}k</span>
+                              : <span className="text-green-600">▼ {(Math.abs(ch) / 1000).toFixed(0)}k</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {goldPrices.length === 0 && (
+                      <tr><td colSpan={4} className="px-4 py-6 text-center text-gray-400 text-sm">Không thể tải giá vàng</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: webgia.com · sjc.com.vn · 1 lượng = 10 chỉ = 37.5g · Chỉ mang tính tham khảo</p>
         </div>
 
       </div>
