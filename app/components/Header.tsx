@@ -10,7 +10,7 @@ const navLinks = [
   { href: '/products', label: 'Sản phẩm' },
   { href: '/real-estate', label: 'Bất động sản' },
   { href: '/forum', label: 'Diễn đàn' },
-  { href: '/market-prices', label: 'Giá thị trường' },
+  { href: '/canh-bao', label: 'Cảnh báo lừa đảo' },
   { href: '/advertisements', label: 'Quảng cáo' },
   { href: '/jobs', label: 'Tuyển dụng' },
   { href: '/pricing', label: 'Bảng giá' },
@@ -24,6 +24,7 @@ const hashtags = [
   { label: '#tuyendung', href: '/jobs' },
   { label: '#muaban', href: '/products' },
   { label: '#dienddan', href: '/forum' },
+  { label: '#canhbao', href: '/canh-bao' },
 ];
 
 export default function Header() {

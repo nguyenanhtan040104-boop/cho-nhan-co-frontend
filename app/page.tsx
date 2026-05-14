@@ -31,7 +31,7 @@ const categories = [
   { title: 'Sản phẩm', sub: 'Nông sản, thực phẩm sạch', href: '/products', color: '#2d6a4f', bg: '#f0fdf4', icon: 'ri-leaf-line' },
   { title: 'Bất động sản', sub: 'Đất vườn, nhà cửa, cho thuê', href: '/real-estate', color: '#1d4ed8', bg: '#eff6ff', icon: 'ri-home-4-line' },
   { title: 'Tuyển dụng', sub: 'Việc làm, thuê nhân công', href: '/jobs', color: '#7c3aed', bg: '#f5f3ff', icon: 'ri-briefcase-line' },
-  { title: 'Giá thị trường', sub: 'Cà phê, hồ tiêu, nông sản', href: '/market-prices', color: '#b45309', bg: '#fffbeb', icon: 'ri-line-chart-line' },
+  { title: 'Cảnh báo lừa đảo', sub: 'Cộng đồng bảo vệ nhau', href: '/canh-bao', color: '#b91c1c', bg: '#fef2f2', icon: 'ri-alarm-warning-line' },
   { title: 'Diễn đàn', sub: 'Chia sẻ kinh nghiệm, hỏi đáp', href: '/forum', color: '#0891b2', bg: '#ecfeff', icon: 'ri-chat-3-line' },
   { title: 'Quảng cáo', sub: 'Khai trương, khuyến mãi', href: '/advertisements', color: '#dc2626', bg: '#fef2f2', icon: 'ri-megaphone-line' },
 ];
@@ -230,6 +230,40 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Giá thị trường mini */}
+      <section className="pb-10">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-yellow-100">
+              <div className="flex items-center gap-2">
+                <i className="ri-line-chart-line text-yellow-600 text-lg"></i>
+                <h2 className="font-bold text-gray-800">Giá thị trường hôm nay</h2>
+              </div>
+              <Link href="/market-prices" className="text-sm text-yellow-700 hover:text-yellow-800 font-medium">Xem đầy đủ →</Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-yellow-100">
+              {[
+                { name: 'Cà phê Robusta', price: '132.000đ/kg', change: '+1.200', up: true },
+                { name: 'Hồ tiêu đen', price: '165.000đ/kg', change: '-500', up: false },
+                { name: 'Sầu riêng', price: '85.000đ/kg', change: '+3.000', up: true },
+                { name: 'Điều nhân', price: '72.000đ/kg', change: '—', up: null },
+              ].map((item, i) => (
+                <div key={i} className="px-5 py-4">
+                  <p className="text-xs text-gray-500 mb-0.5">{item.name}</p>
+                  <p className="font-bold text-gray-800 text-sm">{item.price}</p>
+                  <span className={`text-xs font-medium ${item.up === true ? 'text-red-500' : item.up === false ? 'text-green-600' : 'text-gray-400'}`}>
+                    {item.up === true ? '▲ ' : item.up === false ? '▼ ' : ''}{item.change}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="px-5 py-2 bg-yellow-50/50 border-t border-yellow-100">
+              <p className="text-xs text-gray-400">Giá tham khảo · Cập nhật hằng ngày · <Link href="/market-prices" className="text-yellow-700 hover:underline">Xem bảng giá chi tiết</Link></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="pb-14">
         <div className="max-w-6xl mx-auto px-4">
@@ -278,7 +312,7 @@ export default async function HomePage() {
             <div>
               <h4 className="font-semibold text-gray-200 mb-3">Danh mục</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                {[['Sản phẩm', '/products'], ['Bất động sản', '/real-estate'], ['Tuyển dụng', '/jobs'], ['Diễn đàn', '/forum'], ['Giá thị trường', '/market-prices'], ['Bảng giá', '/pricing']].map(([label, href]) => (
+                {[['Sản phẩm', '/products'], ['Bất động sản', '/real-estate'], ['Tuyển dụng', '/jobs'], ['Diễn đàn', '/forum'], ['Cảnh báo lừa đảo', '/canh-bao'], ['Bảng giá', '/pricing']].map(([label, href]) => (
                   <li key={href}><Link href={href} className="hover:text-green-400 transition">{label}</Link></li>
                 ))}
               </ul>
