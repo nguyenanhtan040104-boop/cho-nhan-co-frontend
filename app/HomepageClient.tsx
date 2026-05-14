@@ -37,9 +37,13 @@ function resolveSearch(q: string): string {
 
 const QUICK_TAGS = [
   { label: '#nongsan', route: '/products?category=NONG_SAN' },
+  { label: '#vatnuoi', route: '/products?category=VAT_NUOI' },
+  { label: '#dichvu', route: '/products?category=DICH_VU' },
   { label: '#batdongsan', route: '/real-estate' },
   { label: '#tuyendung', route: '/jobs' },
-  { label: '#cafferobusta', route: '/products?search=robusta' },
+  { label: '#muaban', route: '/products' },
+  { label: '#dienddan', route: '/forum' },
+  { label: '#canhbao', route: '/canh-bao' },
 ];
 
 export default function HomepageClient() {

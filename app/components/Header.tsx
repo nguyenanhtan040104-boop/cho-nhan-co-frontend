@@ -143,26 +143,9 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Hashtag bar - dưới nav */}
-        <div className="hidden lg:block border-t border-gray-100">
-          <div className="max-w-screen-xl mx-auto px-6 py-1.5 flex items-center gap-1.5 overflow-x-auto">
-            <span className="text-gray-400 text-xs mr-1 whitespace-nowrap">Tìm nhanh:</span>
-            {hashtags.map(tag => (
-              <Link
-                key={tag.label}
-                href={tag.href}
-                className="text-xs px-2.5 py-0.5 rounded-full border border-gray-200 text-gray-500 hover:border-green-500 hover:text-green-700 hover:bg-green-50 transition whitespace-nowrap"
-              >
-                {tag.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
         {/* Mobile menu */}
         {showMobileMenu && (
           <div className="lg:hidden border-t border-gray-100 px-4 py-3">
-            {/* Hashtags mobile */}
             <div className="flex flex-wrap gap-1.5 mb-3">
               {hashtags.map(tag => (
                 <Link key={tag.label} href={tag.href}
