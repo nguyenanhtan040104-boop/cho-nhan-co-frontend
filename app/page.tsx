@@ -31,7 +31,7 @@ const categories = [
   { title: 'Sản phẩm', sub: 'Nông sản, thực phẩm sạch', href: '/products', color: '#2d6a4f', bg: '#f0fdf4', icon: 'ri-leaf-line' },
   { title: 'Bất động sản', sub: 'Đất vườn, nhà cửa, cho thuê', href: '/real-estate', color: '#1d4ed8', bg: '#eff6ff', icon: 'ri-home-4-line' },
   { title: 'Tuyển dụng', sub: 'Việc làm, thuê nhân công', href: '/jobs', color: '#7c3aed', bg: '#f5f3ff', icon: 'ri-briefcase-line' },
-  { title: 'Cảnh báo lừa đảo', sub: 'Cộng đồng bảo vệ nhau', href: '/canh-bao', color: '#b91c1c', bg: '#fef2f2', icon: 'ri-alarm-warning-line' },
+  { title: 'Cảnh báo', sub: 'Lừa đảo, trộm cắp, mất đồ', href: '/canh-bao', color: '#b91c1c', bg: '#fef2f2', icon: 'ri-alarm-warning-line' },
   { title: 'Diễn đàn', sub: 'Chia sẻ kinh nghiệm, hỏi đáp', href: '/forum', color: '#0891b2', bg: '#ecfeff', icon: 'ri-chat-3-line' },
   { title: 'Quảng cáo', sub: 'Khai trương, khuyến mãi', href: '/advertisements', color: '#dc2626', bg: '#fef2f2', icon: 'ri-megaphone-line' },
 ];
@@ -312,7 +312,7 @@ export default async function HomePage() {
             <div>
               <h4 className="font-semibold text-gray-200 mb-3">Danh mục</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                {[['Sản phẩm', '/products'], ['Bất động sản', '/real-estate'], ['Tuyển dụng', '/jobs'], ['Diễn đàn', '/forum'], ['Cảnh báo lừa đảo', '/canh-bao'], ['Bảng giá', '/pricing']].map(([label, href]) => (
+                {[['Sản phẩm', '/products'], ['Bất động sản', '/real-estate'], ['Tuyển dụng', '/jobs'], ['Diễn đàn', '/forum'], ['Cảnh báo cộng đồng', '/canh-bao'], ['Bảng giá', '/pricing']].map(([label, href]) => (
                   <li key={href}><Link href={href} className="hover:text-green-400 transition">{label}</Link></li>
                 ))}
               </ul>

@@ -63,8 +63,8 @@ export default function CanhBaoPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <p className="text-red-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ · Cộng đồng</p>
-              <h1 className="text-2xl font-bold text-white">Cảnh báo lừa đảo</h1>
-              <p className="text-red-200 text-sm mt-1">{total} báo cáo từ cộng đồng · Cùng bảo vệ nhau</p>
+              <h1 className="text-2xl font-bold text-white">Cảnh báo cộng đồng</h1>
+              <p className="text-red-200 text-sm mt-1">{total} thông báo từ cộng đồng · Cùng bảo vệ nhau</p>
             </div>
             <div className="flex gap-2">
               <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2">
@@ -75,7 +75,7 @@ export default function CanhBaoPage() {
               </form>
               <Link href="/canh-bao/create"
                 className="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-400 whitespace-nowrap border border-red-400">
-                + Báo cáo lừa đảo
+                + Đăng cảnh báo
               </Link>
             </div>
           </div>
@@ -97,12 +97,12 @@ export default function CanhBaoPage() {
           {/* Main list */}
           <div className="flex-1 min-w-0">
             {/* Warning notice */}
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5">
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
               <div className="flex gap-3">
-                <i className="ri-error-warning-line text-red-500 text-xl flex-shrink-0 mt-0.5"></i>
+                <i className="ri-information-line text-amber-500 text-xl flex-shrink-0 mt-0.5"></i>
                 <div>
-                  <p className="text-sm font-semibold text-red-800 mb-1">Lưu ý quan trọng</p>
-                  <p className="text-xs text-red-600">Các bài đăng chỉ mang tính cộng đồng cảnh báo, chưa được kiểm chứng pháp lý. Nếu bị thiệt hại về tài sản, hãy trình báo cơ quan công an.</p>
+                  <p className="text-sm font-semibold text-amber-800 mb-1">Lưu ý</p>
+                  <p className="text-xs text-amber-700">Các bài đăng mang tính cộng đồng, chưa được kiểm chứng pháp lý. Nếu bị thiệt hại về tài sản, hãy trình báo cơ quan công an để được hỗ trợ.</p>
                 </div>
               </div>
             </div>
@@ -120,11 +120,11 @@ export default function CanhBaoPage() {
             ) : posts.length === 0 ? (
               <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
                 <i className="ri-shield-check-line text-5xl text-gray-200 block mb-3"></i>
-                <p className="text-gray-500 font-medium mb-1">Chưa có báo cáo nào</p>
-                <p className="text-gray-400 text-sm mb-4">Cộng đồng đang an toàn. Nếu bạn gặp lừa đảo, hãy chia sẻ để cảnh báo mọi người.</p>
+                <p className="text-gray-500 font-medium mb-1">Chưa có thông báo nào</p>
+                <p className="text-gray-400 text-sm mb-4">Cộng đồng đang an toàn. Nếu bạn có thông tin cần cảnh báo, hãy chia sẻ để mọi người cùng biết.</p>
                 <Link href="/canh-bao/create"
                   className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-700">
-                  + Báo cáo đầu tiên
+                  + Đăng cảnh báo đầu tiên
                 </Link>
               </div>
             ) : (
@@ -153,15 +153,15 @@ export default function CanhBaoPage() {
               <Link href="/canh-bao/create"
                 className="block bg-red-600 hover:bg-red-700 text-white rounded-2xl p-5 transition-colors text-center">
                 <i className="ri-alarm-warning-line text-2xl block mb-2"></i>
-                <p className="font-semibold mb-1">Bạn gặp lừa đảo?</p>
-                <p className="text-sm text-red-100">Đăng cảnh báo để bảo vệ cộng đồng</p>
+                <p className="font-semibold mb-1">Có thông tin cần cảnh báo?</p>
+                <p className="text-sm text-red-100">Chia sẻ để bảo vệ cộng đồng</p>
               </Link>
             ) : (
               <Link href="/profile"
                 className="block bg-red-600 hover:bg-red-700 text-white rounded-2xl p-5 transition-colors text-center">
                 <i className="ri-alarm-warning-line text-2xl block mb-2"></i>
-                <p className="font-semibold mb-1">Báo cáo lừa đảo</p>
-                <p className="text-sm text-red-100">Đăng nhập để đăng cảnh báo</p>
+                <p className="font-semibold mb-1">Đăng cảnh báo</p>
+                <p className="text-sm text-red-100">Đăng nhập để chia sẻ thông tin</p>
               </Link>
             )}
 

@@ -10,7 +10,7 @@ const navLinks = [
   { href: '/products', label: 'Sản phẩm' },
   { href: '/real-estate', label: 'Bất động sản' },
   { href: '/forum', label: 'Diễn đàn' },
-  { href: '/canh-bao', label: 'Cảnh báo lừa đảo' },
+  { href: '/canh-bao', label: 'Cảnh báo' },
   { href: '/advertisements', label: 'Quảng cáo' },
   { href: '/jobs', label: 'Tuyển dụng' },
   { href: '/pricing', label: 'Bảng giá' },
