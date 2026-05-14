@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MessengerModal from '../../../components/MessengerModal';
-import { products as productsApi, messages as messagesApi, auth } from '../../../lib/api';
+import { products as productsApi, messages as messagesApi, auth, wallet as walletApi } from '../../../lib/api';
 
 interface ProductDetailProps {
   productId: string;
@@ -20,6 +20,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [deleting, setDeleting] = useState(false);
+  const [buyingVip, setBuyingVip] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -110,6 +111,23 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     } catch {
       alert('Xóa thất bại');
       setDeleting(false);
+    }
+  };
+
+  const handleBuyVip = async () => {
+    if (!confirm('Mua VIP cho sản phẩm này với giá 50,000đ?')) return;
+    setBuyingVip(true);
+    try {
+      const res = await walletApi.buyVip('product', productId) as any;
+      alert(res.message || 'Mua VIP thành công!');
+      // Reload product
+      const r = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
+      const d = await r.json();
+      setProduct(d);
+    } catch (e: any) {
+      alert(e.message || 'Lỗi mua VIP');
+    } finally {
+      setBuyingVip(false);
     }
   };
 
@@ -261,6 +279,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               <button onClick={handleShareClick} className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <i className="ri-share-line"></i>
               </button>
+              {isOwner && !product.isVip && (
+                <button onClick={handleBuyVip} disabled={buyingVip}
+                  className="px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 flex items-center gap-1 text-sm font-medium">
+                  <i className="ri-vip-crown-fill"></i>
+                  {buyingVip ? '...' : 'Mua VIP'}
+                </button>
+              )}
+              {isOwner && product.isVip && (
+                <span className="px-4 py-3 bg-yellow-50 text-yellow-700 rounded-lg text-sm font-medium flex items-center gap-1 border border-yellow-200">
+                  <i className="ri-vip-crown-fill"></i> Đang VIP
+                </span>
+              )}
               {isOwner && (
                 <button onClick={handleDeleteClick} disabled={deleting}
                   className="px-4 py-3 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50">

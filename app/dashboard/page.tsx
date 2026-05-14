@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { auth, users, analytics, products, realEstate, jobs, notifications } from '../../lib/api';
+import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi } from '../../lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [myRealEstates, setMyRealEstates] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<any[]>([]);
   const [notifs, setNotifs] = useState<any[]>([]);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -44,6 +45,7 @@ export default function DashboardPage() {
     if (results[2].status === 'fulfilled') setMyRealEstates(results[2].value.data || []);
     if (results[3].status === 'fulfilled') setMyJobs(results[3].value.data || []);
     if (results[4].status === 'fulfilled') setNotifs(results[4].value.data || []);
+    walletApi.get().then((w: any) => setWalletBalance(Number(w.balance))).catch(() => {});
   } catch (e: any) {
     setError(e.message || 'Lỗi tải dữ liệu');
   } finally {
@@ -254,6 +256,24 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Wallet Balance Card */}
+                <Link href="/wallet" className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-xl p-5 shadow-sm block hover:opacity-90 transition mb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <i className="ri-wallet-3-line text-white text-lg"></i>
+                        <span className="text-green-100 text-sm">Số dư ví</span>
+                      </div>
+                      <p className="text-2xl font-bold text-white">
+                        {walletBalance !== null ? new Intl.NumberFormat('vi-VN').format(walletBalance) + 'đ' : '...'}
+                      </p>
+                    </div>
+                    <div className="text-white/70 text-sm flex items-center gap-1">
+                      Nạp tiền <i className="ri-arrow-right-line"></i>
+                    </div>
+                  </div>
+                </Link>
 
                 {/* Breakdown */}
                 <div className="bg-white rounded-xl p-6 shadow-sm mb-6">

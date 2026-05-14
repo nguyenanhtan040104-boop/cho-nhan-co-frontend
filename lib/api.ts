@@ -603,6 +603,32 @@ export const marketPrices = {
   },
 };
 
+// =================== WALLET ===================
+export const wallet = {
+  async get() {
+    return request<any>('/wallet');
+  },
+  async requestTopUp(amount: number, note?: string) {
+    return request('/wallet/top-up', { method: 'POST', body: JSON.stringify({ amount, note }) });
+  },
+  async buyVip(refType: 'product' | 'job' | 'real_estate', refId: string, durationDays = 30) {
+    return request('/wallet/buy-vip', { method: 'POST', body: JSON.stringify({ refType, refId, durationDays }) });
+  },
+  async getPendingTopUps() {
+    return request<any>('/wallet/admin/pending');
+  },
+  async getAllTransactions(params?: any) {
+    const q = new URLSearchParams(params).toString();
+    return request<any>(`/wallet/admin/transactions?${q}`);
+  },
+  async confirmTopUp(id: string, adminNote?: string) {
+    return request(`/wallet/admin/confirm/${id}`, { method: 'POST', body: JSON.stringify({ adminNote }) });
+  },
+  async rejectTopUp(id: string, adminNote?: string) {
+    return request(`/wallet/admin/reject/${id}`, { method: 'POST', body: JSON.stringify({ adminNote }) });
+  },
+};
+
 // =================== ADVERTISEMENTS ===================
 
 export const advertisements = {
