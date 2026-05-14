@@ -147,6 +147,37 @@ export default function JobsPage() {
           </div>
         ) : (
           <>
+            {/* Tin VIP nổi bật */}
+            {items.filter(j => j.isVip).length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <i className="ri-vip-crown-fill text-yellow-500 text-xl"></i>
+                  <h2 className="text-lg font-bold text-gray-900">Tin nổi bật</h2>
+                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">VIP</span>
+                </div>
+                <div className="space-y-3">
+                  {items.filter(j => j.isVip).slice(0, 3).map(job => (
+                    <Link key={job.id} href={`/jobs/${job.id}`}
+                      className="flex-1 bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex gap-4 items-start ring-2 ring-yellow-400 block">
+                      <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i className="ri-vip-crown-fill text-white text-xl"></i>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-semibold text-gray-900">{job.title}</h3>
+                            <p className="text-sm text-gray-500 mt-0.5">{job.user?.fullName} • {job.location}</p>
+                          </div>
+                          <span className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs px-2 py-0.5 rounded-full font-bold flex-shrink-0">VIP</span>
+                        </div>
+                        {job.salary && <p className="text-green-600 font-semibold text-sm mt-1">{job.salary}</p>}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <hr className="mt-4" />
+              </div>
+            )}
             <div className="space-y-4">
               {items.map(job => (
                 <div key={job.id} className="flex gap-3 items-stretch">

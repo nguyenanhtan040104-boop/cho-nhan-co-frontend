@@ -220,6 +220,41 @@ export default function RealEstatePage() {
           </div>
         ) : (
           <>
+            {/* BĐS VIP nổi bật */}
+            {items.filter(r => r.isVip).length > 0 && (
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <i className="ri-vip-crown-fill text-yellow-500 text-xl"></i>
+                  <h2 className="text-lg font-bold text-gray-900">Bất động sản nổi bật</h2>
+                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">VIP</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {items.filter(r => r.isVip).slice(0, 3).map(item => (
+                    <Link key={item.id} href={`/real-estate/${item.id}`}
+                      className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group block ring-2 ring-yellow-400">
+                      <div className="relative h-48 bg-gray-100">
+                        {item.images?.[0] ? (
+                          <img src={item.images[0].url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <i className="ri-home-4-line text-5xl text-gray-300"></i>
+                          </div>
+                        )}
+                        <span className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                          <i className="ri-vip-crown-fill"></i> VIP
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">{item.title}</h3>
+                        <p className="text-green-600 font-bold text-lg mb-1">{Number(item.price) >= 1000000000 ? (Number(item.price)/1000000000).toFixed(1)+' tỷ' : Number(item.price) >= 1000000 ? (Number(item.price)/1000000).toFixed(0)+' triệu' : Number(item.price).toLocaleString()+'đ'}</p>
+                        <div className="text-sm text-gray-500"><i className="ri-map-pin-line mr-1"></i>{item.address}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <hr className="mt-6" />
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map(item => (
                 <div key={item.id} className="relative">

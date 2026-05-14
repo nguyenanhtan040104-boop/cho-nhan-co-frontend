@@ -160,6 +160,44 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex-1">
+            {/* Tin nổi bật VIP */}
+            {!loading && items.filter(p => p.isVip).length > 0 && (
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <i className="ri-vip-crown-fill text-yellow-500 text-xl"></i>
+                  <h2 className="text-lg font-bold text-gray-900">Tin nổi bật</h2>
+                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">VIP</span>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {items.filter(p => p.isVip).slice(0, 6).map(product => (
+                    <Link key={product.id} href={`/products/${product.id}`}
+                      className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden block group ring-2 ring-yellow-400">
+                      <div className="relative h-40 bg-gray-100">
+                        {product.images?.[0] ? (
+                          <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <i className="ri-image-line text-4xl text-gray-300"></i>
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                          <i className="ri-vip-crown-fill text-xs"></i> VIP
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <h4 className="font-medium text-gray-900 text-sm line-clamp-2 mb-1 group-hover:text-green-600">{product.title}</h4>
+                        <p className="text-green-600 font-bold">{Number(product.price).toLocaleString()}đ/{product.unit}</p>
+                        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
+                          <i className="ri-map-pin-line"></i>
+                          <span className="truncate">{product.location}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <hr className="mt-6" />
+              </div>
+            )}
             {loading ? (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
