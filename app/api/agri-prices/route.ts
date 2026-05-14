@@ -9,28 +9,136 @@ const BROWSER_HEADERS = {
 type PriceRow = { date: string; price: number; change: number | null };
 type ProvinceHistory = { province: string; key: string; rows: PriceRow[] };
 
-// ─── Fetch lịch sử giá cà phê nội địa từ giacafe.vn ───
+// ─── Fetch lịch sử giá cà phê nội địa từ giacafe.vn (AJAX endpoint) ───
 async function fetchCoffeeHistory(): Promise<ProvinceHistory[] | null> {
   try {
-    const res = await fetch('https://giacafe.vn/gia-ca-phe-trong-nuoc', {
-      headers: { ...BROWSER_HEADERS, 'Referer': 'https://giacafe.vn/' },
+    // Bước 1: lấy data-atts và ajaxurl từ trang chủ
+    const pageRes = await fetch('https://giacafe.vn/', {
+      headers: { ...BROWSER_HEADERS },
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
-    return parseCoffeeHistory(html);
-  } catch {
-    // fallback trang chủ
+    if (!pageRes.ok) throw new Error('page fetch failed');
+    const html = await pageRes.text();
+
+    // Lấy atts (base64) và id từ data-atts attribute
+    const attsMatch = html.match(/data-atts="([^"]+)"/);
+    const idMatch = html.match(/devvn_cafe_price"[^>]*>([\s\S]{0,500})/);
+    if (!attsMatch) throw new Error('no atts found');
+
+    // Decode atts để lấy date hiện tại, tạo lại atts với type=table
+    const decoded = Buffer.from(attsMatch[1], 'base64').toString('utf8');
+    // decoded kiểu: json:{"date":"2026-01-27","ajax":true,"type":"ticker"}devvn_cafe_2025
+    const jsonMatch = decoded.match(/json:(\{[^}]+\})/);
+    const idStr = decoded.split('}').pop() || 'devvn_cafe_2025';
+
+    // Tạo atts mới với type=table
+    let tableAtts = attsMatch[1];
+    if (jsonMatch) {
+      const obj = JSON.parse(jsonMatch[1]);
+      // Giữ date, đổi type sang table
+      const newJson = JSON.stringify({ ...obj, type: 'table' });
+      tableAtts = Buffer.from('json:' + newJson + idStr).toString('base64');
+    }
+
+    // Bước 2: gọi AJAX lấy bảng giá
+    const ajaxRes = await fetch('https://giacafe.vn/wp-admin/admin-ajax.php', {
+      method: 'POST',
+      headers: {
+        ...BROWSER_HEADERS,
+        'Referer': 'https://giacafe.vn/',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: new URLSearchParams({
+        action: 'devvn_get_cafe_price',
+        atts: tableAtts,
+        id: idStr.trim(),
+      }).toString(),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!ajaxRes.ok) throw new Error('ajax failed');
+    const json = await ajaxRes.json();
+    if (!json.success || !json.data?.html) throw new Error('no data');
+
+    return parseCoffeeAjaxHtml(json.data.html);
+  } catch (e) {
+    // Fallback: thử với atts cứng (lấy từ trang đã biết)
     try {
-      const res = await fetch('https://giacafe.vn/', {
-        headers: { ...BROWSER_HEADERS },
+      const atts = 'anNvbjp7ImRhdGUiOiIyMDI2LTAxLTI3IiwiYWpheCI6dHJ1ZSwidHlwZSI6InRhYmxlIn1kZXZ2bl9jYWZlXzIwMjU=';
+      const ajaxRes = await fetch('https://giacafe.vn/wp-admin/admin-ajax.php', {
+        method: 'POST',
+        headers: {
+          ...BROWSER_HEADERS,
+          'Referer': 'https://giacafe.vn/',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: `action=devvn_get_cafe_price&atts=${encodeURIComponent(atts)}&id=devvn_cafe_2025`,
         signal: AbortSignal.timeout(10000),
       });
-      if (!res.ok) return null;
-      const html = await res.text();
-      return parseCoffeeHistory(html);
-    } catch { return null; }
+      const json = await ajaxRes.json();
+      if (json.success && json.data?.html) return parseCoffeeAjaxHtml(json.data.html);
+    } catch {}
+    return null;
   }
+}
+
+// Parse HTML từ AJAX response của giacafe.vn
+function parseCoffeeAjaxHtml(html: string): ProvinceHistory[] | null {
+  const provinces = [
+    { key: 'dakLak',  province: 'Đắk Lắk',  tabId: 'tab-dak-lak' },
+    { key: 'lamDong', province: 'Lâm Đồng', tabId: 'tab-lam-dong' },
+    { key: 'giaLai',  province: 'Gia Lai',   tabId: 'tab-gia-lai' },
+    { key: 'dakNong', province: 'Đắk Nông',  tabId: 'tab-dak-nong' },
+  ];
+
+  const result: ProvinceHistory[] = [];
+
+  for (const prov of provinces) {
+    // Tìm section của tỉnh theo data-id
+    const re = new RegExp(`data-id="#${prov.tabId}"[\\s\\S]*?</div>`, 'i');
+    const secMatch = html.match(re);
+    const section = secMatch ? secMatch[0] : '';
+
+    // Nếu không tìm theo data-id, tìm theo tên tỉnh
+    const sectionHtml = section || (() => {
+      const idx = html.indexOf(prov.province);
+      return idx > -1 ? html.slice(idx, idx + 2000) : '';
+    })();
+
+    if (!sectionHtml) continue;
+
+    const rows: PriceRow[] = [];
+    const trRe = /<tr[\s\S]*?<\/tr>/gi;
+    let tr;
+    while ((tr = trRe.exec(sectionHtml)) !== null && rows.length < 10) {
+      const cells = [...tr[0].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)]
+        .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
+      if (cells.length < 2) continue;
+
+      const dateMatch = cells[0].match(/(\d{2}\/\d{2}\/\d{4})/);
+      if (!dateMatch) continue;
+
+      const price = parseInt(cells[1].replace(/[,.\s]/g, ''));
+      if (price < 50000 || price > 200000) continue;
+
+      // Thay đổi: lấy số có dấu + hoặc -
+      let change: number | null = null;
+      if (cells[2]) {
+        const cm = cells[2].match(/([+\-]?\d[\d,]*)/);
+        if (cm) {
+          change = parseInt(cm[1].replace(/,/g, ''));
+          if (isNaN(change)) change = null;
+        }
+      }
+
+      rows.push({ date: dateMatch[1], price, change });
+    }
+
+    if (rows.length > 0) result.push({ ...prov, rows });
+  }
+
+  return result.length > 0 ? result : null;
 }
 
 function parseCoffeeHistory(html: string): ProvinceHistory[] | null {
