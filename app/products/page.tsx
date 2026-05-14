@@ -231,7 +231,7 @@ function ProductsInner() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {vipItems.slice(0, 8).map(product => (
-                    <ProductCard key={product.id} product={product} isVip bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
+                    <ProductCard key={product.id} product={product} isVip bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
                   ))}
                 </div>
                 {normalItems.length > 0 && (
@@ -247,7 +247,7 @@ function ProductsInner() {
             {/* Normal products */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {normalItems.map(product => (
-                <ProductCard key={product.id} product={product} isVip={false} bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
+                <ProductCard key={product.id} product={product} isVip={false} bulkMode={bulkMode} selected={selected.has(product.id)} onToggle={() => toggleSelect(product.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
 
@@ -351,7 +351,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
         </div>
       </Link>
       <div className="absolute top-2 right-2 z-10">
-        <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
+        <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
       </div>
     </div>
   );

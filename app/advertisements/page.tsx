@@ -113,7 +113,7 @@ export default function AdvertisementsPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {items.map(item => (
-                <AdCard key={item.id} item={item} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
+                <AdCard key={item.id} item={item} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
             {totalPages > 1 && (
@@ -177,7 +177,7 @@ function AdCard({ item, currentUserId, onDeleted }: { item: any; currentUserId: 
       </div>
     </Link>
     <div className="absolute top-2 right-2 z-10">
-      <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await advertisements.delete(id); onDeleted(id); }} editHref={`/advertisements/${item.id}/edit`} />
+      <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} onDelete={async (id) => { await advertisements.delete(id); onDeleted(id); }} editHref={`/advertisements/${item.id}/edit`} />
     </div>
     </div>
   );

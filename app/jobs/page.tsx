@@ -142,7 +142,7 @@ export default function JobsPage() {
           <>
             <div className="space-y-3">
               {items.map(item => (
-                <JobCard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} currentUserId={currentUserId} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
+                <JobCard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
             {totalPages > 1 && (
@@ -210,7 +210,7 @@ function JobCard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted 
         </div>
       </Link>
       <div className="absolute top-3 right-3 z-10">
-        <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
+        <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
       </div>
     </div>
   );

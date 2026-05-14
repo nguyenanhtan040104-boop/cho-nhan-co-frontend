@@ -165,7 +165,7 @@ export default function ForumPage() {
           <>
             <div className="space-y-3">
               {posts.map(post => (
-                <ForumCard key={post.id} post={post} bulkMode={bulkMode} selected={selected.has(post.id)} onToggle={() => toggleSelect(post.id)} currentUserId={currentUserId} onDeleted={id => setPosts(prev => prev.filter(p => p.id !== id))} />
+                <ForumCard key={post.id} post={post} bulkMode={bulkMode} selected={selected.has(post.id)} onToggle={() => toggleSelect(post.id)} onDeleted={id => setPosts(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
             {totalPages > 1 && (
@@ -234,7 +234,7 @@ function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDelete
         </div>
       </Link>
       <div className="absolute top-3 right-3 z-10">
-        <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} currentUserId={currentUserId} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
+        <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
       </div>
     </div>
   );
