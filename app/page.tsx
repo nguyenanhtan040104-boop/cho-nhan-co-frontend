@@ -28,12 +28,12 @@ async function getHomeData() {
 }
 
 const categories = [
-  { title: 'Sản phẩm', sub: 'Nông sản, thực phẩm sạch', href: '/products', color: '#2d6a4f', bg: '#f0fdf4', icon: 'ri-leaf-line' },
-  { title: 'Bất động sản', sub: 'Đất vườn, nhà cửa, cho thuê', href: '/real-estate', color: '#1d4ed8', bg: '#eff6ff', icon: 'ri-home-4-line' },
-  { title: 'Tuyển dụng', sub: 'Việc làm, thuê nhân công', href: '/jobs', color: '#7c3aed', bg: '#f5f3ff', icon: 'ri-briefcase-line' },
-  { title: 'Cảnh báo', sub: 'Lừa đảo, trộm cắp, mất đồ', href: '/canh-bao', color: '#b91c1c', bg: '#fef2f2', icon: 'ri-alarm-warning-line' },
-  { title: 'Diễn đàn', sub: 'Chia sẻ kinh nghiệm, hỏi đáp', href: '/forum', color: '#0891b2', bg: '#ecfeff', icon: 'ri-chat-3-line' },
-  { title: 'Quảng cáo', sub: 'Khai trương, khuyến mãi', href: '/advertisements', color: '#dc2626', bg: '#fef2f2', icon: 'ri-megaphone-line' },
+  { title: 'Sản phẩm', sub: 'Nông sản, thực phẩm sạch', href: '/products', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80', accent: '#2d6a4f' },
+  { title: 'Bất động sản', sub: 'Đất vườn, nhà cửa, cho thuê', href: '/real-estate', image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&q=80', accent: '#1d4ed8' },
+  { title: 'Tuyển dụng', sub: 'Việc làm, thuê nhân công', href: '/jobs', image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&q=80', accent: '#7c3aed' },
+  { title: 'Cảnh báo', sub: 'Lừa đảo, trộm cắp, mất đồ', href: '/canh-bao', image: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=400&q=80', accent: '#b91c1c' },
+  { title: 'Diễn đàn', sub: 'Chia sẻ kinh nghiệm, hỏi đáp', href: '/forum', image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80', accent: '#0891b2' },
+  { title: 'Quảng cáo', sub: 'Khai trương, khuyến mãi', href: '/advertisements', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80', accent: '#dc2626' },
 ];
 
 export default async function HomePage() {
@@ -92,13 +92,16 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
-                className="group flex flex-col items-center gap-2 p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all text-center">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: cat.bg }}>
-                  <i className={`${cat.icon} text-xl`} style={{ color: cat.color }}></i>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800 group-hover:text-green-700">{cat.title}</p>
-                  <p className="text-xs text-gray-400 mt-0.5 leading-snug hidden sm:block">{cat.sub}</p>
+                className="group relative overflow-hidden rounded-2xl border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 transition-all aspect-[4/3]">
+                <img
+                  src={cat.image}
+                  alt={cat.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-sm font-bold text-white leading-tight">{cat.title}</p>
+                  <p className="text-xs text-gray-300 mt-0.5 leading-snug hidden sm:block line-clamp-1">{cat.sub}</p>
                 </div>
               </Link>
             ))}
