@@ -165,7 +165,7 @@ export default function PricingPage() {
                     className={`relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${pkg.popular ? 'ring-4 ring-green-300 scale-105' : ''}`}>
                     {pkg.popular && (
                       <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                        <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">⭐ Phổ biến nhất</span>
+                        <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">Phổ biến nhất</span>
                       </div>
                     )}
                     <div className="p-8">
@@ -219,7 +219,7 @@ export default function PricingPage() {
                     className={`relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${pkg.popular ? 'ring-4 ring-orange-300 scale-105' : ''}`}>
                     {pkg.popular && (
                       <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                        <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">⭐ Phổ biến nhất</span>
+                        <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">Phổ biến nhất</span>
                       </div>
                     )}
                     <div className="p-8">
@@ -280,7 +280,7 @@ export default function PricingPage() {
                   {plan.popular && (
                     <div className="absolute -top-5 left-1/2 -translate-x-1/2">
                       <span className={`bg-gradient-to-r ${c.badge} text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg`}>
-                        ⭐ Được chọn nhiều nhất
+                        Được chọn nhiều nhất
                       </span>
                     </div>
                   )}
