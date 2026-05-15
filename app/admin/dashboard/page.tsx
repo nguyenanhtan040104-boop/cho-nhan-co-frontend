@@ -395,6 +395,7 @@ export default function AdminDashboard() {
                 )}
                 onDelete={async id => { await adminFetch(`/advertisements/${id}`, { method: 'DELETE' }); setAllAds(p => p.filter(x => x.id !== id)); }}
                 editHref={id => `/advertisements/${id}/edit`}
+                onToggleVip={async (id, isVip) => { await adminFetch(`/advertisements/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) }); setAllAds(p => p.map(x => x.id === id ? { ...x, isVip } : x)); }}
               />
             )}
 
