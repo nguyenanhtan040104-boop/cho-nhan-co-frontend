@@ -332,23 +332,3 @@ function EmptyBlock({ label }: { label: string }) {
     </div>
   );
 }
-
-function fmtPrice(item: any, type: string) {
-  if (type === 'product') return `${Number(item.price).toLocaleString('vi-VN')}đ`;
-  if (type === 'real-estate') {
-    const p = Number(item.price);
-    return p >= 1e9 ? (p / 1e9).toFixed(1) + ' tỷ' : (p / 1e6).toFixed(0) + ' triệu';
-  }
-  return item.salary || 'Thỏa thuận';
-}
-
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const m = Math.floor(diff / 60000);
-  const h = Math.floor(diff / 3600000);
-  const d = Math.floor(diff / 86400000);
-  if (m < 60) return `${m || 1} phút trước`;
-  if (h < 24) return `${h} giờ trước`;
-  if (d < 30) return `${d} ngày trước`;
-  return new Date(dateStr).toLocaleDateString('vi-VN');
-}
