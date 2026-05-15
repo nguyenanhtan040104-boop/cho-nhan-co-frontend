@@ -626,6 +626,12 @@ export const wallet = {
   async checkPaymentStatus(orderCode: string) {
     return request<any>(`/wallet/payment-status/${orderCode}`);
   },
+  async createVipPayment(refType: 'product' | 'job' | 'real_estate', refId: string, durationDays: number) {
+    return request<any>('/wallet/create-vip-payment', { method: 'POST', body: JSON.stringify({ refType, refId, durationDays }) });
+  },
+  async checkVipPaymentStatus(orderCode: string) {
+    return request<any>(`/wallet/vip-payment-status/${orderCode}`);
+  },
   async buyVip(refType: 'product' | 'job' | 'real_estate', refId: string, durationDays = 30) {
     return request('/wallet/buy-vip', { method: 'POST', body: JSON.stringify({ refType, refId, durationDays }) });
   },

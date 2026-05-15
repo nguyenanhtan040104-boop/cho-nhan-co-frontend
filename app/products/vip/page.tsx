@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { products as productsApi, auth } from '../../../lib/api';
+import { products as productsApi, wallet as walletApi, auth } from '../../../lib/api';
 
 const VIP_PLANS = [
   { days: 7, label: '7 ngày', price: 50000, desc: 'Thử nghiệm' },
@@ -27,9 +27,16 @@ function VipProductContent() {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState(30);
-  const [upgrading, setUpgrading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  // Payment modal state
+  const [paymentData, setPaymentData] = useState<{ checkoutUrl: string; qrCode: string; orderCode: number; amount: number } | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [countdown, setCountdown] = useState(300); // 5 minutes
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!auth.isLoggedIn()) { router.push('/profile'); return; }
@@ -40,22 +47,76 @@ function VipProductContent() {
       .finally(() => setLoading(false));
   }, [productId]);
 
-  async function handleUpgrade() {
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, []);
+
+  function startPolling(orderCode: string) {
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await walletApi.checkVipPaymentStatus(orderCode);
+        if (res.status === 'completed') {
+          stopAll();
+          setShowModal(false);
+          setPaymentData(null);
+          setSuccess(true);
+          setTimeout(() => router.push('/dashboard?tab=products'), 2500);
+        }
+      } catch {}
+    }, 3000);
+  }
+
+  function startCountdown() {
+    setCountdown(300);
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          stopAll();
+          setShowModal(false);
+          setPaymentData(null);
+          setError('Thanh toán hết hạn. Vui lòng thử lại.');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  function stopAll() {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+  }
+
+  async function handlePay() {
     if (!productId) { alert('Vui lòng chọn sản phẩm từ trang quản lý'); return; }
     setError('');
-    setUpgrading(true);
+    setCreating(true);
     try {
-      await productsApi.upgradeVip(productId, selectedPlan);
-      setSuccess(true);
-      setTimeout(() => router.push('/dashboard?tab=products'), 2500);
+      const res = await walletApi.createVipPayment('product', productId, selectedPlan);
+      setPaymentData(res);
+      setShowModal(true);
+      startPolling(String(res.orderCode));
+      startCountdown();
     } catch (e: any) {
-      setError(e.message || 'Nâng cấp thất bại');
+      setError(e.message || 'Không thể tạo thanh toán');
     } finally {
-      setUpgrading(false);
+      setCreating(false);
     }
   }
 
+  function handleCancelModal() {
+    stopAll();
+    setShowModal(false);
+    setPaymentData(null);
+  }
+
   const plan = VIP_PLANS.find(p => p.days === selectedPlan)!;
+  const minutes = Math.floor(countdown / 60);
+  const seconds = countdown % 60;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50">
@@ -182,20 +243,82 @@ function VipProductContent() {
                   <p className="text-sm text-gray-500 mt-1">Đang chuyển về trang quản lý...</p>
                 </div>
               ) : (
-                <button onClick={handleUpgrade} disabled={upgrading || !productId}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white py-3 rounded-xl font-semibold hover:from-yellow-500 hover:to-orange-500 disabled:opacity-50 transition-all shadow-md">
-                  {upgrading ? 'Đang xử lý...' : `Nâng cấp VIP - ${plan.price.toLocaleString()}đ`}
+                <button onClick={handlePay} disabled={creating || !productId}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white py-3 rounded-xl font-semibold hover:from-yellow-500 hover:to-orange-500 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
+                  {creating ? (
+                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang tạo...</>
+                  ) : (
+                    <><i className="ri-bank-card-line"></i> Tiến hành thanh toán</>
+                  )}
                 </button>
               )}
 
               <p className="text-xs text-gray-400 text-center mt-3">
-                Thanh toán qua chuyển khoản ngân hàng.<br />
-                Liên hệ <a href="https://zalo.me/0888317289" target="_blank" rel="noreferrer" className="text-blue-500 underline">Zalo 0888317289</a> để được hỗ trợ.
+                Thanh toán qua PayOS - tự động xác nhận sau khi nhận tiền
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {showModal && paymentData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-yellow-400 to-orange-400 px-6 py-4 text-white text-center">
+              <p className="text-sm font-medium opacity-90">Thanh toán VIP</p>
+              <p className="text-2xl font-bold mt-1">{paymentData.amount.toLocaleString()}đ</p>
+            </div>
+
+            <div className="px-6 py-5">
+              {/* QR Code */}
+              <div className="flex justify-center mb-4">
+                <div className="w-52 h-52 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex items-center justify-center">
+                  {paymentData.qrCode ? (
+                    <img src={paymentData.qrCode} alt="QR thanh toán" className="w-full h-full object-contain" />
+                  ) : (
+                    <i className="ri-qr-code-line text-5xl text-gray-400"></i>
+                  )}
+                </div>
+              </div>
+
+              {/* Countdown */}
+              <div className="text-center mb-4">
+                <p className="text-sm text-gray-500 mb-1">Mã QR hết hạn sau</p>
+                <p className={`text-2xl font-bold tabular-nums ${countdown <= 60 ? 'text-red-500' : 'text-gray-800'}`}>
+                  {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                </p>
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-5">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                Đang chờ thanh toán... tự động xác nhận khi nhận tiền
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <a
+                  href={paymentData.checkoutUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 bg-blue-600 text-white text-sm py-2.5 rounded-xl font-semibold text-center hover:bg-blue-700 transition flex items-center justify-center gap-1.5"
+                >
+                  <i className="ri-external-link-line"></i>
+                  Mở trang thanh toán
+                </a>
+                <button
+                  onClick={handleCancelModal}
+                  className="flex-1 border border-gray-300 text-gray-700 text-sm py-2.5 rounded-xl font-semibold hover:bg-gray-50 transition"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
