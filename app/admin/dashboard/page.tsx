@@ -143,7 +143,7 @@ export default function AdminDashboard() {
     ]);
 
     // Revenue from confirmed txs
-    const revenue = txList.filter((t: any) => t.status === 'completed').reduce((s: number, t: any) => s + (t.amount || 0), 0);
+    const revenue = txList.filter((t: any) => t.status === 'completed' && t.type === 'top_up').reduce((s: number, t: any) => s + (Number(t.amount) || 0), 0);
 
     // Build stats
     const now = new Date();
@@ -441,7 +441,7 @@ function StatusBadge({ status, isVip }: { status?: string; isVip?: boolean }) {
 function OverviewTab({ stats, products, recentActivity, walletTx }: any) {
   const confirmedTx = walletTx.filter((t: any) => t.status === 'completed');
   const pendingTx = walletTx.filter((t: any) => t.status === 'pending');
-  const revenue = confirmedTx.reduce((s: number, t: any) => s + (t.amount || 0), 0);
+  const revenue = walletTx.filter((t: any) => t.status === 'completed' && t.type === 'top_up').reduce((s: number, t: any) => s + (Number(t.amount) || 0), 0);
 
   const cards = [
     { label: 'Tổng sản phẩm', value: stats.totalProducts, icon: 'ri-leaf-line', bg: 'bg-green-50', color: 'text-green-600', border: 'border-green-100' },
@@ -955,7 +955,7 @@ function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void
   const [filter, setFilter] = useState('');
 
   const filtered = filter ? txList.filter(t => t.status === filter) : txList;
-  const revenue = txList.filter(t => t.status === 'completed').reduce((s, t) => s + (t.amount || 0), 0);
+  const revenue = txList.filter(t => t.status === 'completed' && t.type === 'top_up').reduce((s, t) => s + (Number(t.amount) || 0), 0);
 
   async function confirm_(id: string) {
     setProcessing(id);
