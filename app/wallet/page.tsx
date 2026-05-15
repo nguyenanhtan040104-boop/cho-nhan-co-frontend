@@ -78,6 +78,8 @@ function WalletContent() {
       setPaymentStatus('waiting');
       setShowTopUp(false);
       startPolling(String(res.orderCode));
+      // Mở trang thanh toán PayOS ngay lập tức
+      window.open(res.checkoutUrl, '_blank');
     } catch (e: any) {
       setError(e.message || 'Lỗi tạo thanh toán');
     } finally {
@@ -253,19 +255,18 @@ function WalletContent() {
                 Đang chờ thanh toán... tự động xác nhận khi nhận tiền
               </div>
 
-              {/* Nút mở trang thanh toán */}
               <div className="flex gap-3 w-full">
                 <a
                   href={paymentData.checkoutUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 bg-green-600 text-white text-sm font-semibold py-3 rounded-xl hover:bg-green-700 transition text-center"
+                  className="flex-1 bg-green-50 border border-green-300 text-green-700 text-sm font-medium py-2.5 rounded-xl hover:bg-green-100 transition text-center"
                 >
-                  Mở trang thanh toán
+                  <i className="ri-external-link-line mr-1"></i>Mở lại trang thanh toán
                 </a>
                 <button
                   onClick={closePayment}
-                  className="px-5 py-3 border border-gray-300 text-gray-600 text-sm rounded-xl hover:bg-gray-50"
+                  className="px-5 py-2.5 border border-gray-300 text-gray-600 text-sm rounded-xl hover:bg-gray-50"
                 >
                   Hủy
                 </button>
