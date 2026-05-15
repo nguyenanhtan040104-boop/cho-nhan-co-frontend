@@ -836,9 +836,16 @@ function VipTab({ vipItems, onRefresh }: { vipItems: any[]; onRefresh: () => voi
   async function removeVip(item: any) {
     if (!confirm(`Hủy VIP cho "${item.title}"?`)) return;
     setProcessing(item.id);
-    const endpointMap: any = { 'Sản phẩm': `/products/${item.id}/vip`, 'BĐS': `/real-estate/${item.id}/vip`, 'Tuyển dụng': `/jobs/${item.id}/vip` };
+    const endpointMap: any = {
+      'Sản phẩm': `/products/${item.id}/vip`,
+      'BĐS': `/real-estates/${item.id}/vip`,
+      'Tuyển dụng': `/jobs/${item.id}/vip`,
+    };
     try {
-      await adminFetch(endpointMap[item._type], { method: 'DELETE' });
+      await adminFetch(endpointMap[item._type], {
+        method: 'PATCH',
+        body: JSON.stringify({ isVip: false }),
+      });
       onRefresh();
     } catch { alert('Thao tác thất bại'); }
     finally { setProcessing(null); }
