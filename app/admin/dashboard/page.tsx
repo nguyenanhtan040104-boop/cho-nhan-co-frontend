@@ -107,10 +107,10 @@ export default function AdminDashboard() {
       usersRes, pendingRes, walletRes,
     ] = await Promise.allSettled([
       adminFetch('/products?limit=200'),
-      adminFetch('/real-estate?limit=200'),
+      adminFetch('/real-estates?limit=200'),
       adminFetch('/jobs?limit=200'),
       adminFetch('/forum/posts?limit=200'),
-      adminFetch('/users?limit=200'),
+      adminFetch('/users/admin/all?limit=200'),
       adminFetch('/forum/admin/pending?limit=50').catch(() => ({ data: [] })),
       wallet.getAllTransactions({ limit: 50 }).catch(() => ({ data: [] })),
     ]);
@@ -533,7 +533,7 @@ function UsersTab({ usersList, onRefresh }: { usersList: any[]; onRefresh: () =>
     (!roleFilter || u.role?.toLowerCase() === roleFilter)
   );
 
-  async function handleBan(id: string, isBanned: boolean) {
+  async function handleBan(id: string, isBanned: boolean // isActive=false means banned) {
     if (!confirm(isBanned ? 'Mở khóa tài khoản này?' : 'Khóa tài khoản này?')) return;
     setProcessing(id);
     try {
@@ -586,7 +586,7 @@ function UsersTab({ usersList, onRefresh }: { usersList: any[]; onRefresh: () =>
               <tr><td colSpan={5} className="text-center py-12 text-gray-400">Không tìm thấy người dùng nào</td></tr>
             )}
             {filtered.map(u => (
-              <tr key={u.id} className={`hover:bg-gray-50 transition-colors ${u.isBanned ? 'opacity-50' : ''}`}>
+              <tr key={u.id} className={`hover:bg-gray-50 transition-colors ${!u.isActive ? 'opacity-50' : ''}`}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-sm font-bold text-gray-600 flex-shrink-0">
@@ -594,7 +594,7 @@ function UsersTab({ usersList, onRefresh }: { usersList: any[]; onRefresh: () =>
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{u.fullName || 'Chưa đặt tên'}</p>
-                      {u.isBanned && <span className="text-xs text-red-500 font-medium">Đã bị khóa</span>}
+                      {!u.isActive && <span className="text-xs text-red-500 font-medium">Đã bị khóa</span>}
                     </div>
                   </div>
                 </td>
@@ -616,14 +616,14 @@ function UsersTab({ usersList, onRefresh }: { usersList: any[]; onRefresh: () =>
                 <td className="px-4 py-3 text-center text-xs text-gray-400">{fmtDate(u.createdAt)}</td>
                 <td className="px-4 py-3 text-center">
                   <button
-                    onClick={() => handleBan(u.id, u.isBanned)}
+                    onClick={() => handleBan(u.id, !u.isActive)}
                     disabled={processing === u.id}
                     className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
-                      u.isBanned
+                      !u.isActive
                         ? 'bg-green-50 text-green-700 hover:bg-green-100'
                         : 'bg-red-50 text-red-600 hover:bg-red-100'
                     } disabled:opacity-50`}>
-                    {processing === u.id ? '...' : u.isBanned ? 'Mở khóa' : 'Khóa'}
+                    {processing === u.id ? '...' : !u.isActive ? 'Mở khóa' : 'Khóa'}
                   </button>
                 </td>
               </tr>
