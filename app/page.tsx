@@ -64,10 +64,20 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
 
-      {/* Search hero (minimal) */}
-      <div className="bg-white border-b border-gray-200 py-4 px-4">
-        <div className="max-w-2xl mx-auto">
-          <HomepageSearchBar />
+      {/* Hero banner with real Nhân Cơ image */}
+      <div className="relative overflow-hidden" style={{ height: '260px' }}>
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X%C3%A3_Nh%C3%A2n_C%C6%A1%2C_%C4%90%E1%BA%AFk_N%C3%B4ng.jpg"
+          alt="Xã Nhân Cơ, Đắk Nông"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+          <h1 className="text-white text-2xl sm:text-3xl font-bold mb-1 drop-shadow">Chợ Nhân Cơ</h1>
+          <p className="text-gray-200 text-sm mb-4 drop-shadow">Mua bán · Trao đổi · Kết nối cộng đồng Nhân Cơ, Đắk Nông</p>
+          <div className="w-full max-w-xl">
+            <HomepageSearchBar />
+          </div>
         </div>
       </div>
 
@@ -213,6 +223,30 @@ export default async function HomePage() {
                 </div>
                 <i className="ri-arrow-right-s-line text-gray-300 flex-shrink-0"></i>
               </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Hình ảnh Nhân Cơ */}
+        <section className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <h2 className="font-bold text-gray-800 text-sm flex items-center gap-2">
+              <i className="ri-image-line text-red-600"></i> Hình ảnh Nhân Cơ · Đắk Nông
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0">
+            {[
+              { src: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/X%C3%A3_Nh%C3%A2n_C%C6%A1%2C_%C4%90%E1%BA%AFk_N%C3%B4ng.jpg', label: 'Xã Nhân Cơ' },
+              { src: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Cao_nguy%C3%AAn_M%C6%A1_N%C3%B4ng%2C_%C4%90%E1%BA%AFk_N%C3%B4ng.jpg', label: 'Cao nguyên Mơ Nông' },
+              { src: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/X%C3%B3m_nh%E1%BB%8F_tr%C3%AAn_cao_nguy%C3%AAn_M%C6%A1_N%C3%B4ng.jpg', label: 'Buôn làng Mơ Nông' },
+              { src: 'https://upload.wikimedia.org/wikipedia/commons/5/57/TX.Gia_Ngh%C4%A9a%2C_%C4%90%E1%BA%AFk_N%C3%B4ng..jpg', label: 'Thị xã Gia Nghĩa' },
+            ].map((img, i) => (
+              <div key={i} className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                <img src={img.src} alt={img.label} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2">
+                  <p className="text-white text-xs font-medium">{img.label}</p>
+                </div>
+              </div>
             ))}
           </div>
         </section>
