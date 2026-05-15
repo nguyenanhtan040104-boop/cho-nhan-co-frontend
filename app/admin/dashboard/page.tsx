@@ -533,7 +533,7 @@ function UsersTab({ usersList, onRefresh }: { usersList: any[]; onRefresh: () =>
     (!roleFilter || u.role?.toLowerCase() === roleFilter)
   );
 
-  async function handleBan(id: string, isBanned: boolean // isActive=false means banned) {
+  async function handleBan(id: string, isBanned: boolean) {
     if (!confirm(isBanned ? 'Mở khóa tài khoản này?' : 'Khóa tài khoản này?')) return;
     setProcessing(id);
     try {
