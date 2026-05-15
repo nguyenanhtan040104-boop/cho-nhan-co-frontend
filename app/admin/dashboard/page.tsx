@@ -143,7 +143,7 @@ export default function AdminDashboard() {
     ]);
 
     // Revenue from confirmed txs
-    const revenue = txList.filter((t: any) => t.status === 'CONFIRMED').reduce((s: number, t: any) => s + (t.amount || 0), 0);
+    const revenue = txList.filter((t: any) => t.status === 'completed').reduce((s: number, t: any) => s + (t.amount || 0), 0);
 
     // Build stats
     const now = new Date();
@@ -439,8 +439,8 @@ function StatusBadge({ status, isVip }: { status?: string; isVip?: boolean }) {
 
 // ─── OverviewTab ──────────────────────────────────────────────────────
 function OverviewTab({ stats, products, recentActivity, walletTx }: any) {
-  const confirmedTx = walletTx.filter((t: any) => t.status === 'CONFIRMED');
-  const pendingTx = walletTx.filter((t: any) => t.status === 'PENDING');
+  const confirmedTx = walletTx.filter((t: any) => t.status === 'completed');
+  const pendingTx = walletTx.filter((t: any) => t.status === 'pending');
   const revenue = confirmedTx.reduce((s: number, t: any) => s + (t.amount || 0), 0);
 
   const cards = [
@@ -955,7 +955,7 @@ function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void
   const [filter, setFilter] = useState('');
 
   const filtered = filter ? txList.filter(t => t.status === filter) : txList;
-  const revenue = txList.filter(t => t.status === 'CONFIRMED').reduce((s, t) => s + (t.amount || 0), 0);
+  const revenue = txList.filter(t => t.status === 'completed').reduce((s, t) => s + (t.amount || 0), 0);
 
   async function confirm_(id: string) {
     setProcessing(id);
@@ -977,9 +977,9 @@ function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void
         <select value={filter} onChange={e => setFilter(e.target.value)}
           className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
           <option value="">Tất cả</option>
-          <option value="PENDING">Chờ xác nhận</option>
-          <option value="CONFIRMED">Đã xác nhận</option>
-          <option value="REJECTED">Từ chối</option>
+          <option value="pending">Chờ xác nhận</option>
+          <option value="completed">Đã xác nhận</option>
+          <option value="rejected">Từ chối</option>
         </select>
       </div>
 
@@ -987,7 +987,7 @@ function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void
       <div className="grid grid-cols-3 gap-3 mb-4">
         {[
           { label: 'Tổng doanh thu', value: fmtMoney(revenue), color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Chờ xác nhận', value: txList.filter(t => t.status === 'PENDING').length + ' giao dịch', color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: 'Chờ xác nhận', value: txList.filter(t => t.status === 'pending').length + ' giao dịch', color: 'text-orange-600', bg: 'bg-orange-50' },
           { label: 'Tổng giao dịch', value: txList.length, color: 'text-blue-600', bg: 'bg-blue-50' },
         ].map((c, i) => (
           <div key={i} className={`${c.bg} rounded-2xl p-4 border border-gray-100`}>
@@ -1021,14 +1021,14 @@ function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void
                 <td className="px-4 py-3 text-right font-bold text-gray-900">{fmtMoney(tx.amount)}</td>
                 <td className="px-4 py-3 text-center">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    tx.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                    tx.status === 'PENDING' ? 'bg-orange-100 text-orange-700' :
+                    tx.status === 'completed' ? 'bg-green-100 text-green-700' :
+                    tx.status === 'pending' ? 'bg-orange-100 text-orange-700' :
                     'bg-red-100 text-red-600'
-                  }`}>{tx.status === 'CONFIRMED' ? 'Đã xác nhận' : tx.status === 'PENDING' ? 'Chờ xác nhận' : 'Từ chối'}</span>
+                  }`}>{tx.status === 'completed' ? 'Đã xác nhận' : tx.status === 'pending' ? 'Chờ xác nhận' : 'Từ chối'}</span>
                 </td>
                 <td className="px-4 py-3 text-center text-xs text-gray-400">{fmtDate(tx.createdAt)}</td>
                 <td className="px-4 py-3 text-center">
-                  {tx.status === 'PENDING' && (
+                  {tx.status === 'pending' && (
                     <div className="flex gap-1.5 justify-center">
                       <button onClick={() => confirm_(tx.id)} disabled={processing === tx.id}
                         className="text-xs px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
