@@ -293,6 +293,7 @@ export default function AdminDashboard() {
                 )}
                 onDelete={async id => { await adminFetch(`/products/${id}`, { method: 'DELETE' }); setAllProducts(p => p.filter(x => x.id !== id)); }}
                 editHref={id => `/products/${id}/edit`}
+                onToggleVip={async (id, isVip) => { await adminFetch(`/products/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) }); setAllProducts(p => p.map(x => x.id === id ? { ...x, isVip } : x)); }}
               />
             )}
 
@@ -314,8 +315,9 @@ export default function AdminDashboard() {
                     </div>
                   </>
                 )}
-                onDelete={async id => { await adminFetch(`/real-estate/${id}`, { method: 'DELETE' }); setAllRealEstates(p => p.filter(x => x.id !== id)); }}
+                onDelete={async id => { await adminFetch(`/real-estates/${id}`, { method: 'DELETE' }); setAllRealEstates(p => p.filter(x => x.id !== id)); }}
                 editHref={id => `/real-estate/${id}/edit`}
+                onToggleVip={async (id, isVip) => { await adminFetch(`/real-estates/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) }); setAllRealEstates(p => p.map(x => x.id === id ? { ...x, isVip } : x)); }}
               />
             )}
 
@@ -341,6 +343,7 @@ export default function AdminDashboard() {
                 )}
                 onDelete={async id => { await adminFetch(`/jobs/${id}`, { method: 'DELETE' }); setAllJobs(p => p.filter(x => x.id !== id)); }}
                 editHref={id => `/jobs/${id}/edit`}
+                onToggleVip={async (id, isVip) => { await adminFetch(`/jobs/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) }); setAllJobs(p => p.map(x => x.id === id ? { ...x, isVip } : x)); }}
               />
             )}
 
@@ -761,16 +764,18 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
 }
 
 // ─── ContentTab (generic list for products/re/jobs/forum) ─────────────
-function ContentTab({ title, items, color, renderRow, onDelete, editHref }: {
+function ContentTab({ title, items, color, renderRow, onDelete, editHref, onToggleVip }: {
   title: string;
   items: any[];
   color: string;
   renderRow: (item: any) => React.ReactNode;
   onDelete: (id: string) => Promise<void>;
   editHref: (id: string) => string;
+  onToggleVip?: (id: string, isVip: boolean) => Promise<void>;
 }) {
   const [search, setSearch] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [togglingVip, setTogglingVip] = useState<string | null>(null);
 
   const filtered = items.filter(item =>
     !search ||
@@ -784,6 +789,16 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref }: {
     try { await onDelete(id); }
     catch { alert('Xóa thất bại'); }
     finally { setDeleting(null); }
+  }
+
+  async function handleToggleVip(id: string, currentVip: boolean) {
+    if (!onToggleVip) return;
+    const action = currentVip ? 'Hủy VIP' : 'Đặt VIP';
+    if (!confirm(`${action} cho bài này?`)) return;
+    setTogglingVip(id);
+    try { await onToggleVip(id, !currentVip); }
+    catch { alert(`${action} thất bại`); }
+    finally { setTogglingVip(null); }
   }
 
   return (
@@ -802,7 +817,7 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref }: {
       ) : (
         <div className="space-y-2">
           {filtered.map(item => (
-            <div key={item.id} className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex items-center gap-4 hover:border-gray-200 transition-all">
+            <div key={item.id} className={`bg-white rounded-xl border shadow-sm px-4 py-3 flex items-center gap-4 hover:border-gray-200 transition-all ${item.isVip ? 'border-yellow-300 bg-yellow-50/30' : 'border-gray-100'}`}>
               {item.images?.[0]?.url && (
                 <img src={item.images[0].url} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
               )}
@@ -810,6 +825,21 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref }: {
                 {renderRow(item)}
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
+                {onToggleVip && (
+                  <button
+                    onClick={() => handleToggleVip(item.id, item.isVip)}
+                    disabled={togglingVip === item.id}
+                    title={item.isVip ? 'Hủy VIP' : 'Đặt VIP'}
+                    className={`p-2 rounded-lg transition-all disabled:opacity-50 ${
+                      item.isVip
+                        ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100'
+                        : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50'
+                    }`}>
+                    {togglingVip === item.id
+                      ? <i className="ri-loader-4-line text-base animate-spin"></i>
+                      : <i className="ri-vip-crown-fill text-base"></i>}
+                  </button>
+                )}
                 <Link href={editHref(item.id)}
                   className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Chỉnh sửa">
                   <i className="ri-pencil-line text-base"></i>
