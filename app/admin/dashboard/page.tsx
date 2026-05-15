@@ -77,6 +77,7 @@ export default function AdminDashboard() {
   const [allRealEstates, setAllRealEstates] = useState<any[]>([]);
   const [allJobs, setAllJobs] = useState<any[]>([]);
   const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [allAds, setAllAds] = useState<any[]>([]);
   const [pendingPosts, setPendingPosts] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
   const [vipItems, setVipItems] = useState<any[]>([]);
@@ -104,7 +105,7 @@ export default function AdminDashboard() {
   async function loadAll() {
     const [
       productsRes, reRes, jobsRes, postsRes,
-      usersRes, pendingRes, walletRes,
+      usersRes, pendingRes, walletRes, adsRes,
     ] = await Promise.allSettled([
       adminFetch('/products?limit=200'),
       adminFetch('/real-estates?limit=200'),
@@ -113,6 +114,7 @@ export default function AdminDashboard() {
       adminFetch('/users/admin/all?limit=200'),
       adminFetch('/forum/admin/pending?limit=50').catch(() => ({ data: [] })),
       wallet.getAllTransactions({ limit: 50 }).catch(() => ({ data: [] })),
+      adminFetch('/advertisements?limit=200'),
     ]);
 
     const products = productsRes.status === 'fulfilled' ? (productsRes.value?.data || []) : [];
@@ -120,6 +122,8 @@ export default function AdminDashboard() {
     const jobs = jobsRes.status === 'fulfilled' ? (jobsRes.value?.data || []) : [];
     const fp = postsRes.status === 'fulfilled' ? (postsRes.value?.data || []) : [];
     const usersList = usersRes.status === 'fulfilled' ? (usersRes.value?.data || usersRes.value || []) : [];
+    const ads = adsRes.status === 'fulfilled' ? (adsRes.value?.data || []) : [];
+    setAllAds(ads);
     const pending = pendingRes.status === 'fulfilled' ? (pendingRes.value?.data || []) : [];
     const txList = walletRes.status === 'fulfilled' ? (walletRes.value?.data || []) : [];
 
@@ -196,6 +200,7 @@ export default function AdminDashboard() {
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line', badge: allRealEstates.length },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line', badge: allJobs.length },
     { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line', badge: allPosts.length },
+    { id: 'ads', label: 'Quảng cáo', icon: 'ri-megaphone-line', badge: allAds.length },
     { id: 'vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', badge: vipItems.length, badgeColor: 'bg-yellow-500' },
     { id: 'wallet', label: 'Doanh thu', icon: 'ri-wallet-3-line' },
     { id: 'activity', label: 'Hoạt động', icon: 'ri-history-line' },
@@ -366,6 +371,30 @@ export default function AdminDashboard() {
                 )}
                 onDelete={async id => { await adminFetch(`/forum/posts/${id}`, { method: 'DELETE' }); setAllPosts(p => p.filter(x => x.id !== id)); }}
                 editHref={id => `/forum/${id}/edit`}
+              />
+            )}
+
+            {/* ── ADS ──────────────────────────────────────────── */}
+            {activeTab === 'ads' && (
+              <ContentTab
+                title="Quảng cáo" items={allAds} color="orange"
+                renderRow={p => (
+                  <>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{p.title}</p>
+                      <p className="text-xs text-gray-400">{p.user?.fullName} · {p.category}</p>
+                      {p.endDate && <p className="text-xs text-orange-500">Hết hạn: {fmtDate(p.endDate)}</p>}
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${new Date(p.endDate) > new Date() ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {new Date(p.endDate) > new Date() ? 'Đang chạy' : 'Hết hạn'}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-1">{fmtDate(p.createdAt)}</p>
+                    </div>
+                  </>
+                )}
+                onDelete={async id => { await adminFetch(`/advertisements/${id}`, { method: 'DELETE' }); setAllAds(p => p.filter(x => x.id !== id)); }}
+                editHref={id => `/advertisements/${id}/edit`}
               />
             )}
 
