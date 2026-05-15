@@ -406,7 +406,7 @@ export default function AdminDashboard() {
 
             {/* ── WALLET ───────────────────────────────────────── */}
             {activeTab === 'wallet' && (
-              <WalletTab txList={walletTx} onRefresh={loadAll} />
+              <WalletTab txList={walletTx} />
             )}
 
             {/* ── ACTIVITY ─────────────────────────────────────── */}
@@ -950,62 +950,78 @@ function VipTab({ vipItems, onRefresh }: { vipItems: any[]; onRefresh: () => voi
 }
 
 // ─── WalletTab ────────────────────────────────────────────────────────
-function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void }) {
-  const [processing, setProcessing] = useState<string | null>(null);
+function WalletTab({ txList }: { txList: any[] }) {
   const [filter, setFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
 
-  const filtered = filter ? txList.filter(t => t.status === filter) : txList;
+  const filtered = txList.filter(t =>
+    (!filter || t.status === filter) &&
+    (!typeFilter || t.type === typeFilter)
+  );
+
   const revenue = txList.filter(t => t.status === 'completed' && t.type === 'top_up').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const totalSpend = txList.filter(t => t.status === 'completed' && t.type !== 'top_up').reduce((s, t) => s + Math.abs(Number(t.amount) || 0), 0);
 
-  async function confirm_(id: string) {
-    setProcessing(id);
-    try { await wallet.confirmTopUp(id); onRefresh(); }
-    catch { alert('Thao tác thất bại'); }
-    finally { setProcessing(null); }
-  }
-  async function reject_(id: string) {
-    setProcessing(id);
-    try { await wallet.rejectTopUp(id); onRefresh(); }
-    catch { alert('Thao tác thất bại'); }
-    finally { setProcessing(null); }
-  }
+  const typeLabel: Record<string, string> = {
+    top_up: 'Nạp tiền',
+    spend: 'Chi tiêu',
+    vip: 'Mua VIP',
+    refund: 'Hoàn tiền',
+  };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900">Doanh thu & Giao dịch</h2>
-        <select value={filter} onChange={e => setFilter(e.target.value)}
-          className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
-          <option value="">Tất cả</option>
-          <option value="pending">Chờ xác nhận</option>
-          <option value="completed">Đã xác nhận</option>
-          <option value="rejected">Từ chối</option>
-        </select>
+        <div className="flex gap-2">
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
+            className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
+            <option value="">Tất cả loại</option>
+            <option value="top_up">Nạp tiền</option>
+            <option value="spend">Chi tiêu</option>
+          </select>
+          <select value={filter} onChange={e => setFilter(e.target.value)}
+            className="text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Đang xử lý</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="rejected">Thất bại</option>
+          </select>
+        </div>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         {[
-          { label: 'Tổng doanh thu', value: fmtMoney(revenue), color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Chờ xác nhận', value: txList.filter(t => t.status === 'pending').length + ' giao dịch', color: 'text-orange-600', bg: 'bg-orange-50' },
-          { label: 'Tổng giao dịch', value: txList.length, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Tổng nạp thành công', value: fmtMoney(revenue), color: 'text-green-600', bg: 'bg-green-50', icon: 'ri-money-dollar-circle-line' },
+          { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend), color: 'text-purple-600', bg: 'bg-purple-50', icon: 'ri-vip-crown-line' },
+          { label: 'Tổng giao dịch', value: txList.length, color: 'text-blue-600', bg: 'bg-blue-50', icon: 'ri-exchange-line' },
         ].map((c, i) => (
-          <div key={i} className={`${c.bg} rounded-2xl p-4 border border-gray-100`}>
-            <p className={`text-xl font-bold ${c.color}`}>{c.value}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{c.label}</p>
+          <div key={i} className={`${c.bg} rounded-2xl p-4 border border-gray-100 flex items-center gap-3`}>
+            <i className={`${c.icon} text-2xl ${c.color}`}></i>
+            <div>
+              <p className={`text-xl font-bold ${c.color}`}>{c.value}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{c.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+          <p className="text-xs text-gray-400 flex items-center gap-1.5">
+            <i className="ri-paypal-line text-blue-500"></i>
+            Giao dịch được xử lý tự động qua <b>PayOS</b> — không cần xác nhận thủ công
+          </p>
+        </div>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-4 py-3 font-medium text-gray-500">Người dùng</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500">Loại</th>
               <th className="text-right px-4 py-3 font-medium text-gray-500">Số tiền</th>
               <th className="text-center px-4 py-3 font-medium text-gray-500">Trạng thái</th>
               <th className="text-center px-4 py-3 font-medium text-gray-500">Ngày</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-500">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -1016,31 +1032,26 @@ function WalletTab({ txList, onRefresh }: { txList: any[]; onRefresh: () => void
               <tr key={tx.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <p className="font-medium text-gray-900">{tx.user?.fullName || '—'}</p>
-                  <p className="text-xs text-gray-400">{tx.user?.phone || tx.user?.email}</p>
+                  <p className="text-xs text-gray-400">{tx.user?.email || tx.user?.phone}</p>
                 </td>
-                <td className="px-4 py-3 text-right font-bold text-gray-900">{fmtMoney(tx.amount)}</td>
+                <td className="px-4 py-3">
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                    tx.type === 'top_up' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                  }`}>{typeLabel[tx.type] || tx.type}</span>
+                </td>
+                <td className={`px-4 py-3 text-right font-bold ${Number(tx.amount) < 0 ? 'text-red-500' : 'text-gray-900'}`}>
+                  {Number(tx.amount) > 0 ? '+' : ''}{fmtMoney(Number(tx.amount))}
+                </td>
                 <td className="px-4 py-3 text-center">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                     tx.status === 'completed' ? 'bg-green-100 text-green-700' :
                     tx.status === 'pending' ? 'bg-orange-100 text-orange-700' :
                     'bg-red-100 text-red-600'
-                  }`}>{tx.status === 'completed' ? 'Đã xác nhận' : tx.status === 'pending' ? 'Chờ xác nhận' : 'Từ chối'}</span>
+                  }`}>
+                    {tx.status === 'completed' ? 'Hoàn thành' : tx.status === 'pending' ? 'Đang xử lý' : 'Thất bại'}
+                  </span>
                 </td>
                 <td className="px-4 py-3 text-center text-xs text-gray-400">{fmtDate(tx.createdAt)}</td>
-                <td className="px-4 py-3 text-center">
-                  {tx.status === 'pending' && (
-                    <div className="flex gap-1.5 justify-center">
-                      <button onClick={() => confirm_(tx.id)} disabled={processing === tx.id}
-                        className="text-xs px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
-                        {processing === tx.id ? '...' : 'Xác nhận'}
-                      </button>
-                      <button onClick={() => reject_(tx.id)} disabled={processing === tx.id}
-                        className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50">
-                        Từ chối
-                      </button>
-                    </div>
-                  )}
-                </td>
               </tr>
             ))}
           </tbody>
