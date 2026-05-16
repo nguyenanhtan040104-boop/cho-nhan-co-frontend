@@ -69,9 +69,10 @@ export default function EmptyState({
         {keyword && onClearSearch && (
           <button
             onClick={onClearSearch}
-            className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-full font-medium text-sm hover:border-gray-400 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-full font-medium text-sm hover:border-gray-400 hover:bg-gray-50 transition-colors flex items-center gap-2"
           >
-            Xóa bộ lọc
+            <i className="ri-search-line"></i>
+            Tìm từ khóa khác
           </button>
         )}
         {createHref && createLabel && (
