@@ -4,52 +4,66 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const ITEMS = [
-  { key: 'cafe', label: 'Cà phê', img: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=80&h=80&fit=crop&q=80', unit: 'đ/kg' },
-  { key: 'tieu', label: 'Hồ tiêu', img: 'https://images.unsplash.com/photo-1599909533731-9e5b7a4fcf43?w=80&h=80&fit=crop&q=80', unit: 'đ/kg' },
-  { key: 'xang', label: 'Xăng RON95', img: 'https://images.unsplash.com/photo-1545262810-77515befe149?w=80&h=80&fit=crop&q=80', unit: 'đ/lít' },
-  { key: 'cao_su', label: 'Cao su', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=80&h=80&fit=crop&q=80', unit: 'đ/kg' },
+  {
+    key: 'cafe',
+    label: 'Cà phê',
+    img: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=80&h=80&fit=crop&q=80',
+    unit: 'đ/kg',
+    catMatch: 'cà phê',
+    itemIdx: 0,
+  },
+  {
+    key: 'tieu',
+    label: 'Hồ tiêu',
+    img: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=80&h=80&fit=crop&q=80',
+    unit: 'đ/kg',
+    catMatch: 'hồ tiêu',
+    itemIdx: 0,
+  },
+  {
+    key: 'xang',
+    label: 'Xăng RON95',
+    img: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=80&h=80&fit=crop&q=80',
+    unit: 'đ/lít',
+    catMatch: 'xăng dầu',
+    itemIdx: 0,
+  },
+  {
+    key: 'cao_su',
+    label: 'Cao su',
+    img: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=80&h=80&fit=crop&q=80',
+    unit: 'đ/kg',
+    catMatch: 'cao su',
+    itemIdx: 0,
+  },
 ];
 
 function fmt(n: number) {
-  if (!n) return '—';
   return n.toLocaleString('vi-VN');
 }
 
 export default function MarketPriceWidget() {
-  const [prices, setPrices] = useState<Record<string, { price: number; change: number | null }>>({});
+  const [data, setData] = useState<Record<string, { price: number; change: number | null }>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/agri-prices')
       .then(r => r.json())
       .then(d => {
-        const map: Record<string, { price: number; change: number | null }> = {};
         const cats: any[] = d.categories || [];
+        const map: Record<string, { price: number; change: number | null }> = {};
 
-        for (const cat of cats) {
-          const rows = cat.rows || [];
-          if (!rows.length) continue;
-          const label: string = cat.category?.toLowerCase() || '';
-          const latest = rows[0];
-
-          if (label.includes('cà phê') || label.includes('cafe') || label.includes('coffee')) {
-            // Lấy Đắk Lắk nếu có, nếu không lấy đầu tiên
-            const dakLak = rows.find((r: any) => r.province?.toLowerCase().includes('đắk') || r.province?.toLowerCase().includes('dak'));
-            const row = dakLak || rows[0];
-            map['cafe'] = { price: row.price || row.buy || 0, change: row.change ?? null };
-          }
-          if (label.includes('tiêu') || label.includes('pepper')) {
-            const row = rows[0];
-            map['tieu'] = { price: row.price || row.buy || 0, change: row.change ?? null };
-          }
-          if (label.includes('cao su') || label.includes('rubber')) {
-            const row = rows[0];
-            map['cao_su'] = { price: row.price || row.buy || 0, change: row.change ?? null };
+        for (const item of ITEMS) {
+          const cat = cats.find((c: any) =>
+            c.category?.toLowerCase().includes(item.catMatch)
+          );
+          if (!cat) continue;
+          const row = cat.items?.[item.itemIdx];
+          if (row?.price) {
+            map[item.key] = { price: row.price, change: row.change ?? null };
           }
         }
-
-        // Xăng: thử lấy từ goldData hoặc để cứng tạm
-        setPrices(map);
+        setData(map);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -69,29 +83,33 @@ export default function MarketPriceWidget() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-100">
         {ITEMS.map(item => {
-          const data = prices[item.key];
-          const isUp = data?.change != null && data.change > 0;
-          const isDown = data?.change != null && data.change < 0;
+          const row = data[item.key];
+          const isUp = row?.change != null && row.change > 0;
+          const isDown = row?.change != null && row.change < 0;
           return (
             <Link key={item.key} href="/market-prices"
-              className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors group">
-              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+              className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors">
+              <div className="w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
                 <img src={item.img} alt={item.label} className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-gray-500 font-medium">{item.label}</p>
+                <p className="text-xs text-gray-500">{item.label}</p>
                 {loading ? (
-                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse mt-1"></div>
+                  <div className="h-4 w-24 bg-gray-200 rounded animate-pulse mt-1"></div>
+                ) : row?.price ? (
+                  <>
+                    <p className="font-bold text-gray-900 text-sm leading-tight">
+                      {fmt(row.price)}
+                      <span className="text-[11px] font-normal text-gray-400 ml-0.5">{item.unit}</span>
+                    </p>
+                    {row.change != null && row.change !== 0 && (
+                      <p className={`text-[11px] font-semibold ${isUp ? 'text-red-500' : 'text-green-600'}`}>
+                        {isUp ? '▲' : '▼'} {fmt(Math.abs(row.change))}
+                      </p>
+                    )}
+                  </>
                 ) : (
-                  <p className="font-bold text-gray-900 text-sm leading-tight">
-                    {data?.price ? fmt(data.price) : <span className="text-gray-400 font-normal text-xs">Đang cập nhật</span>}
-                    {data?.price ? <span className="text-[11px] font-normal text-gray-400 ml-0.5">{item.unit}</span> : null}
-                  </p>
-                )}
-                {data?.change != null && data.change !== 0 && (
-                  <p className={`text-[11px] font-semibold ${isUp ? 'text-red-500' : 'text-green-600'}`}>
-                    {isUp ? '▲' : '▼'} {Math.abs(data.change).toLocaleString('vi-VN')}
-                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">Đang cập nhật</p>
                 )}
               </div>
             </Link>
