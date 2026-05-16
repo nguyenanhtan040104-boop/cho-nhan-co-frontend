@@ -64,7 +64,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
   const images = item.images || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <><div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/real-estate" className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">
@@ -245,9 +245,10 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
       </div>
     </div>
 
-    {/* Comment Section */}
+    </div>
     <div className="max-w-screen-xl mx-auto px-4 pb-6">
       <CommentSection targetType="REAL_ESTATE" targetId={propertyId} />
     </div>
+    </>
   );
 }

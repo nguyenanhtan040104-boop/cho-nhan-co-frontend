@@ -35,7 +35,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <><div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/jobs" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
@@ -155,9 +155,10 @@ export default function JobDetail({ jobId }: { jobId: string }) {
       </div>
     </div>
 
-    {/* Comment Section */}
+    </div>
     <div className="max-w-screen-xl mx-auto px-4 pb-6">
       <CommentSection targetType="JOB" targetId={jobId} />
     </div>
+    </>
   );
 }
