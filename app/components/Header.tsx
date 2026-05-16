@@ -56,7 +56,6 @@ export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [showSellerMenu, setShowSellerMenu] = useState(false);
-  const [query, setQuery] = useState('');
   const pathname = usePathname();
   const router = useRouter();
 
@@ -79,13 +78,6 @@ export default function Header() {
     setShowHamburger(false);
     setShowSellerMenu(false);
   }, [pathname]);
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    router.push(smartSearch(q));
-  }
 
   function handlePostClick() {
     if (!auth.isLoggedIn()) { router.push('/profile'); return; }
@@ -165,24 +157,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* Search bar — chiếm phần giữa */}
-        <form onSubmit={handleSearch} className="flex-1 hidden sm:flex items-center">
-          <div className="w-full flex items-center border border-gray-200 rounded-full bg-gray-50 hover:border-gray-300 focus-within:border-yellow-400 focus-within:bg-white transition-all overflow-hidden" style={{ height: 38 }}>
-            <i className="ri-search-line text-gray-400 pl-4 text-base flex-shrink-0"></i>
-            <input
-              type="text"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Tìm sản phẩm, việc làm, bất động sản..."
-              className="flex-1 px-3 text-sm focus:outline-none bg-transparent text-gray-800 placeholder-gray-400 h-full"
-            />
-            <button type="submit"
-              className="w-9 h-9 flex items-center justify-center rounded-full m-0.5 flex-shrink-0 transition hover:opacity-90"
-              style={{ backgroundColor: '#ffd400' }}>
-              <i className="ri-search-line text-gray-900 text-sm font-bold"></i>
-            </button>
-          </div>
-        </form>
+        <div className="flex-1" />
 
         {/* Right actions */}
         <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
@@ -199,12 +174,12 @@ export default function Header() {
             <i className="ri-notification-3-line text-lg"></i>
           </Link>
 
-          {/* Liên hệ → Zalo/contact */}
-          <a href="https://zalo.me/0888317289" target="_blank" rel="noreferrer"
+          {/* Liên hệ → trang nhắn tin */}
+          <Link href="/messages"
             className="hidden lg:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
             <i className="ri-chat-1-line text-sm"></i>
             <span>Liên hệ</span>
-          </a>
+          </Link>
 
           {/* Quản lý tin → dashboard tab products */}
           <Link href="/dashboard?tab=products"
