@@ -97,24 +97,30 @@ export default function CreateJobPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Type selector — 2 big cards */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {typeOptions.map(o => (
+            <button key={o.value} type="button"
+              onClick={() => setForm(prev => ({ ...prev, type: o.value }))}
+              className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all ${form.type === o.value ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-300'}`}>
+              <i className={`text-3xl ${o.value === 'EMPLOYER' ? 'ri-building-2-line' : 'ri-user-search-line'}`}></i>
+              <span className="font-semibold text-base">{o.label}</span>
+              <span className="text-xs text-center">{o.value === 'EMPLOYER' ? 'Bạn cần tuyển người' : 'Bạn đang tìm việc'}</span>
+            </button>
+          ))}
+        </div>
+
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
           {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
-              placeholder="Ví dụ: Tuyển công nhân hái cà phê mùa vụ..."
+              placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: Tuyển công nhân hái cà phê mùa vụ...' : 'Ví dụ: Tìm việc làm nông nghiệp tại Đắk Lắk...'}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loại công việc *</label>
-              <select name="type" value={form.type} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                {typeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Ngành nghề *</label>
               <select name="category" required value={form.category} onChange={handleChange}
@@ -122,15 +128,6 @@ export default function CreateJobPage() {
                 <option value="">Chọn ngành nghề</option>
                 {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Mức lương</label>
-              <input type="text" name="salary" value={form.salary} onChange={handleChange}
-                placeholder="Ví dụ: 300.000đ/ngày, thỏa thuận..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Địa điểm *</label>
@@ -142,33 +139,52 @@ export default function CreateJobPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kinh nghiệm yêu cầu</label>
-              <input type="text" name="experience" value={form.experience} onChange={handleChange}
-                placeholder="Ví dụ: Không yêu cầu, 1-2 năm..."
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {form.type === 'EMPLOYER' ? 'Mức lương' : 'Mức lương mong muốn'}
+              </label>
+              <input type="text" name="salary" value={form.salary} onChange={handleChange}
+                placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: 300.000đ/ngày, thỏa thuận...' : 'Ví dụ: 5-7 triệu/tháng, thỏa thuận...'}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {form.type === 'EMPLOYER' ? 'Kinh nghiệm yêu cầu' : 'Kinh nghiệm bản thân'}
+              </label>
+              <input type="text" name="experience" value={form.experience} onChange={handleChange}
+                placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: Không yêu cầu, 1-2 năm...' : 'Ví dụ: 2 năm làm nông, chưa có kinh nghiệm...'}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+            </div>
+          </div>
+
+          {/* Chỉ hiển thị cho Tuyển dụng */}
+          {form.type === 'EMPLOYER' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Hạn nộp hồ sơ</label>
               <input type="date" name="deadline" value={form.deadline} onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
             </div>
-          </div>
+          )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả công việc *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {form.type === 'EMPLOYER' ? 'Mô tả công việc *' : 'Giới thiệu bản thân *'}
+            </label>
             <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
-              placeholder="Mô tả chi tiết về công việc, yêu cầu, giờ làm..."
+              placeholder={form.type === 'EMPLOYER' ? 'Mô tả chi tiết về công việc, yêu cầu, giờ làm...' : 'Giới thiệu về bản thân, kỹ năng, mong muốn công việc...'}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none"
               maxLength={2000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Quyền lợi</label>
-            <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange}
-              placeholder="Ăn ở, xe đưa đón, bảo hiểm..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none" />
-          </div>
+          {/* Chỉ hiển thị cho Tuyển dụng */}
+          {form.type === 'EMPLOYER' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Quyền lợi</label>
+              <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange}
+                placeholder="Ăn ở, xe đưa đón, bảo hiểm..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none" />
+            </div>
+          )}
 
           {/* Upload ảnh */}
           <div>
@@ -193,11 +209,13 @@ export default function CreateJobPage() {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="isUrgent" checked={form.isUrgent}
-              onChange={e => setForm(prev => ({ ...prev, isUrgent: e.target.checked }))} className="rounded" />
-            <span className="text-sm text-gray-700">Đánh dấu là <span className="text-red-600 font-medium">Tuyển gấp</span></span>
-          </label>
+          {form.type === 'EMPLOYER' && (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="isUrgent" checked={form.isUrgent}
+                onChange={e => setForm(prev => ({ ...prev, isUrgent: e.target.checked }))} className="rounded" />
+              <span className="text-sm text-gray-700">Đánh dấu là <span className="text-red-600 font-medium">Tuyển gấp</span></span>
+            </label>
+          )}
 
           <div className="flex gap-4 pt-4 border-t">
             <Link href="/jobs" className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-center">Hủy</Link>
