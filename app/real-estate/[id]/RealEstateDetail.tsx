@@ -93,7 +93,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
               {/* Main image carousel */}
               <div className="relative bg-gray-100" style={{ height: 340 }}>
                 {images[selectedImg] ? (
-                  <img src={images[selectedImg].url} alt={item.title} className="w-full h-full object-cover" />
+                  <img src={images[selectedImg].url} alt={item.title} className="w-full h-full object-contain" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <i className="ri-home-4-line text-6xl text-gray-300"></i>

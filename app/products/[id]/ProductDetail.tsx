@@ -211,7 +211,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                 <img
                   src={mainImage.url || mainImage}
                   alt={product.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
