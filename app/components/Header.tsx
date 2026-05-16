@@ -128,6 +128,22 @@ export default function Header() {
           </div>
         </Link>
 
+        {/* Nav links giữa — kiểu Chợ Tốt */}
+        <nav className="hidden lg:flex items-center gap-1 flex-shrink-0">
+          <Link href="/" className={`text-sm font-semibold px-3 py-1.5 rounded-full transition ${pathname === '/' ? 'text-gray-900 bg-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
+            Chợ NC
+          </Link>
+          <Link href="/products" className={`text-sm font-medium px-3 py-1.5 rounded-full transition ${pathname.startsWith('/products') ? 'text-gray-900 bg-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
+            Sản phẩm
+          </Link>
+          <Link href="/real-estate" className={`text-sm font-medium px-3 py-1.5 rounded-full transition ${pathname.startsWith('/real-estate') ? 'text-gray-900 bg-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
+            Bất động sản
+          </Link>
+          <Link href="/jobs" className={`text-sm font-medium px-3 py-1.5 rounded-full transition ${pathname.startsWith('/jobs') ? 'text-gray-900 bg-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
+            Việc làm
+          </Link>
+        </nav>
+
         {/* Dành cho người bán */}
         <div className="relative hidden md:block flex-shrink-0" ref={sellerMenuRef}>
           <button onClick={() => setShowSellerMenu(v => !v)}
