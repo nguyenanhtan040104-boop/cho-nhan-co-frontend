@@ -15,7 +15,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-prod
 async function getHomeData() {
   try {
     const [products, jobs, realEstate, forum] = await Promise.allSettled([
-      fetch(`${API}/products?limit=12&sortBy=newest`, { next: { revalidate: 300 } }).then(r => r.json()),
+      fetch(`${API}/products?limit=5&sortBy=newest`, { next: { revalidate: 300 } }).then(r => r.json()),
       fetch(`${API}/jobs?limit=6&sortBy=newest`, { next: { revalidate: 300 } }).then(r => r.json()),
       fetch(`${API}/real-estates?limit=6`, { next: { revalidate: 300 } }).then(r => r.json()),
       fetch(`${API}/forum/posts?limit=5`, { next: { revalidate: 300 } }).then(r => r.json()),
@@ -150,7 +150,7 @@ export default async function HomePage() {
               <Link href="/products" className="text-xs text-red-600 font-medium">Xem thêm →</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-4 py-4 bg-white">
-              {vipListings.slice(0, 6).map((item: any) => (
+              {vipListings.slice(0, 5).map((item: any) => (
                 <ListingCard key={`vip-${item.id}`} item={item} />
               ))}
             </div>
@@ -165,7 +165,7 @@ export default async function HomePage() {
           </div>
           {products.length === 0 ? <EmptyBlock label="Chưa có sản phẩm nào" /> : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-4 py-4 bg-white">
-              {products.slice(0, 12).map((item: any) => (
+              {products.slice(0, 5).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />
               ))}
             </div>
@@ -182,7 +182,7 @@ export default async function HomePage() {
           </div>
           {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-4 py-4 bg-white">
-              {realEstate.slice(0, 6).map((item: any) => (
+              {realEstate.slice(0, 5).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />
               ))}
             </div>
@@ -199,7 +199,7 @@ export default async function HomePage() {
           </div>
           {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-4 py-4 bg-white">
-              {jobs.slice(0, 6).map((item: any) => (
+              {jobs.slice(0, 5).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'job' }} />
               ))}
             </div>
@@ -216,7 +216,7 @@ export default async function HomePage() {
           </div>
           {forum.length === 0 ? <EmptyBlock label="Chưa có bài viết nào" /> : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-4 py-4 bg-white">
-              {forum.slice(0, 6).map((item: any) => (
+              {forum.slice(0, 5).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'forum' }} />
               ))}
             </div>
