@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
@@ -28,22 +28,18 @@ const MAX_HISTORY = 8;
 function getHistory(): string[] {
   try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
 }
-function addHistory(q: string) {
+function saveHistory(q: string) {
   const prev = getHistory().filter(h => h !== q);
   localStorage.setItem(HISTORY_KEY, JSON.stringify([q, ...prev].slice(0, MAX_HISTORY)));
 }
-function removeHistory(q: string) {
+function deleteHistory(q: string) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(getHistory().filter(h => h !== q)));
-}
-function clearHistory() {
-  localStorage.setItem(HISTORY_KEY, '[]');
 }
 
 export default function HomepageClient() {
   const [query, setQuery] = useState('');
   const [history, setHistory] = useState<string[]>([]);
   const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setHistory(getHistory());
@@ -51,7 +47,7 @@ export default function HomepageClient() {
 
   function doSearch(q: string) {
     if (!q.trim()) return;
-    addHistory(q.trim());
+    saveHistory(q.trim());
     setHistory(getHistory());
     router.push(smartSearch(q.trim()));
   }
@@ -63,23 +59,17 @@ export default function HomepageClient() {
 
   function handleRemove(e: React.MouseEvent, q: string) {
     e.stopPropagation();
-    removeHistory(q);
+    deleteHistory(q);
     setHistory(getHistory());
   }
 
-  function handleClear() {
-    clearHistory();
-    setHistory([]);
-  }
-
   return (
-    <div className="w-full">
-      {/* Search bar */}
+    <>
+      {/* Search bar — nằm trong banner, đè xuống content */}
       <form onSubmit={handleSubmit}>
-        <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden border border-transparent focus-within:border-yellow-300 transition-all" style={{ height: 48 }}>
+        <div className="flex items-center bg-white rounded-full shadow-xl overflow-hidden" style={{ height: 52 }}>
           <i className="ri-search-line text-gray-400 pl-5 text-lg flex-shrink-0"></i>
           <input
-            ref={inputRef}
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -92,33 +82,36 @@ export default function HomepageClient() {
             </button>
           )}
           <button type="submit"
-            className="h-10 px-5 mr-1 text-sm font-bold text-gray-900 rounded-full transition hover:opacity-90 flex-shrink-0"
+            className="h-[44px] px-6 mr-1 text-sm font-bold text-gray-900 rounded-full transition hover:opacity-90 flex-shrink-0"
             style={{ backgroundColor: '#ffd400' }}>
             Tìm kiếm
           </button>
         </div>
       </form>
 
-      {/* Lịch sử tìm kiếm — chips bên dưới, kiểu Chợ Tốt */}
+      {/* Chips lịch sử — render dưới search bar trên nền gray */}
       {history.length > 0 && (
-        <div className="flex items-center gap-2 mt-2.5 flex-wrap px-1">
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
           {history.map((h, i) => (
-            <button key={i} onClick={() => doSearch(h)}
-              className="flex items-center gap-1.5 bg-white/80 hover:bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm transition border border-white/50 hover:border-gray-200 group">
-              <i className="ri-time-line text-gray-400 text-xs"></i>
-              <span>{h}</span>
-              <span onClick={(e) => handleRemove(e, h)}
-                className="text-gray-400 hover:text-red-500 ml-0.5 transition leading-none">
+            <span key={i}
+              className="flex items-center gap-1 bg-white text-gray-600 text-xs font-medium pl-2.5 pr-1.5 py-1.5 rounded-full shadow-sm cursor-pointer hover:shadow transition border border-gray-100 group"
+              onClick={() => doSearch(h)}>
+              <i className="ri-time-line text-gray-400 text-xs flex-shrink-0"></i>
+              <span className="max-w-[120px] truncate">{h}</span>
+              <button
+                onClick={(e) => handleRemove(e, h)}
+                className="ml-0.5 text-gray-400 hover:text-red-500 transition w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 flex-shrink-0">
                 ×
-              </span>
-            </button>
+              </button>
+            </span>
           ))}
-          <button onClick={handleClear}
-            className="text-xs text-white/70 hover:text-white transition ml-1 underline underline-offset-2">
+          <button
+            onClick={() => { localStorage.setItem(HISTORY_KEY, '[]'); setHistory([]); }}
+            className="text-xs text-gray-400 hover:text-red-500 transition ml-1">
             Xóa lịch sử
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 }

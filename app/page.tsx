@@ -4,7 +4,7 @@ import HomepageClient from './HomepageClient';
 
 export const metadata: Metadata = {
   title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản, việc làm tại Đắk Nông',
-  description: 'Chợ Nhân Cơ là nền tảng mua bán trực tuyến cho cộng đồng Nhân Cơ, Đắk Nông. Đăng tin nông sản, bất động sản, tuyển dụng miễn phí.',
+  description: 'Chợ Nhân Cơ là nền tảng mua bán trực tuyến cho cộng đồng Nhân Cơ, Đắk Nông.',
   alternates: { canonical: 'https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app' },
 };
 
@@ -69,41 +69,47 @@ export default async function HomePage() {
   ];
 
   return (
-    <main className="min-h-screen" style={{ background: '#f4f4f4' }}>
+    <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingBottom: 0 }}>
-        {/* Decorative blobs */}
-        <div className="absolute -top-8 -left-8 w-48 h-48 rounded-full opacity-30" style={{ background: '#ffaa00', filter: 'blur(40px)' }} />
-        <div className="absolute -top-4 right-0 w-56 h-56 rounded-full opacity-20" style={{ background: '#ff8800', filter: 'blur(50px)' }} />
-
-        <div className="relative max-w-3xl mx-auto px-4 pt-7 pb-5 text-center">
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight mb-1">
+      <div className="relative" style={{ background: '#ffd400', paddingBottom: 36 }}>
+        <div className="max-w-screen-xl mx-auto px-4 pt-7 pb-0 text-center">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
             Giá tốt, gần nhà, chốt nhanh!
           </h1>
-          <p className="text-gray-700 text-sm font-medium mb-4">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
-          {/* Search bar inline inside banner */}
-          <HomepageClient />
+          <p className="text-gray-700 text-sm font-medium mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+        </div>
+
+        {/* Search bar đè lên content bên dưới */}
+        <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 px-4 z-10">
+          <div className="max-w-2xl mx-auto">
+            <HomepageClient />
+          </div>
         </div>
       </div>
 
-      {/* ===== BODY ===== */}
-      <div className="max-w-screen-xl mx-auto px-3 sm:px-4">
+      {/* Khoảng trống vừa đủ cho search bar đè xuống */}
+      <div className="h-8" />
+
+      <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-4">
+
+        {/* Lịch sử tìm kiếm chips — client-side, render dưới search bar */}
+        {/* (đã nằm trong HomepageClient) */}
 
         {/* ===== CATEGORIES ===== */}
-        <div className="bg-white mt-2 px-2 py-3">
-          <div className="flex overflow-x-auto scrollbar-hide gap-1">
+        <div className="bg-white mt-3 px-2 py-3">
+          <div className="flex overflow-x-auto scrollbar-hide gap-0">
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-1.5 px-2.5 py-1 hover:opacity-80 transition-opacity flex-shrink-0 min-w-[72px]">
-                <div className="w-14 h-14 overflow-hidden rounded-xl flex-shrink-0">
+                className="flex flex-col items-center gap-1.5 px-3 py-1 hover:opacity-80 transition-opacity flex-shrink-0 min-w-[76px]">
+                <div className="w-14 h-14 overflow-hidden rounded-xl flex-shrink-0 shadow-sm">
                   <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />
                 </div>
                 <span className="text-[11px] text-gray-600 font-medium text-center leading-tight">{cat.title}</span>
               </Link>
             ))}
-            <div className="flex flex-col items-center gap-1.5 px-2.5 py-1 flex-shrink-0 min-w-[48px] justify-center">
-              <div className="w-14 h-14 rounded-xl border-2 border-gray-200 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-1.5 px-3 py-1 flex-shrink-0 min-w-[52px] justify-center">
+              <div className="w-14 h-14 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center">
                 <i className="ri-arrow-right-s-line text-gray-400 text-xl"></i>
               </div>
             </div>
@@ -118,7 +124,7 @@ export default async function HomePage() {
                 <span className="bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">VIP</span>
                 Tin nổi bật
               </h2>
-              <Link href="/products" className="text-xs text-red-600 font-medium hover:underline">Xem thêm →</Link>
+              <Link href="/products" className="text-xs text-red-600 font-medium">Xem thêm →</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
               {vipListings.slice(0, 6).map((item: any) => (
@@ -132,11 +138,9 @@ export default async function HomePage() {
         <section className="mt-2 bg-white overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
             <h2 className="font-bold text-gray-900 text-sm">Sản phẩm mới đăng</h2>
-            <Link href="/products" className="text-xs text-red-600 font-medium hover:underline">Xem tất cả →</Link>
+            <Link href="/products" className="text-xs text-red-600 font-medium">Xem tất cả →</Link>
           </div>
-          {products.length === 0 ? (
-            <EmptyBlock label="Chưa có sản phẩm nào" />
-          ) : (
+          {products.length === 0 ? <EmptyBlock label="Chưa có sản phẩm nào" /> : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
               {products.slice(0, 12).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />
@@ -147,13 +151,12 @@ export default async function HomePage() {
 
         {/* ===== BĐS + TUYỂN DỤNG ===== */}
         <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2">
-
           <section className="bg-white overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
               <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-                <i className="ri-home-4-line text-blue-600"></i> Bất động sản
+                <i className="ri-home-4-line text-blue-500"></i> Bất động sản
               </h2>
-              <Link href="/real-estate" className="text-xs text-red-600 hover:underline">Xem tất cả →</Link>
+              <Link href="/real-estate" className="text-xs text-red-600">Xem tất cả →</Link>
             </div>
             {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
               <div className="grid grid-cols-2 gap-[1px] bg-gray-100">
@@ -167,9 +170,9 @@ export default async function HomePage() {
           <section className="bg-white overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
               <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-                <i className="ri-briefcase-line text-purple-600"></i> Tuyển dụng mới
+                <i className="ri-briefcase-line text-purple-500"></i> Tuyển dụng mới
               </h2>
-              <Link href="/jobs" className="text-xs text-red-600 hover:underline">Xem tất cả →</Link>
+              <Link href="/jobs" className="text-xs text-red-600">Xem tất cả →</Link>
             </div>
             {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
               <div className="divide-y divide-gray-100">
@@ -195,12 +198,12 @@ export default async function HomePage() {
         </div>
 
         {/* ===== DIỄN ĐÀN ===== */}
-        <section className="mt-2 bg-white overflow-hidden mb-3">
+        <section className="mt-2 bg-white overflow-hidden mb-4">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
             <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-              <i className="ri-chat-3-line text-cyan-600"></i> Diễn đàn cộng đồng
+              <i className="ri-chat-3-line text-cyan-500"></i> Diễn đàn cộng đồng
             </h2>
-            <Link href="/forum" className="text-xs text-red-600 hover:underline">Xem tất cả →</Link>
+            <Link href="/forum" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {forum.length === 0 ? <EmptyBlock label="Chưa có bài viết nào" /> : (
             <div className="divide-y divide-gray-100">
@@ -263,7 +266,6 @@ export default async function HomePage() {
   );
 }
 
-/* ===== LISTING CARD ===== */
 function ListingCard({ item }: { item: any }) {
   const href = item._type === 'product' ? `/products/${item.id}`
     : item._type === 'real-estate' ? `/real-estate/${item.id}`
