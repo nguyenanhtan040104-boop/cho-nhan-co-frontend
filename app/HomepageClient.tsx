@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
@@ -39,14 +39,27 @@ function deleteHistory(q: string) {
 export default function HomepageClient() {
   const [query, setQuery] = useState('');
   const [history, setHistory] = useState<string[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setHistory(getHistory()); }, []);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
 
   function doSearch(q: string) {
     if (!q.trim()) return;
     saveHistory(q.trim());
     setHistory(getHistory());
+    setShowDropdown(false);
     router.push(smartSearch(q.trim()));
   }
 
@@ -56,8 +69,7 @@ export default function HomepageClient() {
   }
 
   return (
-    <>
-      {/* Search bar — straddles vàng/xám */}
+    <div ref={wrapperRef} className="relative">
       <form onSubmit={handleSubmit}>
         <div className="flex items-center bg-white rounded-full shadow-xl overflow-hidden border border-gray-100" style={{ height: 52 }}>
           <i className="ri-search-line text-gray-400 pl-4 text-lg flex-shrink-0"></i>
@@ -65,6 +77,7 @@ export default function HomepageClient() {
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
+            onFocus={() => setShowDropdown(true)}
             placeholder="Tìm sản phẩm, việc làm, bất động sản..."
             className="flex-1 px-3 text-sm focus:outline-none text-gray-800 placeholder-gray-400 h-full"
           />
@@ -73,7 +86,6 @@ export default function HomepageClient() {
               <i className="ri-close-line text-lg"></i>
             </button>
           )}
-          <div className="w-px h-6 bg-gray-200 flex-shrink-0 mx-1" />
           <button type="submit"
             className="h-[44px] px-6 mr-1 text-sm font-bold text-gray-900 rounded-full transition hover:opacity-90 flex-shrink-0 whitespace-nowrap"
             style={{ backgroundColor: '#ffd400' }}>
@@ -82,26 +94,33 @@ export default function HomepageClient() {
         </div>
       </form>
 
-      {/* Chips lịch sử — trên nền xám bên dưới search bar */}
-      {history.length > 0 && (
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          {history.map((h, i) => (
-            <span key={i} onClick={() => doSearch(h)}
-              className="flex items-center gap-1 bg-white/75 text-gray-700 text-xs font-medium pl-2.5 pr-1 py-1.5 rounded-full cursor-pointer hover:bg-white transition shadow-sm">
-              <i className="ri-time-line text-gray-400 text-xs flex-shrink-0"></i>
-              <span className="max-w-[100px] truncate">{h}</span>
-              <button onClick={(e) => { e.stopPropagation(); deleteHistory(h); setHistory(getHistory()); }}
-                className="ml-0.5 text-gray-400 hover:text-red-500 w-4 h-4 flex items-center justify-center rounded-full flex-shrink-0 text-sm">
-                ×
-              </button>
-            </span>
-          ))}
-          <button onClick={() => { localStorage.setItem(HISTORY_KEY, '[]'); setHistory([]); }}
-            className="text-xs text-gray-400 hover:text-red-500 transition">
-            Xóa lịch sử
-          </button>
+      {/* Dropdown lịch sử — xuất hiện khi focus */}
+      {showDropdown && history.length > 0 && (
+        <div className="absolute left-0 right-0 top-[56px] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+          <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-gray-100">
+            <span className="text-sm font-semibold text-gray-800">Tìm kiếm gần đây</span>
+            <button onClick={() => { localStorage.setItem(HISTORY_KEY, '[]'); setHistory([]); setShowDropdown(false); }}
+              className="text-xs text-gray-400 hover:text-red-500 transition">
+              Xóa lịch sử
+            </button>
+          </div>
+          <div className="py-1">
+            {history.map((h, i) => (
+              <div key={i}
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer group"
+                onMouseDown={() => doSearch(h)}>
+                <i className="ri-time-line text-gray-400 text-base flex-shrink-0"></i>
+                <span className="flex-1 text-sm text-gray-700 truncate">{h}</span>
+                <button
+                  onMouseDown={e => { e.stopPropagation(); deleteHistory(h); setHistory(getHistory()); }}
+                  className="text-gray-300 hover:text-gray-500 w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                  <i className="ri-close-line text-sm"></i>
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
