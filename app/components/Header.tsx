@@ -162,8 +162,8 @@ export default function Header() {
         {/* Right actions */}
         <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
 
-          {/* Yêu thích → dashboard */}
-          <Link href="/dashboard" title="Bài đã thích"
+          {/* Yêu thích → dashboard tab engagement */}
+          <Link href="/dashboard?tab=liked" title="Bài đã thích"
             className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-heart-line text-lg"></i>
           </Link>

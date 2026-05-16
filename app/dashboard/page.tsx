@@ -7,13 +7,15 @@ import { auth, users, analytics, products, realEstate, jobs, notifications, wall
 
 // Tab mapping từ URL param → tab id trong dashboard
 const TAB_MAP: Record<string, string> = {
-  saved: 'overview',        // chưa có tính năng saved riêng → overview
+  saved: 'engagement',
+  liked: 'engagement',
   notifications: 'notifications',
-  messages: 'overview',     // chưa có messages riêng → overview
+  messages: 'overview',
   products: 'products',
   'real-estate': 'real-estate',
   jobs: 'jobs',
   wallet: 'wallet',
+  engagement: 'engagement',
 };
 
 export default function DashboardPage() {
