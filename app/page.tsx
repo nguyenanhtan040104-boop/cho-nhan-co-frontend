@@ -59,7 +59,9 @@ function fmtPrice(item: any, type: string) {
     const p = Number(item.price);
     return p >= 1e9 ? (p / 1e9).toFixed(1) + ' tỷ' : (p / 1e6).toFixed(0) + ' triệu';
   }
-  return item.salary || 'Thỏa thuận';
+  if (type === 'job') return item.salary || 'Thỏa thuận';
+  if (type === 'forum') return item.category || 'Diễn đàn';
+  return '';
 }
 
 export default async function HomePage() {
@@ -196,22 +198,9 @@ export default async function HomePage() {
             <Link href="/jobs" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
-            <div className="divide-y divide-gray-100">
-              {jobs.slice(0, 5).map((job: any) => (
-                <Link key={job.id} href={`/jobs/${job.id}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
-                  <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                    <i className="ri-briefcase-line text-purple-400 text-sm"></i>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-red-600">{job.title}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      {job.salary && <span className="text-xs font-bold" style={{ color: '#d0011b' }}>{job.salary}</span>}
-                      {job.location && <span className="text-xs text-gray-400 truncate"><i className="ri-map-pin-line"></i> {job.location}</span>}
-                    </div>
-                  </div>
-                  <span className="text-[10px] text-gray-400 flex-shrink-0">{timeAgo(job.createdAt)}</span>
-                </Link>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+              {jobs.slice(0, 6).map((item: any) => (
+                <ListingCard key={item.id} item={{ ...item, _type: 'job' }} />
               ))}
             </div>
           )}
@@ -226,19 +215,9 @@ export default async function HomePage() {
             <Link href="/forum" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {forum.length === 0 ? <EmptyBlock label="Chưa có bài viết nào" /> : (
-            <div className="divide-y divide-gray-100">
-              {forum.slice(0, 5).map((post: any) => (
-                <Link key={post.id} href={`/forum/${post.id}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
-                  <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center flex-shrink-0">
-                    <i className="ri-chat-3-line text-cyan-400 text-sm"></i>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 line-clamp-1 group-hover:text-red-600">{post.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{timeAgo(post.createdAt)}</p>
-                  </div>
-                  <i className="ri-arrow-right-s-line text-gray-300 flex-shrink-0"></i>
-                </Link>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+              {forum.slice(0, 6).map((item: any) => (
+                <ListingCard key={item.id} item={{ ...item, _type: 'forum' }} />
               ))}
             </div>
           )}
@@ -289,8 +268,10 @@ export default async function HomePage() {
 function ListingCard({ item }: { item: any }) {
   const href = item._type === 'product' ? `/products/${item.id}`
     : item._type === 'real-estate' ? `/real-estate/${item.id}`
+    : item._type === 'forum' ? `/forum/${item.id}`
     : `/jobs/${item.id}`;
-  const imgUrl = item.images?.[0]?.url || null;
+  // products/real-estate: images[0].url | jobs/forum: images[0] là string URL
+  const imgUrl = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
   const imgCount = item.images?.length || 0;
   const price = fmtPrice(item, item._type);
 
