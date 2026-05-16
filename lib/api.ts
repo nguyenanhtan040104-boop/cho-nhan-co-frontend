@@ -689,4 +689,6 @@ export const itemComments = {
     request<any>('/item-comments', { method: 'POST', body: JSON.stringify(data) }),
   delete: (id: string) =>
     request<any>(`/item-comments/${id}`, { method: 'DELETE' }),
+  toggleLike: (targetType: string, targetId: string) =>
+    request<{ liked: boolean }>('/item-comments/like', { method: 'POST', body: JSON.stringify({ targetType, targetId }) }),
 };

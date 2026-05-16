@@ -1,32 +1,43 @@
 ﻿'use client';
 import { useState, useEffect } from 'react';
+import { itemComments, auth } from '../../lib/api';
 
 const LIKED_KEY = 'liked_items';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
 
 function getLiked(): string[] {
   try { return JSON.parse(localStorage.getItem(LIKED_KEY) || '[]'); } catch { return []; }
 }
-
-function toggleLiked(id: string): boolean {
+function setLikedLocal(id: string, liked: boolean) {
   const list = getLiked();
-  const isNowLiked = !list.includes(id);
-  const next = isNowLiked ? [...list, id] : list.filter(x => x !== id);
+  const next = liked ? [...list.filter(x => x !== id), id] : list.filter(x => x !== id);
   localStorage.setItem(LIKED_KEY, JSON.stringify(next));
-  return isNowLiked;
 }
 
-export default function LikeButton({ itemId }: { itemId: string }) {
+export default function LikeButton({ itemId, targetType = 'PRODUCT' }: { itemId: string; targetType?: string }) {
   const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLiked(getLiked().includes(itemId));
   }, [itemId]);
 
-  function handleClick(e: React.MouseEvent) {
+  async function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    const nowLiked = toggleLiked(itemId);
+    if (loading) return;
+    const isLoggedIn = auth.isLoggedIn();
+    const nowLiked = !liked;
+    // Optimistic update
     setLiked(nowLiked);
+    setLikedLocal(itemId, nowLiked);
+    if (isLoggedIn) {
+      setLoading(true);
+      try {
+        await itemComments.toggleLike(targetType, itemId);
+      } catch {}
+      setLoading(false);
+    }
   }
 
   return (
