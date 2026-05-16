@@ -63,6 +63,14 @@ export default function Header() {
   const sellerMenuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLDivElement>(null);
 
+  function navDashboard(tab: string) {
+    if (pathname === '/dashboard') {
+      window.dispatchEvent(new CustomEvent('dashboard-switch-tab', { detail: tab }));
+    } else {
+      router.push(`/dashboard?tab=${tab}`);
+    }
+  }
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (postMenuRef.current && !postMenuRef.current.contains(e.target as Node)) setShowPostMenu(false);
@@ -163,16 +171,16 @@ export default function Header() {
         <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
 
           {/* Yêu thích → dashboard tab engagement */}
-          <Link href="/dashboard?tab=liked" title="Bài đã thích"
+          <button onClick={() => navDashboard('liked')} title="Bài đã thích"
             className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-heart-line text-lg"></i>
-          </Link>
+          </button>
 
           {/* Thông báo → dashboard tab notifications */}
-          <Link href="/dashboard?tab=notifications" title="Thông báo"
+          <button onClick={() => navDashboard('notifications')} title="Thông báo"
             className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-notification-3-line text-lg"></i>
-          </Link>
+          </button>
 
           {/* Liên hệ → trang nhắn tin */}
           <Link href="/messages"
@@ -182,10 +190,10 @@ export default function Header() {
           </Link>
 
           {/* Quản lý tin → dashboard tab products */}
-          <Link href="/dashboard?tab=products"
+          <button onClick={() => navDashboard('products')}
             className="hidden md:flex items-center border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
             Quản lý tin
-          </Link>
+          </button>
 
           {/* Đăng tin */}
           <div className="relative" ref={postMenuRef}>

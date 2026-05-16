@@ -53,6 +53,24 @@ function DashboardContent() {
     loadData();
   }, []);
 
+  // Lắng nghe searchParams thay đổi (khi navigate giữa các ?tab=)
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && TAB_MAP[tabParam]) {
+      setActiveTab(TAB_MAP[tabParam]);
+    }
+  }, [searchParams]);
+
+  // Lắng nghe custom event từ header (khi đang ở dashboard, click lại tim/chuông)
+  useEffect(() => {
+    function onSwitchTab(e: Event) {
+      const tab = (e as CustomEvent).detail;
+      if (tab && TAB_MAP[tab]) setActiveTab(TAB_MAP[tab]);
+    }
+    window.addEventListener('dashboard-switch-tab', onSwitchTab);
+    return () => window.removeEventListener('dashboard-switch-tab', onSwitchTab);
+  }, []);
+
   async function loadData() {
   try {
     const userData = await users.getMe();
@@ -1282,75 +1300,134 @@ function AnalyticsTab() {
 // =================== 3.4 ENGAGEMENT TAB ===================
 function EngagementTab() {
   const [data, setData] = useState<any>(null);
+  const [notifs, setNotifs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    analytics.getEngagement()
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      analytics.getEngagement().catch(() => null),
+      notifications.getAll(1).catch(() => null),
+    ]).then(([eng, notifData]) => {
+      setData(eng);
+      const all: any[] = notifData?.data || [];
+      // Lọc các thông báo tương tác: like, comment, reaction
+      const interactTypes = ['LIKE', 'COMMENT', 'REACTION', 'FORUM_LIKE', 'FORUM_COMMENT', 'PRODUCT_LIKE'];
+      const filtered = all.filter((n: any) =>
+        interactTypes.some(t => (n.type || '').toUpperCase().includes(t.replace('_', '').slice(0, 4)))
+        || (n.message || '').toLowerCase().match(/thích|bình luận|comment|like|phản hồi/)
+      );
+      setNotifs(filtered.length > 0 ? filtered : all.slice(0, 10));
+    }).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div></div>;
+  function timeAgoEng(dateStr: string) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'Vừa xong';
+    if (m < 60) return `${m} phút trước`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h} giờ trước`;
+    return `${Math.floor(h / 24)} ngày trước`;
+  }
+
+  function getNotifIcon(type: string) {
+    const t = (type || '').toUpperCase();
+    if (t.includes('LIKE') || t.includes('REACT')) return { icon: 'ri-heart-fill', color: 'text-red-500 bg-red-100' };
+    if (t.includes('COMMENT')) return { icon: 'ri-chat-1-fill', color: 'text-blue-500 bg-blue-100' };
+    if (t.includes('FOLLOW')) return { icon: 'ri-user-follow-fill', color: 'text-green-500 bg-green-100' };
+    return { icon: 'ri-notification-2-fill', color: 'text-yellow-600 bg-yellow-100' };
+  }
+
+  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div></div>;
 
   const summary = data?.summary || {};
   const forumPosts = data?.forumPosts || [];
-
   const totalViews = (summary.totalProductViews || 0) + (summary.totalRealEstateViews || 0) + (summary.totalJobViews || 0);
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Tương tác & Engagement</h2>
+      <h2 className="text-xl font-bold text-gray-900">Tương tác</h2>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: 'Tổng lượt xem', value: totalViews.toLocaleString(), icon: 'ri-eye-line', color: 'bg-blue-100 text-blue-600' },
-          { label: 'Lượt thích forum', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-red-100 text-red-500' },
+          { label: 'Lượt thích', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-red-100 text-red-500' },
           { label: 'Bình luận', value: summary.totalForumComments || 0, icon: 'ri-chat-1-line', color: 'bg-purple-100 text-purple-600' },
           { label: 'View BĐS', value: (summary.totalRealEstateViews || 0).toLocaleString(), icon: 'ri-home-4-line', color: 'bg-green-100 text-green-600' },
         ].map((item, i) => (
-          <div key={i} className="bg-white rounded-xl p-5 shadow-sm">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${item.color}`}>
-              <i className={`${item.icon} text-lg`}></i>
+          <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2 ${item.color}`}>
+              <i className={`${item.icon} text-base`}></i>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{item.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{item.label}</p>
+            <p className="text-xl font-bold text-gray-900">{item.value}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{item.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Breakdown lượt xem theo loại */}
-      <div className="bg-white rounded-xl p-6 shadow-sm">
-        <h3 className="font-semibold text-gray-900 mb-4">Lượt xem theo danh mục</h3>
-        {[
-          { label: 'Sản phẩm', value: summary.totalProductViews || 0, color: 'bg-green-500', total: totalViews },
-          { label: 'Bất động sản', value: summary.totalRealEstateViews || 0, color: 'bg-blue-500', total: totalViews },
-          { label: 'Tuyển dụng', value: summary.totalJobViews || 0, color: 'bg-indigo-500', total: totalViews },
-        ].map((item, i) => (
-          <div key={i} className="mb-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-700">{item.label}</span>
-              <span className="font-medium text-gray-900">{item.value.toLocaleString()} lượt</span>
-            </div>
-            <div className="w-full bg-gray-100 rounded-full h-2">
-              <div className={`${item.color} h-2 rounded-full`}
-                style={{ width: item.total > 0 ? `${(item.value / item.total) * 100}%` : '0%' }}></div>
-            </div>
+      {/* Feed tương tác kiểu Facebook */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+            <i className="ri-heart-line text-red-500"></i>
+            Hoạt động gần đây
+          </h3>
+          <p className="text-xs text-gray-400 mt-0.5">Ai đã thích và bình luận bài của bạn</p>
+        </div>
+        {notifs.length === 0 ? (
+          <div className="flex flex-col items-center py-12 text-gray-400">
+            <i className="ri-heart-line text-4xl mb-2"></i>
+            <p className="text-sm">Chưa có tương tác nào</p>
           </div>
-        ))}
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {notifs.map((n: any) => {
+              const { icon, color } = getNotifIcon(n.type);
+              const senderName = n.sender?.fullName || n.sender?.username || n.actorName || 'Ai đó';
+              const senderAvatar = n.sender?.avatarUrl || null;
+              const initial = senderName[0]?.toUpperCase() || 'A';
+              return (
+                <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition ${!n.isRead ? 'bg-yellow-50/40' : ''}`}>
+                  {/* Avatar + icon badge */}
+                  <div className="relative flex-shrink-0">
+                    {senderAvatar ? (
+                      <img src={senderAvatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm">
+                        {initial}
+                      </div>
+                    )}
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center ${color}`}>
+                      <i className={`${icon} text-xs`}></i>
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-800 leading-snug">
+                      <span className="font-semibold">{senderName}</span>{' '}
+                      {n.message || 'đã tương tác với bài của bạn'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">{timeAgoEng(n.createdAt)}</p>
+                  </div>
+                  {!n.isRead && <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full flex-shrink-0 mt-1.5"></div>}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Forum posts engagement */}
       {forumPosts.length > 0 && (
-        <div className="bg-white rounded-xl p-6 shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i className="ri-chat-3-line text-purple-600"></i>
+            <i className="ri-chat-3-line text-purple-500"></i>
             Bài viết diễn đàn
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {forumPosts.map((p: any) => (
-              <div key={p.id} className="flex items-center gap-4 py-2 border-b border-gray-100 last:border-0">
+              <div key={p.id} className="flex items-center gap-4 py-2.5 border-b border-gray-50 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
                   <p className="text-xs text-gray-400">{new Date(p.createdAt).toLocaleDateString('vi-VN')}</p>
