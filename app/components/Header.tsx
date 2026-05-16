@@ -358,7 +358,10 @@ export default function Header() {
                             className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-amber-50/60' : ''}`}
                             onClick={() => {
                           setShowNotifDropdown(false);
-                          const url = (n.data as any)?.url;
+                          const d = n.data as any;
+                          const url = d?.url
+                            || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
+                            || (n.relatedId ? `/products/${n.relatedId}` : null);
                           if (url) router.push(url);
                           else navDashboard('notifications');
                         }}>

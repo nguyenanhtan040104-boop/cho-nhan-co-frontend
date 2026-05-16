@@ -522,7 +522,11 @@ function DashboardContent() {
                   <div className="space-y-2">
                     {notifs.map(notif => {
                       const convId = notif.data?.conversationId;
-                      const notifUrl = notif.data?.url || (convId ? `/messages/${convId}` : null);
+                      const d = notif.data as any;
+                      const notifUrl = d?.url
+                        || (convId ? `/messages/${convId}` : null)
+                        || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
+                        || (notif.relatedId ? `/products/${notif.relatedId}` : null);
                       const isClickable = !!notifUrl;
                       const isLike = notif.type?.includes('LIKE');
                       const isComment = notif.type?.includes('COMMENT');
