@@ -149,7 +149,7 @@ export default async function HomePage() {
               </h2>
               <Link href="/products" className="text-xs text-red-600 font-medium">Xem thêm →</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-3 py-3 bg-gray-100">
               {vipListings.slice(0, 6).map((item: any) => (
                 <ListingCard key={`vip-${item.id}`} item={item} />
               ))}
@@ -164,7 +164,7 @@ export default async function HomePage() {
             <Link href="/products" className="text-xs text-red-600 font-medium">Xem tất cả →</Link>
           </div>
           {products.length === 0 ? <EmptyBlock label="Chưa có sản phẩm nào" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-3 py-3 bg-gray-100">
               {products.slice(0, 12).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />
               ))}
@@ -181,7 +181,7 @@ export default async function HomePage() {
             <Link href="/real-estate" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-3 py-3 bg-gray-100">
               {realEstate.slice(0, 6).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />
               ))}
@@ -198,7 +198,7 @@ export default async function HomePage() {
             <Link href="/jobs" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-3 py-3 bg-gray-100">
               {jobs.slice(0, 6).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'job' }} />
               ))}
@@ -215,7 +215,7 @@ export default async function HomePage() {
             <Link href="/forum" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {forum.length === 0 ? <EmptyBlock label="Chưa có bài viết nào" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-3 py-3 bg-gray-100">
               {forum.slice(0, 6).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'forum' }} />
               ))}
@@ -276,8 +276,8 @@ function ListingCard({ item }: { item: any }) {
   const price = fmtPrice(item, item._type);
 
   return (
-    <Link href={href} className="group bg-white overflow-hidden hover:bg-gray-50 transition-colors block">
-      <div className="relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
+    <Link href={href} className="group bg-white rounded-xl overflow-hidden hover:shadow-md transition-shadow block border border-gray-100">
+      <div className="relative bg-gray-100 overflow-hidden rounded-t-xl" style={{ aspectRatio: '4/3' }}>
         {imgUrl ? (
           <img src={imgUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
@@ -288,20 +288,20 @@ function ListingCard({ item }: { item: any }) {
         {/* Heart button */}
         <LikeButton itemId={String(item.id)} />
         {item.createdAt && (
-          <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
+          <span className="absolute top-2 left-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
             {timeAgo(item.createdAt)}
           </span>
         )}
         {imgCount > 1 && (
-          <span className="absolute bottom-1.5 right-1.5 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5">
+          <span className="absolute bottom-2 right-2 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
             <i className="ri-image-2-line text-[10px]"></i> {imgCount}
           </span>
         )}
         {item.isVip && (
-          <span className="absolute bottom-1.5 left-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
+          <span className="absolute bottom-2 left-2 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">VIP</span>
         )}
       </div>
-      <div className="px-2.5 pt-2 pb-3">
+      <div className="px-3 pt-2 pb-3">
         <p className="text-sm font-medium leading-snug line-clamp-2 text-gray-800 mb-1.5">{item.title}</p>
         <p className="text-base font-bold" style={{ color: '#d0011b' }}>{price}</p>
         {(item.location || item.address) && (
