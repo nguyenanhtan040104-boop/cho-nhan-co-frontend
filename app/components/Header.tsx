@@ -54,17 +54,33 @@ function smartSearch(q: string): string {
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
 
+function timeAgoHeader(d: string) {
+  const diff = Date.now() - new Date(d).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'Vừa xong';
+  if (m < 60) return `${m} phút trước`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} giờ trước`;
+  return `${Math.floor(h / 24)} ngày trước`;
+}
+
 export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [showSellerMenu, setShowSellerMenu] = useState(false);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  const [showSavedDropdown, setShowSavedDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notifs, setNotifs] = useState<any[]>([]);
+  const [savedProducts, setSavedProducts] = useState<any[]>([]);
   const pathname = usePathname();
   const router = useRouter();
 
   const postMenuRef = useRef<HTMLDivElement>(null);
   const sellerMenuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const savedRef = useRef<HTMLDivElement>(null);
 
   function navDashboard(tab: string) {
     if (pathname === '/dashboard') {
@@ -81,6 +97,8 @@ export default function Header() {
       if (postMenuRef.current && !postMenuRef.current.contains(e.target as Node)) setShowPostMenu(false);
       if (sellerMenuRef.current && !sellerMenuRef.current.contains(e.target as Node)) setShowSellerMenu(false);
       if (hamburgerRef.current && !hamburgerRef.current.contains(e.target as Node)) setShowHamburger(false);
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifDropdown(false);
+      if (savedRef.current && !savedRef.current.contains(e.target as Node)) setShowSavedDropdown(false);
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -90,9 +108,36 @@ export default function Header() {
     setShowPostMenu(false);
     setShowHamburger(false);
     setShowSellerMenu(false);
-    // Reset badge khi vào trang thông báo
+    setShowNotifDropdown(false);
+    setShowSavedDropdown(false);
     if (pathname === '/dashboard') setUnreadCount(0);
   }, [pathname]);
+
+  function openNotifDropdown() {
+    setShowSavedDropdown(false);
+    const token = localStorage.getItem('token');
+    if (!token) { router.push('/profile'); return; }
+    setShowNotifDropdown(v => !v);
+    // Fetch notifications
+    fetch(`${API}/notifications?limit=10`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json()).then(data => setNotifs(data.data || [])).catch(() => {});
+    setUnreadCount(0);
+  }
+
+  function openSavedDropdown() {
+    setShowNotifDropdown(false);
+    setShowSavedDropdown(v => !v);
+    // Load saved products từ localStorage
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
+      if (ids.length === 0) { setSavedProducts([]); return; }
+      Promise.all(
+        ids.slice(0, 6).map(id =>
+          fetch(`${API}/products/${id}`).then(r => r.ok ? r.json() : null).catch(() => null)
+        )
+      ).then(results => setSavedProducts(results.filter(Boolean)));
+    } catch { setSavedProducts([]); }
+  }
 
   useEffect(() => {
     function fetchUnread() {
@@ -213,22 +258,90 @@ export default function Header() {
         {/* Right actions */}
         <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
 
-          {/* Yêu thích → dashboard tab engagement */}
-          <button onClick={() => navDashboard('liked')} title="Bài đã thích"
-            className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
-            <i className="ri-heart-line text-lg"></i>
-          </button>
-
-          {/* Thông báo → dashboard tab notifications */}
-          <button onClick={() => { navDashboard('notifications'); setUnreadCount(0); }} title="Thông báo"
-            className="relative hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
-            <i className="ri-notification-3-line text-lg"></i>
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
+          {/* ❤️ Tin đã lưu dropdown */}
+          <div className="relative hidden sm:block" ref={savedRef}>
+            <button onClick={openSavedDropdown} title="Tin đã lưu"
+              className="flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+              <i className="ri-heart-line text-lg"></i>
+            </button>
+            {showSavedDropdown && (
+              <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <h3 className="font-bold text-gray-900">Tin đăng đã lưu</h3>
+                  <button onClick={() => { setShowSavedDropdown(false); navDashboard('liked'); }}
+                    className="text-xs text-yellow-500 font-medium hover:underline">Xem tất cả</button>
+                </div>
+                {savedProducts.length === 0 ? (
+                  <div className="py-10 text-center text-gray-400">
+                    <i className="ri-heart-line text-3xl block mb-2"></i>
+                    <p className="text-sm font-medium text-gray-700">Bạn chưa lưu tin đăng nào</p>
+                    <p className="text-xs mt-1">Lưu tin yêu thích, tin sẽ hiển thị ở đây để bạn dễ dàng quay lại sau.</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-50">
+                    {savedProducts.map((p: any) => (
+                      <Link key={p.id} href={`/products/${p.id}`} onClick={() => setShowSavedDropdown(false)}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                          {p.images?.[0]?.url
+                            ? <img src={p.images[0].url} alt="" className="w-full h-full object-cover" />
+                            : <i className="ri-image-line text-gray-300 text-xl flex items-center justify-center w-full h-full"></i>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-800 line-clamp-1">{p.title}</p>
+                          <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
-          </button>
+          </div>
+
+          {/* 🔔 Thông báo dropdown */}
+          <div className="relative hidden sm:block" ref={notifRef}>
+            <button onClick={openNotifDropdown} title="Thông báo"
+              className="flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+              <i className="ri-notification-3-line text-lg"></i>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+            {showNotifDropdown && (
+              <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <h3 className="font-bold text-gray-900">Thông Báo</h3>
+                  <button onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}
+                    className="text-xs text-yellow-500 font-medium hover:underline">Xem tất cả</button>
+                </div>
+                {notifs.length === 0 ? (
+                  <div className="py-10 text-center text-gray-400">
+                    <i className="ri-notification-3-line text-3xl block mb-2"></i>
+                    <p className="text-sm">Chưa có thông báo nào</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-50 max-h-96 overflow-y-auto">
+                    {notifs.map((n: any) => (
+                      <div key={n.id} className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-yellow-50/50' : ''}`}
+                        onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}>
+                        <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <i className={`text-sm ${n.type?.includes('LIKE') ? 'ri-heart-fill text-red-500' : n.type?.includes('COMMENT') ? 'ri-chat-1-fill text-blue-500' : 'ri-notification-2-fill text-yellow-600'}`}></i>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-800 leading-snug line-clamp-2">{n.body || n.title}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{timeAgoHeader(n.createdAt)}</p>
+                        </div>
+                        {!n.isRead && <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-2"></div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Liên hệ → trang nhắn tin */}
           <Link href="/messages"
