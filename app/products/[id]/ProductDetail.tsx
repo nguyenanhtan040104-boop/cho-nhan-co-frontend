@@ -13,6 +13,8 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showMessengerModal, setShowMessengerModal] = useState(false);
@@ -205,13 +207,36 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
           {/* Product Images */}
           <div className="space-y-3">
+            {/* Lightbox */}
+            {lightbox && mainImage && (
+              <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center" onClick={() => { setLightbox(false); setZoom(1); }}>
+                <div className="absolute top-4 right-4 flex gap-2 z-10">
+                  <button onClick={e => { e.stopPropagation(); setZoom(z => Math.min(z + 0.5, 4)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-zoom-in-line text-lg"></i></button>
+                  <button onClick={e => { e.stopPropagation(); setZoom(z => Math.max(z - 0.5, 0.5)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-zoom-out-line text-lg"></i></button>
+                  <button onClick={e => { e.stopPropagation(); setZoom(1); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-fullscreen-exit-line text-lg"></i></button>
+                  <button onClick={() => { setLightbox(false); setZoom(1); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-close-line text-lg"></i></button>
+                </div>
+                {images.length > 1 && (
+                  <>
+                    <button onClick={e => { e.stopPropagation(); setSelectedImageIndex(i => (i - 1 + images.length) % images.length); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition z-10"><i className="ri-arrow-left-s-line text-2xl"></i></button>
+                    <button onClick={e => { e.stopPropagation(); setSelectedImageIndex(i => (i + 1) % images.length); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition z-10"><i className="ri-arrow-right-s-line text-2xl"></i></button>
+                    <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">{selectedImageIndex + 1} / {images.length}</span>
+                  </>
+                )}
+                <div className="overflow-auto max-w-full max-h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
+                  <img src={mainImage.url || mainImage} alt={product.title} style={{ transform: `scale(${zoom})`, transition: 'transform 0.2s', maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', cursor: zoom > 1 ? 'zoom-out' : 'zoom-in' }} onClick={() => setZoom(z => z > 1 ? 1 : 2)} />
+                </div>
+              </div>
+            )}
+
             {/* Main image carousel */}
             <div className="relative w-full rounded-xl overflow-hidden bg-gray-100 border" style={{ height: 340 }}>
               {mainImage ? (
                 <img
                   src={mainImage.url || mainImage}
                   alt={product.title}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain cursor-zoom-in"
+                  onClick={() => { setLightbox(true); setZoom(1); }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
