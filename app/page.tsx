@@ -72,42 +72,45 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingTop: 40, paddingBottom: 44 }}>
-        {/* Decorations left */}
-        <div className="absolute left-4 top-0 bottom-0 hidden md:flex flex-col justify-around py-4 pointer-events-none">
-          <div className="w-14 h-14 bg-white/30 rounded-2xl flex items-center justify-center -rotate-12 shadow-sm">
-            <i className="ri-home-4-fill text-3xl text-gray-800 opacity-80"></i>
-          </div>
-          <div className="w-11 h-11 bg-white/30 rounded-xl flex items-center justify-center rotate-6 shadow-sm ml-6">
-            <i className="ri-leaf-fill text-2xl text-gray-800 opacity-80"></i>
-          </div>
-          <div className="w-12 h-12 bg-white/30 rounded-2xl flex items-center justify-center -rotate-6 shadow-sm ml-2">
-            <i className="ri-briefcase-fill text-2xl text-gray-800 opacity-80"></i>
-          </div>
+      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingTop: 44, paddingBottom: 32 }}>
+        {/* === Scattered decorations (absolute positioned) === */}
+        {/* Left side */}
+        <div className="absolute top-4 left-6 hidden md:flex w-16 h-16 bg-white/25 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(-14deg)' }}>
+          <i className="ri-home-4-fill text-4xl" style={{ color: 'rgba(0,0,0,0.55)' }}></i>
         </div>
-        {/* Decorations right */}
-        <div className="absolute right-4 top-0 bottom-0 hidden md:flex flex-col justify-around py-4 pointer-events-none items-end">
-          <div className="w-14 h-14 bg-white/30 rounded-2xl flex items-center justify-center rotate-12 shadow-sm">
-            <i className="ri-shopping-bag-3-fill text-3xl text-gray-800 opacity-80"></i>
-          </div>
-          <div className="w-11 h-11 bg-white/30 rounded-xl flex items-center justify-center -rotate-8 shadow-sm mr-6">
-            <i className="ri-bear-smile-fill text-2xl text-gray-800 opacity-80"></i>
-          </div>
-          <div className="w-12 h-12 bg-white/30 rounded-2xl flex items-center justify-center rotate-6 shadow-sm mr-2">
-            <i className="ri-megaphone-fill text-2xl text-gray-800 opacity-80"></i>
-          </div>
+        <div className="absolute bottom-10 left-10 hidden md:flex w-12 h-12 bg-white/20 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(8deg)' }}>
+          <i className="ri-leaf-fill text-2xl" style={{ color: 'rgba(0,0,0,0.5)' }}></i>
         </div>
+        <div className="absolute top-1/2 left-28 hidden lg:flex w-10 h-10 bg-white/20 rounded-xl items-center justify-center pointer-events-none" style={{ transform: 'translateY(-50%) rotate(-6deg)' }}>
+          <i className="ri-briefcase-fill text-xl" style={{ color: 'rgba(0,0,0,0.45)' }}></i>
+        </div>
+        <div className="absolute top-6 left-36 hidden xl:flex w-9 h-9 bg-white/15 rounded-xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(10deg)' }}>
+          <i className="ri-car-fill text-lg" style={{ color: 'rgba(0,0,0,0.4)' }}></i>
+        </div>
+        {/* Right side */}
+        <div className="absolute top-3 right-8 hidden md:flex w-16 h-16 bg-white/25 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(12deg)' }}>
+          <i className="ri-shopping-bag-3-fill text-4xl" style={{ color: 'rgba(0,0,0,0.55)' }}></i>
+        </div>
+        <div className="absolute bottom-8 right-12 hidden md:flex w-12 h-12 bg-white/20 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(-9deg)' }}>
+          <i className="ri-bear-smile-fill text-2xl" style={{ color: 'rgba(0,0,0,0.5)' }}></i>
+        </div>
+        <div className="absolute top-1/2 right-28 hidden lg:flex w-10 h-10 bg-white/20 rounded-xl items-center justify-center pointer-events-none" style={{ transform: 'translateY(-50%) rotate(7deg)' }}>
+          <i className="ri-tv-fill text-xl" style={{ color: 'rgba(0,0,0,0.45)' }}></i>
+        </div>
+        <div className="absolute bottom-6 right-36 hidden xl:flex w-9 h-9 bg-white/15 rounded-xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(-12deg)' }}>
+          <i className="ri-sofa-fill text-lg" style={{ color: 'rgba(0,0,0,0.4)' }}></i>
+        </div>
+
+        {/* Text */}
         <div className="text-center px-4 relative z-10">
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
             Giá tốt, gần nhà, chốt nhanh!
           </h1>
           <p className="text-gray-700 text-sm font-semibold mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
         </div>
-      </div>
 
-      {/* ===== SEARCH BAR (below banner) ===== */}
-      <div className="bg-white shadow-sm px-4 py-4">
-        <div className="max-w-2xl mx-auto">
+        {/* Search bar — inside banner, bottom */}
+        <div className="relative z-10 max-w-2xl mx-auto px-4 mt-5">
           <HomepageClient />
         </div>
       </div>

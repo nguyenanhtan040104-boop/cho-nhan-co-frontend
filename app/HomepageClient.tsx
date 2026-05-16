@@ -87,7 +87,7 @@ export default function HomepageClient() {
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           {history.map((h, i) => (
             <span key={i} onClick={() => doSearch(h)}
-              className="flex items-center gap-1 bg-white text-gray-600 text-xs font-medium pl-2.5 pr-1 py-1.5 rounded-full cursor-pointer hover:shadow-sm transition shadow-sm border border-gray-100">
+              className="flex items-center gap-1 bg-white/75 text-gray-700 text-xs font-medium pl-2.5 pr-1 py-1.5 rounded-full cursor-pointer hover:bg-white transition shadow-sm">
               <i className="ri-time-line text-gray-400 text-xs flex-shrink-0"></i>
               <span className="max-w-[100px] truncate">{h}</span>
               <button onClick={(e) => { e.stopPropagation(); deleteHistory(h); setHistory(getHistory()); }}
