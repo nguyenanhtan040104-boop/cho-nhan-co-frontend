@@ -41,9 +41,7 @@ export default function HomepageClient() {
   const [history, setHistory] = useState<string[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    setHistory(getHistory());
-  }, []);
+  useEffect(() => { setHistory(getHistory()); }, []);
 
   function doSearch(q: string) {
     if (!q.trim()) return;
@@ -65,9 +63,9 @@ export default function HomepageClient() {
 
   return (
     <>
-      {/* Search bar — nằm trong banner, đè xuống content */}
+      {/* Search bar — nằm trong banner vàng */}
       <form onSubmit={handleSubmit}>
-        <div className="flex items-center bg-white rounded-full shadow-xl overflow-hidden" style={{ height: 52 }}>
+        <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden" style={{ height: 52 }}>
           <i className="ri-search-line text-gray-400 pl-5 text-lg flex-shrink-0"></i>
           <input
             type="text"
@@ -89,25 +87,22 @@ export default function HomepageClient() {
         </div>
       </form>
 
-      {/* Chips lịch sử — render dưới search bar trên nền gray */}
+      {/* Chips lịch sử — xuất hiện ngay dưới search bar, vẫn trên nền vàng */}
       {history.length > 0 && (
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
+        <div className="flex items-center gap-2 mt-2.5 flex-wrap justify-center">
           {history.map((h, i) => (
-            <span key={i}
-              className="flex items-center gap-1 bg-white text-gray-600 text-xs font-medium pl-2.5 pr-1.5 py-1.5 rounded-full shadow-sm cursor-pointer hover:shadow transition border border-gray-100 group"
-              onClick={() => doSearch(h)}>
+            <span key={i} onClick={() => doSearch(h)}
+              className="flex items-center gap-1 bg-white/80 hover:bg-white text-gray-700 text-xs font-medium pl-2.5 pr-1 py-1.5 rounded-full cursor-pointer transition shadow-sm border border-white/50">
               <i className="ri-time-line text-gray-400 text-xs flex-shrink-0"></i>
-              <span className="max-w-[120px] truncate">{h}</span>
-              <button
-                onClick={(e) => handleRemove(e, h)}
-                className="ml-0.5 text-gray-400 hover:text-red-500 transition w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 flex-shrink-0">
+              <span className="max-w-[100px] truncate">{h}</span>
+              <button onClick={(e) => handleRemove(e, h)}
+                className="ml-0.5 text-gray-400 hover:text-red-500 w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-100 flex-shrink-0 text-sm leading-none">
                 ×
               </button>
             </span>
           ))}
-          <button
-            onClick={() => { localStorage.setItem(HISTORY_KEY, '[]'); setHistory([]); }}
-            className="text-xs text-gray-400 hover:text-red-500 transition ml-1">
+          <button onClick={() => { localStorage.setItem(HISTORY_KEY, '[]'); setHistory([]); }}
+            className="text-xs text-gray-600/70 hover:text-gray-900 transition">
             Xóa lịch sử
           </button>
         </div>

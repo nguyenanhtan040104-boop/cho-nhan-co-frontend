@@ -72,31 +72,36 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div className="relative" style={{ background: '#ffd400', paddingBottom: 36 }}>
-        <div className="max-w-screen-xl mx-auto px-4 pt-7 pb-0 text-center">
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
-            Giá tốt, gần nhà, chốt nhanh!
-          </h1>
-          <p className="text-gray-700 text-sm font-medium mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+      <div className="relative overflow-hidden" style={{ background: '#ffd400', minHeight: 220 }}>
+        {/* Decorative floating items — trái */}
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 pointer-events-none select-none hidden md:flex flex-col justify-center items-start pl-6 gap-4">
+          <span className="text-5xl drop-shadow-md" style={{ transform: 'rotate(-15deg)' }}>🛋️</span>
+          <span className="text-4xl drop-shadow-md ml-10" style={{ transform: 'rotate(10deg)' }}>🪴</span>
+          <span className="text-3xl drop-shadow-md ml-4" style={{ transform: 'rotate(-8deg)' }}>👜</span>
+        </div>
+        {/* Decorative floating items — phải */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/4 pointer-events-none select-none hidden md:flex flex-col justify-center items-end pr-6 gap-4">
+          <span className="text-5xl drop-shadow-md" style={{ transform: 'rotate(12deg)' }}>💻</span>
+          <span className="text-4xl drop-shadow-md mr-8" style={{ transform: 'rotate(-10deg)' }}>🚗</span>
+          <span className="text-3xl drop-shadow-md mr-2" style={{ transform: 'rotate(8deg)' }}>🪑</span>
         </div>
 
-        {/* Search bar đè lên content bên dưới */}
-        <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 px-4 z-10">
-          <div className="max-w-2xl mx-auto">
+        {/* Center content */}
+        <div className="relative max-w-2xl mx-auto px-4 flex flex-col items-center justify-center" style={{ minHeight: 220 }}>
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight text-center mb-1">
+            Giá tốt, gần nhà, chốt nhanh!
+          </h1>
+          <p className="text-gray-700 text-sm font-medium mb-5 text-center">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+          {/* Search bar nằm trong banner vàng */}
+          <div className="w-full">
             <HomepageClient />
           </div>
         </div>
       </div>
 
-      {/* Khoảng trống vừa đủ cho search bar đè xuống */}
-      <div className="h-8" />
-
       <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-4">
 
-        {/* Lịch sử tìm kiếm chips — client-side, render dưới search bar */}
-        {/* (đã nằm trong HomepageClient) */}
-
-        {/* ===== CATEGORIES ===== */}
+          {/* ===== CATEGORIES ===== */}
         <div className="bg-white mt-3 px-2 py-3">
           <div className="flex overflow-x-auto scrollbar-hide gap-0">
             {categories.map(cat => (
