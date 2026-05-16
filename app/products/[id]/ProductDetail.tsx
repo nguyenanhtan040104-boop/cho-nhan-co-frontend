@@ -21,6 +21,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [likeCount, setLikeCount] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const [buyingVip, setBuyingVip] = useState(false);
+  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
+  const [likedIds, setLikedIds] = useState<string[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,8 +43,20 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
     try {
       const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
       setLiked(ids.includes(productId));
+      setLikedIds(ids);
     } catch {}
   }, [productId]);
+
+  // Fetch similar products after product loads
+  useEffect(() => {
+    if (!product) return;
+    const cat = product.category || '';
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/products?limit=10&category=${cat}`;
+    fetch(url).then(r => r.json()).then(data => {
+      const list = (data.data || []).filter((p: any) => String(p.id) !== String(productId));
+      setSimilarProducts(list.slice(0, 8));
+    }).catch(() => {});
+  }, [product, productId]);
 
   // Prevent hydration mismatch - only render on client
   const [mounted, setMounted] = useState(false);
@@ -98,7 +112,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       const next = isNowLiked ? [...ids, productId] : ids.filter(x => x !== productId);
       localStorage.setItem('liked_items', JSON.stringify(next));
       setLiked(isNowLiked);
+      setLikedIds(next);
       setLikeCount(c => isNowLiked ? c + 1 : c - 1);
+    } catch {}
+  };
+
+  const toggleSimilarLike = (e: React.MouseEvent, id: string) => {
+    e.preventDefault(); e.stopPropagation();
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
+      const next = ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id];
+      localStorage.setItem('liked_items', JSON.stringify(next));
+      setLikedIds(next);
     } catch {}
   };
 
@@ -360,6 +385,53 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           </div>
         )}
       </div>
+
+      {/* ===== TIN ĐĂNG TƯƠNG TỰ ===== */}
+      {similarProducts.length > 0 && (
+        <div className="max-w-screen-xl mx-auto px-4 py-6">
+          <h2 className="text-base font-bold text-gray-900 mb-3">Tin đăng tương tự</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {similarProducts.map((p: any) => {
+              const isLiked = likedIds.includes(String(p.id));
+              const imgUrl = p.images?.[0]?.url || null;
+              const imgCount = p.images?.length || 0;
+              const diff = Date.now() - new Date(p.createdAt).getTime();
+              const d = Math.floor(diff / 86400000);
+              const h = Math.floor(diff / 3600000);
+              const timeStr = d > 0 ? `${d} ngày trước` : h > 0 ? `${h} giờ trước` : 'Vừa đăng';
+              return (
+                <a key={p.id} href={`/products/${p.id}`}
+                  className="flex-shrink-0 w-44 bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow block">
+                  <div className="relative" style={{ aspectRatio: '4/3' }}>
+                    {imgUrl ? (
+                      <img src={imgUrl} alt={p.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                        <i className="ri-image-line text-2xl text-gray-300"></i>
+                      </div>
+                    )}
+                    <button onClick={e => toggleSimilarLike(e, String(p.id))}
+                      className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
+                      <i className={`${isLiked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400'} text-sm`}></i>
+                    </button>
+                    <span className="absolute bottom-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">{timeStr}</span>
+                    {imgCount > 1 && (
+                      <span className="absolute bottom-1.5 right-1.5 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                        <i className="ri-image-2-line text-[10px]"></i> {imgCount}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-2">
+                    <p className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug mb-1">{p.title}</p>
+                    <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                    {p.location && <p className="text-[10px] text-gray-400 mt-0.5 truncate"><i className="ri-map-pin-line"></i> {p.location}</p>}
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Contact Modal */}
       {showContactModal && product.user && (
