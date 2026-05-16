@@ -65,7 +65,9 @@ export default function Header() {
 
   function navDashboard(tab: string) {
     if (pathname === '/dashboard') {
+      // Đang ở dashboard: dispatch event để switch tab ngay + replace URL
       window.dispatchEvent(new CustomEvent('dashboard-switch-tab', { detail: tab }));
+      router.replace(`/dashboard?tab=${tab}`);
     } else {
       router.push(`/dashboard?tab=${tab}`);
     }
