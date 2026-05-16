@@ -56,6 +56,10 @@ export default function CreateRealEstatePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    if (imageFiles.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh bất động sản');
+      return;
+    }
     setLoading(true);
     try {
       let imageUrls: string[] = [];

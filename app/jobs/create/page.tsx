@@ -53,6 +53,10 @@ export default function CreateJobPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    if (imageFiles.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh cho tin tuyển dụng');
+      return;
+    }
     setLoading(true);
     try {
       let imageUrls: string[] = [];

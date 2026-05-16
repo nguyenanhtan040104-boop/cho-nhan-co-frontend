@@ -118,6 +118,10 @@ export default function CreateProductPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    if (imageFiles.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh sản phẩm');
+      return;
+    }
     setLoading(true);
 
     try {
