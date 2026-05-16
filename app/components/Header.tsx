@@ -33,10 +33,30 @@ const postItems = [
   { href: '/forum/create', icon: 'ri-chat-3-line', label: 'Bài diễn đàn', sub: 'Chia sẻ kinh nghiệm' },
 ];
 
+// Danh sách tìm kiếm nhanh theo từ khóa → route
+const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
+  { keywords: ['bất động sản', 'bds', 'nhà', 'đất', 'phòng trọ', 'căn hộ'], route: '/real-estate' },
+  { keywords: ['việc làm', 'tuyển dụng', 'tuyển', 'xin việc', 'nhân công'], route: '/jobs' },
+  { keywords: ['diễn đàn', 'forum', 'hỏi đáp'], route: '/forum' },
+  { keywords: ['cảnh báo', 'lừa đảo', 'mất đồ'], route: '/canh-bao' },
+  { keywords: ['quảng cáo', 'khai trương', 'khuyến mãi'], route: '/advertisements' },
+  { keywords: ['nông sản', 'rau', 'củ', 'thực phẩm'], route: '/products?category=NONG_SAN' },
+  { keywords: ['vật nuôi', 'chó', 'mèo', 'gà', 'heo', 'bò'], route: '/products?category=VAT_NUOI' },
+];
+
+function smartSearch(q: string): string {
+  const lower = q.toLowerCase().trim();
+  for (const { keywords, route } of SEARCH_ROUTES) {
+    if (keywords.some(k => lower.includes(k))) return route + (route.includes('?') ? '&' : '?') + `search=${encodeURIComponent(q)}`;
+  }
+  return `/products?search=${encodeURIComponent(q)}`;
+}
+
 export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [showSellerMenu, setShowSellerMenu] = useState(false);
+  const [query, setQuery] = useState('');
   const pathname = usePathname();
   const router = useRouter();
 
@@ -60,6 +80,13 @@ export default function Header() {
     setShowSellerMenu(false);
   }, [pathname]);
 
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    router.push(smartSearch(q));
+  }
+
   function handlePostClick() {
     if (!auth.isLoggedIn()) { router.push('/profile'); return; }
     setShowPostMenu(v => !v);
@@ -67,12 +94,12 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm" suppressHydrationWarning>
-      <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-3 h-14" suppressHydrationWarning>
+      <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-2 h-14" suppressHydrationWarning>
 
-        {/* Hamburger — opens danh mục */}
-        <div className="relative" ref={hamburgerRef}>
+        {/* Hamburger → Danh mục */}
+        <div className="relative flex-shrink-0" ref={hamburgerRef}>
           <button onClick={() => setShowHamburger(v => !v)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 flex-shrink-0">
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600">
             <i className="ri-menu-line text-xl"></i>
           </button>
           {showHamburger && (
@@ -99,17 +126,17 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* Dành cho người bán dropdown */}
-        <div className="relative hidden md:block" ref={sellerMenuRef}>
+        {/* Dành cho người bán */}
+        <div className="relative hidden md:block flex-shrink-0" ref={sellerMenuRef}>
           <button onClick={() => setShowSellerMenu(v => !v)}
-            className="flex items-center gap-1 text-sm text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap">
+            className="flex items-center gap-1 text-sm text-gray-600 font-medium hover:text-gray-900 whitespace-nowrap">
             Dành cho người bán <i className="ri-arrow-down-s-line"></i>
           </button>
           {showSellerMenu && (
             <div className="absolute left-0 top-9 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
               <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <i className="ri-file-list-3-line text-gray-600"></i>
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <i className="ri-file-list-3-line text-gray-600 text-sm"></i>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Quản lý tin</p>
@@ -117,8 +144,8 @@ export default function Header() {
                 </div>
               </Link>
               <Link href="/pricing" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <i className="ri-vip-crown-line text-yellow-600"></i>
+                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <i className="ri-vip-crown-line text-yellow-600 text-sm"></i>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Gói VIP</p>
@@ -126,8 +153,8 @@ export default function Header() {
                 </div>
               </Link>
               <Link href="/advertisements/create" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <i className="ri-megaphone-line text-orange-600"></i>
+                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <i className="ri-megaphone-line text-orange-600 text-sm"></i>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Đăng quảng cáo</p>
@@ -138,56 +165,62 @@ export default function Header() {
           )}
         </div>
 
-        {/* Center nav */}
-        <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center" suppressHydrationWarning>
-          {navLinks.map(link => {
-            const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
-            return (
-              <Link key={link.href} href={link.href}
-                className={`text-sm font-medium transition-colors whitespace-nowrap ${isActive ? 'text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900'}`}>
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Search bar — chiếm phần giữa */}
+        <form onSubmit={handleSearch} className="flex-1 hidden sm:flex items-center">
+          <div className="w-full flex items-center border border-gray-200 rounded-full bg-gray-50 hover:border-gray-300 focus-within:border-yellow-400 focus-within:bg-white transition-all overflow-hidden" style={{ height: 38 }}>
+            <i className="ri-search-line text-gray-400 pl-4 text-base flex-shrink-0"></i>
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Tìm sản phẩm, việc làm, bất động sản..."
+              className="flex-1 px-3 text-sm focus:outline-none bg-transparent text-gray-800 placeholder-gray-400 h-full"
+            />
+            <button type="submit"
+              className="w-9 h-9 flex items-center justify-center rounded-full m-0.5 flex-shrink-0 transition hover:opacity-90"
+              style={{ backgroundColor: '#ffd400' }}>
+              <i className="ri-search-line text-gray-900 text-sm font-bold"></i>
+            </button>
+          </div>
+        </form>
 
         {/* Right actions */}
-        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0" suppressHydrationWarning>
+        <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
 
-          {/* Yêu thích */}
+          {/* Yêu thích → dashboard tab saved */}
           <Link href="/dashboard?tab=saved" title="Bài đã thích"
             className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-heart-line text-lg"></i>
           </Link>
 
-          {/* Thông báo */}
+          {/* Thông báo → dashboard tab notifications */}
           <Link href="/dashboard?tab=notifications" title="Thông báo"
-            className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition relative">
+            className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-notification-3-line text-lg"></i>
           </Link>
 
-          {/* Liên hệ / Nhắn tin */}
-          <Link href="/messages" title="Nhắn tin"
-            className="hidden md:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
-            <i className="ri-chat-1-line"></i>
+          {/* Liên hệ → trang nhắn tin */}
+          <Link href="/dashboard?tab=messages" title="Nhắn tin"
+            className="hidden lg:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
+            <i className="ri-chat-1-line text-sm"></i>
             <span>Liên hệ</span>
           </Link>
 
-          {/* Quản lý tin */}
+          {/* Quản lý tin → dashboard */}
           <Link href="/dashboard"
-            className="hidden md:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
+            className="hidden md:flex items-center border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
             Quản lý tin
           </Link>
 
           {/* Đăng tin */}
           <div className="relative" ref={postMenuRef}>
             <button onClick={handlePostClick}
-              className="flex items-center gap-1.5 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-800 transition">
+              className="flex items-center gap-1 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-800 transition">
               Đăng tin
             </button>
             {showPostMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider px-4 py-2 border-b border-gray-50">Chọn loại đăng tin</p>
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider px-4 py-2 border-b border-gray-100">Chọn loại đăng tin</p>
                 {postItems.map(item => (
                   <Link key={item.href} href={item.href}
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
