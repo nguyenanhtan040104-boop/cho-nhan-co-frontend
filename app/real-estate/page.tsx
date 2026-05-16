@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { realEstate, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
@@ -31,6 +31,7 @@ export default function RealEstatePage() {
 
 function RealEstateContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [items, setItems] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -162,7 +163,7 @@ function RealEstateContent() {
             entityLabel="bất động sản"
             createHref="/real-estate/create"
             createLabel="+ Đăng tin đầu tiên"
-            onClearSearch={search || type ? () => { setSearch(''); setType(''); } : undefined}
+            onClearSearch={search || type ? () => { setSearch(''); setType(''); router.replace('/real-estate'); } : undefined}
           />
         ) : (
           <>

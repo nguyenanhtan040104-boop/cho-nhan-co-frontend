@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { forum, auth } from '../../lib/api';
 import EmptyState from '../components/EmptyState';
 
@@ -31,6 +32,7 @@ const TIPS = [
 ];
 
 export default function CanhBaoPage() {
+  const router = useRouter();
   const [posts, setPosts] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -126,7 +128,7 @@ export default function CanhBaoPage() {
                 entityLabel="cảnh báo"
                 createHref="/canh-bao/create"
                 createLabel="+ Đăng cảnh báo đầu tiên"
-                onClearSearch={search ? () => setSearch('') : undefined}
+                onClearSearch={search ? () => { setSearch(''); router.replace('/canh-bao'); } : undefined}
               />
             ) : (
               <>

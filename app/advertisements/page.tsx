@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { advertisements, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
@@ -32,6 +33,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function AdvertisementsPage() {
+  const router = useRouter();
   const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
   const [items, setItems] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -110,7 +112,7 @@ export default function AdvertisementsPage() {
             entityLabel="quảng cáo"
             createHref="/advertisements/create"
             createLabel="+ Đăng quảng cáo đầu tiên"
-            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); } : undefined}
+            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); router.replace('/advertisements'); } : undefined}
           />
         ) : (
           <>

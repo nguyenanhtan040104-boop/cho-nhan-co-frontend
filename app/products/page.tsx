@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
@@ -28,6 +28,7 @@ export default function ProductsPage() {
 
 function ProductsInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -66,7 +67,16 @@ function ProductsInner() {
     finally { setLoading(false); }
   }
 
-  function handleSearch(e: React.FormEvent) { e.preventDefault(); setPage(1); loadProducts(search); }
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    setPage(1);
+    // Cập nhật URL để back button hoạt động đúng
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (category) params.set('category', category);
+    router.replace('/products' + (params.toString() ? '?' + params.toString() : ''));
+    loadProducts(search);
+  }
   function toggleSelect(id: string) { setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); }
 
   async function handleBulkDelete() {
@@ -213,7 +223,7 @@ function ProductsInner() {
             entityLabel="sản phẩm"
             createHref="/products/create"
             createLabel="+ Đăng sản phẩm ngay"
-            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); } : undefined}
+            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); router.replace('/products'); } : undefined}
           />
         ) : (
           <>

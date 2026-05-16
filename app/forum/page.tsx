@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { forum, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
@@ -50,6 +50,7 @@ export default function ForumPage() {
 
 function ForumContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [posts, setPosts] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -177,7 +178,7 @@ function ForumContent() {
             entityLabel="bài viết"
             createHref="/forum/create"
             createLabel="+ Viết bài đầu tiên"
-            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); } : undefined}
+            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); router.replace('/forum'); } : undefined}
           />
         ) : (
           <>
