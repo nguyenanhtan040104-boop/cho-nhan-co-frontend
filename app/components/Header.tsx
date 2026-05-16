@@ -52,10 +52,13 @@ function smartSearch(q: string): string {
   return `/products?search=${encodeURIComponent(q)}`;
 }
 
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
+
 export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [showSellerMenu, setShowSellerMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -87,7 +90,25 @@ export default function Header() {
     setShowPostMenu(false);
     setShowHamburger(false);
     setShowSellerMenu(false);
+    // Reset badge khi vào trang thông báo
+    if (pathname === '/dashboard') setUnreadCount(0);
   }, [pathname]);
+
+  useEffect(() => {
+    function fetchUnread() {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) return;
+      fetch(`${API}/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data?.count !== undefined) setUnreadCount(data.count); })
+        .catch(() => {});
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   function handlePostClick() {
     if (!auth.isLoggedIn()) { router.push('/profile'); return; }
@@ -199,9 +220,14 @@ export default function Header() {
           </button>
 
           {/* Thông báo → dashboard tab notifications */}
-          <button onClick={() => navDashboard('notifications')} title="Thông báo"
-            className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+          <button onClick={() => { navDashboard('notifications'); setUnreadCount(0); }} title="Thông báo"
+            className="relative hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-notification-3-line text-lg"></i>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </button>
 
           {/* Liên hệ → trang nhắn tin */}
