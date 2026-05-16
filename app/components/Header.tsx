@@ -356,7 +356,12 @@ export default function Header() {
                         return (
                           <div key={n.id}
                             className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-amber-50/60' : ''}`}
-                            onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}>
+                            onClick={() => {
+                          setShowNotifDropdown(false);
+                          const url = (n.data as any)?.url;
+                          if (url) router.push(url);
+                          else navDashboard('notifications');
+                        }}>
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${iconBg}`}>
                               <i className={`${iconClass} text-base`}></i>
                             </div>

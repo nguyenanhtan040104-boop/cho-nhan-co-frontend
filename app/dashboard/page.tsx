@@ -522,21 +522,27 @@ function DashboardContent() {
                   <div className="space-y-2">
                     {notifs.map(notif => {
                       const convId = notif.data?.conversationId;
-                      const isMessage = notif.type === 'MESSAGE' && convId;
-                      const icon = notif.type === 'MESSAGE' ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-green-500';
+                      const notifUrl = notif.data?.url || (convId ? `/messages/${convId}` : null);
+                      const isClickable = !!notifUrl;
+                      const isLike = notif.type?.includes('LIKE');
+                      const isComment = notif.type?.includes('COMMENT');
+                      const isMessage = notif.type === 'MESSAGE';
+                      const icon = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : isMessage ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-green-500';
                       const content = (
                         <div className={`bg-white rounded-xl p-4 shadow-sm border-l-4 transition-colors ${
-                          notif.isRead ? 'border-gray-200' : 'border-green-500'
-                        } ${isMessage ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
+                          notif.isRead ? 'border-gray-200' : 'border-yellow-400'
+                        } ${isClickable ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
                           onClick={async () => {
                             if (!notif.isRead) {
                               await notifications.markRead(notif.id).catch(() => {});
                               setNotifs(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
                             }
-                            if (isMessage) router.push(`/messages/${convId}`);
+                            if (notifUrl) router.push(notifUrl);
                           }}>
                           <div className="flex items-start gap-3">
-                            <i className={`${icon} text-xl flex-shrink-0 mt-0.5`}></i>
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${isLike ? 'bg-red-50' : isComment ? 'bg-blue-50' : 'bg-gray-100'}`}>
+                              <i className={`${icon} text-base`}></i>
+                            </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
                                 <p className={`font-medium text-sm ${notif.isRead ? 'text-gray-600' : 'text-gray-900'}`}>{notif.title}</p>
