@@ -72,28 +72,35 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div className="relative overflow-hidden" style={{ background: '#ffd400', minHeight: 220 }}>
-        {/* Decorative floating items — trái */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 pointer-events-none select-none hidden md:flex flex-col justify-center items-start pl-6 gap-4">
-          <span className="text-5xl drop-shadow-md" style={{ transform: 'rotate(-15deg)' }}>🛋️</span>
-          <span className="text-4xl drop-shadow-md ml-10" style={{ transform: 'rotate(10deg)' }}>🪴</span>
-          <span className="text-3xl drop-shadow-md ml-4" style={{ transform: 'rotate(-8deg)' }}>👜</span>
-        </div>
-        {/* Decorative floating items — phải */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 pointer-events-none select-none hidden md:flex flex-col justify-center items-end pr-6 gap-4">
-          <span className="text-5xl drop-shadow-md" style={{ transform: 'rotate(12deg)' }}>💻</span>
-          <span className="text-4xl drop-shadow-md mr-8" style={{ transform: 'rotate(-10deg)' }}>🚗</span>
-          <span className="text-3xl drop-shadow-md mr-2" style={{ transform: 'rotate(8deg)' }}>🪑</span>
+      <div className="relative overflow-hidden" style={{ background: '#ffd400', height: 168, marginBottom: 36 }}>
+
+        {/* Decorative — trái */}
+        <div className="absolute left-0 top-0 h-full hidden md:block pointer-events-none select-none" style={{ width: '22%' }}>
+          <span className="absolute text-6xl drop-shadow-lg" style={{ top: 8, left: 32, transform: 'rotate(-12deg)' }}>🛋️</span>
+          <span className="absolute text-5xl drop-shadow-lg" style={{ top: 70, left: 80, transform: 'rotate(8deg)' }}>🪴</span>
+          <span className="absolute text-4xl drop-shadow-lg" style={{ top: 110, left: 20, transform: 'rotate(-5deg)' }}>👜</span>
+          <span className="absolute text-3xl drop-shadow" style={{ top: 20, left: 130, transform: 'rotate(15deg)' }}>🪙</span>
         </div>
 
-        {/* Center content */}
-        <div className="relative max-w-2xl mx-auto px-4 flex flex-col items-center justify-center" style={{ minHeight: 220 }}>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight text-center mb-1">
+        {/* Decorative — phải */}
+        <div className="absolute right-0 top-0 h-full hidden md:block pointer-events-none select-none" style={{ width: '22%' }}>
+          <span className="absolute text-6xl drop-shadow-lg" style={{ top: 10, right: 40, transform: 'rotate(10deg)' }}>💻</span>
+          <span className="absolute text-5xl drop-shadow-lg" style={{ top: 75, right: 90, transform: 'rotate(-8deg)' }}>🚗</span>
+          <span className="absolute text-4xl drop-shadow-lg" style={{ top: 108, right: 30, transform: 'rotate(6deg)' }}>🪑</span>
+          <span className="absolute text-3xl drop-shadow" style={{ top: 18, right: 140, transform: 'rotate(-14deg)' }}>❄️</span>
+        </div>
+
+        {/* Center text */}
+        <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
             Giá tốt, gần nhà, chốt nhanh!
           </h1>
-          <p className="text-gray-700 text-sm font-medium mb-5 text-center">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
-          {/* Search bar nằm trong banner vàng */}
-          <div className="w-full">
+          <p className="text-gray-700 text-sm font-semibold mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+        </div>
+
+        {/* Search bar — đè lên ranh giới vàng/xám */}
+        <div className="absolute left-0 right-0 px-4" style={{ bottom: -26 }}>
+          <div className="max-w-2xl mx-auto">
             <HomepageClient />
           </div>
         </div>
