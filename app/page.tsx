@@ -149,7 +149,7 @@ export default async function HomePage() {
               </h2>
               <Link href="/products" className="text-xs text-red-600 font-medium">Xem thêm →</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
               {vipListings.slice(0, 6).map((item: any) => (
                 <ListingCard key={`vip-${item.id}`} item={item} />
               ))}
@@ -164,7 +164,7 @@ export default async function HomePage() {
             <Link href="/products" className="text-xs text-red-600 font-medium">Xem tất cả →</Link>
           </div>
           {products.length === 0 ? <EmptyBlock label="Chưa có sản phẩm nào" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
               {products.slice(0, 12).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />
               ))}
@@ -181,7 +181,7 @@ export default async function HomePage() {
             <Link href="/real-estate" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
               {realEstate.slice(0, 6).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />
               ))}
@@ -198,7 +198,7 @@ export default async function HomePage() {
             <Link href="/jobs" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
               {jobs.slice(0, 6).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'job' }} />
               ))}
@@ -215,7 +215,7 @@ export default async function HomePage() {
             <Link href="/forum" className="text-xs text-red-600">Xem tất cả →</Link>
           </div>
           {forum.length === 0 ? <EmptyBlock label="Chưa có bài viết nào" /> : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[1px] bg-gray-100">
               {forum.slice(0, 6).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'forum' }} />
               ))}
@@ -301,11 +301,11 @@ function ListingCard({ item }: { item: any }) {
           <span className="absolute bottom-1.5 left-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
         )}
       </div>
-      <div className="px-2 pt-1.5 pb-2">
-        <p className="text-xs font-medium leading-snug line-clamp-2 text-gray-800 mb-1">{item.title}</p>
-        <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{price}</p>
+      <div className="px-2.5 pt-2 pb-3">
+        <p className="text-sm font-medium leading-snug line-clamp-2 text-gray-800 mb-1.5">{item.title}</p>
+        <p className="text-base font-bold" style={{ color: '#d0011b' }}>{price}</p>
         {(item.location || item.address) && (
-          <p className="text-[10px] text-gray-400 mt-0.5 truncate">
+          <p className="text-xs text-gray-400 mt-1 truncate flex items-center gap-0.5">
             <i className="ri-map-pin-line"></i> {item.location || item.address}
           </p>
         )}
