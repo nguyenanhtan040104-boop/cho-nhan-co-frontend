@@ -180,7 +180,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   };
 
   const images = product.images || [];
-  const mainImage = images.length > 0 ? images[0] : null;
+  const mainImage = images.length > 0 ? images[selectedImageIndex] : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
