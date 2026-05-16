@@ -28,16 +28,16 @@ async function getHomeData() {
 }
 
 const categories = [
-  { title: 'Nông sản', href: '/products?category=NONG_SAN', img: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=120&h=120&fit=crop&q=80' },
-  { title: 'Bất động sản', href: '/real-estate', img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=120&h=120&fit=crop&q=80' },
-  { title: 'Tuyển dụng', href: '/jobs', img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=120&h=120&fit=crop&q=80' },
-  { title: 'Vật nuôi', href: '/products?category=VAT_NUOI', img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=120&h=120&fit=crop&q=80' },
-  { title: 'Dịch vụ', href: '/products?category=DICH_VU', img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=120&h=120&fit=crop&q=80' },
-  { title: 'Diễn đàn', href: '/forum', img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&h=120&fit=crop&q=80' },
-  { title: 'Cảnh báo', href: '/canh-bao', img: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=120&h=120&fit=crop&q=80' },
-  { title: 'Quảng cáo', href: '/advertisements', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&h=120&fit=crop&q=80' },
-  { title: 'Bảng giá', href: '/market-prices', img: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=120&h=120&fit=crop&q=80' },
-  { title: 'Sản phẩm', href: '/products', img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop&q=80' },
+  { title: 'Nông sản', href: '/products?category=NONG_SAN', icon: 'ri-leaf-line', bg: '#e8f5e9', color: '#2e7d32' },
+  { title: 'Bất động sản', href: '/real-estate', icon: 'ri-home-4-line', bg: '#e3f2fd', color: '#1565c0' },
+  { title: 'Tuyển dụng', href: '/jobs', icon: 'ri-briefcase-line', bg: '#f3e5f5', color: '#6a1b9a' },
+  { title: 'Vật nuôi', href: '/products?category=VAT_NUOI', icon: 'ri-bear-smile-line', bg: '#fff3e0', color: '#e65100' },
+  { title: 'Dịch vụ', href: '/products?category=DICH_VU', icon: 'ri-customer-service-2-line', bg: '#e0f7fa', color: '#00695c' },
+  { title: 'Diễn đàn', href: '/forum', icon: 'ri-chat-3-line', bg: '#fffde7', color: '#f57f17' },
+  { title: 'Cảnh báo', href: '/canh-bao', icon: 'ri-alarm-warning-line', bg: '#fce4ec', color: '#c62828' },
+  { title: 'Quảng cáo', href: '/advertisements', icon: 'ri-megaphone-line', bg: '#fce4ec', color: '#ad1457' },
+  { title: 'Bảng giá', href: '/market-prices', icon: 'ri-bar-chart-line', bg: '#e8eaf6', color: '#283593' },
+  { title: 'Sản phẩm', href: '/products', icon: 'ri-shopping-bag-3-line', bg: '#e0f2f1', color: '#004d40' },
 ];
 
 function timeAgo(dateStr: string) {
@@ -72,21 +72,45 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div className="relative" style={{ background: '#ffd400', paddingTop: 36, paddingBottom: 40 }}>
-        <div className="text-center px-4">
+      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingTop: 40, paddingBottom: 44 }}>
+        {/* Decorations left */}
+        <div className="absolute left-4 top-0 bottom-0 hidden md:flex flex-col justify-around py-4 pointer-events-none">
+          <div className="w-14 h-14 bg-white/30 rounded-2xl flex items-center justify-center -rotate-12 shadow-sm">
+            <i className="ri-home-4-fill text-3xl text-gray-800 opacity-80"></i>
+          </div>
+          <div className="w-11 h-11 bg-white/30 rounded-xl flex items-center justify-center rotate-6 shadow-sm ml-6">
+            <i className="ri-leaf-fill text-2xl text-gray-800 opacity-80"></i>
+          </div>
+          <div className="w-12 h-12 bg-white/30 rounded-2xl flex items-center justify-center -rotate-6 shadow-sm ml-2">
+            <i className="ri-briefcase-fill text-2xl text-gray-800 opacity-80"></i>
+          </div>
+        </div>
+        {/* Decorations right */}
+        <div className="absolute right-4 top-0 bottom-0 hidden md:flex flex-col justify-around py-4 pointer-events-none items-end">
+          <div className="w-14 h-14 bg-white/30 rounded-2xl flex items-center justify-center rotate-12 shadow-sm">
+            <i className="ri-shopping-bag-3-fill text-3xl text-gray-800 opacity-80"></i>
+          </div>
+          <div className="w-11 h-11 bg-white/30 rounded-xl flex items-center justify-center -rotate-8 shadow-sm mr-6">
+            <i className="ri-bear-smile-fill text-2xl text-gray-800 opacity-80"></i>
+          </div>
+          <div className="w-12 h-12 bg-white/30 rounded-2xl flex items-center justify-center rotate-6 shadow-sm mr-2">
+            <i className="ri-megaphone-fill text-2xl text-gray-800 opacity-80"></i>
+          </div>
+        </div>
+        <div className="text-center px-4 relative z-10">
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
             Giá tốt, gần nhà, chốt nhanh!
           </h1>
           <p className="text-gray-700 text-sm font-semibold mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
         </div>
-        {/* Search bar floating — nửa vàng nửa xám */}
-        <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 px-4 z-10">
-          <div className="max-w-2xl mx-auto">
-            <HomepageClient />
-          </div>
+      </div>
+
+      {/* ===== SEARCH BAR (below banner) ===== */}
+      <div className="bg-white shadow-sm px-4 py-4">
+        <div className="max-w-2xl mx-auto">
+          <HomepageClient />
         </div>
       </div>
-      <div style={{ height: 42 }} />
 
       <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-4">
 
@@ -95,18 +119,14 @@ export default async function HomePage() {
           <div className="flex overflow-x-auto scrollbar-hide gap-0">
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-1.5 px-3 py-1 hover:opacity-80 transition-opacity flex-shrink-0 min-w-[76px]">
-                <div className="w-14 h-14 overflow-hidden rounded-xl flex-shrink-0 shadow-sm">
-                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />
+                className="flex flex-col items-center gap-1.5 px-3 py-2 hover:opacity-80 transition-opacity flex-shrink-0 min-w-[72px]">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: cat.bg }}>
+                  <i className={`${cat.icon} text-2xl`} style={{ color: cat.color }}></i>
                 </div>
                 <span className="text-[11px] text-gray-600 font-medium text-center leading-tight">{cat.title}</span>
               </Link>
             ))}
-            <div className="flex flex-col items-center gap-1.5 px-3 py-1 flex-shrink-0 min-w-[52px] justify-center">
-              <div className="w-14 h-14 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center">
-                <i className="ri-arrow-right-s-line text-gray-400 text-xl"></i>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -278,6 +298,11 @@ function ListingCard({ item }: { item: any }) {
             <i className="ri-image-line text-3xl text-gray-300"></i>
           </div>
         )}
+        {/* Heart button */}
+        <button onClick={e => e.preventDefault()}
+          className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
+          <i className="ri-heart-line text-gray-500 text-sm"></i>
+        </button>
         {item.createdAt && (
           <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
             {timeAgo(item.createdAt)}
@@ -289,7 +314,7 @@ function ListingCard({ item }: { item: any }) {
           </span>
         )}
         {item.isVip && (
-          <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
+          <span className="absolute bottom-1.5 left-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
         )}
       </div>
       <div className="px-2 pt-1.5 pb-2">
