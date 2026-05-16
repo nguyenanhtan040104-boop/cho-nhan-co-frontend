@@ -299,10 +299,9 @@ function ListingCard({ item }: { item: any }) {
           </div>
         )}
         {/* Heart button */}
-        <button onClick={e => e.preventDefault()}
-          className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
+        <span className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm">
           <i className="ri-heart-line text-gray-500 text-sm"></i>
-        </button>
+        </span>
         {item.createdAt && (
           <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
             {timeAgo(item.createdAt)}
