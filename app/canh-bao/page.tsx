@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { forum, auth } from '../../lib/api';
+import EmptyState from '../components/EmptyState';
 
 const reportTypes = [
   { value: '', label: 'Tất cả' },
@@ -120,15 +121,13 @@ export default function CanhBaoPage() {
                 ))}
               </div>
             ) : posts.length === 0 ? (
-              <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
-                <i className="ri-shield-check-line text-5xl text-gray-200 block mb-3"></i>
-                <p className="text-gray-500 font-medium mb-1">Chưa có thông báo nào</p>
-                <p className="text-gray-400 text-sm mb-4">Cộng đồng đang an toàn. Nếu bạn có thông tin cần cảnh báo, hãy chia sẻ để mọi người cùng biết.</p>
-                <Link href="/canh-bao/create"
-                  className="inline-block bg-red-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-700">
-                  + Đăng cảnh báo đầu tiên
-                </Link>
-              </div>
+              <EmptyState
+                keyword={search || undefined}
+                entityLabel="cảnh báo"
+                createHref="/canh-bao/create"
+                createLabel="+ Đăng cảnh báo đầu tiên"
+                onClearSearch={search ? () => setSearch('') : undefined}
+              />
             ) : (
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

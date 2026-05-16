@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
+import EmptyState from '../components/EmptyState';
 
 const categories = [
   { value: '', name: 'Tất cả', icon: '' },
@@ -207,16 +208,13 @@ function ProductsInner() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center shadow-sm border border-gray-100">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-              <i className="ri-inbox-line text-3xl text-gray-300"></i>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Chưa có sản phẩm nào</h3>
-            <p className="text-gray-500 text-sm mb-6">Hãy là người đầu tiên đăng sản phẩm lên chợ!</p>
-            <Link href="/products/create" className="inline-block bg-green-700 text-white px-6 py-2.5 rounded-xl hover:bg-green-800 font-medium text-sm">
-              + Đăng sản phẩm ngay
-            </Link>
-          </div>
+          <EmptyState
+            keyword={search || category ? (search || category) : undefined}
+            entityLabel="sản phẩm"
+            createHref="/products/create"
+            createLabel="+ Đăng sản phẩm ngay"
+            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); } : undefined}
+          />
         ) : (
           <>
             {/* VIP section */}

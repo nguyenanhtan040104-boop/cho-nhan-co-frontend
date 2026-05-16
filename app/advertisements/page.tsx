@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { advertisements, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
+import EmptyState from '../components/EmptyState';
 
 const CATEGORIES = [
   { value: '', label: 'Tất cả' },
@@ -104,11 +105,13 @@ export default function AdvertisementsPage() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
-            <i className="ri-megaphone-line text-5xl text-gray-200 block mb-3"></i>
-            <p className="text-gray-500 mb-4">Chưa có quảng cáo nào</p>
-            <Link href="/advertisements/create" className="inline-block bg-orange-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-orange-700">+ Đăng quảng cáo đầu tiên</Link>
-          </div>
+          <EmptyState
+            keyword={search || category ? (search || category) : undefined}
+            entityLabel="quảng cáo"
+            createHref="/advertisements/create"
+            createLabel="+ Đăng quảng cáo đầu tiên"
+            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); } : undefined}
+          />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

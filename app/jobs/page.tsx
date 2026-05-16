@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { jobs, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
+import EmptyState from '../components/EmptyState';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -149,11 +150,13 @@ function JobsContent() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
-            <i className="ri-briefcase-line text-5xl text-gray-200 block mb-3"></i>
-            <p className="text-gray-500 mb-4">Chưa có tin tuyển dụng nào</p>
-            <Link href="/jobs/create" className="inline-block bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-700">+ Đăng tin đầu tiên</Link>
-          </div>
+          <EmptyState
+            keyword={search || type ? (search || type) : undefined}
+            entityLabel="việc làm"
+            createHref="/jobs/create"
+            createLabel="+ Đăng tin đầu tiên"
+            onClearSearch={search || type ? () => { setSearch(''); setType(''); } : undefined}
+          />
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

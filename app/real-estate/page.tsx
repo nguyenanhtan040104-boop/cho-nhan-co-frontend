@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { realEstate, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
+import EmptyState from '../components/EmptyState';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -156,11 +157,13 @@ function RealEstateContent() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
-            <i className="ri-home-4-line text-5xl text-gray-200 block mb-3"></i>
-            <p className="text-gray-500 mb-4">Chưa có tin bất động sản nào</p>
-            <Link href="/real-estate/create" className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700">+ Đăng tin đầu tiên</Link>
-          </div>
+          <EmptyState
+            keyword={search || type ? (search || type) : undefined}
+            entityLabel="bất động sản"
+            createHref="/real-estate/create"
+            createLabel="+ Đăng tin đầu tiên"
+            onClearSearch={search || type ? () => { setSearch(''); setType(''); } : undefined}
+          />
         ) : (
           <>
             {vipItems.length > 0 && (

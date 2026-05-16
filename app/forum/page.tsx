@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { forum, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
+import EmptyState from '../components/EmptyState';
 
 const categoryOptions = [
   { value: '', label: 'Tất cả' },
@@ -171,11 +172,13 @@ function ForumContent() {
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center border border-gray-100">
-            <i className="ri-chat-3-line text-5xl text-gray-200 block mb-3"></i>
-            <p className="text-gray-500 mb-4">Chưa có bài viết nào</p>
-            <Link href="/forum/create" className="inline-block bg-green-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700">+ Viết bài đầu tiên</Link>
-          </div>
+          <EmptyState
+            keyword={search || category ? (search || category) : undefined}
+            entityLabel="bài viết"
+            createHref="/forum/create"
+            createLabel="+ Viết bài đầu tiên"
+            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); } : undefined}
+          />
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
