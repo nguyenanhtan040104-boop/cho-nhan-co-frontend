@@ -12,17 +12,82 @@ const navLinks = [
   { href: '/jobs', label: 'Việc làm' },
 ];
 
-const allCategories = [
-  { href: '/products', label: 'Sản phẩm', icon: 'ri-leaf-line' },
-  { href: '/real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
-  { href: '/jobs', label: 'Tuyển dụng / Việc làm', icon: 'ri-briefcase-line' },
-  { href: '/products?category=NONG_SAN', label: 'Nông sản, thực phẩm', icon: 'ri-plant-line' },
-  { href: '/products?category=VAT_NUOI', label: 'Vật nuôi', icon: 'ri-bear-smile-line' },
-  { href: '/products?category=DICH_VU', label: 'Dịch vụ', icon: 'ri-service-line' },
-  { href: '/forum', label: 'Diễn đàn cộng đồng', icon: 'ri-chat-3-line' },
-  { href: '/canh-bao', label: 'Cảnh báo, lừa đảo', icon: 'ri-alert-line' },
-  { href: '/advertisements', label: 'Quảng cáo, khuyến mãi', icon: 'ri-megaphone-line' },
-  { href: '/market-prices', label: 'Bảng giá thị trường', icon: 'ri-line-chart-line' },
+const mainCategories = [
+  {
+    label: 'Bất động sản', icon: 'ri-home-4-line',
+    sub: [
+      { href: '/real-estate?type=ban', label: 'Mua bán' },
+      { href: '/real-estate?type=thue', label: 'Cho thuê' },
+      { href: '/real-estate?type=du-an', label: 'Dự án' },
+    ],
+  },
+  {
+    label: 'Nông sản & Thực phẩm', icon: 'ri-plant-line',
+    sub: [
+      { href: '/products?category=NONG_SAN', label: 'Nông sản' },
+      { href: '/products?category=NONG_SAN&sub=rau-cu', label: 'Rau củ quả' },
+      { href: '/products?category=NONG_SAN&sub=ca-phe', label: 'Cà phê, hồ tiêu' },
+      { href: '/products?category=NONG_SAN&sub=thuc-pham', label: 'Thực phẩm khác' },
+    ],
+  },
+  {
+    label: 'Vật nuôi', icon: 'ri-bear-smile-line',
+    sub: [
+      { href: '/products?category=VAT_NUOI&sub=cho', label: 'Chó' },
+      { href: '/products?category=VAT_NUOI&sub=meo', label: 'Mèo' },
+      { href: '/products?category=VAT_NUOI&sub=gia-cam', label: 'Gia cầm' },
+      { href: '/products?category=VAT_NUOI&sub=gia-suc', label: 'Gia súc' },
+      { href: '/products?category=VAT_NUOI', label: 'Vật nuôi khác' },
+    ],
+  },
+  {
+    label: 'Tuyển dụng / Việc làm', icon: 'ri-briefcase-line',
+    sub: [
+      { href: '/jobs?type=HIRING', label: 'Tuyển dụng' },
+      { href: '/jobs?type=SEEKING', label: 'Tìm việc' },
+      { href: '/jobs?type=FREELANCE', label: 'Thuê thời vụ' },
+    ],
+  },
+  {
+    label: 'Dịch vụ', icon: 'ri-service-line',
+    sub: [
+      { href: '/products?category=DICH_VU&sub=sua-chua', label: 'Sửa chữa, bảo dưỡng' },
+      { href: '/products?category=DICH_VU&sub=van-chuyen', label: 'Vận chuyển' },
+      { href: '/products?category=DICH_VU&sub=tu-van', label: 'Tư vấn' },
+      { href: '/products?category=DICH_VU', label: 'Dịch vụ khác' },
+    ],
+  },
+  {
+    label: 'Diễn đàn cộng đồng', icon: 'ri-chat-3-line',
+    sub: [
+      { href: '/forum?category=KINH_NGHIEM', label: 'Kinh nghiệm' },
+      { href: '/forum?category=TIN_TUC', label: 'Tin tức' },
+      { href: '/forum?category=HOI_DAP', label: 'Hỏi đáp' },
+      { href: '/forum', label: 'Tất cả bài viết' },
+    ],
+  },
+  {
+    label: 'Quảng cáo & Khuyến mãi', icon: 'ri-megaphone-line',
+    sub: [
+      { href: '/advertisements', label: 'Tất cả quảng cáo' },
+      { href: '/advertisements/create', label: 'Đăng quảng cáo' },
+    ],
+  },
+  {
+    label: 'Cảnh báo lừa đảo', icon: 'ri-alert-line',
+    sub: [
+      { href: '/canh-bao', label: 'Xem cảnh báo' },
+      { href: '/canh-bao/create', label: 'Đăng cảnh báo' },
+    ],
+  },
+  {
+    label: 'Bảng giá thị trường', icon: 'ri-line-chart-line',
+    sub: [
+      { href: '/market-prices', label: 'Giá nông sản' },
+      { href: '/market-prices', label: 'Giá xăng dầu' },
+      { href: '/market-prices', label: 'Giá cao su' },
+    ],
+  },
 ];
 
 const postItems = [
@@ -68,6 +133,7 @@ export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [showSellerMenu, setShowSellerMenu] = useState(false);
+  const [hoveredCat, setHoveredCat] = useState(0);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [showSavedDropdown, setShowSavedDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -171,16 +237,31 @@ export default function Header() {
             <i className="ri-menu-line text-xl"></i>
           </button>
           {showHamburger && (
-            <div className="absolute left-0 top-11 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50">
-              <p className="text-base font-bold text-gray-900 px-4 mb-2">Danh mục</p>
-              <div className="divide-y divide-gray-50">
-                {allCategories.map(cat => (
-                  <Link key={cat.href} href={cat.href}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group">
-                    <i className={`${cat.icon} text-gray-400 text-lg w-5 flex-shrink-0`}></i>
-                    <span className="text-sm text-gray-700 group-hover:text-gray-900">{cat.label}</span>
-                  </Link>
+            <div className="absolute left-0 top-11 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 flex overflow-hidden" style={{ minWidth: 520 }}>
+              {/* Cột trái — danh mục chính */}
+              <div className="w-56 bg-white py-2 border-r border-gray-100">
+                <p className="text-sm font-bold text-gray-900 px-4 py-2">Danh mục</p>
+                {mainCategories.map((cat, idx) => (
+                  <button key={idx} onMouseEnter={() => setHoveredCat(idx)}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${hoveredCat === idx ? 'bg-yellow-50 text-gray-900' : 'hover:bg-gray-50 text-gray-700'}`}>
+                    <i className={`${cat.icon} text-lg w-5 flex-shrink-0 ${hoveredCat === idx ? 'text-yellow-500' : 'text-gray-400'}`}></i>
+                    <span className="text-sm font-medium flex-1">{cat.label}</span>
+                    <i className="ri-arrow-right-s-line text-gray-300 text-base"></i>
+                  </button>
                 ))}
+              </div>
+              {/* Cột phải — danh mục con */}
+              <div className="flex-1 py-4 px-3 bg-gray-50">
+                <p className="text-xs font-bold text-gray-400 uppercase px-2 mb-2">{mainCategories[hoveredCat]?.label}</p>
+                <div className="space-y-0.5">
+                  {mainCategories[hoveredCat]?.sub.map((sub, i) => (
+                    <Link key={i} href={sub.href} onClick={() => setShowHamburger(false)}
+                      className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-sm text-gray-700 hover:text-gray-900 font-medium">
+                      <i className="ri-arrow-right-s-line text-yellow-400"></i>
+                      {sub.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           )}
