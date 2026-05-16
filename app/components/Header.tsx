@@ -187,8 +187,8 @@ export default function Header() {
         {/* Right actions */}
         <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
 
-          {/* Yêu thích → dashboard tab saved */}
-          <Link href="/dashboard?tab=saved" title="Bài đã thích"
+          {/* Yêu thích → dashboard */}
+          <Link href="/dashboard" title="Bài đã thích"
             className="hidden sm:flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
             <i className="ri-heart-line text-lg"></i>
           </Link>
@@ -199,15 +199,15 @@ export default function Header() {
             <i className="ri-notification-3-line text-lg"></i>
           </Link>
 
-          {/* Liên hệ → trang nhắn tin */}
-          <Link href="/dashboard?tab=messages" title="Nhắn tin"
+          {/* Liên hệ → Zalo/contact */}
+          <a href="https://zalo.me/0888317289" target="_blank" rel="noreferrer"
             className="hidden lg:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
             <i className="ri-chat-1-line text-sm"></i>
             <span>Liên hệ</span>
-          </Link>
+          </a>
 
-          {/* Quản lý tin → dashboard */}
-          <Link href="/dashboard"
+          {/* Quản lý tin → dashboard tab products */}
+          <Link href="/dashboard?tab=products"
             className="hidden md:flex items-center border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
             Quản lý tin
           </Link>

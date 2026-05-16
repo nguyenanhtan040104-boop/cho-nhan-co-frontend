@@ -1,12 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi } from '../../lib/api';
 
+// Tab mapping từ URL param → tab id trong dashboard
+const TAB_MAP: Record<string, string> = {
+  saved: 'overview',        // chưa có tính năng saved riêng → overview
+  notifications: 'notifications',
+  messages: 'overview',     // chưa có messages riêng → overview
+  products: 'products',
+  'real-estate': 'real-estate',
+  jobs: 'jobs',
+  wallet: 'wallet',
+};
+
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">Đang tải...</div>}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [myProducts, setMyProducts] = useState<any[]>([]);
@@ -22,6 +42,11 @@ export default function DashboardPage() {
     if (!auth.isLoggedIn()) {
       router.push('/profile');
       return;
+    }
+    // Đọc tab từ URL query param
+    const tabParam = searchParams.get('tab');
+    if (tabParam && TAB_MAP[tabParam]) {
+      setActiveTab(TAB_MAP[tabParam]);
     }
     loadData();
   }, []);
