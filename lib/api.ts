@@ -679,3 +679,14 @@ export const advertisements = {
     return request(`/advertisements/${id}`, { method: 'DELETE' });
   },
 };
+
+// =================== ITEM COMMENTS ===================
+
+export const itemComments = {
+  getAll: (targetType: string, targetId: string) =>
+    request<any[]>(`/item-comments?targetType=${targetType}&targetId=${targetId}`),
+  create: (data: { targetType: string; targetId: string; content: string; parentId?: string }) =>
+    request<any>('/item-comments', { method: 'POST', body: JSON.stringify(data) }),
+  delete: (id: string) =>
+    request<any>(`/item-comments/${id}`, { method: 'DELETE' }),
+};

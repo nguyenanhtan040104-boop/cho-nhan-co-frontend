@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MessengerModal from '../../../components/MessengerModal';
 import { products as productsApi, messages as messagesApi, auth, wallet as walletApi } from '../../../lib/api';
+import CommentSection from '../../../components/CommentSection';
 
 interface ProductDetailProps {
   productId: string;
@@ -432,6 +433,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
           </div>
         </div>
       )}
+
+      {/* Comment Section */}
+      <div className="max-w-screen-xl mx-auto px-4 pb-6">
+        <CommentSection targetType="PRODUCT" targetId={productId} />
+      </div>
 
       {/* Contact Modal */}
       {showContactModal && product.user && (

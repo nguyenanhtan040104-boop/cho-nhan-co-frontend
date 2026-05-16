@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { jobs, messages as messagesApi, auth } from '../../../lib/api';
+import CommentSection from '../../../components/CommentSection';
 
 const typeLabel: any = {
   EMPLOYER: 'Tuyển dụng', JOB_SEEKER: 'Tìm việc',
@@ -152,6 +153,11 @@ export default function JobDetail({ jobId }: { jobId: string }) {
           </div>
         </div>
       </div>
+    </div>
+
+    {/* Comment Section */}
+    <div className="max-w-screen-xl mx-auto px-4 pb-6">
+      <CommentSection targetType="JOB" targetId={jobId} />
     </div>
   );
 }

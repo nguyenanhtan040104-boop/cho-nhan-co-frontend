@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { realEstate, messages as messagesApi, auth } from '../../../lib/api';
+import CommentSection from '../../../components/CommentSection';
 
 function getCurrentUserId(): string | null {
   try {
@@ -242,6 +243,11 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
           </div>
         </div>
       </div>
+    </div>
+
+    {/* Comment Section */}
+    <div className="max-w-screen-xl mx-auto px-4 pb-6">
+      <CommentSection targetType="REAL_ESTATE" targetId={propertyId} />
     </div>
   );
 }
