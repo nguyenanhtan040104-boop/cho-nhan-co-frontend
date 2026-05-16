@@ -56,6 +56,10 @@ export default function CreatePostPage() {
     e.preventDefault();
     setError('');
     const isDraft = publishStatus === 'DRAFT';
+    if (!isDraft && imageFiles.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh cho bài viết');
+      return;
+    }
     if (isDraft) setDraftLoading(true); else setLoading(true);
     try {
       const tags = form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [];

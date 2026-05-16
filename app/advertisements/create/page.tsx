@@ -55,6 +55,10 @@ export default function CreateAdvertisementPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    if (imageFiles.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh quảng cáo');
+      return;
+    }
     setLoading(true);
     try {
       let imageUrls: string[] = [];

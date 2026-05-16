@@ -137,6 +137,10 @@ export default function CreateReportPage() {
       setError('Vui lòng điền tiêu đề và mô tả chi tiết');
       return;
     }
+    if (imageFiles.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh bằng chứng');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
