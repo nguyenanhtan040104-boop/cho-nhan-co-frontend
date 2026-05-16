@@ -72,7 +72,7 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingTop: 44, paddingBottom: 32 }}>
+      <div className="relative" style={{ background: '#ffd400', paddingTop: 44, paddingBottom: 32 }}>
         {/* === Scattered decorations (absolute positioned) === */}
         {/* Left side */}
         <div className="absolute top-4 left-6 hidden md:flex w-16 h-16 bg-white/25 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(-14deg)' }}>
