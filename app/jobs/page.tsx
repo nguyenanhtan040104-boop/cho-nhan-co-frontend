@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { jobs, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 
@@ -20,6 +21,15 @@ function timeAgo(dateStr: string) {
 }
 
 export default function JobsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Đang tải...</div>}>
+      <JobsContent />
+    </Suspense>
+  );
+}
+
+function JobsContent() {
+  const searchParams = useSearchParams();
   const [items, setItems] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -33,6 +43,12 @@ export default function JobsPage() {
   const [deleting, setDeleting] = useState(false);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
   const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
+
+  // Đọc query params từ URL (từ header dropdown)
+  useEffect(() => {
+    const t = searchParams.get('type');
+    if (t) setType(t);
+  }, [searchParams]);
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
