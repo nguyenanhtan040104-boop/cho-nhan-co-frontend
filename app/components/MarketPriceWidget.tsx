@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const ITEMS = [
-  { key: 'cafe', label: 'Cà phê', icon: '☕', color: '#6b3a2a', bg: '#fdf6f0', unit: 'đ/kg' },
-  { key: 'tieu', label: 'Hồ tiêu', icon: '🌿', color: '#2d6a4f', bg: '#f0fdf4', unit: 'đ/kg' },
-  { key: 'xang', label: 'Xăng RON95', icon: '⛽', color: '#1d4ed8', bg: '#eff6ff', unit: 'đ/lít' },
-  { key: 'cao_su', label: 'Cao su', icon: '🌱', color: '#7c3aed', bg: '#f5f3ff', unit: 'đ/kg' },
+  { key: 'cafe', label: 'Cà phê', img: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=80&h=80&fit=crop&q=80', unit: 'đ/kg' },
+  { key: 'tieu', label: 'Hồ tiêu', img: 'https://images.unsplash.com/photo-1599909533731-9e5b7a4fcf43?w=80&h=80&fit=crop&q=80', unit: 'đ/kg' },
+  { key: 'xang', label: 'Xăng RON95', img: 'https://images.unsplash.com/photo-1545262810-77515befe149?w=80&h=80&fit=crop&q=80', unit: 'đ/lít' },
+  { key: 'cao_su', label: 'Cao su', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=80&h=80&fit=crop&q=80', unit: 'đ/kg' },
 ];
 
 function fmt(n: number) {
@@ -75,9 +75,8 @@ export default function MarketPriceWidget() {
           return (
             <Link key={item.key} href="/market-prices"
               className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                style={{ backgroundColor: item.bg }}>
-                {item.icon}
+              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                <img src={item.img} alt={item.label} className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-gray-500 font-medium">{item.label}</p>
