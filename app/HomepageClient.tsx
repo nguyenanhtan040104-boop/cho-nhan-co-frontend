@@ -59,7 +59,7 @@ export default function HomepageClient() {
     <>
       {/* Search bar — straddles vàng/xám */}
       <form onSubmit={handleSubmit}>
-        <div className="flex items-center bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100" style={{ height: 52 }}>
+        <div className="flex items-center bg-white rounded-full shadow-xl overflow-hidden border border-gray-100" style={{ height: 52 }}>
           <i className="ri-search-line text-gray-400 pl-4 text-lg flex-shrink-0"></i>
           <input
             type="text"
@@ -75,7 +75,7 @@ export default function HomepageClient() {
           )}
           <div className="w-px h-6 bg-gray-200 flex-shrink-0 mx-1" />
           <button type="submit"
-            className="h-10 px-5 mx-1 text-sm font-bold text-gray-900 rounded-xl transition hover:opacity-90 flex-shrink-0 whitespace-nowrap"
+            className="h-[44px] px-6 mr-1 text-sm font-bold text-gray-900 rounded-full transition hover:opacity-90 flex-shrink-0 whitespace-nowrap"
             style={{ backgroundColor: '#ffd400' }}>
             Tìm kiếm
           </button>

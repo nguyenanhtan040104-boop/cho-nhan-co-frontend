@@ -72,21 +72,21 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div style={{ background: '#ffd400', paddingTop: 32, paddingBottom: 28 }}>
-        {/* Text */}
-        <div className="text-center px-4 mb-5">
+      <div className="relative" style={{ background: '#ffd400', paddingTop: 36, paddingBottom: 40 }}>
+        <div className="text-center px-4">
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">
             Giá tốt, gần nhà, chốt nhanh!
           </h1>
           <p className="text-gray-700 text-sm font-semibold mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
         </div>
-        {/* Search bar — nằm trong vàng */}
-        <div className="px-4">
+        {/* Search bar floating — nửa vàng nửa xám */}
+        <div className="absolute bottom-0 translate-y-1/2 left-0 right-0 px-4 z-10">
           <div className="max-w-2xl mx-auto">
             <HomepageClient />
           </div>
         </div>
       </div>
+      <div style={{ height: 42 }} />
 
       <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-4">
 
