@@ -13,6 +13,9 @@ export default function JobDetail({ jobId }: { jobId: string }) {
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedImg, setSelectedImg] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     jobs.getOne(jobId)
@@ -52,6 +55,54 @@ export default function JobDetail({ jobId }: { jobId: string }) {
       <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           <div className="lg:col-span-2 space-y-6">
+            {/* Images carousel */}
+            {job.images?.length > 0 && (() => {
+              const images = job.images;
+              const cur = images[selectedImg];
+              const imgUrl = typeof cur === 'string' ? cur : cur?.url;
+              return (
+                <div className="space-y-3">
+                  {lightbox && imgUrl && (
+                    <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center" onClick={() => { setLightbox(false); setZoom(1); }}>
+                      <div className="absolute top-4 right-4 flex gap-2 z-10">
+                        <button onClick={e => { e.stopPropagation(); setZoom(z => Math.min(z + 0.5, 4)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white"><i className="ri-zoom-in-line text-lg"></i></button>
+                        <button onClick={e => { e.stopPropagation(); setZoom(z => Math.max(z - 0.5, 0.5)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white"><i className="ri-zoom-out-line text-lg"></i></button>
+                        <button onClick={() => { setLightbox(false); setZoom(1); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white"><i className="ri-close-line text-lg"></i></button>
+                      </div>
+                      {images.length > 1 && (<>
+                        <button onClick={e => { e.stopPropagation(); setSelectedImg(i => (i - 1 + images.length) % images.length); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white z-10"><i className="ri-arrow-left-s-line text-2xl"></i></button>
+                        <button onClick={e => { e.stopPropagation(); setSelectedImg(i => (i + 1) % images.length); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white z-10"><i className="ri-arrow-right-s-line text-2xl"></i></button>
+                        <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">{selectedImg + 1} / {images.length}</span>
+                      </>)}
+                      <div className="overflow-auto flex items-center justify-center" onClick={e => e.stopPropagation()}>
+                        <img src={imgUrl} alt="" style={{ transform: `scale(${zoom})`, transition: 'transform 0.2s', maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', cursor: zoom > 1 ? 'zoom-out' : 'zoom-in' }} onClick={() => setZoom(z => z > 1 ? 1 : 2)} />
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative bg-gray-100 rounded-xl overflow-hidden" style={{ height: 300 }}>
+                    <img src={imgUrl} alt={job.title} className="w-full h-full object-contain cursor-zoom-in" onClick={() => { setLightbox(true); setZoom(1); }} />
+                    {images.length > 1 && (<>
+                      <button onClick={() => setSelectedImg(i => (i - 1 + images.length) % images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white z-10"><i className="ri-arrow-left-s-line text-xl text-gray-700"></i></button>
+                      <button onClick={() => setSelectedImg(i => (i + 1) % images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white z-10"><i className="ri-arrow-right-s-line text-xl text-gray-700"></i></button>
+                      <span className="absolute bottom-2.5 right-3 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">{selectedImg + 1}/{images.length}</span>
+                    </>)}
+                  </div>
+                  {images.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {images.map((img: any, i: number) => {
+                        const url = typeof img === 'string' ? img : img?.url;
+                        return (
+                          <button key={i} onClick={() => setSelectedImg(i)} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${selectedImg === i ? 'border-yellow-400' : 'border-transparent hover:border-gray-300'}`}>
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
               <div className="flex items-start gap-3 mb-4">
                 <div className="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">

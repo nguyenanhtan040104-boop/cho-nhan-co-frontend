@@ -8,6 +8,7 @@ import { auth as _auth } from '../../../lib/api';
 
 const typeOptions = [
   { value: 'EMPLOYER', label: 'Tuyển dụng' },
+  { value: 'JOB_SEEKER', label: 'Tìm việc' },
 ];
 
 const categoryOptions = [
