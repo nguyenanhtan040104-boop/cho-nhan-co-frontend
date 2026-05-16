@@ -356,8 +356,14 @@ export default function Header() {
                         return (
                           <div key={n.id}
                             className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-amber-50/60' : ''}`}
-                            onClick={() => {
+                            onClick={async () => {
                           setShowNotifDropdown(false);
+                          if (!n.isRead) {
+                            try {
+                              await fetch(`${API}/notifications/${n.id}/read`, { method: 'PATCH', headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } });
+                              setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, isRead: true } : x));
+                            } catch {}
+                          }
                           const d = n.data as any;
                           const url = d?.url
                             || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
@@ -369,8 +375,8 @@ export default function Header() {
                               <i className={`${iconClass} text-base`}></i>
                             </div>
                             <div className="flex-1 min-w-0">
-                              {n.title && <p className="text-sm font-semibold text-gray-900 leading-snug">{n.title}</p>}
-                              <p className="text-sm text-gray-600 leading-snug line-clamp-2 mt-0.5">{n.body || n.message}</p>
+                              {n.title && <p className={`text-sm leading-snug ${!n.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-600'}`}>{n.title}</p>}
+                              <p className={`text-sm leading-snug line-clamp-2 mt-0.5 ${!n.isRead ? 'text-gray-700' : 'text-gray-400'}`}>{n.body || n.message}</p>
                               <p className="text-xs text-gray-400 mt-1">{timeAgoHeader(n.createdAt)}</p>
                             </div>
                             {!n.isRead && <div className="w-2.5 h-2.5 bg-red-500 rounded-full flex-shrink-0 mt-2"></div>}

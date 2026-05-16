@@ -549,10 +549,10 @@ function DashboardContent() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
-                                <p className={`font-medium text-sm ${notif.isRead ? 'text-gray-600' : 'text-gray-900'}`}>{notif.title}</p>
-                                {!notif.isRead && <span className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0 mt-1"></span>}
+                                <p className={`text-sm ${notif.isRead ? 'font-medium text-gray-600' : 'font-bold text-gray-900'}`}>{notif.title}</p>
+                                {!notif.isRead && <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1"></span>}
                               </div>
-                              {notif.body && <p className="text-sm text-gray-500 mt-0.5 truncate">{notif.body}</p>}
+                              {notif.body && <p className={`text-sm mt-0.5 ${notif.isRead ? 'text-gray-400' : 'text-gray-700'}`}>{notif.body}</p>}
                               <p className="text-xs text-gray-400 mt-1">
                                 {new Date(notif.createdAt).toLocaleString('vi-VN', {
                                   day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
