@@ -3,19 +3,20 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
-  { keywords: ['bất động sản', 'bds', 'nhà', 'đất', 'phòng trọ', 'căn hộ'], route: '/real-estate' },
-  { keywords: ['việc làm', 'tuyển dụng', 'tuyển', 'xin việc', 'nhân công'], route: '/jobs' },
-  { keywords: ['diễn đàn', 'forum', 'hỏi đáp'], route: '/forum' },
-  { keywords: ['cảnh báo', 'lừa đảo', 'mất đồ'], route: '/canh-bao' },
-  { keywords: ['quảng cáo', 'khai trương', 'khuyến mãi'], route: '/advertisements' },
-  { keywords: ['nông sản', 'rau', 'củ', 'thực phẩm'], route: '/products?category=NONG_SAN' },
-  { keywords: ['vật nuôi', 'chó', 'mèo', 'gà', 'heo', 'bò'], route: '/products?category=VAT_NUOI' },
+  { keywords: ['bất động sản', 'bat dong san', 'bds', 'nhà đất', 'nha dat', 'phòng trọ', 'phong tro', 'căn hộ', 'can ho', 'mặt bằng', 'mat bang'], route: '/real-estate' },
+  { keywords: ['việc làm', 'viec lam', 'tuyển dụng', 'tuyen dung', 'xin việc', 'xin viec', 'nhân công', 'nhan cong', 'tìm việc', 'tim viec'], route: '/jobs' },
+  { keywords: ['diễn đàn', 'dien dan', 'forum', 'hỏi đáp', 'hoi dap'], route: '/forum' },
+  { keywords: ['cảnh báo', 'canh bao', 'lừa đảo', 'lua dao', 'mất đồ', 'mat do'], route: '/canh-bao' },
+  { keywords: ['quảng cáo', 'quang cao', 'khai trương', 'khai truong', 'khuyến mãi', 'khuyen mai'], route: '/advertisements' },
+  { keywords: ['nông sản', 'nong san', 'thực phẩm', 'thuc pham', 'rau củ', 'rau cu', 'trái cây', 'trai cay'], route: '/products?category=NONG_SAN' },
+  { keywords: ['vật nuôi', 'vat nuoi', 'chó', 'mèo', 'gà', 'heo', 'bò', 'trâu', 'dê', 'thú cưng', 'thu cung'], route: '/products?category=VAT_NUOI' },
 ];
 
 function smartSearch(q: string): string {
-  const lower = q.toLowerCase().trim();
+  // Normalize Unicode để tiếng Việt NFC/NFD đều match được
+  const lower = q.toLowerCase().trim().normalize('NFC');
   for (const { keywords, route } of SEARCH_ROUTES) {
-    if (keywords.some(k => lower.includes(k))) {
+    if (keywords.some(k => lower.includes(k.normalize('NFC')))) {
       return route + (route.includes('?') ? '&' : '?') + `search=${encodeURIComponent(q)}`;
     }
   }
