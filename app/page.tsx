@@ -17,7 +17,7 @@ async function getHomeData() {
     const [products, jobs, realEstate, forum] = await Promise.allSettled([
       fetch(`${API}/products?limit=12&sortBy=newest`, { next: { revalidate: 300 } }).then(r => r.json()),
       fetch(`${API}/jobs?limit=6&sortBy=newest`, { next: { revalidate: 300 } }).then(r => r.json()),
-      fetch(`${API}/real-estate?limit=6&sortBy=newest`, { next: { revalidate: 300 } }).then(r => r.json()),
+      fetch(`${API}/real-estates?limit=6`, { next: { revalidate: 300 } }).then(r => r.json()),
       fetch(`${API}/forum/posts?limit=5`, { next: { revalidate: 300 } }).then(r => r.json()),
     ]);
     return {
