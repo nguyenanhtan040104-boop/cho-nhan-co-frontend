@@ -204,35 +204,50 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
           {/* Product Images */}
-          <div className="space-y-4">
-            <div className="w-full rounded-lg bg-white border overflow-hidden">
+          <div className="space-y-3">
+            {/* Main image carousel */}
+            <div className="relative w-full rounded-xl overflow-hidden bg-gray-100 border" style={{ height: 340 }}>
               {mainImage ? (
                 <img
                   src={mainImage.url || mainImage}
                   alt={product.title}
-                  className="w-full h-auto max-h-[500px] object-contain"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                <div className="w-full h-full flex items-center justify-center">
                   <i className="ri-image-line text-6xl text-gray-300"></i>
                 </div>
               )}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setSelectedImageIndex(i => (i - 1 + images.length) % images.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white transition z-10">
+                    <i className="ri-arrow-left-s-line text-xl text-gray-700"></i>
+                  </button>
+                  <button
+                    onClick={() => setSelectedImageIndex(i => (i + 1) % images.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white transition z-10">
+                    <i className="ri-arrow-right-s-line text-xl text-gray-700"></i>
+                  </button>
+                  <span className="absolute bottom-2.5 right-3 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
+                    {selectedImageIndex + 1}/{images.length}
+                  </span>
+                </>
+              )}
             </div>
+            {/* Thumbnail strip */}
             {images.length > 1 && (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="flex gap-2 overflow-x-auto pb-1">
                 {images.map((image: any, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square overflow-hidden rounded-lg border-2 transition-colors ${
-                      selectedImageIndex === index ? 'border-green-500' : 'border-gray-200 hover:border-gray-300'
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
+                      selectedImageIndex === index ? 'border-yellow-400' : 'border-transparent hover:border-gray-300'
                     }`}
                   >
-                    <img
-                      src={image.url || image}
-                      alt={`${product.title} ${index + 1}`}
-                      className="w-full h-full object-contain"
-                    />
+                    <img src={image.url || image} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

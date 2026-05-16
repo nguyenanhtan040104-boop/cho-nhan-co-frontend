@@ -90,23 +90,42 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
           <div className="lg:col-span-2 space-y-6">
             {/* Images */}
             <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <div className="relative bg-gray-100">
+              {/* Main image carousel */}
+              <div className="relative bg-gray-100" style={{ height: 340 }}>
                 {images[selectedImg] ? (
-                  <img src={images[selectedImg].url} alt={item.title} className="w-full h-auto max-h-[500px] object-contain" />
+                  <img src={images[selectedImg].url} alt={item.title} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <i className="ri-home-4-line text-6xl text-gray-300"></i>
                   </div>
                 )}
                 {item.isVip && (
-                  <span className="absolute top-3 left-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">VIP</span>
+                  <span className="absolute top-3 left-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded z-10">VIP</span>
+                )}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setSelectedImg(i => (i - 1 + images.length) % images.length)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white transition z-10">
+                      <i className="ri-arrow-left-s-line text-xl text-gray-700"></i>
+                    </button>
+                    <button
+                      onClick={() => setSelectedImg(i => (i + 1) % images.length)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white transition z-10">
+                      <i className="ri-arrow-right-s-line text-xl text-gray-700"></i>
+                    </button>
+                    <span className="absolute bottom-2.5 right-3 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
+                      {selectedImg + 1}/{images.length}
+                    </span>
+                  </>
                 )}
               </div>
+              {/* Thumbnail strip */}
               {images.length > 1 && (
                 <div className="flex gap-2 p-3 overflow-x-auto">
                   {images.map((img: any, i: number) => (
                     <button key={i} onClick={() => setSelectedImg(i)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${selectedImg === i ? 'border-green-500' : 'border-transparent'}`}>
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${selectedImg === i ? 'border-yellow-400' : 'border-transparent hover:border-gray-300'}`}>
                       <img src={img.url} alt="" className="w-full h-full object-cover" />
                     </button>
                   ))}
