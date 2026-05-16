@@ -180,9 +180,22 @@ export default async function HomePage() {
               <Link href="/real-estate" className="text-xs text-red-600">Xem tất cả →</Link>
             </div>
             {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
-              <div className="grid grid-cols-2 gap-[1px] bg-gray-100">
-                {realEstate.slice(0, 4).map((item: any) => (
-                  <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />
+              <div className="divide-y divide-gray-100">
+                {realEstate.slice(0, 5).map((item: any) => (
+                  <Link key={item.id} href={`/real-estate/${item.id}`}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
+                    <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <i className="ri-home-4-line text-blue-400 text-sm"></i>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-red-600">{item.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {item.price && <span className="text-xs font-bold" style={{ color: '#d0011b' }}>{fmtPrice(item, 'real-estate')}</span>}
+                        {item.address && <span className="text-xs text-gray-400 truncate"><i className="ri-map-pin-line"></i> {item.address}</span>}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-gray-400 flex-shrink-0">{timeAgo(item.createdAt)}</span>
+                  </Link>
                 ))}
               </div>
             )}
