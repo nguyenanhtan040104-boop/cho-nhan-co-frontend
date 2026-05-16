@@ -71,64 +71,56 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen" style={{ background: '#f4f4f4' }}>
 
-      {/* ===== BANNER (Chợ Tốt style) ===== */}
-      <div className="relative" style={{ background: '#ffd400', minHeight: 180 }}>
-        {/* Glow circles for depth */}
-        <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full opacity-20" style={{ background: '#ffaa00', filter: 'blur(60px)' }} />
-        <div className="absolute top-0 right-1/4 w-64 h-64 rounded-full opacity-20" style={{ background: '#ff8800', filter: 'blur(60px)' }} />
+      {/* ===== BANNER ===== */}
+      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingBottom: 0 }}>
+        {/* Decorative blobs */}
+        <div className="absolute -top-8 -left-8 w-48 h-48 rounded-full opacity-30" style={{ background: '#ffaa00', filter: 'blur(40px)' }} />
+        <div className="absolute -top-4 right-0 w-56 h-56 rounded-full opacity-20" style={{ background: '#ff8800', filter: 'blur(50px)' }} />
 
-        <div className="relative max-w-screen-xl mx-auto px-4 pt-8 pb-16 text-center">
+        <div className="relative max-w-3xl mx-auto px-4 pt-7 pb-5 text-center">
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight mb-1">
             Giá tốt, gần nhà, chốt nhanh!
           </h1>
-          <p className="text-gray-700 text-sm font-medium">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
-        </div>
-
-        {/* Search bar floating at bottom */}
-        <div className="absolute -bottom-6 left-0 right-0 px-4">
-          <div className="max-w-2xl mx-auto">
-            <HomepageClient />
-          </div>
+          <p className="text-gray-700 text-sm font-medium mb-4">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+          {/* Search bar inline inside banner */}
+          <HomepageClient />
         </div>
       </div>
 
-      {/* spacer for search bar overlap */}
-      <div className="h-10" />
-
-      <div className="max-w-screen-xl mx-auto px-3 sm:px-6">
+      {/* ===== BODY ===== */}
+      <div className="max-w-screen-xl mx-auto px-3 sm:px-4">
 
         {/* ===== CATEGORIES ===== */}
-        <div className="bg-white rounded-xl mt-3 px-2 py-4 shadow-sm">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {categories.map((cat, i) => (
+        <div className="bg-white mt-2 px-2 py-3">
+          <div className="flex overflow-x-auto scrollbar-hide gap-1">
+            {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-2 px-3 py-1 hover:opacity-80 transition-opacity flex-shrink-0 group min-w-[80px]">
-                <div className="w-14 h-14 overflow-hidden rounded-lg flex-shrink-0">
-                  <img src={(cat as any).img} alt={cat.title} className="w-full h-full object-cover" />
+                className="flex flex-col items-center gap-1.5 px-2.5 py-1 hover:opacity-80 transition-opacity flex-shrink-0 min-w-[72px]">
+                <div className="w-14 h-14 overflow-hidden rounded-xl flex-shrink-0">
+                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-[11px] text-gray-600 font-medium text-center leading-tight whitespace-nowrap">{cat.title}</span>
+                <span className="text-[11px] text-gray-600 font-medium text-center leading-tight">{cat.title}</span>
               </Link>
             ))}
-            {/* Arrow more */}
-            <button className="flex flex-col items-center gap-2 px-3 py-1 flex-shrink-0 min-w-[40px] justify-center">
-              <div className="w-14 h-14 rounded-full border-2 border-gray-200 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-1.5 px-2.5 py-1 flex-shrink-0 min-w-[48px] justify-center">
+              <div className="w-14 h-14 rounded-xl border-2 border-gray-200 flex items-center justify-center">
                 <i className="ri-arrow-right-s-line text-gray-400 text-xl"></i>
               </div>
-            </button>
+            </div>
           </div>
         </div>
 
         {/* ===== VIP / NỔI BẬT ===== */}
         {vipListings.length > 0 && (
-          <section className="mt-3 bg-white border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200">
+          <section className="mt-2 bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
               <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
                 <span className="bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">VIP</span>
                 Tin nổi bật
               </h2>
               <Link href="/products" className="text-xs text-red-600 font-medium hover:underline">Xem thêm →</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-200">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
               {vipListings.slice(0, 6).map((item: any) => (
                 <ListingCard key={`vip-${item.id}`} item={item} />
               ))}
@@ -137,15 +129,15 @@ export default async function HomePage() {
         )}
 
         {/* ===== SẢN PHẨM ===== */}
-        <section className="mt-3 bg-white border border-gray-200 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200">
+        <section className="mt-2 bg-white overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
             <h2 className="font-bold text-gray-900 text-sm">Sản phẩm mới đăng</h2>
             <Link href="/products" className="text-xs text-red-600 font-medium hover:underline">Xem tất cả →</Link>
           </div>
           {products.length === 0 ? (
             <EmptyBlock label="Chưa có sản phẩm nào" />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-200">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
               {products.slice(0, 12).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />
               ))}
@@ -154,40 +146,38 @@ export default async function HomePage() {
         </section>
 
         {/* ===== BĐS + TUYỂN DỤNG ===== */}
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2">
 
-          {/* BĐS */}
-          <section className="bg-white bg-white border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <section className="bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
               <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
                 <i className="ri-home-4-line text-blue-600"></i> Bất động sản
               </h2>
-              <Link href="/real-estate" className="text-xs text-gray-400 hover:text-red-600">Xem tất cả →</Link>
+              <Link href="/real-estate" className="text-xs text-red-600 hover:underline">Xem tất cả →</Link>
             </div>
             {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
-              <div className="grid grid-cols-2 gap-0 divide-x divide-y divide-gray-100">
+              <div className="grid grid-cols-2 gap-[1px] bg-gray-100">
                 {realEstate.slice(0, 4).map((item: any) => (
-                  <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} compact />
+                  <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />
                 ))}
               </div>
             )}
           </section>
 
-          {/* Tuyển dụng */}
-          <section className="bg-white bg-white border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <section className="bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
               <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
                 <i className="ri-briefcase-line text-purple-600"></i> Tuyển dụng mới
               </h2>
-              <Link href="/jobs" className="text-xs text-gray-400 hover:text-red-600">Xem tất cả →</Link>
+              <Link href="/jobs" className="text-xs text-red-600 hover:underline">Xem tất cả →</Link>
             </div>
             {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
               <div className="divide-y divide-gray-100">
                 {jobs.slice(0, 5).map((job: any) => (
                   <Link key={job.id} href={`/jobs/${job.id}`}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
-                    <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                      <i className="ri-briefcase-line text-purple-400"></i>
+                    <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                      <i className="ri-briefcase-line text-purple-400 text-sm"></i>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-red-600">{job.title}</p>
@@ -205,12 +195,12 @@ export default async function HomePage() {
         </div>
 
         {/* ===== DIỄN ĐÀN ===== */}
-        <section className="mt-4 bg-white bg-white border border-gray-200 overflow-hidden mb-4">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <section className="mt-2 bg-white overflow-hidden mb-3">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
             <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
               <i className="ri-chat-3-line text-cyan-600"></i> Diễn đàn cộng đồng
             </h2>
-            <Link href="/forum" className="text-xs text-gray-400 hover:text-red-600">Xem tất cả →</Link>
+            <Link href="/forum" className="text-xs text-red-600 hover:underline">Xem tất cả →</Link>
           </div>
           {forum.length === 0 ? <EmptyBlock label="Chưa có bài viết nào" /> : (
             <div className="divide-y divide-gray-100">
@@ -234,11 +224,11 @@ export default async function HomePage() {
       </div>
 
       {/* ===== FOOTER ===== */}
-      <footer className="border-t border-gray-200 bg-white mt-2">
+      <footer className="border-t border-gray-200 bg-white">
         <div className="max-w-screen-xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-6">
             <div>
-              <h3 className="font-['Pacifico'] text-lg mb-2" style={{ color: '#d0011b' }}>Chợ Nhân Cơ</h3>
+              <h3 className="font-bold text-lg mb-2 text-gray-900">Chợ Nhân Cơ</h3>
               <p className="text-gray-500 text-sm leading-relaxed">Kết nối giao thương, gắn kết cộng đồng nông thôn tại Nhân Cơ, Đắk Nông.</p>
               <div className="flex gap-3 mt-3">
                 <a href="https://www.facebook.com/trungnguyenanhtan" className="text-gray-400 hover:text-blue-600 transition"><i className="ri-facebook-circle-line text-xl"></i></a>
@@ -274,7 +264,7 @@ export default async function HomePage() {
 }
 
 /* ===== LISTING CARD ===== */
-function ListingCard({ item, compact }: { item: any; compact?: boolean }) {
+function ListingCard({ item }: { item: any }) {
   const href = item._type === 'product' ? `/products/${item.id}`
     : item._type === 'real-estate' ? `/real-estate/${item.id}`
     : `/jobs/${item.id}`;
@@ -283,8 +273,7 @@ function ListingCard({ item, compact }: { item: any; compact?: boolean }) {
   const price = fmtPrice(item, item._type);
 
   return (
-    <Link href={href} className="group bg-white overflow-hidden border border-gray-200 hover:border-gray-300 transition-colors">
-      {/* Image */}
+    <Link href={href} className="group bg-white overflow-hidden hover:bg-gray-50 transition-colors block">
       <div className="relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
         {imgUrl ? (
           <img src={imgUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -294,20 +283,19 @@ function ListingCard({ item, compact }: { item: any; compact?: boolean }) {
           </div>
         )}
         {item.createdAt && (
-          <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-sm font-medium">
+          <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
             {timeAgo(item.createdAt)}
           </span>
         )}
         {imgCount > 1 && (
-          <span className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-sm flex items-center gap-0.5">
+          <span className="absolute bottom-1.5 right-1.5 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5">
             <i className="ri-image-2-line text-[10px]"></i> {imgCount}
           </span>
         )}
         {item.isVip && (
-          <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">VIP</span>
+          <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
         )}
       </div>
-      {/* Info */}
       <div className="px-2 pt-1.5 pb-2">
         <p className="text-xs font-medium leading-snug line-clamp-2 text-gray-800 mb-1">{item.title}</p>
         <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{price}</p>
@@ -323,7 +311,7 @@ function ListingCard({ item, compact }: { item: any; compact?: boolean }) {
 
 function EmptyBlock({ label }: { label: string }) {
   return (
-    <div className="py-10 text-center text-gray-400 text-sm">
+    <div className="py-8 text-center text-gray-400 text-sm">
       <i className="ri-inbox-line text-3xl block mb-2"></i>
       {label}
     </div>
