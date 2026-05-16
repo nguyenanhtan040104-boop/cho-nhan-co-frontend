@@ -121,13 +121,13 @@ export default function JobsPage() {
         )}
 
         {loading && items.length === 0 ? (
-          <div className="space-y-3">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl p-5 animate-pulse flex gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-xl flex-shrink-0"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
+                <div className="w-full bg-gray-200" style={{ paddingBottom: '65%' }}></div>
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -140,7 +140,7 @@ export default function JobsPage() {
           </div>
         ) : (
           <>
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {items.map(item => (
                 <JobCard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
@@ -162,54 +162,56 @@ export default function JobsPage() {
   );
 }
 
-function JobCard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId: string | null; onDeleted: (id: string) => void }) {
+function JobCard({ item, bulkMode, selected, onToggle, onDeleted }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId?: string | null; onDeleted: (id: string) => void }) {
   const isEmployer = item.type === 'EMPLOYER';
-  const categoryLabel: any = {
-    NONG_NGHIEP: 'Nông nghiệp', CHAN_NUOI: 'Chăn nuôi',
-    VAN_TAI: 'Vận tải', KINH_DOANH: 'Kinh doanh', KHAC: 'Khác',
-  };
+  const thumb = item.images?.[0];
+  const thumbUrl = typeof thumb === 'string' ? thumb : thumb?.url;
 
   return (
-    <div className="relative">
+    <div className="relative group">
       {bulkMode && (
         <button onClick={onToggle}
-          className={`absolute bottom-3 right-3 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-300'}`}>
+          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}
       <Link href={bulkMode ? '#' : `/jobs/${item.id}`}
         onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all p-5 ${selected ? 'ring-2 ring-indigo-500' : ''}`}>
-        <div className="flex gap-4 items-start">
-          <div className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-lg font-bold text-white"
-            style={{ backgroundColor: isEmployer ? '#4338ca' : '#0369a1' }}>
-            {(item.companyName || item.title || 'J')[0].toUpperCase()}
+        className={`block bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden ${selected ? 'ring-2 ring-indigo-500' : ''}`}>
+
+        {/* Ảnh hoặc placeholder */}
+        <div className="relative w-full bg-gray-100" style={{ paddingBottom: '65%' }}>
+          {thumbUrl ? (
+            <img src={thumbUrl} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center"
+              style={{ background: isEmployer ? 'linear-gradient(135deg,#4338ca,#6366f1)' : 'linear-gradient(135deg,#0369a1,#0ea5e9)' }}>
+              <span className="text-4xl font-bold text-white/80">{(item.title || 'J')[0].toUpperCase()}</span>
+            </div>
+          )}
+          {/* badges */}
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
+            {item.isUrgent && <span className="text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded">Gấp</span>}
+            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${isEmployer ? 'bg-indigo-600 text-white' : 'bg-sky-500 text-white'}`}>
+              {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
+            </span>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h3 className="font-semibold text-gray-800 hover:text-indigo-700 transition-colors line-clamp-1">{item.title}</h3>
-                {item.companyName && <p className="text-sm text-gray-500 mt-0.5">{item.companyName}</p>}
-              </div>
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                {item.isUrgent && (
-                  <span className="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">Gấp</span>
-                )}
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isEmployer ? 'bg-indigo-50 text-indigo-700' : 'bg-sky-50 text-sky-700'}`}>
-                  {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
-              {item.location && <span><i className="ri-map-pin-line mr-0.5"></i>{item.location}</span>}
-              {item.salary && <span className="text-green-700 font-semibold">{item.salary}</span>}
-              {item.category && <span>{categoryLabel[item.category] || item.category}</span>}
-              {item.createdAt && <span className="ml-auto">{timeAgo(item.createdAt)}</span>}
-            </div>
+        </div>
+
+        {/* Info */}
+        <div className="p-3">
+          <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-1">{item.title}</h3>
+          {item.salary && <p className="text-green-600 font-bold text-sm">{item.salary}</p>}
+          <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
+            {item.location && <><i className="ri-map-pin-line"></i><span className="truncate">{item.location}</span></>}
+          </div>
+          <div className="flex items-center justify-between mt-2 text-[11px] text-gray-400">
+            <span>{item.category}</span>
+            <span>{timeAgo(item.createdAt)}</span>
           </div>
         </div>
       </Link>
-      <div className="absolute top-3 left-3 z-10">
+      <div className="absolute top-2 right-2 z-10">
         <PostOptionsMenu postId={item.id} ownerId={item.userId || item.user?.id} onDelete={async (id) => { await jobs.delete(id); onDeleted(id); }} editHref={`/jobs/${item.id}/edit`} />
       </div>
     </div>
