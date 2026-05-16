@@ -302,7 +302,7 @@ function ListingCard({ item }: { item: any }) {
           </div>
         )}
         {/* Heart button */}
-        <LikeButton />
+        <LikeButton itemId={String(item.id)} />
         {item.createdAt && (
           <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
             {timeAgo(item.createdAt)}

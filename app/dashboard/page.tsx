@@ -1302,6 +1302,22 @@ function EngagementTab() {
   const [data, setData] = useState<any>(null);
   const [notifs, setNotifs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [likedProducts, setLikedProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load liked products from localStorage
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
+      if (ids.length > 0) {
+        Promise.all(
+          ids.slice(0, 12).map(id =>
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api'}/products/${id}`)
+              .then(r => r.ok ? r.json() : null).catch(() => null)
+          )
+        ).then(results => setLikedProducts(results.filter(Boolean)));
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -1365,6 +1381,38 @@ function EngagementTab() {
           </div>
         ))}
       </div>
+
+      {/* Sản phẩm đã thích */}
+      {likedProducts.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <i className="ri-heart-fill text-red-500"></i>
+              Sản phẩm đã thích
+            </h3>
+            <span className="text-xs text-gray-400">{likedProducts.length} sản phẩm</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[1px] bg-gray-100">
+            {likedProducts.map((p: any) => (
+              <a key={p.id} href={`/products/${p.id}`} className="bg-white hover:bg-gray-50 transition block">
+                <div className="relative" style={{ aspectRatio: '4/3' }}>
+                  {p.images?.[0]?.url ? (
+                    <img src={p.images[0].url} alt={p.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                      <i className="ri-image-line text-2xl text-gray-300"></i>
+                    </div>
+                  )}
+                </div>
+                <div className="px-2 py-2">
+                  <p className="text-xs font-medium text-gray-800 line-clamp-1">{p.title}</p>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: '#d0011b' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Feed tương tác kiểu Facebook */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
