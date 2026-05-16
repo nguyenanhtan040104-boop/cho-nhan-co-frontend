@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import HomepageClient from './HomepageClient';
 import LikeButton from './components/LikeButton';
+import MarketPriceWidget from './components/MarketPriceWidget';
 
 export const metadata: Metadata = {
   title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản, việc làm tại Đắk Nông',
@@ -132,6 +133,9 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+
+        {/* ===== GIÁ THỊ TRƯỜNG ===== */}
+        <MarketPriceWidget />
 
         {/* ===== VIP / NỔI BẬT ===== */}
         {vipListings.length > 0 && (
