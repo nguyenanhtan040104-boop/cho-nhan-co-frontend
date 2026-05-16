@@ -71,38 +71,45 @@ export default async function HomePage() {
     <main className="min-h-screen bg-gray-100">
 
       {/* ===== BANNER ===== */}
-      <div style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 60%, #ef4444 100%)' }} className="relative overflow-hidden">
-        <div className="max-w-screen-xl mx-auto px-6 py-10 sm:py-16 flex flex-col sm:flex-row items-center justify-between gap-6">
-          {/* Text */}
-          <div className="text-center sm:text-left">
-            <p className="text-white/80 text-sm font-medium mb-1">Nhân Cơ · Đắk Nông</p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight drop-shadow mb-2">
-              Gần nhà,<br className="sm:hidden" /> giá tốt, uy tín!
+      <div className="relative overflow-hidden" style={{ background: '#d0011b' }}>
+        {/* subtle diagonal stripes overlay */}
+        <div className="absolute inset-0 opacity-[0.06]" style={{
+          backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)',
+          backgroundSize: '12px 12px'
+        }} />
+        <div className="relative max-w-screen-xl mx-auto px-5 py-7 sm:py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-white/20 text-white text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide">📍 Nhân Cơ · Đắk Nông</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white leading-snug mb-1">
+              Chợ online của người Nhân Cơ
             </h1>
-            <p className="text-white/90 text-sm sm:text-base">Mua bán nông sản, bất động sản, việc làm tại Nhân Cơ</p>
+            <p className="text-red-200 text-sm">Mua bán · Tuyển dụng · Bất động sản · Cộng đồng</p>
           </div>
-          {/* Decorative icons */}
-          <div className="hidden sm:flex items-center gap-6 text-white/30 flex-shrink-0">
-            {['ri-leaf-line', 'ri-home-4-line', 'ri-briefcase-line', 'ri-store-2-line'].map((ic, i) => (
-              <i key={i} className={`${ic} text-5xl sm:text-6xl`} style={{ opacity: 0.25 + i * 0.15 }}></i>
-            ))}
+          <div className="flex gap-2 flex-shrink-0">
+            <Link href="/products/create" className="bg-white text-red-600 font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-red-50 transition">
+              + Đăng tin miễn phí
+            </Link>
+            <Link href="/products" className="border border-white/40 text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-white/10 transition">
+              Xem tin đăng
+            </Link>
           </div>
         </div>
-
       </div>
 
       <div className="max-w-screen-xl mx-auto px-3 sm:px-6">
 
         {/* ===== CATEGORIES ===== */}
-        <div className="bg-white rounded-xl shadow-sm mt-3 px-4 py-4">
-          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="bg-white border-b border-gray-200 mt-3 rounded-t-lg px-3 py-3">
+          <div className="flex gap-0 overflow-x-auto scrollbar-hide divide-x divide-gray-100">
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors flex-shrink-0 group min-w-[80px]">
-                <div className="w-14 h-14 rounded-xl overflow-hidden transition-transform group-hover:scale-105">
-                  <img src={(cat as any).img} alt={cat.title} className="w-full h-full object-cover" />
+                className="flex flex-col items-center gap-1 px-4 py-1.5 hover:bg-gray-50 transition-colors flex-shrink-0 group min-w-[76px]">
+                <div className="w-12 h-12 overflow-hidden rounded-lg">
+                  <img src={(cat as any).img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                 </div>
-                <span className="text-xs text-gray-600 font-medium text-center leading-tight group-hover:text-gray-900 whitespace-nowrap">{cat.title}</span>
+                <span className="text-[11px] text-gray-500 font-medium text-center leading-tight group-hover:text-gray-800 whitespace-nowrap mt-0.5">{cat.title}</span>
               </Link>
             ))}
           </div>
@@ -110,15 +117,15 @@ export default async function HomePage() {
 
         {/* ===== VIP / NỔI BẬT ===== */}
         {vipListings.length > 0 && (
-          <section className="mt-3">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-bold text-gray-800 flex items-center gap-2">
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded">VIP</span>
+          <section className="mt-3 bg-white border border-gray-200 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200">
+              <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
+                <span className="bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">VIP</span>
                 Tin nổi bật
               </h2>
-              <Link href="/products" className="text-xs font-medium text-gray-500 hover:text-red-600">Xem thêm →</Link>
+              <Link href="/products" className="text-xs text-red-600 font-medium hover:underline">Xem thêm →</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-200">
               {vipListings.slice(0, 6).map((item: any) => (
                 <ListingCard key={`vip-${item.id}`} item={item} />
               ))}
@@ -127,17 +134,15 @@ export default async function HomePage() {
         )}
 
         {/* ===== SẢN PHẨM ===== */}
-        <section className="mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-bold text-gray-800 flex items-center gap-1.5">
-              <i className="ri-leaf-line text-green-600"></i> Sản phẩm mới đăng
-            </h2>
-            <Link href="/products" className="text-xs font-medium text-gray-500 hover:text-red-600">Xem tất cả →</Link>
+        <section className="mt-3 bg-white border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200">
+            <h2 className="font-bold text-gray-900 text-sm">Sản phẩm mới đăng</h2>
+            <Link href="/products" className="text-xs text-red-600 font-medium hover:underline">Xem tất cả →</Link>
           </div>
           {products.length === 0 ? (
             <EmptyBlock label="Chưa có sản phẩm nào" />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-200">
               {products.slice(0, 12).map((item: any) => (
                 <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />
               ))}
@@ -149,8 +154,8 @@ export default async function HomePage() {
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
 
           {/* BĐS */}
-          <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <section className="bg-white bg-white border border-gray-200 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
               <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
                 <i className="ri-home-4-line text-blue-600"></i> Bất động sản
               </h2>
@@ -166,8 +171,8 @@ export default async function HomePage() {
           </section>
 
           {/* Tuyển dụng */}
-          <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <section className="bg-white bg-white border border-gray-200 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
               <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
                 <i className="ri-briefcase-line text-purple-600"></i> Tuyển dụng mới
               </h2>
@@ -197,8 +202,8 @@ export default async function HomePage() {
         </div>
 
         {/* ===== DIỄN ĐÀN ===== */}
-        <section className="mt-4 bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <section className="mt-4 bg-white bg-white border border-gray-200 overflow-hidden mb-4">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
             <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
               <i className="ri-chat-3-line text-cyan-600"></i> Diễn đàn cộng đồng
             </h2>
@@ -275,41 +280,37 @@ function ListingCard({ item, compact }: { item: any; compact?: boolean }) {
   const price = fmtPrice(item, item._type);
 
   return (
-    <Link href={href} className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+    <Link href={href} className="group bg-white overflow-hidden border border-gray-200 hover:border-gray-300 transition-colors">
       {/* Image */}
       <div className="relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
         {imgUrl ? (
           <img src={imgUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center bg-gray-50">
             <i className="ri-image-line text-3xl text-gray-300"></i>
           </div>
         )}
-        {/* Badges */}
-        <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1">
-          {item.isVip && (
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
-          )}
-          {imgCount > 1 && (
-            <span className="bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5">
-              <i className="ri-image-2-line text-[10px]"></i> {imgCount}
-            </span>
-          )}
-        </div>
         {item.createdAt && (
-          <span className="absolute top-1.5 left-1.5 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
+          <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-sm font-medium">
             {timeAgo(item.createdAt)}
           </span>
         )}
+        {imgCount > 1 && (
+          <span className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-sm flex items-center gap-0.5">
+            <i className="ri-image-2-line text-[10px]"></i> {imgCount}
+          </span>
+        )}
+        {item.isVip && (
+          <span className="absolute top-1.5 right-1.5 bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">VIP</span>
+        )}
       </div>
       {/* Info */}
-      <div className="p-2">
-        <p className="text-xs font-medium leading-tight line-clamp-2 text-gray-700 group-hover:text-red-600 transition-colors mb-1">{item.title}</p>
+      <div className="px-2 pt-1.5 pb-2">
+        <p className="text-xs font-medium leading-snug line-clamp-2 text-gray-800 mb-1">{item.title}</p>
         <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{price}</p>
         {(item.location || item.address) && (
-          <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-0.5 truncate">
-            <i className="ri-map-pin-line flex-shrink-0"></i>
-            {item.location || item.address}
+          <p className="text-[10px] text-gray-400 mt-0.5 truncate">
+            <i className="ri-map-pin-line"></i> {item.location || item.address}
           </p>
         )}
       </div>

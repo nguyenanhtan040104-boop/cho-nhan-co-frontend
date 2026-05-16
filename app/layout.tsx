@@ -1,8 +1,8 @@
-import { Inter } from 'next/font/google';
+import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import Header from './components/Header';
 
-const inter = Inter({ subsets: ['latin', 'vietnamese'] });
+const inter = Be_Vietnam_Pro({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600', '700', '800'] });
 
 const siteUrl = 'https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app';
 const siteName = 'Chợ Nhân Cơ';
