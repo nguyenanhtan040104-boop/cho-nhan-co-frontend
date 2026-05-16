@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi } from '../../lib/api';
+import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi, forum, advertisements } from '../../lib/api';
 
 // Tab mapping từ URL param → tab id trong dashboard
 const TAB_MAP: Record<string, string> = {
@@ -16,6 +16,9 @@ const TAB_MAP: Record<string, string> = {
   jobs: 'jobs',
   wallet: 'wallet',
   engagement: 'engagement',
+  advertisements: 'advertisements',
+  forum: 'forum',
+  'canh-bao': 'canh-bao',
 };
 
 export default function DashboardPage() {
@@ -34,6 +37,9 @@ function DashboardContent() {
   const [myProducts, setMyProducts] = useState<any[]>([]);
   const [myRealEstates, setMyRealEstates] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<any[]>([]);
+  const [myAds, setMyAds] = useState<any[]>([]);
+  const [myForumPosts, setMyForumPosts] = useState<any[]>([]);
+  const [myCanhBao, setMyCanhBao] = useState<any[]>([]);
   const [notifs, setNotifs] = useState<any[]>([]);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -83,6 +89,9 @@ function DashboardContent() {
       realEstate.getMine(),
       jobs.getMine(),
       notifications.getAll(),
+      advertisements.getMine(),
+      forum.getMyPosts({ limit: 50 }),
+      forum.getMyPosts({ category: 'CANH_BAO', limit: 50 }),
     ]);
 
     if (results[0].status === 'fulfilled') setStats(results[0].value);
@@ -90,6 +99,9 @@ function DashboardContent() {
     if (results[2].status === 'fulfilled') setMyRealEstates(results[2].value.data || []);
     if (results[3].status === 'fulfilled') setMyJobs(results[3].value.data || []);
     if (results[4].status === 'fulfilled') setNotifs(results[4].value.data || []);
+    if (results[5].status === 'fulfilled') setMyAds((results[5].value as any).data || []);
+    if (results[6].status === 'fulfilled') setMyForumPosts((results[6].value as any).data || []);
+    if (results[7].status === 'fulfilled') setMyCanhBao((results[7].value as any).data || []);
     walletApi.get().then((w: any) => setWalletBalance(Number(w.balance))).catch(() => {});
   } catch (e: any) {
     setError(e.message || 'Lỗi tải dữ liệu');
@@ -167,6 +179,9 @@ function DashboardContent() {
     { id: 'products', label: 'Sản phẩm', icon: 'ri-plant-line' },
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line' },
+    { id: 'advertisements', label: 'Quảng cáo', icon: 'ri-megaphone-line' },
+    { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line' },
+    { id: 'canh-bao', label: 'Cảnh báo', icon: 'ri-alert-line' },
     { id: 'notifications', label: 'Thông báo', icon: 'ri-notification-line' },
     { id: 'security', label: 'Bảo mật', icon: 'ri-shield-check-line' },
     { id: 'settings', label: 'Cài đặt', icon: 'ri-settings-line' },
@@ -491,6 +506,176 @@ function DashboardContent() {
                             onClick={() => handleDeleteJob(job.id)}
                             className="p-2 text-gray-500 hover:text-red-600 transition-colors"
                           >
+                            <i className="ri-delete-bin-line text-lg"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ADVERTISEMENTS TAB */}
+            {activeTab === 'advertisements' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Quảng cáo của tôi ({myAds.length})</h2>
+                  <Link href="/advertisements/create" className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm">
+                    + Đăng quảng cáo
+                  </Link>
+                </div>
+                {myAds.length === 0 ? (
+                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+                    <i className="ri-megaphone-line text-5xl text-gray-300 block mb-3"></i>
+                    <p className="text-gray-500 mb-4">Bạn chưa có quảng cáo nào</p>
+                    <Link href="/advertisements/create" className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
+                      Đăng quảng cáo ngay
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myAds.map((ad: any) => (
+                      <div key={ad.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
+                        <div className="w-16 h-16 bg-orange-50 rounded-lg overflow-hidden flex-shrink-0">
+                          {ad.images?.[0] ? (
+                            <img src={ad.images[0]} alt={ad.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <i className="ri-megaphone-line text-orange-400 text-xl"></i>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">{ad.title}</h4>
+                          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                            <span>{ad.businessName || 'Không có tên cửa hàng'}</span>
+                            {ad.location && <span>· <i className="ri-map-pin-line mr-0.5"></i>{ad.location}</span>}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                            {ad.startDate && <span>Từ {new Date(ad.startDate).toLocaleDateString('vi-VN')}</span>}
+                            {ad.endDate && <span>đến {new Date(ad.endDate).toLocaleDateString('vi-VN')}</span>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/advertisements/${ad.id}`} className="p-2 text-gray-500 hover:text-orange-500 transition-colors">
+                            <i className="ri-eye-line text-lg"></i>
+                          </Link>
+                          <button onClick={async () => {
+                            if (!confirm('Xóa quảng cáo này?')) return;
+                            try { await advertisements.delete(ad.id); setMyAds(prev => prev.filter((a: any) => a.id !== ad.id)); }
+                            catch { alert('Xóa thất bại'); }
+                          }} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
+                            <i className="ri-delete-bin-line text-lg"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* FORUM TAB */}
+            {activeTab === 'forum' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Bài diễn đàn của tôi ({myForumPosts.length})</h2>
+                  <Link href="/forum/create" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                    + Viết bài mới
+                  </Link>
+                </div>
+                {myForumPosts.length === 0 ? (
+                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+                    <i className="ri-chat-3-line text-5xl text-gray-300 block mb-3"></i>
+                    <p className="text-gray-500 mb-4">Bạn chưa có bài viết nào</p>
+                    <Link href="/forum/create" className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                      Viết bài ngay
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myForumPosts.map((post: any) => (
+                      <div key={post.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
+                        <div className="w-12 h-12 bg-purple-100 rounded-lg overflow-hidden flex-shrink-0">
+                          {post.images?.[0] ? (
+                            <img src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <i className="ri-article-line text-purple-400 text-xl"></i>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                            <span><i className="ri-heart-line mr-0.5"></i>{post.likeCount || 0}</span>
+                            <span><i className="ri-chat-1-line mr-0.5"></i>{post._count?.comments || 0}</span>
+                            <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0}</span>
+                            <span className={`px-2 py-0.5 rounded-full ${post.publishStatus === 'PUBLISHED' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                              {post.publishStatus === 'PUBLISHED' ? 'Đã đăng' : 'Nháp'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/forum/${post.id}`} className="p-2 text-gray-500 hover:text-purple-600 transition-colors">
+                            <i className="ri-eye-line text-lg"></i>
+                          </Link>
+                          <button onClick={async () => {
+                            if (!confirm('Xóa bài viết này?')) return;
+                            try { await forum.delete(post.id); setMyForumPosts(prev => prev.filter((p: any) => p.id !== post.id)); }
+                            catch { alert('Xóa thất bại'); }
+                          }} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
+                            <i className="ri-delete-bin-line text-lg"></i>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* CANH BAO TAB */}
+            {activeTab === 'canh-bao' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-900">Cảnh báo của tôi ({myCanhBao.length})</h2>
+                  <Link href="/canh-bao/create" className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                    + Đăng cảnh báo
+                  </Link>
+                </div>
+                {myCanhBao.length === 0 ? (
+                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+                    <i className="ri-alert-line text-5xl text-gray-300 block mb-3"></i>
+                    <p className="text-gray-500 mb-4">Bạn chưa đăng cảnh báo nào</p>
+                    <Link href="/canh-bao/create" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                      Đăng cảnh báo ngay
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myCanhBao.map((post: any) => (
+                      <div key={post.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
+                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <i className="ri-alert-line text-red-500 text-xl"></i>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                            <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0} lượt xem</span>
+                            <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/canh-bao/${post.id}`} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
+                            <i className="ri-eye-line text-lg"></i>
+                          </Link>
+                          <button onClick={async () => {
+                            if (!confirm('Xóa cảnh báo này?')) return;
+                            try { await forum.delete(post.id); setMyCanhBao(prev => prev.filter((p: any) => p.id !== post.id)); }
+                            catch { alert('Xóa thất bại'); }
+                          }} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
                             <i className="ri-delete-bin-line text-lg"></i>
                           </button>
                         </div>

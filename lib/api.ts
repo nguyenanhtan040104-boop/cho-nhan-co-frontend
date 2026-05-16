@@ -440,6 +440,14 @@ export const forum = {
     return request(`/forum/posts/${id}`, { method: 'DELETE' });
   },
 
+  // My posts (all statuses)
+  async getMyPosts(params?: { category?: string; limit?: number }) {
+    const query = new URLSearchParams();
+    if (params?.category) query.append('category', params.category);
+    if (params?.limit) query.append('limit', String(params.limit));
+    return request<any>(`/forum/my-posts?${query}`);
+  },
+
   // Draft management
   async getMyDrafts() {
     return request<any[]>('/forum/my-drafts');
