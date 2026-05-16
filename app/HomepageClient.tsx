@@ -2,6 +2,26 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
+  { keywords: ['bất động sản', 'bds', 'nhà', 'đất', 'phòng trọ', 'căn hộ'], route: '/real-estate' },
+  { keywords: ['việc làm', 'tuyển dụng', 'tuyển', 'xin việc', 'nhân công'], route: '/jobs' },
+  { keywords: ['diễn đàn', 'forum', 'hỏi đáp'], route: '/forum' },
+  { keywords: ['cảnh báo', 'lừa đảo', 'mất đồ'], route: '/canh-bao' },
+  { keywords: ['quảng cáo', 'khai trương', 'khuyến mãi'], route: '/advertisements' },
+  { keywords: ['nông sản', 'rau', 'củ', 'thực phẩm'], route: '/products?category=NONG_SAN' },
+  { keywords: ['vật nuôi', 'chó', 'mèo', 'gà', 'heo', 'bò'], route: '/products?category=VAT_NUOI' },
+];
+
+function smartSearch(q: string): string {
+  const lower = q.toLowerCase().trim();
+  for (const { keywords, route } of SEARCH_ROUTES) {
+    if (keywords.some(k => lower.includes(k))) {
+      return route + (route.includes('?') ? '&' : '?') + `search=${encodeURIComponent(q)}`;
+    }
+  }
+  return `/products?search=${encodeURIComponent(q)}`;
+}
+
 export default function HomepageClient() {
   const [query, setQuery] = useState('');
   const router = useRouter();
@@ -10,7 +30,7 @@ export default function HomepageClient() {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    router.push(`/products?search=${encodeURIComponent(q)}`);
+    router.push(smartSearch(q));
   }
 
   return (
