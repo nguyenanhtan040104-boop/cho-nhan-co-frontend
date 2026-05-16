@@ -154,8 +154,6 @@ export default function JobDetail({ jobId }: { jobId: string }) {
         </div>
       </div>
     </div>
-
-    </div>
     <div className="max-w-screen-xl mx-auto px-4 pb-6">
       <CommentSection targetType="JOB" targetId={jobId} />
     </div>

@@ -244,8 +244,6 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
         </div>
       </div>
     </div>
-
-    </div>
     <div className="max-w-screen-xl mx-auto px-4 pb-6">
       <CommentSection targetType="REAL_ESTATE" targetId={propertyId} />
     </div>
