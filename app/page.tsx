@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import HomepageClient from './HomepageClient';
 
 export const metadata: Metadata = {
   title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản, việc làm tại Đắk Nông',
@@ -68,50 +69,52 @@ export default async function HomePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen" style={{ background: '#f4f4f4' }}>
 
-      {/* ===== BANNER ===== */}
-      <div className="relative overflow-hidden" style={{ background: '#d0011b' }}>
-        {/* subtle diagonal stripes overlay */}
-        <div className="absolute inset-0 opacity-[0.06]" style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)',
-          backgroundSize: '12px 12px'
-        }} />
-        <div className="relative max-w-screen-xl mx-auto px-5 py-7 sm:py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-white/20 text-white text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide">📍 Nhân Cơ · Đắk Nông</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white leading-snug mb-1">
-              Chợ online của người Nhân Cơ
-            </h1>
-            <p className="text-red-200 text-sm">Mua bán · Tuyển dụng · Bất động sản · Cộng đồng</p>
-          </div>
-          <div className="flex gap-2 flex-shrink-0">
-            <Link href="/products/create" className="bg-white text-red-600 font-bold text-sm px-5 py-2.5 rounded-lg hover:bg-red-50 transition">
-              + Đăng tin miễn phí
-            </Link>
-            <Link href="/products" className="border border-white/40 text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-white/10 transition">
-              Xem tin đăng
-            </Link>
+      {/* ===== BANNER (Chợ Tốt style) ===== */}
+      <div className="relative" style={{ background: '#ffd400', minHeight: 180 }}>
+        {/* Glow circles for depth */}
+        <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full opacity-20" style={{ background: '#ffaa00', filter: 'blur(60px)' }} />
+        <div className="absolute top-0 right-1/4 w-64 h-64 rounded-full opacity-20" style={{ background: '#ff8800', filter: 'blur(60px)' }} />
+
+        <div className="relative max-w-screen-xl mx-auto px-4 pt-8 pb-16 text-center">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight mb-1">
+            Giá tốt, gần nhà, chốt nhanh!
+          </h1>
+          <p className="text-gray-700 text-sm font-medium">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+        </div>
+
+        {/* Search bar floating at bottom */}
+        <div className="absolute -bottom-6 left-0 right-0 px-4">
+          <div className="max-w-2xl mx-auto">
+            <HomepageClient />
           </div>
         </div>
       </div>
 
+      {/* spacer for search bar overlap */}
+      <div className="h-10" />
+
       <div className="max-w-screen-xl mx-auto px-3 sm:px-6">
 
         {/* ===== CATEGORIES ===== */}
-        <div className="bg-white border-b border-gray-200 mt-3 rounded-t-lg px-3 py-3">
-          <div className="flex gap-0 overflow-x-auto scrollbar-hide divide-x divide-gray-100">
-            {categories.map(cat => (
+        <div className="bg-white rounded-xl mt-3 px-2 py-4 shadow-sm">
+          <div className="flex overflow-x-auto scrollbar-hide">
+            {categories.map((cat, i) => (
               <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-1 px-4 py-1.5 hover:bg-gray-50 transition-colors flex-shrink-0 group min-w-[76px]">
-                <div className="w-12 h-12 overflow-hidden rounded-lg">
-                  <img src={(cat as any).img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                className="flex flex-col items-center gap-2 px-3 py-1 hover:opacity-80 transition-opacity flex-shrink-0 group min-w-[80px]">
+                <div className="w-14 h-14 overflow-hidden rounded-lg flex-shrink-0">
+                  <img src={(cat as any).img} alt={cat.title} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-[11px] text-gray-500 font-medium text-center leading-tight group-hover:text-gray-800 whitespace-nowrap mt-0.5">{cat.title}</span>
+                <span className="text-[11px] text-gray-600 font-medium text-center leading-tight whitespace-nowrap">{cat.title}</span>
               </Link>
             ))}
+            {/* Arrow more */}
+            <button className="flex flex-col items-center gap-2 px-3 py-1 flex-shrink-0 min-w-[40px] justify-center">
+              <div className="w-14 h-14 rounded-full border-2 border-gray-200 flex items-center justify-center">
+                <i className="ri-arrow-right-s-line text-gray-400 text-xl"></i>
+              </div>
+            </button>
           </div>
         </div>
 

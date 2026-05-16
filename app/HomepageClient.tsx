@@ -2,24 +2,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const HASHTAG_ROUTES: Record<string, string> = {
-  batdongsan: '/real-estate', bds: '/real-estate', phongtro: '/real-estate',
-  tuyendung: '/jobs', timviec: '/jobs', nhancong: '/jobs',
-  dienddan: '/forum', canhbao: '/canh-bao', quangcao: '/advertisements',
-  nongsan: '/products?category=NONG_SAN',
-  vatnuoi: '/products?category=VAT_NUOI',
-  dichvu: '/products?category=DICH_VU',
-  muaban: '/products',
-};
-
-function resolveSearch(q: string): string {
-  if (q.startsWith('#')) {
-    const tag = q.slice(1).toLowerCase().replace(/\s/g, '');
-    return HASHTAG_ROUTES[tag] || `/products?search=${encodeURIComponent(tag)}`;
-  }
-  return `/products?search=${encodeURIComponent(q)}`;
-}
-
 export default function HomepageClient() {
   const [query, setQuery] = useState('');
   const router = useRouter();
@@ -28,24 +10,24 @@ export default function HomepageClient() {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    router.push(resolveSearch(q));
+    router.push(`/products?search=${encodeURIComponent(q)}`);
   }
 
   return (
     <form onSubmit={handleSearch}>
-      <div className="flex items-center bg-white rounded-xl overflow-hidden shadow-lg">
-        <i className="ri-search-line text-gray-400 pl-4 text-lg flex-shrink-0"></i>
+      <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden border border-gray-100" style={{ height: 52 }}>
+        <i className="ri-search-line text-gray-400 pl-5 text-lg flex-shrink-0"></i>
         <input
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Tìm sản phẩm, việc làm, bất động sản..."
-          className="flex-1 px-3 py-3.5 text-sm focus:outline-none text-gray-800 placeholder-gray-400"
+          placeholder="Tìm sản phẩm..."
+          className="flex-1 px-3 text-sm focus:outline-none text-gray-800 placeholder-gray-400 h-full"
         />
         <button
           type="submit"
-          className="px-6 py-3.5 text-sm font-bold text-white transition hover:opacity-90 flex-shrink-0 rounded-r-xl"
-          style={{ backgroundColor: '#d0011b' }}
+          className="px-6 h-full text-sm font-bold text-gray-900 transition hover:opacity-90 flex-shrink-0 rounded-full m-1"
+          style={{ backgroundColor: '#ffd400' }}
         >
           Tìm kiếm
         </button>
