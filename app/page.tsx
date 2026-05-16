@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import HomepageClient from './HomepageClient';
 
 export const metadata: Metadata = {
   title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản, việc làm tại Đắk Nông',
@@ -73,7 +72,7 @@ export default async function HomePage() {
 
       {/* ===== BANNER ===== */}
       <div style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f97316 60%, #ef4444 100%)' }} className="relative overflow-hidden">
-        <div className="max-w-screen-xl mx-auto px-6 py-8 sm:py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="max-w-screen-xl mx-auto px-6 py-10 sm:py-16 flex flex-col sm:flex-row items-center justify-between gap-6">
           {/* Text */}
           <div className="text-center sm:text-left">
             <p className="text-white/80 text-sm font-medium mb-1">Nhân Cơ · Đắk Nông</p>
@@ -90,12 +89,6 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Search bar */}
-        <div className="pb-6 px-4">
-          <div className="max-w-2xl mx-auto">
-            <HomepageClient />
-          </div>
-        </div>
       </div>
 
       <div className="max-w-screen-xl mx-auto px-3 sm:px-6">
