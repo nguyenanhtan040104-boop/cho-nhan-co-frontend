@@ -162,7 +162,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm" suppressHydrationWarning>
-      <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-2 h-14" suppressHydrationWarning>
+      <div className="w-full px-3 flex items-center gap-2 h-14" suppressHydrationWarning>
 
         {/* Hamburger → Danh mục */}
         <div className="relative flex-shrink-0" ref={hamburgerRef}>
