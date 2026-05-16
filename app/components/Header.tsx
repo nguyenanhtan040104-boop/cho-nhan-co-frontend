@@ -115,10 +115,9 @@ export default function Header() {
 
   function openNotifDropdown() {
     setShowSavedDropdown(false);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) { router.push('/profile'); return; }
     setShowNotifDropdown(v => !v);
-    // Fetch notifications
     fetch(`${API}/notifications?limit=10`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json()).then(data => setNotifs(data.data || [])).catch(() => {});
     setUnreadCount(0);
@@ -141,7 +140,7 @@ export default function Header() {
 
   useEffect(() => {
     function fetchUnread() {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
       if (!token) return;
       fetch(`${API}/notifications/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
