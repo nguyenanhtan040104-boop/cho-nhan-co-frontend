@@ -143,15 +143,14 @@ export default function ForumPage() {
         )}
 
         {loading && posts.length === 0 ? (
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl p-5 animate-pulse">
-                <div className="flex gap-3 mb-3">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex-shrink-0"></div>
-                  <div className="h-3 bg-gray-200 rounded w-32 mt-2"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
+                <div className="w-full bg-gray-200" style={{ paddingBottom: '65%' }}></div>
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
               </div>
             ))}
           </div>
@@ -163,7 +162,7 @@ export default function ForumPage() {
           </div>
         ) : (
           <>
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {posts.map(post => (
                 <ForumCard key={post.id} post={post} bulkMode={bulkMode} selected={selected.has(post.id)} onToggle={() => toggleSelect(post.id)} onDeleted={id => setPosts(prev => prev.filter(p => p.id !== id))} />
               ))}
@@ -185,55 +184,53 @@ export default function ForumPage() {
   );
 }
 
-function ForumCard({ post, bulkMode, selected, onToggle, currentUserId, onDeleted }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId: string | null; onDeleted: (id: string) => void }) {
+function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId?: string | null; onDeleted: (id: string) => void }) {
   const cat = catColors[post.category] || catColors.KHAC;
-  const hasImage = post.images?.[0]?.url;
+  const thumb = post.images?.[0]?.url || post.images?.[0];
 
   return (
-    <div className="relative">
+    <div className="relative group">
       {bulkMode && (
         <button onClick={onToggle}
-          className={`absolute bottom-3 right-3 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
+          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}
       <Link href={bulkMode ? '#' : `/forum/${post.id}`}
         onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all p-5 ${selected ? 'ring-2 ring-green-500' : ''}`}>
-        <div className="flex gap-4">
-          {hasImage && (
-            <img src={hasImage} alt={post.title} className="w-20 h-20 object-cover rounded-xl flex-shrink-0" />
+        className={`block bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden ${selected ? 'ring-2 ring-green-500' : ''}`}>
+        {/* Thumbnail */}
+        <div className="relative w-full bg-gray-100" style={{ paddingBottom: '65%' }}>
+          {thumb ? (
+            <img src={thumb} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}44)` }}>
+              <i className="ri-article-line text-4xl" style={{ color: cat.color, opacity: 0.5 }}></i>
+            </div>
           )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              {post.category && (
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: cat.bg, color: cat.color }}>{cat.label}</span>
-              )}
-              {post.isPinned && <span className="text-xs bg-yellow-100 text-yellow-700 font-semibold px-2 py-0.5 rounded-full">Ghim</span>}
+          {post.category && (
+            <span className="absolute top-2 left-2 text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: cat.color, color: '#fff' }}>{cat.label}</span>
+          )}
+          {post.isPinned && <span className="absolute top-2 right-2 text-[10px] bg-yellow-400 text-yellow-900 font-bold px-1.5 py-0.5 rounded">Ghim</span>}
+        </div>
+        {/* Info */}
+        <div className="p-3">
+          <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2">{post.title}</h3>
+          <div className="flex items-center justify-between text-[11px] text-gray-400">
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-[10px] flex-shrink-0">
+                {post.user?.fullName?.[0] || 'U'}
+              </div>
+              <span className="truncate max-w-[60px]">{post.user?.fullName}</span>
             </div>
-            <h3 className="font-semibold text-gray-800 hover:text-green-700 transition-colors line-clamp-2 mb-1">{post.title}</h3>
-            {post.content && (
-              <p className="text-sm text-gray-400 line-clamp-2">{post.content.replace(/<[^>]+>/g, '').slice(0, 120)}</p>
-            )}
-            <div className="flex items-center gap-3 mt-3 text-xs text-gray-400">
-              {post.user && (
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-xs text-green-700 font-bold flex-shrink-0">
-                    {post.user.fullName?.[0] || 'U'}
-                  </div>
-                  <span>{post.user.fullName}</span>
-                </div>
-              )}
-              <span className="ml-auto flex items-center gap-3">
-                <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0}</span>
-                <span><i className="ri-chat-3-line mr-0.5"></i>{post.commentCount || post._count?.comments || 0}</span>
-                {post.createdAt && <span>{timeAgo(post.createdAt)}</span>}
-              </span>
-            </div>
+            <span className="flex items-center gap-2">
+              <span><i className="ri-chat-3-line"></i> {post.commentCount || post._count?.comments || 0}</span>
+              <span>{timeAgo(post.createdAt)}</span>
+            </span>
           </div>
         </div>
       </Link>
-      <div className="absolute top-3 left-3 z-10">
+      <div className="absolute top-2 right-2 z-10">
         <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
       </div>
     </div>

@@ -108,12 +108,14 @@ export default function CanhBaoPage() {
             </div>
 
             {loading && posts.length === 0 ? (
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl p-5 animate-pulse">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-full mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
+                    <div className="w-full bg-gray-200" style={{ paddingBottom: '65%' }}></div>
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -129,7 +131,7 @@ export default function CanhBaoPage() {
               </div>
             ) : (
               <>
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {posts.map(post => <ReportCard key={post.id} post={post} />)}
                 </div>
                 {totalPages > 1 && (
@@ -210,40 +212,36 @@ export default function CanhBaoPage() {
 }
 
 function ReportCard({ post }: { post: any }) {
-  const hasImage = post.images?.[0]?.url;
+  const thumb = post.images?.[0]?.url || post.images?.[0];
 
   return (
     <Link href={`/forum/${post.id}`}
-      className="block bg-white rounded-2xl border border-red-100 hover:shadow-md hover:-translate-y-0.5 transition-all p-5 group">
-      <div className="flex gap-4">
-        {hasImage && (
-          <img src={hasImage} alt={post.title} className="w-20 h-20 object-cover rounded-xl flex-shrink-0 border border-gray-100" />
+      className="block bg-white rounded-2xl border border-red-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden group">
+      {/* Thumbnail */}
+      <div className="relative w-full bg-red-50" style={{ paddingBottom: '65%' }}>
+        {thumb ? (
+          <img src={thumb} alt={post.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
+            <i className="ri-alarm-warning-line text-4xl text-red-400"></i>
+          </div>
         )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="font-semibold text-gray-800 group-hover:text-red-700 transition-colors line-clamp-2 leading-snug">{post.title}</h3>
-            <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium flex-shrink-0">Cảnh báo</span>
+        <span className="absolute top-2 left-2 text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded">Cảnh báo</span>
+      </div>
+      {/* Info */}
+      <div className="p-3">
+        <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2 group-hover:text-red-700 transition-colors">{post.title}</h3>
+        <div className="flex items-center justify-between text-[11px] text-gray-400">
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-bold text-[10px] flex-shrink-0">
+              {post.user?.fullName?.[0] || 'U'}
+            </div>
+            <span className="truncate max-w-[60px]">{post.user?.fullName}</span>
           </div>
-          {post.content && (
-            <p className="text-sm text-gray-500 line-clamp-2 mb-2">
-              {post.content.replace(/<[^>]+>/g, '').slice(0, 150)}
-            </p>
-          )}
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            {post.user && (
-              <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-bold text-xs flex-shrink-0">
-                  {post.user.fullName?.[0] || 'U'}
-                </div>
-                <span>{post.user.fullName}</span>
-              </div>
-            )}
-            <span className="ml-auto flex items-center gap-3">
-              <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0}</span>
-              <span><i className="ri-chat-3-line mr-0.5"></i>{post.commentCount || post._count?.comments || 0}</span>
-              {post.createdAt && <span>{timeAgo(post.createdAt)}</span>}
-            </span>
-          </div>
+          <span className="flex items-center gap-2">
+            <span><i className="ri-chat-3-line"></i> {post.commentCount || post._count?.comments || 0}</span>
+            <span>{timeAgo(post.createdAt)}</span>
+          </span>
         </div>
       </div>
     </Link>
