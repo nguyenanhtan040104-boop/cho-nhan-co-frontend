@@ -7,7 +7,7 @@ const ITEMS = [
   {
     key: 'cafe',
     label: 'Cà phê',
-    img: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=80&h=80&fit=crop&q=80',
+    img: '/img-cafe-v2.jpg',
     unit: 'đ/kg',
     catMatch: 'cà phê',
     itemIdx: 0,
@@ -15,7 +15,7 @@ const ITEMS = [
   {
     key: 'tieu',
     label: 'Hồ tiêu',
-    img: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=80&h=80&fit=crop&q=80',
+    img: '/img-tieu-v2.jpg',
     unit: 'đ/kg',
     catMatch: 'hồ tiêu',
     itemIdx: 0,
@@ -23,7 +23,7 @@ const ITEMS = [
   {
     key: 'xang',
     label: 'Xăng RON95',
-    img: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=80&h=80&fit=crop&q=80',
+    img: '/img-xang-v2.jpg',
     unit: 'đ/lít',
     catMatch: 'xăng dầu',
     itemIdx: 0,
@@ -31,7 +31,7 @@ const ITEMS = [
   {
     key: 'cao_su',
     label: 'Cao su',
-    img: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=80&h=80&fit=crop&q=80',
+    img: '/img-cao-su-v2.jpg',
     unit: 'đ/kg',
     catMatch: 'cao su',
     itemIdx: 0,
