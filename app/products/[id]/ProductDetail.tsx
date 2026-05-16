@@ -37,6 +37,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       }
     }
     loadProduct();
+    // Sync liked state from localStorage
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
+      setLiked(ids.includes(productId));
+    } catch {}
   }, [productId]);
 
   // Prevent hydration mismatch - only render on client
@@ -87,9 +92,14 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   };
 
   const handleLikeClick = () => {
-    if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
-    setLiked(l => !l);
-    setLikeCount(c => liked ? c - 1 : c + 1);
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
+      const isNowLiked = !ids.includes(productId);
+      const next = isNowLiked ? [...ids, productId] : ids.filter(x => x !== productId);
+      localStorage.setItem('liked_items', JSON.stringify(next));
+      setLiked(isNowLiked);
+      setLikeCount(c => isNowLiked ? c + 1 : c - 1);
+    } catch {}
   };
 
   const handleShareClick = async () => {
