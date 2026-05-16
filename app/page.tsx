@@ -170,66 +170,52 @@ export default async function HomePage() {
           )}
         </section>
 
-        {/* ===== BĐS + TUYỂN DỤNG ===== */}
-        <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2">
-          <section className="bg-white overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
-              <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-                <i className="ri-home-4-line text-blue-500"></i> Bất động sản
-              </h2>
-              <Link href="/real-estate" className="text-xs text-red-600">Xem tất cả →</Link>
+        {/* ===== BĐS ===== */}
+        <section className="mt-2 bg-white overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+            <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+              <i className="ri-home-4-line text-blue-500"></i> Bất động sản
+            </h2>
+            <Link href="/real-estate" className="text-xs text-red-600">Xem tất cả →</Link>
+          </div>
+          {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-[1px] bg-gray-100">
+              {realEstate.slice(0, 6).map((item: any) => (
+                <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />
+              ))}
             </div>
-            {realEstate.length === 0 ? <EmptyBlock label="Chưa có tin bất động sản" /> : (
-              <div className="divide-y divide-gray-100">
-                {realEstate.slice(0, 5).map((item: any) => (
-                  <Link key={item.id} href={`/real-estate/${item.id}`}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
-                    <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      <i className="ri-home-4-line text-blue-400 text-sm"></i>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-red-600">{item.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        {item.price && <span className="text-xs font-bold" style={{ color: '#d0011b' }}>{fmtPrice(item, 'real-estate')}</span>}
-                        {item.address && <span className="text-xs text-gray-400 truncate"><i className="ri-map-pin-line"></i> {item.address}</span>}
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-gray-400 flex-shrink-0">{timeAgo(item.createdAt)}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </section>
+          )}
+        </section>
 
-          <section className="bg-white overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
-              <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
-                <i className="ri-briefcase-line text-purple-500"></i> Tuyển dụng mới
-              </h2>
-              <Link href="/jobs" className="text-xs text-red-600">Xem tất cả →</Link>
+        {/* ===== TUYỂN DỤNG ===== */}
+        <section className="mt-2 bg-white overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+            <h2 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+              <i className="ri-briefcase-line text-purple-500"></i> Tuyển dụng mới
+            </h2>
+            <Link href="/jobs" className="text-xs text-red-600">Xem tất cả →</Link>
+          </div>
+          {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
+            <div className="divide-y divide-gray-100">
+              {jobs.slice(0, 5).map((job: any) => (
+                <Link key={job.id} href={`/jobs/${job.id}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
+                  <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                    <i className="ri-briefcase-line text-purple-400 text-sm"></i>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-red-600">{job.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {job.salary && <span className="text-xs font-bold" style={{ color: '#d0011b' }}>{job.salary}</span>}
+                      {job.location && <span className="text-xs text-gray-400 truncate"><i className="ri-map-pin-line"></i> {job.location}</span>}
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-gray-400 flex-shrink-0">{timeAgo(job.createdAt)}</span>
+                </Link>
+              ))}
             </div>
-            {jobs.length === 0 ? <EmptyBlock label="Chưa có tin tuyển dụng" /> : (
-              <div className="divide-y divide-gray-100">
-                {jobs.slice(0, 5).map((job: any) => (
-                  <Link key={job.id} href={`/jobs/${job.id}`}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors group">
-                    <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                      <i className="ri-briefcase-line text-purple-400 text-sm"></i>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-red-600">{job.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        {job.salary && <span className="text-xs font-bold" style={{ color: '#d0011b' }}>{job.salary}</span>}
-                        {job.location && <span className="text-xs text-gray-400 truncate"><i className="ri-map-pin-line"></i> {job.location}</span>}
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-gray-400 flex-shrink-0">{timeAgo(job.createdAt)}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </section>
-        </div>
+          )}
+        </section>
 
         {/* ===== DIỄN ĐÀN ===== */}
         <section className="mt-2 bg-white overflow-hidden mb-4">
