@@ -75,6 +75,22 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
     const name = c.user?.fullName || c.user?.username || 'Ẩn danh';
     const initial = name[0]?.toUpperCase() || 'A';
     const isOwn = currentUser && currentUser.id === c.userId;
+
+    const CLIKE_KEY = 'comment_likes';
+    const getCLiked = () => { try { return JSON.parse(localStorage.getItem(CLIKE_KEY) || '{}'); } catch { return {}; } };
+    const [cLiked, setCLiked] = useState(() => !!getCLiked()[c.id]);
+    const [cLikeCount, setCLikeCount] = useState<number>(c.likeCount || 0);
+
+    function handleCommentLike() {
+      if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+      const liked = getCLiked();
+      const nowLiked = !liked[c.id];
+      if (nowLiked) liked[c.id] = true; else delete liked[c.id];
+      localStorage.setItem(CLIKE_KEY, JSON.stringify(liked));
+      setCLiked(nowLiked);
+      setCLikeCount(n => nowLiked ? n + 1 : Math.max(0, n - 1));
+    }
+
     return (
       <div className="flex gap-3">
         <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 mt-0.5">
@@ -87,6 +103,12 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
           </div>
           <div className="flex items-center gap-3 mt-1 px-1">
             <span className="text-[11px] text-gray-400">{timeAgo(c.createdAt)}</span>
+            {/* Like button */}
+            <button onClick={handleCommentLike}
+              className={`flex items-center gap-1 text-[11px] font-semibold transition ${cLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}>
+              <i className={cLiked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
+              {cLikeCount > 0 && <span>{cLikeCount}</span>}
+            </button>
             {!parentId && (
               <button onClick={() => setReplyTo({ id: c.id, name })}
                 className="text-[11px] text-gray-500 font-semibold hover:text-gray-800">
@@ -101,7 +123,7 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
             )}
           </div>
           {c.replies?.length > 0 && (
-            <div className="mt-2 space-y-2">
+            <div className="mt-2 space-y-2 pl-2 border-l-2 border-gray-100">
               {c.replies.map((r: any) => <CommentItem key={r.id} c={r} parentId={c.id} />)}
             </div>
           )}

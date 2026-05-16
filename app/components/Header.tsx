@@ -72,6 +72,7 @@ export default function Header() {
   const [showSavedDropdown, setShowSavedDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifs, setNotifs] = useState<any[]>([]);
+  const [notifTab, setNotifTab] = useState<'activity'|'news'>('activity');
   const [savedProducts, setSavedProducts] = useState<any[]>([]);
   const pathname = usePathname();
   const router = useRouter();
@@ -310,34 +311,67 @@ export default function Header() {
               )}
             </button>
             {showNotifDropdown && (
-              <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <h3 className="font-bold text-gray-900">Thông Báo</h3>
-                  <button onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}
-                    className="text-xs text-yellow-500 font-medium hover:underline">Xem tất cả</button>
-                </div>
-                {notifs.length === 0 ? (
-                  <div className="py-10 text-center text-gray-400">
-                    <i className="ri-notification-3-line text-3xl block mb-2"></i>
-                    <p className="text-sm">Chưa có thông báo nào</p>
+              <div className="absolute right-0 top-12 w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                {/* Header */}
+                <div className="px-5 pt-4 pb-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-bold text-gray-900">Thông Báo</h3>
+                    <button onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}
+                      className="text-xs text-yellow-500 font-semibold hover:underline">Xem tất cả</button>
                   </div>
-                ) : (
-                  <div className="divide-y divide-gray-50 max-h-96 overflow-y-auto">
-                    {notifs.map((n: any) => (
-                      <div key={n.id} className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-yellow-50/50' : ''}`}
-                        onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}>
-                        <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <i className={`text-sm ${n.type?.includes('LIKE') ? 'ri-heart-fill text-red-500' : n.type?.includes('COMMENT') ? 'ri-chat-1-fill text-blue-500' : 'ri-notification-2-fill text-yellow-600'}`}></i>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-800 leading-snug line-clamp-2">{n.body || n.title}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{timeAgoHeader(n.createdAt)}</p>
-                        </div>
-                        {!n.isRead && <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-2"></div>}
-                      </div>
+                  {/* Tabs */}
+                  <div className="flex gap-0 border-b border-gray-100">
+                    {(['activity','news'] as const).map(tab => (
+                      <button key={tab} onClick={() => setNotifTab(tab)}
+                        className={`px-4 py-2.5 text-sm font-semibold transition border-b-2 -mb-px ${notifTab === tab ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
+                        {tab === 'activity' ? 'Hoạt Động' : 'Tin Tức'}
+                      </button>
                     ))}
                   </div>
-                )}
+                </div>
+
+                {/* Content */}
+                <div className="max-h-[480px] overflow-y-auto">
+                  {notifTab === 'news' ? (
+                    <div className="py-12 text-center text-gray-400">
+                      <i className="ri-newspaper-line text-4xl block mb-2"></i>
+                      <p className="text-sm">Chưa có tin tức nào</p>
+                    </div>
+                  ) : notifs.length === 0 ? (
+                    <div className="py-12 text-center text-gray-400">
+                      <i className="ri-notification-3-line text-4xl block mb-2"></i>
+                      <p className="text-sm font-medium text-gray-600">Chưa có thông báo nào</p>
+                      <p className="text-xs mt-1">Các thông báo tương tác sẽ hiện ở đây</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {notifs.some((n:any) => !n.isRead) && (
+                        <p className="px-5 pt-3 pb-1 text-xs font-bold text-gray-900">Thông báo mới</p>
+                      )}
+                      {notifs.map((n: any) => {
+                        const isLike = n.type?.includes('LIKE');
+                        const isComment = n.type?.includes('COMMENT');
+                        const iconClass = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : 'ri-notification-2-fill text-yellow-600';
+                        const iconBg = isLike ? 'bg-red-50' : isComment ? 'bg-blue-50' : 'bg-yellow-50';
+                        return (
+                          <div key={n.id}
+                            className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-amber-50/60' : ''}`}
+                            onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${iconBg}`}>
+                              <i className={`${iconClass} text-base`}></i>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              {n.title && <p className="text-sm font-semibold text-gray-900 leading-snug">{n.title}</p>}
+                              <p className="text-sm text-gray-600 leading-snug line-clamp-2 mt-0.5">{n.body || n.message}</p>
+                              <p className="text-xs text-gray-400 mt-1">{timeAgoHeader(n.createdAt)}</p>
+                            </div>
+                            {!n.isRead && <div className="w-2.5 h-2.5 bg-red-500 rounded-full flex-shrink-0 mt-2"></div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
