@@ -8,12 +8,12 @@ import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 
 const subCategories = [
-  { value: '', label: 'Tất cả vật nuôi' },
-  { value: 'chó', label: '🐕 Chó' },
-  { value: 'mèo', label: '🐈 Mèo' },
-  { value: 'gia cầm', label: '🐓 Gia cầm' },
-  { value: 'gia súc', label: '🐄 Gia súc' },
-  { value: 'cá', label: '🐟 Cá cảnh' },
+  { value: '', label: 'Tất cả' },
+  { value: 'chó', label: 'Chó' },
+  { value: 'mèo', label: 'Mèo' },
+  { value: 'gia cầm', label: 'Gia cầm' },
+  { value: 'gia súc', label: 'Gia súc' },
+  { value: 'cá', label: 'Cá cảnh' },
 ];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
@@ -89,7 +89,7 @@ function VatNuoiContent() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-amber-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-1">🐾 Vật nuôi</h1>
+              <h1 className="text-3xl font-bold text-white mb-1">Vật nuôi</h1>
               <p className="text-amber-200 text-sm">
                 <span className="font-semibold text-white">{total}</span> tin đăng · Chó, mèo, gia cầm, gia súc...
               </p>
@@ -234,7 +234,7 @@ function PetCard({ item, isVip }: { item: any; isVip?: boolean }) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-              <span className="text-4xl">🐾</span>
+              <i className="ri-bear-smile-line text-4xl text-amber-300"></i>
               <span className="text-xs text-gray-400">Chưa có ảnh</span>
             </div>
           )}

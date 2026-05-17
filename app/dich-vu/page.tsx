@@ -8,13 +8,13 @@ import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 
 const subCategories = [
-  { value: '', label: 'Tất cả dịch vụ' },
-  { value: 'sửa chữa', label: '🔧 Sửa chữa, bảo dưỡng' },
-  { value: 'vận chuyển', label: '🚛 Vận chuyển' },
-  { value: 'tư vấn', label: '💬 Tư vấn' },
-  { value: 'xây dựng', label: '🏗️ Xây dựng' },
-  { value: 'giặt ủi', label: '👕 Giặt ủi' },
-  { value: 'vệ sinh', label: '🧹 Vệ sinh' },
+  { value: '', label: 'Tất cả' },
+  { value: 'sửa chữa', label: 'Sửa chữa, bảo dưỡng' },
+  { value: 'vận chuyển', label: 'Vận chuyển' },
+  { value: 'tư vấn', label: 'Tư vấn' },
+  { value: 'xây dựng', label: 'Xây dựng' },
+  { value: 'giặt ủi', label: 'Giặt ủi' },
+  { value: 'vệ sinh', label: 'Vệ sinh' },
 ];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
@@ -90,7 +90,7 @@ function DichVuContent() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-indigo-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-1">🔧 Dịch vụ</h1>
+              <h1 className="text-3xl font-bold text-white mb-1">Dịch vụ</h1>
               <p className="text-indigo-200 text-sm">
                 <span className="font-semibold text-white">{total}</span> dịch vụ · Sửa chữa, vận chuyển, tư vấn...
               </p>
@@ -235,7 +235,7 @@ function ServiceCard({ item, isVip }: { item: any; isVip?: boolean }) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-              <span className="text-4xl">🔧</span>
+              <i className="ri-service-line text-4xl text-indigo-300"></i>
               <span className="text-xs text-gray-400">Chưa có ảnh</span>
             </div>
           )}
