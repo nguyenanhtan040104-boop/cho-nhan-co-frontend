@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app' },
 };
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
 
 async function getHomeData() {
   try {
