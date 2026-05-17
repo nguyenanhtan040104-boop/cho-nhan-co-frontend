@@ -128,7 +128,7 @@ function smartSearch(q: string): string {
   return `/products?search=${encodeURIComponent(q)}`;
 }
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
 
 function timeAgoHeader(d: string) {
   const diff = Date.now() - new Date(d).getTime();

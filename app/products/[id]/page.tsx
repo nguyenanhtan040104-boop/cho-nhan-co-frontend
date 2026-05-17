@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import ProductDetail from './ProductDetail';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
 
 async function getProduct(id: string) {
   try {

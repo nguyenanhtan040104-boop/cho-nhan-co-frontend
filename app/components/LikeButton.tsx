@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { itemComments, auth } from '../../lib/api';
 
 const LIKED_KEY = 'liked_items';
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend-production.up.railway.app/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
 
 function getLiked(): string[] {
   try { return JSON.parse(localStorage.getItem(LIKED_KEY) || '[]'); } catch { return []; }
