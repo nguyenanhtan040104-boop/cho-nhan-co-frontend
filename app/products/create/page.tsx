@@ -14,13 +14,17 @@ const CATEGORY_CONFIG: Record<string, { label: string; backHref: string; success
   HANG_TIEU_DUNG:  { label: 'Hàng tiêu dùng',   backHref: '/products', successHref: '/products', color: 'green' },
 };
 
+// Danh mục chỉ dùng khi không pre-select (trang nông sản chung)
 const categories = [
   { id: 'NONG_SAN',         name: 'Nông sản' },
   { id: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng gia đình' },
   { id: 'HANG_TIEU_DUNG',   name: 'Hàng tiêu dùng' },
-  { id: 'VAT_NUOI',         name: 'Vật nuôi' },
-  { id: 'DICH_VU',          name: 'Dịch vụ' },
 ];
+
+// Subcategories cho vật nuôi
+const VAT_NUOI_SUBS = ['Chó', 'Mèo', 'Gia cầm', 'Gia súc', 'Cá cảnh', 'Khác'];
+// Subcategories cho dịch vụ
+const DICH_VU_SUBS  = ['Sửa chữa', 'Vận chuyển', 'Tư vấn', 'Xây dựng', 'Giặt ủi', 'Vệ sinh', 'Khác'];
 
 export default function CreateProductPage() {
   return (
@@ -42,6 +46,7 @@ function CreateProductContent() {
   const [formData, setFormData] = useState({
     title: '',
     category: initCategory,
+    subCategory: '',
     price: '',
     unit: '',
     description: '',
@@ -95,12 +100,16 @@ function CreateProductContent() {
       const uploaded = await uploads.uploadImages(imageFiles);
       const imageUrls = uploaded.map((u: any) => u.url);
 
+      const descWithSub = formData.subCategory
+        ? `#${formData.subCategory}\n${formData.description}`
+        : formData.description;
+
       await productsApi.create({
         title: formData.title,
         category: formData.category as any,
         price: Number(formData.price),
         unit: formData.unit,
-        description: formData.description,
+        description: descWithSub,
         location: formData.location,
         contactPhone: formData.contactPhone || undefined,
         quantity: formData.quantity ? Number(formData.quantity) : undefined,
@@ -198,14 +207,41 @@ function CreateProductContent() {
             {/* Danh mục & Giá */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Danh mục <span className="text-red-500">*</span>
-                </label>
-                <select name="category" required value={formData.category} onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 outline-none ${ringClass} bg-white`}>
-                  <option value="">Chọn danh mục</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+                {/* Nếu category đã cố định (VAT_NUOI / DICH_VU) → show subcategory picker */}
+                {initCategory === 'VAT_NUOI' ? (
+                  <>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Loại vật nuôi <span className="text-red-500">*</span>
+                    </label>
+                    <select name="subCategory" required value={formData.subCategory} onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 outline-none ${ringClass} bg-white`}>
+                      <option value="">Chọn loại</option>
+                      {VAT_NUOI_SUBS.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </>
+                ) : initCategory === 'DICH_VU' ? (
+                  <>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Loại dịch vụ <span className="text-red-500">*</span>
+                    </label>
+                    <select name="subCategory" required value={formData.subCategory} onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 outline-none ${ringClass} bg-white`}>
+                      <option value="">Chọn loại</option>
+                      {DICH_VU_SUBS.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </>
+                ) : (
+                  <>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Danh mục <span className="text-red-500">*</span>
+                    </label>
+                    <select name="category" required value={formData.category} onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 outline-none ${ringClass} bg-white`}>
+                      <option value="">Chọn danh mục</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
