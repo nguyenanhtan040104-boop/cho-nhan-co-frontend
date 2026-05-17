@@ -6,8 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
 
 const navLinks = [
-  { href: '/', label: 'Chợ Nhân Cơ' },
-  { href: '/products', label: 'Sản phẩm' },
+  { href: '/', label: 'Chợ NC' },
+  { href: '/products', label: 'Nông sản' },
+  { href: '/vat-nuoi', label: 'Vật nuôi' },
+  { href: '/dich-vu', label: 'Dịch vụ' },
   { href: '/real-estate', label: 'Bất động sản' },
   { href: '/jobs', label: 'Việc làm' },
 ];
@@ -34,10 +36,11 @@ const mainCategories = [
   {
     label: 'Vật nuôi', icon: 'ri-bear-smile-line',
     sub: [
-      { href: '/products?category=VAT_NUOI', label: 'Tất cả vật nuôi' },
-      { href: '/products?category=VAT_NUOI&search=chó', label: 'Chó' },
-      { href: '/products?category=VAT_NUOI&search=mèo', label: 'Mèo' },
-      { href: '/products?category=VAT_NUOI&search=gia cầm', label: 'Gia cầm, gia súc' },
+      { href: '/vat-nuoi', label: 'Tất cả vật nuôi' },
+      { href: '/vat-nuoi?search=chó', label: '🐕 Chó' },
+      { href: '/vat-nuoi?search=mèo', label: '🐈 Mèo' },
+      { href: '/vat-nuoi?search=gia cầm', label: '🐓 Gia cầm' },
+      { href: '/vat-nuoi?search=gia súc', label: '🐄 Gia súc' },
     ],
   },
   {
@@ -51,10 +54,11 @@ const mainCategories = [
   {
     label: 'Dịch vụ', icon: 'ri-service-line',
     sub: [
-      { href: '/products?category=DICH_VU', label: 'Tất cả dịch vụ' },
-      { href: '/products?category=DICH_VU&search=sửa chữa', label: 'Sửa chữa, bảo dưỡng' },
-      { href: '/products?category=DICH_VU&search=vận chuyển', label: 'Vận chuyển' },
-      { href: '/products?category=DICH_VU&search=tư vấn', label: 'Tư vấn' },
+      { href: '/dich-vu', label: 'Tất cả dịch vụ' },
+      { href: '/dich-vu?search=sửa chữa', label: '🔧 Sửa chữa, bảo dưỡng' },
+      { href: '/dich-vu?search=vận chuyển', label: '🚛 Vận chuyển' },
+      { href: '/dich-vu?search=tư vấn', label: '💬 Tư vấn' },
+      { href: '/dich-vu?search=xây dựng', label: '🏗️ Xây dựng' },
     ],
   },
   {
@@ -96,7 +100,9 @@ const mainCategories = [
 ];
 
 const postItems = [
-  { href: '/products/create', icon: 'ri-leaf-line', label: 'Đăng sản phẩm', sub: 'Nông sản, thực phẩm, vật nuôi' },
+  { href: '/products/create', icon: 'ri-leaf-line', label: 'Đăng nông sản', sub: 'Nông sản, thực phẩm' },
+  { href: '/products/create?category=VAT_NUOI', icon: 'ri-bear-smile-line', label: 'Đăng vật nuôi', sub: 'Chó, mèo, gia súc...' },
+  { href: '/products/create?category=DICH_VU', icon: 'ri-service-line', label: 'Đăng dịch vụ', sub: 'Sửa chữa, vận chuyển...' },
   { href: '/real-estate/create', icon: 'ri-home-4-line', label: 'Bất động sản', sub: 'Nhà đất, phòng trọ' },
   { href: '/jobs/create', icon: 'ri-briefcase-line', label: 'Tuyển dụng', sub: 'Tìm việc, thuê nhân công' },
   { href: '/advertisements/create', icon: 'ri-megaphone-line', label: 'Quảng cáo', sub: 'Khai trương, khuyến mãi' },
@@ -322,20 +328,17 @@ export default function Header() {
         {/* Spacer trái */}
         <div className="flex-1" />
 
-        {/* Nav links ở GIỮA — như Chợ Tốt */}
+        {/* Nav links ở GIỮA */}
         <nav className="hidden lg:flex items-center gap-1 flex-shrink-0">
-          <Link href="/" className={`text-sm font-semibold px-3 py-1.5 rounded-full transition ${pathname === '/' ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}>
-            Chợ NC
-          </Link>
-          <Link href="/products" className={`text-sm font-medium px-3 py-1.5 rounded-full transition ${pathname.startsWith('/products') ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}>
-            Sản phẩm
-          </Link>
-          <Link href="/real-estate" className={`text-sm font-medium px-3 py-1.5 rounded-full transition ${pathname.startsWith('/real-estate') ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}>
-            Bất động sản
-          </Link>
-          <Link href="/jobs" className={`text-sm font-medium px-3 py-1.5 rounded-full transition ${pathname.startsWith('/jobs') ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}>
-            Việc làm
-          </Link>
+          {navLinks.map(link => (
+            <Link key={link.href} href={link.href}
+              className={`text-sm font-medium px-3 py-1.5 rounded-full transition whitespace-nowrap ${
+                link.href === '/' ? (pathname === '/' ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900')
+                : pathname.startsWith(link.href) ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'
+              }`}>
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
         {/* Spacer phải */}

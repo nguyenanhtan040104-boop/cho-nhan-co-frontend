@@ -8,12 +8,10 @@ import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 
 const categories = [
-  { value: '', name: 'Tất cả', icon: '' },
+  { value: '', name: 'Tất cả nông sản', icon: '' },
   { value: 'NONG_SAN', name: 'Nông sản', icon: '' },
-  { value: 'VAT_NUOI', name: 'Vật nuôi', icon: '' },
   { value: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng', icon: '' },
   { value: 'HANG_TIEU_DUNG', name: 'Tiêu dùng', icon: '' },
-  { value: 'DICH_VU', name: 'Dịch vụ', icon: '' },
 ];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
@@ -123,7 +121,7 @@ function ProductsInner() {
                   <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                   <input
                     type="text"
-                    placeholder="Tìm sản phẩm, vật nuôi..."
+                    placeholder="Tìm nông sản, thực phẩm..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white/90 backdrop-blur"
