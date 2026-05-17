@@ -12,6 +12,8 @@ const TAB_MAP: Record<string, string> = {
   notifications: 'notifications',
   messages: 'overview',
   products: 'products',
+  'vat-nuoi': 'vat-nuoi',
+  'dich-vu': 'dich-vu',
   'real-estate': 'real-estate',
   jobs: 'jobs',
   wallet: 'wallet',
@@ -176,7 +178,9 @@ function DashboardContent() {
     { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-line' },
     { id: 'analytics', label: 'Hiệu suất', icon: 'ri-bar-chart-line' },
     { id: 'engagement', label: 'Tương tác', icon: 'ri-heart-line' },
-    { id: 'products', label: 'Sản phẩm', icon: 'ri-plant-line' },
+    { id: 'products', label: 'Nông sản', icon: 'ri-plant-line' },
+    { id: 'vat-nuoi', label: 'Vật nuôi', icon: 'ri-bear-smile-line' },
+    { id: 'dich-vu', label: 'Dịch vụ', icon: 'ri-service-line' },
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line' },
     { id: 'advertisements', label: 'Quảng cáo', icon: 'ri-megaphone-line' },
@@ -387,8 +391,39 @@ function DashboardContent() {
             {/* PRODUCTS TAB */}
             {activeTab === 'products' && (
               <ProductsTab
-                myProducts={myProducts}
+                myProducts={myProducts.filter((p: any) => p.category !== 'VAT_NUOI' && p.category !== 'DICH_VU')}
                 setMyProducts={setMyProducts}
+                title="Nông sản của tôi"
+                createHref="/products/create"
+                createLabel="+ Đăng nông sản"
+                emptyLabel="nông sản"
+                accentColor="green"
+              />
+            )}
+
+            {/* VAT NUOI TAB */}
+            {activeTab === 'vat-nuoi' && (
+              <ProductsTab
+                myProducts={myProducts.filter((p: any) => p.category === 'VAT_NUOI')}
+                setMyProducts={setMyProducts}
+                title="Vật nuôi của tôi"
+                createHref="/products/create?category=VAT_NUOI"
+                createLabel="+ Đăng vật nuôi"
+                emptyLabel="vật nuôi"
+                accentColor="amber"
+              />
+            )}
+
+            {/* DICH VU TAB */}
+            {activeTab === 'dich-vu' && (
+              <ProductsTab
+                myProducts={myProducts.filter((p: any) => p.category === 'DICH_VU')}
+                setMyProducts={setMyProducts}
+                title="Dịch vụ của tôi"
+                createHref="/products/create?category=DICH_VU"
+                createLabel="+ Đăng dịch vụ"
+                emptyLabel="dịch vụ"
+                accentColor="indigo"
               />
             )}
 
@@ -1206,7 +1241,23 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
 }
 
 // =================== PRODUCTS TAB COMPONENT ===================
-function ProductsTab({ myProducts, setMyProducts }: { myProducts: any[]; setMyProducts: any }) {
+function ProductsTab({
+  myProducts,
+  setMyProducts,
+  title = 'Sản phẩm của tôi',
+  createHref = '/products/create',
+  createLabel = '+ Đăng sản phẩm',
+  emptyLabel = 'sản phẩm',
+  accentColor = 'green',
+}: {
+  myProducts: any[];
+  setMyProducts: any;
+  title?: string;
+  createHref?: string;
+  createLabel?: string;
+  emptyLabel?: string;
+  accentColor?: string;
+}) {
   const [editingQuantity, setEditingQuantity] = useState<string | null>(null);
   const [quantityValue, setQuantityValue] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -1263,18 +1314,18 @@ function ProductsTab({ myProducts, setMyProducts }: { myProducts: any[]; setMyPr
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Sản phẩm của tôi ({myProducts.length})</h2>
-        <Link href="/products/create" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm">
-          + Đăng sản phẩm
+        <h2 className="text-xl font-bold text-gray-900">{title} ({myProducts.length})</h2>
+        <Link href={createHref} className={`bg-${accentColor}-600 text-white px-4 py-2 rounded-lg hover:bg-${accentColor}-700 text-sm`}>
+          {createLabel}
         </Link>
       </div>
 
       {myProducts.length === 0 ? (
         <div className="bg-white rounded-xl p-12 text-center shadow-sm">
           <i className="ri-plant-line text-5xl text-gray-300 block mb-3"></i>
-          <p className="text-gray-500 mb-4">Bạn chưa có sản phẩm nào</p>
-          <Link href="/products/create" className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
-            Đăng sản phẩm ngay
+          <p className="text-gray-500 mb-4">Bạn chưa có {emptyLabel} nào</p>
+          <Link href={createHref} className={`bg-${accentColor}-600 text-white px-6 py-2 rounded-lg hover:bg-${accentColor}-700`}>
+            Đăng {emptyLabel} ngay
           </Link>
         </div>
       ) : (
@@ -1303,7 +1354,7 @@ function ProductsTab({ myProducts, setMyProducts }: { myProducts: any[]; setMyPr
                   </div>
 
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    <span className="text-green-600 font-semibold text-sm">{Number(product.price).toLocaleString()}đ/{product.unit}</span>
+                    <span className={`text-${accentColor}-600 font-semibold text-sm`}>{Number(product.price).toLocaleString()}đ/{product.unit}</span>
                     {product.isVip && (
                       <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">VIP</span>
                     )}
@@ -1319,7 +1370,7 @@ function ProductsTab({ myProducts, setMyProducts }: { myProducts: any[]; setMyPr
                           className="w-20 px-2 py-0.5 border border-gray-300 rounded text-xs" min="0" autoFocus />
                         <button onClick={() => handleSaveQuantity(product.id)}
                           disabled={actionLoading === product.id + '-qty'}
-                          className="text-xs bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 disabled:opacity-50">
+                          className={`text-xs bg-${accentColor}-600 text-white px-2 py-0.5 rounded hover:bg-${accentColor}-700 disabled:opacity-50`}>
                           {actionLoading === product.id + '-qty' ? '...' : 'Lưu'}
                         </button>
                         <button onClick={() => setEditingQuantity(null)} className="text-xs text-gray-500 hover:text-gray-700">Hủy</button>
