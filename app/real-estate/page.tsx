@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { realEstate, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
+import LikeButton from '../components/LikeButton';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -219,6 +220,7 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
           )}
           {item.isVip && <span className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VIP</span>}
           {item.type && <span className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">{typeLabel[item.type] || item.type}</span>}
+          <LikeButton itemId={String(item.id)} />
         </div>
         <div className="p-4">
           <h3 className="font-semibold text-gray-800 line-clamp-2 mb-2 group-hover:text-blue-700 transition-colors">{item.title}</h3>

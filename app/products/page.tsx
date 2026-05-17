@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
+import LikeButton from '../components/LikeButton';
 
 const categories = [
   { value: '', name: 'Tất cả nông sản', icon: '' },
@@ -317,6 +318,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
               <i className="ri-vip-crown-fill text-xs"></i> VIP
             </div>
           )}
+          <LikeButton itemId={String(product.id)} />
           {/* Category tag */}
           {product.category && (
             <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full">

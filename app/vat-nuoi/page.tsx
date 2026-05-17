@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { products as productsApi, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
+import LikeButton from '../components/LikeButton';
 
 const subCategories = [
   { value: '', label: 'Tất cả' },
@@ -239,10 +240,11 @@ function PetCard({ item, isVip }: { item: any; isVip?: boolean }) {
             </div>
           )}
           {isVip && (
-            <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 shadow">
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 shadow">
               <i className="ri-vip-crown-fill text-xs"></i> VIP
             </div>
           )}
+          <LikeButton itemId={String(item.id)} />
         </div>
         <div className="p-3">
           <h4 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2 group-hover:text-amber-700 transition-colors">
