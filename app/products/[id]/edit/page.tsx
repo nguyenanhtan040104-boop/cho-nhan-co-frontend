@@ -81,8 +81,11 @@ export default function EditProductPage() {
       let newUrls: string[] = [];
       if (newFiles.length > 0) {
         const uploaded = await uploads.uploadImages(newFiles);
-        newUrls = uploaded.map(u => u.url);
+        newUrls = uploaded.map((u: any) => u.url);
       }
+
+      // Gửi toàn bộ danh sách ảnh (ảnh cũ còn lại + ảnh mới)
+      const allImages = [...existingImages, ...newUrls];
 
       await productsApi.update(id, {
         title: form.title,
@@ -90,14 +93,16 @@ export default function EditProductPage() {
         category: form.category,
         price: Number(form.price),
         unit: form.unit,
-        quantity: form.quantity ? Number(form.quantity) : undefined,
+        quantity: form.quantity !== '' ? Number(form.quantity) : undefined,
         location: form.location,
         contactPhone: form.contactPhone || undefined,
+        images: allImages,
       });
 
       router.push(`/products/${id}`);
-    } catch (e: any) {
-      setError(e.message || 'Lưu thất bại');
+    } catch (err: any) {
+      const msg = err?.message || err?.error || JSON.stringify(err);
+      setError(msg || 'Lưu thất bại. Vui lòng thử lại.');
     } finally {
       setSaving(false);
     }
