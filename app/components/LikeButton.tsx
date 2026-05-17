@@ -43,7 +43,7 @@ export default function LikeButton({ itemId, targetType = 'PRODUCT' }: { itemId:
   return (
     <button
       onClick={handleClick}
-      className="absolute bottom-2 left-1/2 -translate-x-1/2 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-10"
+      className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-10"
     >
       <i className={`${liked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400'} text-sm transition-colors`}></i>
     </button>

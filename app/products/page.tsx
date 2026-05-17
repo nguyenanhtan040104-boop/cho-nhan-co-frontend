@@ -314,7 +314,7 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
           )}
           {/* VIP badge */}
           {isVip && (
-            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 shadow">
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 shadow">
               <i className="ri-vip-crown-fill text-xs"></i> VIP
             </div>
           )}

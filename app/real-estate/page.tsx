@@ -218,7 +218,7 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
           ) : (
             <div className="w-full h-full flex items-center justify-center"><i className="ri-home-4-line text-4xl text-gray-200"></i></div>
           )}
-          {item.isVip && <span className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VIP</span>}
+          {item.isVip && <span className="absolute top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VIP</span>}
           {item.type && <span className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">{typeLabel[item.type] || item.type}</span>}
           <LikeButton itemId={String(item.id)} />
         </div>
