@@ -27,10 +27,10 @@ const mainCategories = [
   {
     label: 'Nông sản & Thực phẩm', icon: 'ri-plant-line',
     sub: [
-      { href: '/products?category=NONG_SAN', label: 'Tất cả nông sản' },
-      { href: '/products?category=NONG_SAN&search=rau', label: 'Rau củ quả' },
-      { href: '/products?category=NONG_SAN&search=cà phê', label: 'Cà phê, hồ tiêu' },
-      { href: '/products?category=NONG_SAN&search=gạo', label: 'Lúa gạo' },
+      { href: '/products', label: 'Tất cả sản phẩm' },
+      { href: '/products?category=NONG_SAN', label: 'Nông sản' },
+      { href: '/products?category=DO_DUNG_GIA_DINH', label: 'Đồ dùng gia đình' },
+      { href: '/products?category=HANG_TIEU_DUNG', label: 'Hàng tiêu dùng' },
     ],
   },
   {
