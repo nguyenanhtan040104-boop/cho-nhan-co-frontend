@@ -292,7 +292,7 @@ export default function ProfilePage() {
         {(tab === 'login' || tab === 'register') && (
           <div className="mb-4">
             <a
-              href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://api.chonhanco.com'}/api/auth/google`}
+              href="https://api.chonhanco.com/api/auth/google"
               className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700 bg-white"
             >
               <svg width="20" height="20" viewBox="0 0 48 48">
