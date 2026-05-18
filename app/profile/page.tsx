@@ -104,7 +104,7 @@ export default function ProfilePage() {
       const res = await fetch(`${API_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: formData.email, code: formData.otp, type: 'REGISTER' }),
+        body: JSON.stringify({ email: formData.email, code: formData.otp }),
       });
       const data = await res.json();
       if (!res.ok) {
