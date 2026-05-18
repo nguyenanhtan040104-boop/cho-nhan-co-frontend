@@ -83,10 +83,10 @@ export default function ProfilePage() {
       if (!res.ok) throw new Error(data.message || 'Đăng ký thất bại');
 
       setOtpAttempts(0);
-      setMessage(`Mã OTP đã gửi tới ${formData.email}`);
       setFormData(prev => ({ ...prev, otp: '' }));
       setTab('verify-otp');
       startCountdown();
+      setMessage(data.message || `Mã OTP đã gửi tới ${formData.email}`);
     } catch (err: any) {
       setError(err.message || 'Có lỗi xảy ra');
     } finally {
