@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [otpAttempts, setOtpAttempts] = useState(0);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -63,6 +64,7 @@ export default function ProfilePage() {
     setLoading(true); setError(''); setMessage('');
     try {
       if (!formData.username || !formData.password) throw new Error('Tên đăng nhập và mật khẩu là bắt buộc');
+      if (!formData.email) throw new Error('Email là bắt buộc để xác thực tài khoản');
       if (formData.password !== formData.confirmPassword) throw new Error('Mật khẩu không khớp');
       if (formData.password.length < 6) throw new Error('Mật khẩu phải ít nhất 6 ký tự');
 
@@ -74,18 +76,17 @@ export default function ProfilePage() {
           password: formData.password,
           confirmPassword: formData.confirmPassword,
           fullName: formData.fullName || formData.username,
-          email: formData.email || undefined,
+          email: formData.email,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Đăng ký thất bại');
 
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      setMessage('Đăng ký thành công!');
-      setTimeout(() => router.push('/dashboard'), 1500);
+      setOtpAttempts(0);
+      setMessage(`Mã OTP đã gửi tới ${formData.email}`);
+      setFormData(prev => ({ ...prev, otp: '' }));
+      setTab('verify-otp');
+      startCountdown();
     } catch (err: any) {
       setError(err.message || 'Có lỗi xảy ra');
     } finally {
@@ -98,14 +99,22 @@ export default function ProfilePage() {
     setLoading(true); setError(''); setMessage('');
     try {
       if (!formData.otp || formData.otp.length !== 6) throw new Error('Vui lòng nhập mã OTP 6 chữ số');
+      if (otpAttempts >= 5) throw new Error('Bạn đã nhập sai OTP quá 5 lần. Vui lòng gửi lại OTP mới.');
 
       const res = await fetch(`${API_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, code: formData.otp }),
+        body: JSON.stringify({ target: formData.email, code: formData.otp, type: 'REGISTER' }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Xác nhận OTP thất bại');
+      if (!res.ok) {
+        const newAttempts = otpAttempts + 1;
+        setOtpAttempts(newAttempts);
+        const remaining = 5 - newAttempts;
+        throw new Error(remaining > 0
+          ? `OTP không chính xác. Còn ${remaining} lần thử.`
+          : 'Bạn đã nhập sai OTP quá 5 lần. Vui lòng gửi lại OTP mới.');
+      }
 
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
@@ -225,6 +234,8 @@ export default function ProfilePage() {
       });
       if (!res.ok) throw new Error('Gửi lại OTP thất bại');
       setMessage('Đã gửi lại mã OTP');
+      setOtpAttempts(0);
+      setFormData(prev => ({ ...prev, otp: '' }));
       startCountdown();
     } catch (err: any) {
       setError(err.message);
@@ -327,10 +338,11 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email <span className="text-gray-400 font-normal">(tùy chọn, để xác thực sau)</span>
+                Email <span className="text-red-500">*</span>
               </label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com"
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+              <p className="text-xs text-gray-500 mt-1">Dùng để xác thực tài khoản qua OTP</p>
             </div>
             <button type="submit" disabled={loading}
               className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
@@ -358,7 +370,10 @@ export default function ProfilePage() {
               <input type="text" name="otp" value={formData.otp} onChange={handleChange} placeholder="000000" maxLength={6}
                 className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono" />
             </div>
-            <button type="submit" disabled={loading || formData.otp.length !== 6}
+            {otpAttempts > 0 && otpAttempts < 5 && (
+              <p className="text-xs text-orange-600 text-center">Còn {5 - otpAttempts} lần thử</p>
+            )}
+            <button type="submit" disabled={loading || formData.otp.length !== 6 || otpAttempts >= 5}
               className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang xác nhận...' : 'Xác nhận'}
             </button>
