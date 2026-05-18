@@ -104,9 +104,9 @@ function ProductsInner() {
           }} />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-green-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
               <h1 className="text-3xl font-bold text-white mb-1">Sản phẩm nông nghiệp</h1>
@@ -116,8 +116,8 @@ function ProductsInner() {
             </div>
 
             {/* Search */}
-            <div className="flex gap-2 w-full lg:w-auto">
-              <form onSubmit={handleSearch} className="flex flex-1 lg:w-80 gap-2">
+            <div className="flex gap-2 w-full">
+              <form onSubmit={handleSearch} className="flex flex-1 gap-2">
                 <div className="relative flex-1">
                   <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                   <input
@@ -141,7 +141,7 @@ function ProductsInner() {
           </div>
 
           {/* Category pills */}
-          <div className="flex gap-2 mt-5 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 flex-wrap justify-center mt-5">
             {categories.map(cat => (
               <button
                 key={cat.value}

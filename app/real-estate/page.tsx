@@ -94,17 +94,17 @@ function RealEstateContent() {
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>
               <p className="text-blue-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ</p>
               <h1 className="text-2xl font-bold text-white">Bất động sản</h1>
               <p className="text-blue-200 text-sm mt-1">{total} tin đăng tại Đắk Nông</p>
             </div>
-            <div className="flex gap-2">
-              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2">
+            <div className="flex gap-2 w-full">
+              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex flex-1 gap-2">
                 <input type="text" placeholder="Tìm địa chỉ, tiêu đề..." value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-blue-200 focus:outline-none focus:bg-white/20 w-52" />
+                  className="flex-1 px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-blue-200 focus:outline-none focus:bg-white/20" />
                 <button type="submit" className="bg-white text-blue-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-50">Tìm</button>
               </form>
               <Link href="/real-estate/create" className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-400 whitespace-nowrap">
@@ -113,7 +113,7 @@ function RealEstateContent() {
             </div>
           </div>
           {/* Filters */}
-          <div className="flex gap-2 mt-4 flex-wrap">
+          <div className="flex gap-2 flex-wrap justify-center mt-5">
             {typeOptions.map(o => (
               <button key={o.value} onClick={() => setType(o.value)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${type === o.value ? 'bg-white text-blue-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>

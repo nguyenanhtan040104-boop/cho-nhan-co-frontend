@@ -86,9 +86,9 @@ function DichVuContent() {
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }} />
         <div className="relative max-w-7xl mx-auto px-4 py-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-indigo-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
               <h1 className="text-3xl font-bold text-white mb-1">Dịch vụ</h1>
@@ -96,8 +96,8 @@ function DichVuContent() {
                 <span className="font-semibold text-white">{total}</span> dịch vụ · Sửa chữa, vận chuyển, tư vấn...
               </p>
             </div>
-            <div className="flex gap-2 w-full lg:w-auto">
-              <form onSubmit={handleSearch} className="flex flex-1 lg:w-80 gap-2">
+            <div className="flex gap-2 w-full">
+              <form onSubmit={handleSearch} className="flex flex-1 gap-2">
                 <div className="relative flex-1">
                   <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                   <input
@@ -121,7 +121,7 @@ function DichVuContent() {
           </div>
 
           {/* Sub-category pills */}
-          <div className="flex gap-2 mt-5 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 flex-wrap justify-center mt-5">
             {subCategories.map(cat => (
               <button key={cat.value} onClick={() => { setSubFilter(cat.value); setPage(1); }}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${

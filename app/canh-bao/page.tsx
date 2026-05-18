@@ -63,17 +63,17 @@ export default function CanhBaoPage() {
       {/* Banner đỏ cảnh báo */}
       <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>
               <p className="text-red-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ · Cộng đồng</p>
               <h1 className="text-2xl font-bold text-white">Cảnh báo cộng đồng</h1>
               <p className="text-red-200 text-sm mt-1">{total} thông báo từ cộng đồng · Cùng bảo vệ nhau</p>
             </div>
-            <div className="flex gap-2">
-              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2">
+            <div className="flex gap-2 w-full">
+              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex flex-1 gap-2">
                 <input type="text" placeholder="Tìm tên, số tài khoản, số điện thoại..." value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-red-200 focus:outline-none focus:bg-white/20 w-64" />
+                  className="flex-1 px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-red-200 focus:outline-none focus:bg-white/20" />
                 <button type="submit" className="bg-white text-red-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-50">Tìm</button>
               </form>
               <Link href="/canh-bao/create"
@@ -83,7 +83,7 @@ export default function CanhBaoPage() {
             </div>
           </div>
           {/* Sort */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 flex-wrap justify-center mt-5">
             {[{ v: 'newest', l: 'Mới nhất' }, { v: 'popular', l: 'Nhiều xem nhất' }, { v: 'most_comments', l: 'Nhiều bình luận' }].map(o => (
               <button key={o.v} onClick={() => setSortBy(o.v)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.v ? 'bg-white text-red-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
