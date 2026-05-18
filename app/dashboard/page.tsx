@@ -21,6 +21,10 @@ const TAB_MAP: Record<string, string> = {
   advertisements: 'advertisements',
   forum: 'forum',
   'canh-bao': 'canh-bao',
+  analytics: 'analytics',
+  performance: 'analytics',
+  security: 'security',
+  settings: 'settings',
 };
 
 export default function DashboardPage() {
@@ -349,11 +353,12 @@ function DashboardContent() {
                       { label: 'Tuyển dụng', value: stats.breakdown?.jobs, color: 'text-indigo-600', icon: 'ri-briefcase-line' },
                       { label: 'Diễn đàn', value: stats.breakdown?.forumPosts, color: 'text-purple-600', icon: 'ri-chat-3-line' },
                     ].map((item, i) => (
-                      <div key={i} className="text-center p-4 bg-gray-50 rounded-lg">
+                      <button key={i} onClick={() => setActiveTab(['products','real-estate','jobs','forum'][i])}
+                        className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer">
                         <i className={`${item.icon} text-2xl ${item.color} mb-1 block`}></i>
                         <p className="text-2xl font-bold text-gray-900">{item.value || 0}</p>
                         <p className="text-sm text-gray-500">{item.label}</p>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -478,10 +483,10 @@ function DashboardContent() {
                           <Link href={`/real-estate/${item.id}`} className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <button
-                            onClick={() => handleDeleteRealEstate(item.id)}
-                            className="p-2 text-gray-500 hover:text-red-600 transition-colors"
-                          >
+                          <Link href={`/real-estate/${item.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                            <i className="ri-edit-line text-lg"></i>
+                          </Link>
+                          <button onClick={() => handleDeleteRealEstate(item.id)} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
                             <i className="ri-delete-bin-line text-lg"></i>
                           </button>
                         </div>
@@ -537,10 +542,10 @@ function DashboardContent() {
                           <Link href={`/jobs/${job.id}`} className="p-2 text-gray-500 hover:text-indigo-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <button
-                            onClick={() => handleDeleteJob(job.id)}
-                            className="p-2 text-gray-500 hover:text-red-600 transition-colors"
-                          >
+                          <Link href={`/jobs/${job.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                            <i className="ri-edit-line text-lg"></i>
+                          </Link>
+                          <button onClick={() => handleDeleteJob(job.id)} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
                             <i className="ri-delete-bin-line text-lg"></i>
                           </button>
                         </div>
@@ -595,6 +600,9 @@ function DashboardContent() {
                         <div className="flex items-center gap-2">
                           <Link href={`/advertisements/${ad.id}`} className="p-2 text-gray-500 hover:text-orange-500 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
+                          </Link>
+                          <Link href={`/advertisements/${ad.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                            <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={async () => {
                             if (!confirm('Xóa quảng cáo này?')) return;
@@ -656,6 +664,9 @@ function DashboardContent() {
                           <Link href={`/forum/${post.id}`} className="p-2 text-gray-500 hover:text-purple-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
+                          <Link href={`/forum/${post.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                            <i className="ri-edit-line text-lg"></i>
+                          </Link>
                           <button onClick={async () => {
                             if (!confirm('Xóa bài viết này?')) return;
                             try { await forum.delete(post.id); setMyForumPosts(prev => prev.filter((p: any) => p.id !== post.id)); }
@@ -705,6 +716,9 @@ function DashboardContent() {
                         <div className="flex items-center gap-2">
                           <Link href={`/canh-bao/${post.id}`} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
+                          </Link>
+                          <Link href={`/canh-bao/${post.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                            <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={async () => {
                             if (!confirm('Xóa cảnh báo này?')) return;
