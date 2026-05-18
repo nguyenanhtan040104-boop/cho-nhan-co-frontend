@@ -278,7 +278,7 @@ function DashboardContent() {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                  <Link href="/dashboard?tab=products" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                         <i className="ri-price-tag-3-line text-green-600 text-lg"></i>
@@ -286,9 +286,9 @@ function DashboardContent() {
                       <span className="text-gray-500 text-sm">Tin đăng</span>
                     </div>
                     <p className="text-3xl font-bold text-gray-900">{stats.totalListings}</p>
-                  </div>
+                  </Link>
 
-                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                  <Link href="/dashboard?tab=performance" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <i className="ri-eye-line text-blue-600 text-lg"></i>
@@ -296,9 +296,9 @@ function DashboardContent() {
                       <span className="text-gray-500 text-sm">Lượt xem</span>
                     </div>
                     <p className="text-3xl font-bold text-gray-900">{stats.totalViews}</p>
-                  </div>
+                  </Link>
 
-                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                  <Link href="/messages" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                         <i className="ri-message-3-line text-purple-600 text-lg"></i>
@@ -306,9 +306,9 @@ function DashboardContent() {
                       <span className="text-gray-500 text-sm">Tin nhắn mới</span>
                     </div>
                     <p className="text-3xl font-bold text-gray-900">{stats.unreadMessages}</p>
-                  </div>
+                  </Link>
 
-                  <div className="bg-white rounded-xl p-5 shadow-sm">
+                  <Link href="/pricing" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                         <i className="ri-vip-crown-line text-yellow-600 text-lg"></i>
@@ -318,7 +318,7 @@ function DashboardContent() {
                     <p className="text-xl font-bold text-gray-900">
                       {stats.vip ? `${stats.vip.plan} (${stats.vip.daysLeft}d)` : 'Chưa có'}
                     </p>
-                  </div>
+                  </Link>
                 </div>
 
                 {/* Wallet Balance Card */}
