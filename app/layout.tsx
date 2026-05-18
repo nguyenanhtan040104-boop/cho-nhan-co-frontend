@@ -4,7 +4,7 @@ import Header from './components/Header';
 
 const inter = Be_Vietnam_Pro({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600', '700', '800'] });
 
-const siteUrl = 'https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app';
+const siteUrl = 'https://chonhanco.com';
 const siteName = 'Chợ Nhân Cơ';
 
 export const metadata = {
@@ -56,7 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="shortcut icon" href="/icon.svg" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
         {/* Structured data - Organization */}
         <script
           type="application/ld+json"
