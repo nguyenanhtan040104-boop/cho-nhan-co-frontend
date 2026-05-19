@@ -84,8 +84,9 @@ const mainCategories = [
     label: 'Cảnh báo lừa đảo', icon: 'ri-alert-line',
     sub: [
       { href: '/canh-bao', label: 'Tất cả cảnh báo' },
-      { href: '/canh-bao?search=lừa đảo mua bán', label: 'Lừa đảo mua bán' },
-      { href: '/canh-bao?search=giả mạo', label: 'Giả mạo danh tính' },
+      { href: '/canh-bao?sub=L%E1%BB%ABa%20%C4%91%E1%BA%A3o%20mua%20b%C3%A1n', label: 'Lừa đảo mua bán' },
+      { href: '/canh-bao?sub=Gi%E1%BA%A3%20m%E1%BA%A1o%20danh%20t%C3%ADnh', label: 'Giả mạo danh tính' },
+      { href: '/canh-bao?sub=L%E1%BB%ABa%20%C4%91%E1%BA%A3o%20%C4%91%E1%BA%B7t%20c%E1%BB%8Dc', label: 'Lừa đảo đặt cọc' },
       { href: '/canh-bao/create', label: '+ Đăng cảnh báo' },
     ],
   },

@@ -1,18 +1,18 @@
-'use client';
+﻿'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { forum, auth } from '../../lib/api';
 import EmptyState from '../components/EmptyState';
 
 const reportTypes = [
-  { value: '', label: 'Tất cả' },
-  { value: 'lua_dao_mua_ban', label: 'Lừa đảo mua bán' },
-  { value: 'gia_mao', label: 'Giả mạo danh tính' },
-  { value: 'lua_dao_dat_coc', label: 'Lừa đảo đặt cọc' },
-  { value: 'hang_gia', label: 'Hàng giả / kém chất lượng' },
-  { value: 'khac', label: 'Khác' },
+  { value: '', label: 'Tất cả', icon: 'ri-list-check' },
+  { value: 'Lừa đảo mua bán', label: 'Lừa đảo mua bán', icon: 'ri-shopping-cart-line' },
+  { value: 'Giả mạo danh tính', label: 'Giả mạo danh tính', icon: 'ri-user-unfollow-line' },
+  { value: 'Lừa đảo đặt cọc', label: 'Lừa đảo đặt cọc', icon: 'ri-money-dollar-circle-line' },
+  { value: 'Hàng giả', label: 'Hàng giả / kém CL', icon: 'ri-close-circle-line' },
+  { value: 'Khác', label: 'Khác', icon: 'ri-more-line' },
 ];
 
 function timeAgo(dateStr: string) {
@@ -31,36 +31,55 @@ const TIPS = [
   'Cảnh giác với giá quá rẻ, ưu đãi hấp dẫn bất thường',
 ];
 
-export default function CanhBaoPage() {
+function CanhBaoContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [posts, setPosts] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [subFilter, setSubFilter] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+
+  useEffect(() => {
+    const sub = searchParams.get('sub') || '';
+    const q = searchParams.get('search') || '';
+    setSubFilter(sub);
+    if (q) setSearch(q);
+  }, [searchParams]);
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
     try {
       const params: any = { page: p, limit: 15, sortBy, category: 'CANH_BAO' };
       if (search) params.search = search;
+      if (subFilter) params.search = (params.search ? params.search + ' ' : '') + subFilter;
       const res = await forum.getAll(params);
       setPosts(res.data || []);
       setTotal(res.total || 0);
       setTotalPages(res.totalPages || 1);
       setPage(p);
     } catch { } finally { setLoading(false); }
-  }, [search, sortBy]);
+  }, [search, subFilter, sortBy]);
 
   useEffect(() => { loadData(1); }, [loadData]);
 
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
 
+  function handleSubFilter(val: string) {
+    setSubFilter(val);
+    setSearch('');
+    if (val) {
+      router.replace(`/canh-bao?sub=${encodeURIComponent(val)}`);
+    } else {
+      router.replace('/canh-bao');
+    }
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
-      {/* Banner đỏ cảnh báo */}
       <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
@@ -82,11 +101,23 @@ export default function CanhBaoPage() {
               </Link>
             </div>
           </div>
-          {/* Sort */}
+
+          {/* Sub-category pills */}
           <div className="flex gap-2 flex-wrap justify-center mt-5">
+            {reportTypes.map(rt => (
+              <button key={rt.value} onClick={() => handleSubFilter(rt.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${subFilter === rt.value ? 'bg-white text-red-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
+                <i className={`${rt.icon} text-sm`}></i>
+                {rt.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort */}
+          <div className="flex gap-2 flex-wrap justify-center mt-3">
             {[{ v: 'newest', l: 'Mới nhất' }, { v: 'popular', l: 'Nhiều xem nhất' }, { v: 'most_comments', l: 'Nhiều bình luận' }].map(o => (
               <button key={o.v} onClick={() => setSortBy(o.v)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.v ? 'bg-white text-red-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
+                className={`px-3 py-1 rounded-full text-xs transition-all ${sortBy === o.v ? 'bg-red-900/60 text-white border border-white/30' : 'text-red-200 hover:text-white'}`}>
                 {o.l}
               </button>
             ))}
@@ -99,7 +130,19 @@ export default function CanhBaoPage() {
 
           {/* Main list */}
           <div className="flex-1 min-w-0">
-            {/* Warning notice */}
+            {subFilter && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm text-gray-500">Đang lọc:</span>
+                <span className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium flex items-center gap-2">
+                  {subFilter}
+                  <button onClick={() => handleSubFilter('')} className="hover:text-red-900">
+                    <i className="ri-close-line"></i>
+                  </button>
+                </span>
+                <button onClick={() => handleSubFilter('')} className="text-xs text-gray-400 hover:text-gray-600 underline">Bỏ lọc</button>
+              </div>
+            )}
+
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
               <div className="flex gap-3">
                 <i className="ri-information-line text-amber-500 text-xl flex-shrink-0 mt-0.5"></i>
@@ -124,11 +167,11 @@ export default function CanhBaoPage() {
               </div>
             ) : posts.length === 0 ? (
               <EmptyState
-                keyword={search || undefined}
+                keyword={search || subFilter || undefined}
                 entityLabel="cảnh báo"
                 createHref="/canh-bao/create"
                 createLabel="+ Đăng cảnh báo đầu tiên"
-                onClearSearch={search ? () => { setSearch(''); router.replace('/canh-bao'); } : undefined}
+                onClearSearch={(search || subFilter) ? () => { setSearch(''); handleSubFilter(''); } : undefined}
               />
             ) : (
               <>
@@ -151,7 +194,6 @@ export default function CanhBaoPage() {
 
           {/* Sidebar */}
           <div className="lg:w-72 flex-shrink-0 space-y-4">
-            {/* Đăng báo cáo CTA */}
             {isLoggedIn ? (
               <Link href="/canh-bao/create"
                 className="block bg-red-600 hover:bg-red-700 text-white rounded-2xl p-5 transition-colors text-center">
@@ -167,6 +209,24 @@ export default function CanhBaoPage() {
                 <p className="text-sm text-red-100">Đăng nhập để chia sẻ thông tin</p>
               </Link>
             )}
+
+            {/* Lọc theo loại */}
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <i className="ri-filter-3-line text-red-500"></i>
+                Lọc theo loại
+              </h3>
+              <div className="space-y-1">
+                {reportTypes.map(rt => (
+                  <button key={rt.value} onClick={() => handleSubFilter(rt.value)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-left ${subFilter === rt.value ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}>
+                    <i className={`${rt.icon} text-base flex-shrink-0 ${subFilter === rt.value ? 'text-red-500' : 'text-gray-400'}`}></i>
+                    <span>{rt.label}</span>
+                    {subFilter === rt.value && <i className="ri-check-line ml-auto text-red-500"></i>}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Tips */}
             <div className="bg-white rounded-2xl p-5 border border-gray-100">
@@ -212,13 +272,24 @@ export default function CanhBaoPage() {
   );
 }
 
+export default function CanhBaoPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f8f5f0' }}>
+        <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <CanhBaoContent />
+    </Suspense>
+  );
+}
+
 function ReportCard({ post }: { post: any }) {
   const thumb = post.images?.[0]?.url || post.images?.[0];
 
   return (
     <Link href={`/forum/${post.id}`}
       className="block bg-white rounded-2xl border border-red-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden group">
-      {/* Thumbnail */}
       <div className="relative w-full bg-red-50" style={{ paddingBottom: '65%' }}>
         {thumb ? (
           <img src={thumb} alt={post.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -229,7 +300,6 @@ function ReportCard({ post }: { post: any }) {
         )}
         <span className="absolute top-2 left-2 text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded">Cảnh báo</span>
       </div>
-      {/* Info */}
       <div className="p-3">
         <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2 group-hover:text-red-700 transition-colors">{post.title}</h3>
         <div className="flex items-center justify-between text-[11px] text-gray-400">
