@@ -37,10 +37,10 @@ const mainCategories = [
     label: 'Vật nuôi', icon: 'ri-bear-smile-line',
     sub: [
       { href: '/vat-nuoi', label: 'Tất cả vật nuôi' },
-      { href: '/vat-nuoi?search=chó', label: 'Chó' },
-      { href: '/vat-nuoi?search=mèo', label: 'Mèo' },
-      { href: '/vat-nuoi?search=gia cầm', label: 'Gia cầm' },
-      { href: '/vat-nuoi?search=gia súc', label: 'Gia súc' },
+      { href: '/vat-nuoi?sub=chó', label: 'Chó' },
+      { href: '/vat-nuoi?sub=mèo', label: 'Mèo' },
+      { href: '/vat-nuoi?sub=gia cầm', label: 'Gia cầm' },
+      { href: '/vat-nuoi?sub=gia súc', label: 'Gia súc' },
     ],
   },
   {
@@ -55,10 +55,10 @@ const mainCategories = [
     label: 'Dịch vụ', icon: 'ri-service-line',
     sub: [
       { href: '/dich-vu', label: 'Tất cả dịch vụ' },
-      { href: '/dich-vu?search=sửa chữa', label: 'Sửa chữa, bảo dưỡng' },
-      { href: '/dich-vu?search=vận chuyển', label: 'Vận chuyển' },
-      { href: '/dich-vu?search=tư vấn', label: 'Tư vấn' },
-      { href: '/dich-vu?search=xây dựng', label: 'Xây dựng' },
+      { href: '/dich-vu?sub=sửa chữa', label: 'Sửa chữa, bảo dưỡng' },
+      { href: '/dich-vu?sub=vận chuyển', label: 'Vận chuyển' },
+      { href: '/dich-vu?sub=tư vấn', label: 'Tư vấn' },
+      { href: '/dich-vu?sub=xây dựng', label: 'Xây dựng' },
     ],
   },
   {
