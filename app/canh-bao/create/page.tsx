@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -109,6 +109,7 @@ export default function CreateReportPage() {
     isAnonymous: false,
   });
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -174,9 +175,8 @@ export default function CreateReportPage() {
         category: 'CANH_BAO',
         images: imageUrls,
         isAnonymous: form.isAnonymous,
-        status: 'PUBLISHED',
       });
-      router.push('/canh-bao');
+      setSubmitted(true);
     } catch (e: any) {
       setError(e.message || 'Đăng thất bại, thử lại sau');
     } finally {
@@ -185,6 +185,69 @@ export default function CreateReportPage() {
   }
 
   const typeInfo = getTypeInfo(selectedType);
+
+  // Màn hình chờ duyệt — sau khi submit thành công
+  if (submitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f8f5f0' }}>
+        <div className="bg-white rounded-3xl shadow-lg p-8 max-w-md w-full text-center">
+          {/* Icon */}
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <i className="ri-time-line text-4xl text-amber-500"></i>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Đã gửi thành công!</h2>
+          <p className="text-gray-500 text-sm mb-5 leading-relaxed">
+            Bài cảnh báo của bạn đang <span className="font-semibold text-amber-600">chờ admin kiểm duyệt</span>.<br/>
+            Sau khi được duyệt, bài sẽ xuất hiện công khai cho cộng đồng.
+          </p>
+
+          {/* Stepper */}
+          <div className="flex items-center justify-center gap-2 mb-7">
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <i className="ri-check-line text-white text-sm"></i>
+              </div>
+              <span className="text-[10px] text-green-600 font-medium">Đã gửi</span>
+            </div>
+            <div className="flex-1 h-0.5 bg-amber-200 max-w-[48px]"></div>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center animate-pulse">
+                <i className="ri-time-line text-white text-sm"></i>
+              </div>
+              <span className="text-[10px] text-amber-600 font-medium">Chờ duyệt</span>
+            </div>
+            <div className="flex-1 h-0.5 bg-gray-200 max-w-[48px]"></div>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <i className="ri-global-line text-gray-400 text-sm"></i>
+              </div>
+              <span className="text-[10px] text-gray-400 font-medium">Công khai</span>
+            </div>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 text-left">
+            <div className="flex gap-2">
+              <i className="ri-information-line text-amber-500 flex-shrink-0 mt-0.5"></i>
+              <p className="text-xs text-amber-700 leading-relaxed">
+                Thông thường bài được duyệt trong vòng <strong>vài giờ</strong>. Bạn sẽ nhận thông báo khi bài được duyệt hoặc nếu có vấn đề.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Link href="/canh-bao"
+              className="block bg-red-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors">
+              Về trang Cảnh báo
+            </Link>
+            <button onClick={() => { setSubmitted(false); setForm({ subject: '', phone: '', bankAccount: '', amount: '', location: '', itemDescription: '', description: '', isAnonymous: false }); setImageFiles([]); setImagePreviews([]); }}
+              className="block text-gray-500 text-sm py-2 hover:text-gray-700 transition-colors">
+              Đăng thêm cảnh báo khác
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>

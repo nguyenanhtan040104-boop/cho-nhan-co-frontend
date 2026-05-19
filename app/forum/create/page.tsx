@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -210,12 +210,29 @@ export default function CreatePostPage() {
 
       {success && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-line text-green-600 text-2xl"></i>
+          <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl">
+            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-time-line text-amber-500 text-2xl"></i>
             </div>
-            <h3 className="text-lg font-semibold mb-2">Đăng bài thành công!</h3>
-            <p className="text-gray-500 text-sm">Đang chuyển trang...</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Đã gửi thành công!</h3>
+            <p className="text-gray-500 text-sm leading-relaxed mb-1">Bài viết đang <span className="font-semibold text-amber-600">chờ admin kiểm duyệt</span>.</p>
+            <p className="text-gray-400 text-xs">Sau khi được duyệt, bài sẽ xuất hiện công khai.</p>
+            <div className="mt-4 flex justify-center gap-3">
+              <div className="flex flex-col items-center gap-1">
+                <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center"><i className="ri-check-line text-white text-xs"></i></div>
+                <span className="text-[10px] text-green-600">Đã gửi</span>
+              </div>
+              <div className="flex-1 h-0.5 bg-amber-200 mt-3.5 max-w-[32px]"></div>
+              <div className="flex flex-col items-center gap-1">
+                <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center animate-pulse"><i className="ri-time-line text-white text-xs"></i></div>
+                <span className="text-[10px] text-amber-600">Chờ duyệt</span>
+              </div>
+              <div className="flex-1 h-0.5 bg-gray-200 mt-3.5 max-w-[32px]"></div>
+              <div className="flex flex-col items-center gap-1">
+                <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center"><i className="ri-global-line text-gray-400 text-xs"></i></div>
+                <span className="text-[10px] text-gray-400">Công khai</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
