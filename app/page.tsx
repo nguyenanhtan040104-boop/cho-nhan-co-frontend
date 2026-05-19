@@ -29,17 +29,50 @@ async function getHomeData() {
   } catch { return { products: [], jobs: [], realEstate: [], forum: [] }; }
 }
 
-const categories = [
-  { title: 'Nông sản', href: '/products?category=NONG_SAN', img: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=120&h=120&fit=crop&q=80' },
-  { title: 'Bất động sản', href: '/real-estate', img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=120&h=120&fit=crop&q=80' },
-  { title: 'Tuyển dụng', href: '/jobs', img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=120&h=120&fit=crop&q=80' },
-  { title: 'Vật nuôi', href: '/products?category=VAT_NUOI', img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=120&h=120&fit=crop&q=80' },
-  { title: 'Dịch vụ', href: '/products?category=DICH_VU', img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=120&h=120&fit=crop&q=80' },
-  { title: 'Diễn đàn', href: '/forum', img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&h=120&fit=crop&q=80' },
-  { title: 'Cảnh báo', href: '/canh-bao', img: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=120&h=120&fit=crop&q=80' },
-  { title: 'Quảng cáo', href: '/advertisements', img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&h=120&fit=crop&q=80' },
-  { title: 'Bảng giá', href: '/market-prices', img: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=120&h=120&fit=crop&q=80' },
-  { title: 'Sản phẩm', href: '/products', img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop&q=80' },
+// Nhóm danh mục đầy đủ — mỗi mục có href chính xác
+const categoryGroups = [
+  {
+    group: 'Mua bán',
+    color: '#2d6a4f',
+    items: [
+      { title: 'Nông sản', href: '/products?category=NONG_SAN', icon: 'ri-leaf-fill', bg: '#d8f3dc' },
+      { title: 'Vật nuôi', href: '/vat-nuoi', icon: 'ri-bear-smile-fill', bg: '#fff0d6' },
+      { title: 'Dịch vụ', href: '/dich-vu', icon: 'ri-tools-fill', bg: '#e0f2fe' },
+      { title: 'Đồ dùng', href: '/products?category=DO_DUNG_GIA_DINH', icon: 'ri-home-smile-fill', bg: '#fce7f3' },
+      { title: 'Tiêu dùng', href: '/products?category=HANG_TIEU_DUNG', icon: 'ri-shopping-bag-3-fill', bg: '#fef3c7' },
+      { title: 'Tất cả SP', href: '/products', icon: 'ri-store-3-fill', bg: '#ede9fe' },
+    ],
+  },
+  {
+    group: 'Bất động sản & Việc làm',
+    color: '#1d4ed8',
+    items: [
+      { title: 'Bất động sản', href: '/real-estate', icon: 'ri-home-4-fill', bg: '#dbeafe' },
+      { title: 'Tuyển dụng', href: '/jobs', icon: 'ri-briefcase-fill', bg: '#ede9fe' },
+      { title: 'Tìm việc', href: '/jobs?type=JOB_SEEKER', icon: 'ri-user-search-fill', bg: '#f0fdf4' },
+    ],
+  },
+  {
+    group: 'Diễn đàn cộng đồng',
+    color: '#0891b2',
+    items: [
+      { title: 'Nông nghiệp', href: '/forum?category=NONG_NGHIEP', icon: 'ri-plant-fill', bg: '#d1fae5' },
+      { title: 'Chăn nuôi', href: '/forum?category=CHAN_NUOI', icon: 'ri-footprint-fill', bg: '#fff7ed' },
+      { title: 'Thị trường', href: '/forum?category=THI_TRUONG', icon: 'ri-line-chart-fill', bg: '#dbeafe' },
+      { title: 'Kỹ thuật', href: '/forum?category=KY_THUAT', icon: 'ri-settings-5-fill', bg: '#fdf4ff' },
+      { title: 'Kinh nghiệm', href: '/forum?category=KINH_NGHIEM', icon: 'ri-lightbulb-flash-fill', bg: '#fef9c3' },
+      { title: 'Diễn đàn', href: '/forum', icon: 'ri-chat-3-fill', bg: '#e0f2fe' },
+    ],
+  },
+  {
+    group: 'Tiện ích',
+    color: '#dc2626',
+    items: [
+      { title: 'Cảnh báo', href: '/canh-bao', icon: 'ri-alarm-warning-fill', bg: '#fee2e2' },
+      { title: 'Quảng cáo', href: '/advertisements', icon: 'ri-megaphone-fill', bg: '#fce7f3' },
+      { title: 'Bảng giá', href: '/market-prices', icon: 'ri-price-tag-3-fill', bg: '#fef3c7' },
+    ],
+  },
 ];
 
 function timeAgo(dateStr: string) {
@@ -122,16 +155,32 @@ export default async function HomePage() {
       <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-4">
 
           {/* ===== CATEGORIES ===== */}
-        <div className="bg-white mt-3 px-2 py-3">
-          <div className="grid grid-cols-5 sm:grid-cols-10 gap-1">
-            {categories.map(cat => (
-              <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-1.5 py-2 hover:opacity-80 transition-opacity">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
-                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />
+        <div className="bg-white mt-3 px-3 py-3">
+          <div className="space-y-3">
+            {categoryGroups.map(group => (
+              <div key={group.group}>
+                {/* Group label */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
+                    style={{ backgroundColor: group.color }}>
+                    {group.group}
+                  </span>
+                  <div className="flex-1 h-px bg-gray-100" />
                 </div>
-                <span className="text-[11px] text-gray-600 font-medium text-center leading-tight">{cat.title}</span>
-              </Link>
+                {/* Items */}
+                <div className="grid grid-cols-6 sm:grid-cols-6 md:grid-cols-6 gap-1">
+                  {group.items.map(cat => (
+                    <Link key={cat.href} href={cat.href}
+                      className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl hover:bg-gray-50 transition-all active:scale-95">
+                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: cat.bg }}>
+                        <i className={`${cat.icon} text-xl`} style={{ color: group.color }}></i>
+                      </div>
+                      <span className="text-[10px] text-gray-600 font-medium text-center leading-tight">{cat.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
