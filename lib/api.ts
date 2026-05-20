@@ -1,4 +1,4 @@
-// lib/api.ts - Tất cả API calls
+﻿// lib/api.ts - Tất cả API calls
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -511,6 +511,12 @@ export const messages = {
     return request(`/conversations/${conversationId}/archive`, { method: 'PUT' });
   },
 
+  async sendMessage(conversationId: string, content: string, type = 'TEXT', fileUrl?: string) {
+    return request<any>(`/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ content, type, fileUrl }),
+    });
+  },
   async mute(conversationId: string) {
     return request(`/conversations/${conversationId}/mute`, { method: 'PUT' });
   },

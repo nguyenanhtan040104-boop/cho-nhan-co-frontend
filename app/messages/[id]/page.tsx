@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -130,8 +130,14 @@ export default function ChatPage() {
     if (socketRef.current?.connected) {
       socketRef.current.emit('send_message', { conversationId, content: t, type: 'TEXT' });
     } else {
-      // fallback: reload messages after short delay
-      setTimeout(loadData, 500);
+      // REST fallback khi WebSocket không kết nối được
+      try {
+        const msg = await messages.sendMessage(conversationId, t, 'TEXT');
+        setMsgs(prev => prev.find(m => m.id === msg.id) ? prev : [...prev, msg]);
+      } catch (err: any) {
+        alert(err?.message || 'Gửi thất bại, vui lòng thử lại');
+        setText(t); // khôi phục nội dung
+      }
     }
   }
 
@@ -141,8 +147,13 @@ export default function ChatPage() {
     setUploadingImg(true);
     try {
       const { url } = await uploads.uploadImage(file);
-      socketRef.current?.emit('send_message', { conversationId, content: '', type: 'IMAGE', fileUrl: url });
-    } catch { alert('Upload ảnh thất bại'); }
+      if (socketRef.current?.connected) {
+        socketRef.current.emit('send_message', { conversationId, content: '', type: 'IMAGE', fileUrl: url });
+      } else {
+        const msg = await messages.sendMessage(conversationId, '', 'IMAGE', url);
+        setMsgs(prev => prev.find(m => m.id === msg.id) ? prev : [...prev, msg]);
+      }
+    } catch { alert('Gửi ảnh thất bại'); }
     finally {
       setUploadingImg(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -183,7 +194,8 @@ export default function ChatPage() {
           <div className="flex-1">
             <p className="font-semibold text-gray-900 text-sm">{otherUser?.fullName || otherUser?.username || 'Người dùng'}</p>
             {typing && <p className="text-xs text-green-600 animate-pulse">Đang nhập...</p>}
-            {!socketReady && <p className="text-xs text-gray-400">Đang kết nối...</p>}
+            {!socketReady && <p className="text-xs text-amber-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse inline-block"></span>Đang kết nối...</p>}
+            {socketReady && !typing && <p className="text-xs text-green-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block"></span>Đang hoạt động</p>}
           </div>
           <div className="relative">
             <button onClick={() => setShowMenu(!showMenu)}
