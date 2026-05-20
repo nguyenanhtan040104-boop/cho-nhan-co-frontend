@@ -81,7 +81,9 @@ export default function ChatPage() {
       const socket = io(`${WS_URL}/messaging`, {
         auth: { token },
         transports: ['websocket', 'polling'],
-        reconnectionAttempts: 3,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        timeout: 10000,
       });
       socketRef.current = socket;
 
@@ -127,6 +129,15 @@ export default function ChatPage() {
     if (!t) return;
     setText('');
     socketRef.current?.emit('typing_stop', { conversationId });
+
+    // Nếu socket đang kết nối — đợi tối đa 3 giây
+    if (socketRef.current && !socketRef.current.connected) {
+      await new Promise<void>(resolve => {
+        const timeout = setTimeout(resolve, 3000);
+        socketRef.current?.once('connect', () => { clearTimeout(timeout); resolve(); });
+      });
+    }
+
     if (socketRef.current?.connected) {
       socketRef.current.emit('send_message', { conversationId, content: t, type: 'TEXT' });
     } else {
@@ -136,7 +147,7 @@ export default function ChatPage() {
         setMsgs(prev => prev.find(m => m.id === msg.id) ? prev : [...prev, msg]);
       } catch (err: any) {
         alert(err?.message || 'Gửi thất bại, vui lòng thử lại');
-        setText(t); // khôi phục nội dung
+        setText(t);
       }
     }
   }
