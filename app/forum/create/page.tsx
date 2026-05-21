@@ -86,7 +86,12 @@ export default function CreatePostPage() {
         setTimeout(() => router.push('/forum'), 2000);
       }
     } catch (e: any) {
-      setError(e.message || 'Thao tác thất bại. Vui lòng xác thực email trước.');
+      const status = e?.statusCode || e?.status;
+      if (status === 403 || (e?.message && e.message.toLowerCase().includes('gioi han'))) {
+        setError('Ban da dat gioi han dang bai thang nay. Nang cap VIP de dang them bai.');
+      } else {
+        setError(e.message || 'Thao tac that bai. Vui long xac thuc email truoc.');
+      }
     } finally {
       setLoading(false);
       setDraftLoading(false);
@@ -114,7 +119,16 @@ export default function CreatePostPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-8">
         <form onSubmit={(e) => handleSubmit(e, 'PUBLISHED')} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {error}
+              {error.includes('gioi han') && (
+                <div className="mt-2">
+                  <Link href="/vip" className="text-red-800 font-semibold underline">Xem goi VIP &rarr;</Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>

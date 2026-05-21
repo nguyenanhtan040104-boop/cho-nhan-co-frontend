@@ -80,7 +80,12 @@ export default function CreateJobPage() {
       setSuccess(true);
       setTimeout(() => router.push('/jobs'), 2000);
     } catch (e: any) {
-      setError(e.message || 'Đăng tin thất bại. Vui lòng đăng nhập trước.');
+      const status = e?.statusCode || e?.status;
+      if (status === 403 || (e?.message && e.message.toLowerCase().includes('gioi han'))) {
+        setError('Ban da dat gioi han dang bai thang nay. Nang cap VIP de dang them bai.');
+      } else {
+        setError(e.message || 'Dang tin that bai. Vui long dang nhap truoc.');
+      }
     } finally {
       setLoading(false);
     }
@@ -115,7 +120,16 @@ export default function CreateJobPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {error}
+              {error.includes('gioi han') && (
+                <div className="mt-2">
+                  <Link href="/vip" className="text-red-800 font-semibold underline">Xem goi VIP &rarr;</Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>

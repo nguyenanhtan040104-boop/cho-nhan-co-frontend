@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { products as productsApi, uploads } from '../../../lib/api';
+import { products as productsApi, uploads, users as usersApi } from '../../../lib/api';
 import { auth as _auth } from '../../../lib/api';
 
 const CATEGORY_CONFIG: Record<string, { label: string; backHref: string; successHref: string; color: string }> = {
@@ -59,6 +59,13 @@ function CreateProductContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [monthlyUsage, setMonthlyUsage] = useState<{ used: number; limit: number; isVip: boolean; remaining: number } | null>(null);
+
+  useEffect(() => {
+    if (_auth.isLoggedIn()) {
+      usersApi.getMonthlyUsage().then(setMonthlyUsage).catch(() => {});
+    }
+  }, []);
 
   const cfg = CATEGORY_CONFIG[formData.category] || CATEGORY_CONFIG['NONG_SAN'];
 
@@ -119,7 +126,12 @@ function CreateProductContent() {
       setShowSuccess(true);
       setTimeout(() => router.push(cfg.successHref), 2000);
     } catch (e: any) {
-      setError(e.message || 'Đăng thất bại. Vui lòng đăng nhập trước.');
+      const status = e?.statusCode || e?.status;
+      if (status === 403 || (e?.message && e.message.toLowerCase().includes('gioi han'))) {
+        setError('Ban da dat gioi han dang bai thang nay. Nang cap VIP de dang them bai.');
+      } else {
+        setError(e.message || 'Dang that bai. Vui long dang nhap truoc.');
+      }
     } finally {
       setLoading(false);
     }
@@ -159,12 +171,31 @@ function CreateProductContent() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
+        {/* Monthly usage banner */}
+        {monthlyUsage && (
+          <div className={`mb-4 p-3 rounded-lg text-sm flex items-center justify-between ${monthlyUsage.remaining === 0 ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-blue-50 border border-blue-200 text-blue-700'}`}>
+            <span>
+              {monthlyUsage.isVip ? 'Goi VIP: ' : 'Goi mien phi: '}
+              Thang nay da dang {monthlyUsage.used}/{monthlyUsage.limit === 999 ? 'khong gioi han' : monthlyUsage.limit} bai
+              {monthlyUsage.remaining === 0 && ' - Da het luot dang bai'}
+            </span>
+            {!monthlyUsage.isVip && (
+              <Link href="/vip" className="ml-2 underline font-medium whitespace-nowrap">Nang cap VIP</Link>
+            )}
+          </div>
+        )}
+
         <div className="bg-white rounded-xl shadow-sm border">
           <form onSubmit={handleSubmit} className="p-6 space-y-5">
 
             {error && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
                 {error}
+                {error.includes('gioi han') && (
+                  <div className="mt-2">
+                    <Link href="/vip" className="text-red-800 font-semibold underline">Xem goi VIP &rarr;</Link>
+                  </div>
+                )}
               </div>
             )}
 

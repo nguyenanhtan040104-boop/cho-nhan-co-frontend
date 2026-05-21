@@ -191,6 +191,10 @@ export const users = {
   async getUserProducts(userId: string, page = 1) {
     return request<any>(`/users/${userId}/products?page=${page}`);
   },
+
+  async getMonthlyUsage() {
+    return request<{ used: number; limit: number; isVip: boolean; remaining: number }>('/users/me/monthly-usage');
+  },
 };
 
 // =================== PRODUCTS ===================

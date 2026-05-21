@@ -178,7 +178,12 @@ export default function CreateReportPage() {
       });
       setSubmitted(true);
     } catch (e: any) {
-      setError(e.message || 'Đăng thất bại, thử lại sau');
+      const status = e?.statusCode || e?.status;
+      if (status === 403 || (e?.message && e.message.toLowerCase().includes('gioi han'))) {
+        setError('Ban da dat gioi han dang bai thang nay. Nang cap VIP de dang them bai.');
+      } else {
+        setError(e.message || 'Dang that bai, thu lai sau');
+      }
     } finally {
       setLoading(false);
     }
@@ -418,7 +423,14 @@ export default function CreateReportPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">{error}</div>
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
+              {error}
+              {error.includes('gioi han') && (
+                <div className="mt-2">
+                  <Link href="/vip" className="text-red-800 font-semibold underline">Xem goi VIP &rarr;</Link>
+                </div>
+              )}
+            </div>
           )}
 
           <div className="flex gap-3">
