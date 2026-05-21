@@ -1,347 +1,343 @@
-'use client';
+﻿'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+const CATEGORIES = [
+  { id: 'nong-san',    label: 'Nông sản',       icon: 'ri-plant-line',        color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-200',  activeBg: 'bg-green-600' },
+  { id: 'bat-dong-san',label: 'Bất động sản',   icon: 'ri-building-line',     color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200', activeBg: 'bg-orange-600' },
+  { id: 'viec-lam',    label: 'Việc làm',        icon: 'ri-briefcase-line',    color: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200',   activeBg: 'bg-blue-600' },
+  { id: 'vat-nuoi',    label: 'Vật nuôi',        icon: 'ri-bear-smile-line',   color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200', activeBg: 'bg-yellow-500' },
+  { id: 'dich-vu',     label: 'Dịch vụ',         icon: 'ri-service-line',      color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', activeBg: 'bg-purple-600' },
+  { id: 'quang-cao',   label: 'Quảng cáo',       icon: 'ri-megaphone-line',    color: 'text-red-600',    bg: 'bg-red-50',    border: 'border-red-200',    activeBg: 'bg-red-600' },
+];
+
+type PkgTier = { name: string; badge?: string; price: number; unit: string; posts: number | string; vipPosts: number; features: string[]; highlight: boolean; createHref: string };
+
+const PACKAGES: Record<string, PkgTier[]> = {
+  'nong-san': [
+    {
+      name: 'Cơ bản', price: 0, unit: 'Miễn phí',
+      posts: 10, vipPosts: 0,
+      features: ['10 tin thường/tháng', 'Hiển thị 30 ngày/tin', 'Tối đa 5 ảnh/tin', 'Hỗ trợ qua email'],
+      highlight: false, createHref: '/products/create',
+    },
+    {
+      name: 'Tiêu chuẩn', badge: 'Phổ biến', price: 99000, unit: '/tháng',
+      posts: 30, vipPosts: 3,
+      features: ['30 tin thường/tháng', '3 tin VIP ưu tiên', 'Hiển thị 45 ngày/tin', 'Tối đa 10 ảnh/tin', 'Ghim tin 3 ngày', 'Hỗ trợ ưu tiên'],
+      highlight: true, createHref: '/wallet',
+    },
+    {
+      name: 'Chuyên nghiệp', price: 199000, unit: '/tháng',
+      posts: 'Không giới hạn', vipPosts: 10,
+      features: ['Tin thường không giới hạn', '10 tin VIP/tháng', 'Hiển thị 60 ngày/tin', 'Ảnh không giới hạn', 'Ghim tin 7 ngày', 'Trang cửa hàng riêng', 'Hỗ trợ 24/7'],
+      highlight: false, createHref: '/wallet',
+    },
+  ],
+  'bat-dong-san': [
+    {
+      name: 'Cơ bản', price: 0, unit: 'Miễn phí',
+      posts: 5, vipPosts: 0,
+      features: ['5 tin thường/tháng', 'Hiển thị 30 ngày/tin', 'Tối đa 8 ảnh/tin', 'Hỗ trợ qua email'],
+      highlight: false, createHref: '/real-estate/create',
+    },
+    {
+      name: 'Tiêu chuẩn', badge: 'Phổ biến', price: 199000, unit: '/tháng',
+      posts: 20, vipPosts: 5,
+      features: ['20 tin thường/tháng', '5 tin VIP ưu tiên', 'Hiển thị 60 ngày/tin', 'Tối đa 15 ảnh/tin', 'Ghim tin 5 ngày', 'Hỗ trợ ưu tiên'],
+      highlight: true, createHref: '/wallet',
+    },
+    {
+      name: 'Chuyên nghiệp', price: 399000, unit: '/tháng',
+      posts: 'Không giới hạn', vipPosts: 15,
+      features: ['Tin thường không giới hạn', '15 tin VIP/tháng', 'Hiển thị 90 ngày/tin', 'Ảnh không giới hạn', 'Ghim tin 14 ngày', 'Trang cửa hàng riêng', 'Hỗ trợ 24/7'],
+      highlight: false, createHref: '/wallet',
+    },
+  ],
+  'viec-lam': [
+    {
+      name: 'Cơ bản', price: 0, unit: 'Miễn phí',
+      posts: 5, vipPosts: 0,
+      features: ['5 tin tuyển dụng/tháng', 'Hiển thị 30 ngày/tin', 'Tối đa 3 ảnh/tin', 'Hỗ trợ qua email'],
+      highlight: false, createHref: '/jobs/create',
+    },
+    {
+      name: 'Tiêu chuẩn', badge: 'Phổ biến', price: 149000, unit: '/tháng',
+      posts: 20, vipPosts: 3,
+      features: ['20 tin tuyển dụng/tháng', '3 tin VIP ưu tiên', 'Hiển thị 45 ngày/tin', 'Logo công ty', 'Ghim tin 3 ngày', 'Hỗ trợ ưu tiên'],
+      highlight: true, createHref: '/wallet',
+    },
+    {
+      name: 'Chuyên nghiệp', price: 299000, unit: '/tháng',
+      posts: 'Không giới hạn', vipPosts: 10,
+      features: ['Tin tuyển dụng không giới hạn', '10 tin VIP/tháng', 'Hiển thị 60 ngày/tin', 'Trang doanh nghiệp riêng', 'Ghim tin 7 ngày', 'Lọc hồ sơ nâng cao', 'Hỗ trợ 24/7'],
+      highlight: false, createHref: '/wallet',
+    },
+  ],
+  'vat-nuoi': [
+    {
+      name: 'Cơ bản', price: 0, unit: 'Miễn phí',
+      posts: 10, vipPosts: 0,
+      features: ['10 tin vật nuôi/tháng', 'Hiển thị 30 ngày/tin', 'Tối đa 5 ảnh/tin', 'Hỗ trợ qua email'],
+      highlight: false, createHref: '/products/create?category=VAT_NUOI',
+    },
+    {
+      name: 'Tiêu chuẩn', badge: 'Phổ biến', price: 79000, unit: '/tháng',
+      posts: 25, vipPosts: 3,
+      features: ['25 tin vật nuôi/tháng', '3 tin VIP ưu tiên', 'Hiển thị 45 ngày/tin', 'Tối đa 10 ảnh/tin', 'Ghim tin 3 ngày', 'Hỗ trợ ưu tiên'],
+      highlight: true, createHref: '/wallet',
+    },
+    {
+      name: 'Chuyên nghiệp', price: 149000, unit: '/tháng',
+      posts: 'Không giới hạn', vipPosts: 8,
+      features: ['Tin không giới hạn', '8 tin VIP/tháng', 'Hiển thị 60 ngày/tin', 'Ảnh không giới hạn', 'Ghim tin 7 ngày', 'Trang trại riêng', 'Hỗ trợ 24/7'],
+      highlight: false, createHref: '/wallet',
+    },
+  ],
+  'dich-vu': [
+    {
+      name: 'Cơ bản', price: 0, unit: 'Miễn phí',
+      posts: 10, vipPosts: 0,
+      features: ['10 tin dịch vụ/tháng', 'Hiển thị 30 ngày/tin', 'Tối đa 5 ảnh/tin', 'Hỗ trợ qua email'],
+      highlight: false, createHref: '/products/create?category=DICH_VU',
+    },
+    {
+      name: 'Tiêu chuẩn', badge: 'Phổ biến', price: 99000, unit: '/tháng',
+      posts: 30, vipPosts: 3,
+      features: ['30 tin dịch vụ/tháng', '3 tin VIP ưu tiên', 'Hiển thị 45 ngày/tin', 'Tối đa 10 ảnh/tin', 'Ghim tin 3 ngày', 'Hỗ trợ ưu tiên'],
+      highlight: true, createHref: '/wallet',
+    },
+    {
+      name: 'Chuyên nghiệp', price: 199000, unit: '/tháng',
+      posts: 'Không giới hạn', vipPosts: 8,
+      features: ['Tin không giới hạn', '8 tin VIP/tháng', 'Hiển thị 60 ngày/tin', 'Ảnh không giới hạn', 'Ghim tin 7 ngày', 'Trang dịch vụ riêng', 'Hỗ trợ 24/7'],
+      highlight: false, createHref: '/wallet',
+    },
+  ],
+  'quang-cao': [
+    {
+      name: 'Cơ bản', price: 0, unit: 'Miễn phí',
+      posts: 3, vipPosts: 0,
+      features: ['3 quảng cáo/tháng', 'Hiển thị 7 ngày/tin', 'Tối đa 3 ảnh', 'Hỗ trợ qua email'],
+      highlight: false, createHref: '/advertisements/create',
+    },
+    {
+      name: 'Nổi bật', badge: 'Phổ biến', price: 50000, unit: '/tin',
+      posts: 1, vipPosts: 0,
+      features: ['Vị trí ưu tiên', 'Hiển thị 14 ngày', 'Nhãn "Nổi bật"', 'Tối đa 5 ảnh', 'Ghim 3 ngày đầu', 'Hỗ trợ ưu tiên'],
+      highlight: true, createHref: '/wallet',
+    },
+    {
+      name: 'VIP', price: 100000, unit: '/tin',
+      posts: 1, vipPosts: 0,
+      features: ['Vị trí đầu tiên', 'Hiển thị 30 ngày', 'Nhãn "VIP" nổi bật', 'Ảnh không giới hạn', 'Ghim toàn thời gian', 'Hỗ trợ 24/7'],
+      highlight: false, createHref: '/wallet',
+    },
+  ],
+};
+
+const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [activeCat, setActiveCat] = useState('nong-san');
   const router = useRouter();
-
-  const advertisementPackages = [
-    {
-      id: 'ad_basic',
-      name: 'Quảng cáo Cơ bản',
-      price: 0,
-      duration: '7 ngày',
-      features: ['Hiển thị 7 ngày', 'Vị trí thường trong danh sách', 'Tối đa 3 hình ảnh', 'Hỗ trợ cơ bản'],
-      popular: false,
-    },
-    {
-      id: 'ad_featured',
-      name: 'Quảng cáo Nổi bật',
-      price: 50000,
-      duration: '14 ngày',
-      features: ['Hiển thị 14 ngày', 'Vị trí ưu tiên', 'Tối đa 5 hình ảnh', 'Nhãn "Nổi bật"', 'Ghim 3 ngày đầu', 'Hỗ trợ ưu tiên'],
-      popular: true,
-    },
-    {
-      id: 'ad_vip',
-      name: 'Quảng cáo VIP',
-      price: 100000,
-      duration: '30 ngày',
-      features: ['Hiển thị 30 ngày', 'Vị trí đầu tiên', 'Không giới hạn hình ảnh', 'Nhãn "VIP" nổi bật', 'Ghim toàn thời gian', 'Hỗ trợ chuyên biệt'],
-      popular: false,
-    },
-  ];
-
-  const postPackages = [
-    {
-      id: 'basic',
-      name: 'Tin thường',
-      price: 0,
-      duration: '30 ngày',
-      features: ['Đăng tin miễn phí', 'Hiển thị trong danh sách', 'Tối đa 5 hình ảnh', 'Hỗ trợ cơ bản'],
-      popular: false,
-    },
-    {
-      id: 'vip',
-      name: 'Tin VIP',
-      price: 50000,
-      duration: '30 ngày',
-      features: ['Ưu tiên hiển thị trên đầu', 'Khung viền vàng nổi bật', 'Nhãn "VIP" đặc biệt', 'Tối đa 10 hình ảnh', 'Hỗ trợ ưu tiên'],
-      popular: true,
-    },
-    {
-      id: 'premium',
-      name: 'Tin Premium',
-      price: 100000,
-      duration: '45 ngày',
-      features: ['Hiển thị nổi bật nhất', 'Khung viền Premium', 'Nhãn "PREMIUM"', 'Không giới hạn hình ảnh', 'Ghim 7 ngày đầu', 'Hỗ trợ 24/7'],
-      popular: false,
-    },
-  ];
-
-  const membershipPlans = [
-    {
-      id: 'basic_member',
-      name: 'Thành viên Cơ bản',
-      price: { monthly: 99000, yearly: 990000 },
-      color: 'blue',
-      popular: false,
-      features: ['Đăng 20 tin/tháng', 'Giảm 20% phí tin VIP', 'Duyệt tin nhanh hơn 50%', 'Thống kê cơ bản', 'Hỗ trợ email'],
-    },
-    {
-      id: 'pro_member',
-      name: 'Thành viên Pro',
-      price: { monthly: 199000, yearly: 1990000 },
-      color: 'green',
-      popular: true,
-      features: ['Đăng không giới hạn tin', 'Giảm 40% phí tin VIP', 'Duyệt tin ưu tiên', 'Thống kê chi tiết', 'Hỗ trợ điện thoại', 'Quản lý tin đăng nâng cao'],
-    },
-    {
-      id: 'business_member',
-      name: 'Thành viên Doanh nghiệp',
-      price: { monthly: 399000, yearly: 3990000 },
-      color: 'purple',
-      popular: false,
-      features: ['Tất cả tính năng Pro', 'Trang cửa hàng riêng', 'Tin được ghim tự động', 'API tích hợp', 'Quản lý đa tài khoản', 'Hỗ trợ chuyên biệt', 'Báo cáo doanh số'],
-    },
-  ];
-
-  const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
-  const discount = (m: number, y: number) => Math.round(((m * 12 - y) / (m * 12)) * 100);
-
-  const memberColorMap: Record<string, { ring: string; badge: string; btn: string; iconCls: string }> = {
-    blue:   { ring: 'ring-blue-300',   badge: 'from-blue-500 to-indigo-500',   btn: 'from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',   iconCls: 'text-blue-600 bg-blue-100' },
-    green:  { ring: 'ring-green-300',  badge: 'from-green-500 to-emerald-500', btn: 'from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600', iconCls: 'text-green-600 bg-green-100' },
-    purple: { ring: 'ring-purple-300', badge: 'from-purple-500 to-indigo-500', btn: 'from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600', iconCls: 'text-purple-600 bg-purple-100' },
-  };
+  const cat = CATEGORIES.find(c => c.id === activeCat)!;
+  const pkgs = PACKAGES[activeCat] || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-gray-50">
 
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <i className="ri-price-tag-3-line text-4xl text-white"></i>
+      {/* Hero */}
+      <div className="bg-white border-b">
+        <div className="max-w-5xl mx-auto px-4 py-10 text-center">
+          <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1.5 rounded-full mb-4">
+            <i className="ri-vip-crown-fill"></i> Gói PRO
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Bảng giá dịch vụ</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Chọn gói phù hợp để tăng hiệu quả kinh doanh
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gói dịch vụ đăng tin chuyên nghiệp</h1>
+          <p className="text-gray-500 text-sm max-w-xl mx-auto">Tối ưu chi phí, tăng hiệu quả tiếp cận khách hàng với gói PRO phù hợp từng danh mục</p>
         </div>
+      </div>
 
-        {/* Billing Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white p-1.5 rounded-2xl shadow-md border border-gray-200 flex">
-            <button onClick={() => setBillingCycle('monthly')}
-              className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-md' : 'text-gray-500 hover:text-gray-800'}`}>
-              Hàng tháng
-            </button>
-            <button onClick={() => setBillingCycle('yearly')}
-              className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${billingCycle === 'yearly' ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-md' : 'text-gray-500 hover:text-gray-800'}`}>
-              Hàng năm
-              <span className="ml-2 bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">-17%</span>
-            </button>
-          </div>
-        </div>
+      <div className="max-w-5xl mx-auto px-4 py-8">
 
-        {/* ===== MONTHLY: Gói đăng tin + Quảng cáo + Thành viên ===== */}
-        {billingCycle === 'monthly' && (
-          <>
-            {/* Quick links */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-              {[
-                { href: '/products/create', icon: 'ri-plant-line', label: 'Đăng sản phẩm', color: 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' },
-                { href: '/jobs/create', icon: 'ri-briefcase-line', label: 'Đăng tuyển dụng', color: 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100' },
-                { href: '/real-estate/create', icon: 'ri-home-4-line', label: 'Đăng BĐS', color: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100' },
-                { href: '/forum/create', icon: 'ri-discuss-line', label: 'Đăng diễn đàn', color: 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100' },
-              ].map(l => (
-                <Link key={l.href} href={l.href}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all font-medium text-sm text-center ${l.color}`}>
-                  <i className={`${l.icon} text-2xl`}></i>
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-
-            {/* Gói đăng tin */}
-            <div className="mb-16">
-              <div className="text-center mb-10">
-                <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <i className="ri-article-line text-2xl text-white"></i>
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Gói đăng tin</h2>
-                <p className="text-gray-500">Chọn loại tin phù hợp — mua qua ví</p>
-                <Link href="/wallet" className="inline-flex items-center gap-1 mt-2 text-green-600 hover:underline text-sm">
-                  <i className="ri-wallet-3-line"></i> Nạp tiền vào ví để mua VIP
-                </Link>
+        {/* Quản lý gói */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6">
+          <p className="text-sm font-semibold text-gray-700 mb-3">Quản lý gói đang sử dụng</p>
+          <Link href="/dashboard?tab=vip"
+            className="flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:border-yellow-400 hover:bg-yellow-50 transition-all group">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center">
+                <i className="ri-vip-crown-fill text-white text-base"></i>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {postPackages.map(pkg => (
-                  <div key={pkg.id}
-                    className={`relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${pkg.popular ? 'ring-4 ring-green-300 scale-105' : ''}`}>
-                    {pkg.popular && (
-                      <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                        <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">Phổ biến nhất</span>
-                      </div>
-                    )}
-                    <div className="p-8">
-                      <div className="text-center mb-6">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${pkg.id === 'basic' ? 'bg-gray-100' : pkg.id === 'vip' ? 'bg-yellow-100' : 'bg-red-100'}`}>
-                          <i className={`text-2xl ${pkg.id === 'basic' ? 'ri-article-line text-gray-500' : pkg.id === 'vip' ? 'ri-vip-crown-fill text-yellow-600' : 'ri-award-fill text-red-500'}`}></i>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
-                        <p className="text-4xl font-bold text-gray-900">{pkg.price === 0 ? 'Miễn phí' : fmt(pkg.price)}</p>
-                        {pkg.price > 0 && <p className="text-gray-500 text-sm">/{pkg.duration}</p>}
-                      </div>
-                      <ul className="space-y-3 mb-8">
-                        {pkg.features.map((f, i) => (
-                          <li key={i} className="flex items-center gap-3 text-sm text-gray-700">
-                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <i className="ri-check-line text-green-600 text-xs"></i>
-                            </div>
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                      {pkg.id === 'basic' ? (
-                        <Link href="/products/create"
-                          className="block w-full py-3.5 rounded-2xl font-bold text-center bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                          Đăng tin miễn phí
-                        </Link>
-                      ) : (
-                        <Link href="/wallet"
-                          className={`block w-full py-3.5 rounded-2xl font-bold text-white text-center transition shadow-md hover:shadow-lg ${pkg.id === 'vip' ? 'bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500' : 'bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800'}`}>
-                          Mua qua ví
-                        </Link>
-                      )}
-                    </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Quản lý gói PRO</p>
+                <p className="text-xs text-gray-400">Xem gói đang dùng, lịch sử mua</p>
+              </div>
+            </div>
+            <i className="ri-arrow-right-s-line text-gray-400 group-hover:text-yellow-500 text-lg"></i>
+          </Link>
+        </div>
+
+        {/* Chọn danh mục */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6">
+          <p className="text-sm font-semibold text-gray-700 mb-4">Chọn danh mục gói cần mua</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {CATEGORIES.map(c => (
+              <button key={c.id} onClick={() => setActiveCat(c.id)}
+                className={`flex items-center justify-between px-4 py-3.5 rounded-xl border-2 transition-all font-medium text-sm ${
+                  activeCat === c.id
+                    ? `${c.activeBg} text-white border-transparent shadow-md`
+                    : `bg-white ${c.border} ${c.color} hover:${c.bg}`
+                }`}>
+                <div className="flex items-center gap-2.5">
+                  <i className={`${c.icon} text-lg`}></i>
+                  <span>{c.label}</span>
+                </div>
+                <i className="ri-arrow-right-s-line text-base opacity-70"></i>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Gói theo danh mục */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6">
+          <div className="flex items-center gap-2 mb-6">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${cat.bg}`}>
+              <i className={`${cat.icon} ${cat.color} text-base`}></i>
+            </div>
+            <div>
+              <p className="font-bold text-gray-900 text-base">Gói PRO — {cat.label}</p>
+              <p className="text-xs text-gray-400">Chọn gói phù hợp với nhu cầu đăng tin</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {pkgs.map((pkg) => (
+              <div key={pkg.name}
+                className={`relative rounded-2xl border-2 p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                  pkg.highlight
+                    ? 'border-yellow-400 bg-yellow-50 shadow-md'
+                    : 'border-gray-200 bg-white'
+                }`}>
+                {pkg.badge && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow">
+                      {pkg.badge}
+                    </span>
                   </div>
+                )}
+
+                {/* Header */}
+                <div className="text-center mb-4 pt-1">
+                  <p className="font-bold text-gray-900 text-base mb-1">{pkg.name}</p>
+                  <p className={`text-2xl font-bold ${pkg.highlight ? 'text-yellow-700' : 'text-gray-900'}`}>
+                    {pkg.price === 0 ? 'Miễn phí' : fmt(pkg.price)}
+                  </p>
+                  {pkg.price > 0 && <p className="text-xs text-gray-400">{pkg.unit}</p>}
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <div className={`rounded-xl p-2.5 text-center ${pkg.highlight ? 'bg-yellow-100' : 'bg-gray-50'}`}>
+                    <p className={`text-lg font-bold ${pkg.highlight ? 'text-yellow-700' : 'text-gray-800'}`}>
+                      {typeof pkg.posts === 'number' ? pkg.posts : '∞'}
+                    </p>
+                    <p className="text-[10px] text-gray-500">Tin thường</p>
+                  </div>
+                  <div className={`rounded-xl p-2.5 text-center ${pkg.vipPosts > 0 ? (pkg.highlight ? 'bg-orange-100' : 'bg-orange-50') : (pkg.highlight ? 'bg-yellow-100' : 'bg-gray-50')}`}>
+                    <p className={`text-lg font-bold ${pkg.vipPosts > 0 ? 'text-orange-600' : 'text-gray-400'}`}>
+                      {pkg.vipPosts}
+                    </p>
+                    <p className="text-[10px] text-gray-500">Tin VIP</p>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <ul className="space-y-1.5 mb-5">
+                  {pkg.features.map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-xs text-gray-600">
+                      <i className={`ri-check-line flex-shrink-0 ${pkg.highlight ? 'text-yellow-600' : 'text-green-500'}`}></i>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                {pkg.price === 0 ? (
+                  <Link href={pkg.createHref}
+                    className="block w-full text-center py-2.5 rounded-xl border-2 border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
+                    Đăng tin miễn phí
+                  </Link>
+                ) : (
+                  <Link href={pkg.createHref}
+                    className={`block w-full text-center py-2.5 rounded-xl text-sm font-bold text-white transition shadow ${
+                      pkg.highlight
+                        ? 'bg-yellow-500 hover:bg-yellow-600'
+                        : 'bg-gray-800 hover:bg-gray-700'
+                    }`}>
+                    Mua ngay
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* So sánh nhanh */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6">
+          <p className="font-semibold text-gray-800 mb-4">So sánh các gói — {cat.label}</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-2 pr-4 text-gray-500 font-medium w-1/3">Tính năng</th>
+                  {pkgs.map(p => (
+                    <th key={p.name} className={`py-2 px-3 text-center font-bold ${p.highlight ? 'text-yellow-700' : 'text-gray-700'}`}>
+                      {p.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {[
+                  { label: 'Giá', values: pkgs.map(p => p.price === 0 ? 'Miễn phí' : fmt(p.price) + p.unit) },
+                  { label: 'Tin thường/tháng', values: pkgs.map(p => typeof p.posts === 'number' ? p.posts.toString() : '∞') },
+                  { label: 'Tin VIP/tháng', values: pkgs.map(p => p.vipPosts === 0 ? '—' : p.vipPosts.toString()) },
+                  { label: 'Thời hạn hiển thị', values: pkgs.map((_, i) => i === 0 ? '30 ngày' : i === 1 ? '45 ngày' : '60 ngày') },
+                  { label: 'Ghim tin', values: pkgs.map((_, i) => i === 0 ? '—' : i === 1 ? '3 ngày' : '7 ngày') },
+                  { label: 'Hỗ trợ', values: pkgs.map((_, i) => i === 0 ? 'Email' : i === 1 ? 'Ưu tiên' : '24/7') },
+                ].map(row => (
+                  <tr key={row.label}>
+                    <td className="py-2.5 pr-4 text-gray-500">{row.label}</td>
+                    {row.values.map((v, i) => (
+                      <td key={i} className={`py-2.5 px-3 text-center font-medium ${pkgs[i]?.highlight ? 'text-yellow-700 bg-yellow-50/50' : 'text-gray-700'}`}>
+                        {v}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </div>
-            </div>
-
-            {/* Gói quảng cáo */}
-            <div className="mb-16">
-              <div className="text-center mb-10">
-                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <i className="ri-megaphone-line text-2xl text-white"></i>
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Gói quảng cáo</h2>
-                <p className="text-gray-500">Quảng bá sản phẩm và doanh nghiệp hiệu quả</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {advertisementPackages.map(pkg => (
-                  <div key={pkg.id}
-                    className={`relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${pkg.popular ? 'ring-4 ring-orange-300 scale-105' : ''}`}>
-                    {pkg.popular && (
-                      <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                        <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">Phổ biến nhất</span>
-                      </div>
-                    )}
-                    <div className="p-8">
-                      <div className="text-center mb-6">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${pkg.id === 'ad_basic' ? 'bg-gray-100' : pkg.id === 'ad_featured' ? 'bg-orange-100' : 'bg-red-100'}`}>
-                          <i className={`ri-megaphone-line text-2xl ${pkg.id === 'ad_basic' ? 'text-gray-500' : pkg.id === 'ad_featured' ? 'text-orange-600' : 'text-red-600'}`}></i>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
-                        <p className="text-4xl font-bold text-gray-900">{pkg.price === 0 ? 'Miễn phí' : fmt(pkg.price)}</p>
-                        {pkg.price > 0 && <p className="text-gray-500 text-sm">/{pkg.duration}</p>}
-                      </div>
-                      <ul className="space-y-3 mb-8">
-                        {pkg.features.map((f, i) => (
-                          <li key={i} className="flex items-center gap-3 text-sm text-gray-700">
-                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <i className="ri-check-line text-green-600 text-xs"></i>
-                            </div>
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                      {pkg.id === 'ad_basic' ? (
-                        <Link href="/advertisements/create"
-                          className="block w-full py-3.5 rounded-2xl font-bold text-center bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-                          Đăng quảng cáo miễn phí
-                        </Link>
-                      ) : (
-                        <button onClick={() => router.push(`/payment?package=${pkg.id}`)}
-                          className={`w-full py-3.5 rounded-2xl font-bold text-white transition shadow-md hover:shadow-lg ${pkg.popular ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600' : 'bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800'}`}>
-                          Chọn gói này
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* ===== BOTH: Gói thành viên ===== */}
-        <div className="mb-16">
-          <div className="text-center mb-10">
-            <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <i className="ri-vip-crown-2-line text-2xl text-white"></i>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Gói thành viên</h2>
-            <p className="text-gray-500">
-              {billingCycle === 'yearly' ? 'Thanh toán hàng năm — tiết kiệm hơn 17%' : 'Nâng cấp tài khoản để đăng tin không giới hạn'}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {membershipPlans.map(plan => {
-              const c = memberColorMap[plan.color];
-              return (
-                <div key={plan.id}
-                  className={`relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${plan.popular ? `ring-4 ${c.ring} scale-105` : ''}`}>
-                  {plan.popular && (
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                      <span className={`bg-gradient-to-r ${c.badge} text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg`}>
-                        Được chọn nhiều nhất
-                      </span>
-                    </div>
-                  )}
-                  <div className="p-8">
-                    <div className="text-center mb-6">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 ${c.iconCls}`}>
-                        <i className="ri-vip-crown-2-line text-2xl"></i>
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">{plan.name}</h3>
-                      <p className="text-4xl font-bold text-gray-900">{fmt(plan.price[billingCycle])}</p>
-                      <p className="text-gray-500 text-sm">/{billingCycle === 'monthly' ? 'tháng' : 'năm'}</p>
-                      {billingCycle === 'yearly' && (
-                        <span className="inline-block mt-2 text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full font-medium">
-                          Tiết kiệm {discount(plan.price.monthly, plan.price.yearly)}%
-                        </span>
-                      )}
-                      {billingCycle === 'monthly' && (
-                        <p className="text-xs text-gray-400 mt-1">≈ {fmt(Math.round(plan.price.monthly / 30))}/ngày</p>
-                      )}
-                    </div>
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((f, i) => (
-                        <li key={i} className="flex items-center gap-3 text-sm text-gray-700">
-                          <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <i className="ri-check-line text-green-600 text-xs"></i>
-                          </div>
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => router.push(`/payment?package=${plan.id}`)}
-                      className={`w-full py-3.5 rounded-2xl font-bold text-white bg-gradient-to-r ${c.btn} transition-all shadow-md hover:shadow-lg`}>
-                      Đăng ký ngay
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-3xl p-12 text-white text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-56 h-56 bg-white/10 rounded-full -translate-y-28 translate-x-28"></div>
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full translate-y-20 -translate-x-20"></div>
-          <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-4">Bắt đầu ngay hôm nay</h2>
-            <p className="text-lg opacity-90 mb-8">Đăng tin, kết nối khách hàng và phát triển kinh doanh cùng Chợ Nhân Cơ</p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/products/create" className="bg-white text-green-700 px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-100 transition shadow-md flex items-center gap-2">
-                <i className="ri-plant-line"></i> Đăng sản phẩm
-              </Link>
-              <Link href="/jobs/create" className="bg-white/20 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-white/30 transition backdrop-blur-sm flex items-center gap-2">
-                <i className="ri-briefcase-line"></i> Đăng tuyển dụng
-              </Link>
-              <Link href="/real-estate/create" className="bg-white/20 text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-white/30 transition backdrop-blur-sm flex items-center gap-2">
-                <i className="ri-home-4-line"></i> Đăng BĐS
-              </Link>
+        {/* Nạp ví */}
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <i className="ri-wallet-3-line text-2xl"></i>
+            </div>
+            <div>
+              <p className="font-bold text-base">Thanh toán qua Ví Chợ NC</p>
+              <p className="text-sm text-yellow-100">Nạp tiền vào ví để mua gói PRO nhanh chóng</p>
             </div>
           </div>
+          <Link href="/wallet"
+            className="flex-shrink-0 bg-white text-yellow-700 font-bold px-6 py-2.5 rounded-xl hover:bg-yellow-50 transition text-sm whitespace-nowrap">
+            Nạp tiền ngay
+          </Link>
         </div>
 
       </div>
