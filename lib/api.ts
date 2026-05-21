@@ -278,6 +278,16 @@ export const products = {
   async adminToggleVip(id: string, isVip: boolean) {
     return request(`/products/${id}/vip`, { method: 'POST', body: JSON.stringify({ durationDays: isVip ? 30 : 0 }) });
   },
+
+  async adminGetPending(page = 1, limit = 20) {
+    return request<any>(`/products/admin/pending?page=${page}&limit=${limit}`);
+  },
+  async adminApprove(id: string) {
+    return request(`/products/${id}/approve`, { method: 'PATCH' });
+  },
+  async adminReject(id: string) {
+    return request(`/products/${id}/reject`, { method: 'PATCH' });
+  },
 };
 
 // =================== REAL ESTATE ===================
@@ -324,6 +334,16 @@ export const realEstate = {
   async adminToggleVip(id: string, isVip: boolean) {
     return request(`/real-estate/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) });
   },
+
+  async adminGetPending(page = 1, limit = 20) {
+    return request<any>(`/real-estates/admin/pending?page=${page}&limit=${limit}`);
+  },
+  async adminApprove(id: string) {
+    return request(`/real-estates/${id}/approve`, { method: 'PATCH' });
+  },
+  async adminReject(id: string) {
+    return request(`/real-estates/${id}/reject`, { method: 'PATCH' });
+  },
 };
 
 // =================== JOBS ===================
@@ -365,6 +385,16 @@ export const jobs = {
 
   async adminToggleVip(id: string, isVip: boolean) {
     return request(`/jobs/${id}/vip`, { method: 'PATCH', body: JSON.stringify({ isVip }) });
+  },
+
+  async adminGetPending(page = 1, limit = 20) {
+    return request<any>(`/jobs/admin/pending?page=${page}&limit=${limit}`);
+  },
+  async adminApprove(id: string) {
+    return request(`/jobs/${id}/approve`, { method: 'PATCH' });
+  },
+  async adminReject(id: string) {
+    return request(`/jobs/${id}/reject`, { method: 'PATCH' });
   },
 };
 

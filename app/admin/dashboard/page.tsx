@@ -1138,6 +1138,10 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
           <h2 className="text-lg font-black text-gray-900">Kiểm duyệt bài viết</h2>
           <p className="text-xs text-gray-400 mt-0.5">{items.length} bài chờ duyệt</p>
         </div>
+        <a href="/admin/content"
+          className="flex items-center gap-1.5 text-xs font-semibold text-white bg-gray-900 hover:bg-gray-700 px-3 py-2 rounded-xl transition">
+          <i className="ri-store-2-line"></i> Duyệt SP/BĐS/Việc làm
+        </a>
         {selected.size > 0 && (
           <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 px-4 py-2 rounded-xl">
             <span className="text-xs font-bold text-orange-700">Đã chọn {selected.size}</span>
