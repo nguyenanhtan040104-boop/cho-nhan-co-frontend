@@ -110,26 +110,58 @@ const postItems = [
   { href: '/forum/create', icon: 'ri-chat-3-line', label: 'Bài diễn đàn', sub: 'Chia sẻ kinh nghiệm' },
 ];
 
-// Danh sách tìm kiếm nhanh theo từ khóa → route
+// Quy tắc: cụ thể nhất trước, chung nhất sau (thứ tự quan trọng)
 const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
-  { keywords: ['bất động sản', 'bat dong san', 'bds', 'nhà đất', 'phòng trọ', 'phong tro', 'căn hộ', 'can ho', 'mặt bằng', 'nhà ở', 'đất nền'], route: '/real-estate' },
-  { keywords: ['việc làm', 'viec lam', 'tuyển dụng', 'tuyen dung', 'xin việc', 'xin viec', 'nhân công', 'nhan cong', 'tìm việc', 'tuyển'], route: '/jobs' },
-  { keywords: ['dịch vụ', 'dich vu', 'sửa chữa', 'sua chua', 'vận chuyển', 'van chuyen', 'tư vấn', 'tu van', 'xây dựng', 'xay dung'], route: '/dich-vu' },
-  { keywords: ['vật nuôi', 'vat nuoi', 'thú cưng', 'thu cung', 'chó', 'mèo', 'gà', 'heo', 'bò', 'trâu', 'dê', 'thỏ', 'chim'], route: '/vat-nuoi' },
-  { keywords: ['diễn đàn', 'dien dan', 'forum', 'hỏi đáp', 'hoi dap'], route: '/forum' },
-  { keywords: ['cảnh báo', 'canh bao', 'lừa đảo', 'lua dao', 'tố cáo', 'giả mạo'], route: '/canh-bao' },
-  { keywords: ['quảng cáo', 'quang cao', 'khai trương', 'khai truong', 'khuyến mãi', 'khuyen mai'], route: '/advertisements' },
-  { keywords: ['nông sản', 'nong san', 'thực phẩm', 'thuc pham', 'rau củ', 'rau cu', 'trái cây', 'trai cay', 'lúa', 'gạo', 'cà phê', 'tiêu', 'điều'], route: '/products?category=NONG_SAN' },
+  // Bất động sản - sub
+  { keywords: ['phòng trọ', 'phong tro', 'cho thuê phòng', 'nhà trọ', 'nha tro'], route: '/real-estate?type=PHONG_TRO' },
+  { keywords: ['đất nền', 'dat nen', 'mua đất', 'bán đất', 'lô đất'], route: '/real-estate?type=DAT_NEN' },
+  { keywords: ['mặt bằng', 'mat bang', 'thuê mặt bằng', 'mặt bằng kinh doanh'], route: '/real-estate?type=MAT_BANG' },
+  { keywords: ['nhà ở', 'nha o', 'mua nhà', 'bán nhà', 'nhà đất', 'nha dat', 'căn hộ', 'can ho'], route: '/real-estate?type=NHA_O' },
+  { keywords: ['bất động sản', 'bat dong san', 'bds'], route: '/real-estate' },
+  // Việc làm - sub
+  { keywords: ['tuyển dụng', 'tuyen dung', 'tuyển nhân viên', 'đăng tuyển', 'cần tuyển'], route: '/jobs?type=EMPLOYER' },
+  { keywords: ['tìm việc', 'tim viec', 'xin việc', 'xin viec', 'cần việc', 'nhân công', 'nhan cong'], route: '/jobs?type=JOB_SEEKER' },
+  { keywords: ['việc làm', 'viec lam', 'tuyển', 'lương', 'luong'], route: '/jobs' },
+  // Dịch vụ - sub
+  { keywords: ['sửa chữa', 'sua chua', 'bảo dưỡng', 'bao duong', 'sửa máy', 'sửa xe'], route: '/dich-vu?sub=s%E1%BB%ADa%20ch%E1%BB%AFa' },
+  { keywords: ['vận chuyển', 'van chuyen', 'ship', 'giao hàng', 'giao hang', 'chuyển nhà', 'vận tải'], route: '/dich-vu?sub=v%E1%BA%ADn%20chuy%E1%BB%83n' },
+  { keywords: ['tư vấn', 'tu van', 'tư vấn nông nghiệp', 'tư vấn kỹ thuật'], route: '/dich-vu?sub=t%C6%B0%20v%E1%BA%A5n' },
+  { keywords: ['xây dựng', 'xay dung', 'thi công', 'thi cong', 'xây nhà', 'sửa nhà'], route: '/dich-vu?sub=x%C3%A2y%20d%E1%BB%B1ng' },
+  { keywords: ['dịch vụ', 'dich vu'], route: '/dich-vu' },
+  // Vật nuôi - sub
+  { keywords: ['chó', 'cún', 'chó cảnh', 'mua chó', 'bán chó'], route: '/vat-nuoi?sub=ch%C3%B3' },
+  { keywords: ['mèo', 'mèo cảnh', 'mua mèo', 'bán mèo'], route: '/vat-nuoi?sub=m%C3%A8o' },
+  { keywords: ['gà', 'gia cầm', 'gia cam', 'vịt', 'ngan', 'ngỗng', 'chim'], route: '/vat-nuoi?sub=gia%20c%E1%BA%A7m' },
+  { keywords: ['heo', 'bò', 'trâu', 'dê', 'cừu', 'ngựa', 'gia súc', 'gia suc'], route: '/vat-nuoi?sub=gia%20s%C3%BAc' },
+  { keywords: ['vật nuôi', 'vat nuoi', 'thú cưng', 'thu cung', 'thỏ'], route: '/vat-nuoi' },
+  // Diễn đàn - sub
+  { keywords: ['kinh nghiệm trồng', 'chia sẻ kinh nghiệm'], route: '/forum?category=KINH_NGHIEM' },
+  { keywords: ['hỏi đáp', 'hoi dap', 'thắc mắc'], route: '/forum?category=HOI_DAP' },
+  { keywords: ['giá thị trường', 'tin tức thị trường'], route: '/forum?category=THI_TRUONG' },
+  { keywords: ['chăn nuôi', 'chan nuoi', 'kỹ thuật chăn'], route: '/forum?category=CHAN_NUOI' },
+  { keywords: ['diễn đàn', 'dien dan', 'forum'], route: '/forum' },
+  // Cảnh báo - sub
+  { keywords: ['lừa đảo mua bán', 'lua dao mua ban'], route: '/canh-bao?sub=L%E1%BB%ABa%20%C4%91%E1%BA%A3o%20mua%20b%C3%A1n' },
+  { keywords: ['giả mạo danh tính', 'gia mao', 'giả danh', 'mạo danh'], route: '/canh-bao?sub=Gi%E1%BA%A3%20m%E1%BA%A1o%20danh%20t%C3%ADnh' },
+  { keywords: ['lừa đảo đặt cọc', 'lua dao dat coc', 'lừa cọc', 'tiền cọc'], route: '/canh-bao?sub=L%E1%BB%ABa%20%C4%91%E1%BA%A3o%20%C4%91%E1%BA%B7t%20c%E1%BB%8Dc' },
+  { keywords: ['cảnh báo', 'canh bao', 'lừa đảo', 'lua dao', 'tố cáo', 'hàng giả'], route: '/canh-bao' },
+  // Quảng cáo - sub
+  { keywords: ['khai trương', 'khai truong'], route: '/advertisements?category=KHAI_TRUONG' },
+  { keywords: ['khuyến mãi', 'khuyen mai', 'giảm giá', 'giam gia', 'sale', 'ưu đãi'], route: '/advertisements?category=KHUYEN_MAI' },
+  { keywords: ['sự kiện', 'su kien', 'hội chợ', 'hoi cho', 'triển lãm'], route: '/advertisements?category=SU_KIEN' },
+  { keywords: ['quảng cáo', 'quang cao'], route: '/advertisements' },
+  // Nông sản
+  { keywords: ['nông sản', 'nong san', 'thực phẩm', 'thuc pham', 'rau củ', 'rau cu', 'trái cây', 'trai cay', 'lúa', 'gạo', 'cà phê', 'ca phe', 'tiêu', 'điều', 'sầu riêng'], route: '/products?category=NONG_SAN' },
 ];
 
 function smartSearch(q: string): string {
   const lower = q.toLowerCase().trim().normalize('NFC');
   for (const { keywords, route } of SEARCH_ROUTES) {
-    if (keywords.some(k => lower.includes(k.normalize('NFC')))) {
-      return route + (route.includes('?') ? '&' : '?') + `search=${encodeURIComponent(q)}`;
+    if (keywords.some(k => lower.includes(k.toLowerCase().normalize('NFC')))) {
+      const sep = route.includes('?') ? '&' : '?';
+      return route + sep + `search=${encodeURIComponent(q)}`;
     }
   }
-  // Fallback: tìm trong tất cả sản phẩm (không lọc danh mục)
   return `/products?search=${encodeURIComponent(q)}`;
 }
 
