@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Mua bán nông sản',
-  description: 'Mua bán nông sản, hàng hóa tươi sạch từ nông dân Đắk Nông, Tây Nguyên. Giá tốt, minh bạch, giao dịch tin cậy.',
+  title: 'Sản phẩm',
+  description: 'Mua bán sản phẩm, hàng hóa từ bà con Đắk Nông, Tây Nguyên. Nông sản, vật nuôi, đồ dùng, dịch vụ — giá tốt, giao dịch tin cậy.',
   openGraph: {
-    title: 'Mua bán nông sản | Chợ Nhân Cơ',
-    description: 'Nông sản tươi sạch, giá tốt từ Tây Nguyên.',
+    title: 'Sản phẩm | Chợ Nhân Cơ',
+    description: 'Mua bán đủ loại sản phẩm, hàng hóa tại Chợ Nhân Cơ.',
   },
 };
 

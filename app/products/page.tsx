@@ -9,8 +9,10 @@ import EmptyState from '../components/EmptyState';
 import LikeButton from '../components/LikeButton';
 
 const categories = [
-  { value: '', name: 'Tất cả nông sản', icon: '' },
+  { value: '', name: 'Tất cả sản phẩm', icon: '' },
   { value: 'NONG_SAN', name: 'Nông sản', icon: '' },
+  { value: 'VAT_NUOI', name: 'Vật nuôi', icon: '' },
+  { value: 'DICH_VU', name: 'Dịch vụ', icon: '' },
   { value: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng', icon: '' },
   { value: 'HANG_TIEU_DUNG', name: 'Tiêu dùng', icon: '' },
 ];
@@ -109,9 +111,15 @@ function ProductsInner() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-green-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
-              {search && !category ? <h1 className="text-3xl font-bold text-white mb-1">Kết quả tìm kiếm</h1> : <h1 className="text-3xl font-bold text-white mb-1">Sản phẩm nông nghiệp</h1>}
+              {search && !category
+                ? <h1 className="text-3xl font-bold text-white mb-1">Kết quả tìm kiếm</h1>
+                : <h1 className="text-3xl font-bold text-white mb-1">Sản phẩm</h1>
+              }
               <p className="text-green-200 text-sm">
-                {search && !category ? <><span className="font-semibold text-white">{total}</span> kết quả cho &ldquo;<span className="text-yellow-300">{search}</span>&rdquo;</> : <><span className="font-semibold text-white">{total}</span> sản phẩm từ bà con địa phương</>}
+                {search && !category
+                  ? <><span className="font-semibold text-white">{total}</span> kết quả cho &ldquo;<span className="text-yellow-300">{search}</span>&rdquo;</>
+                  : <><span className="font-semibold text-white">{total}</span> sản phẩm đang rao bán</>
+                }
               </p>
             </div>
 
