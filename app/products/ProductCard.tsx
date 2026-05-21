@@ -31,7 +31,6 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [showContact, setShowContact] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showMessengerModal, setShowMessengerModal] = useState(false);
 
@@ -58,9 +57,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  const handleCall = () => {
-    window.open(`tel:${product.seller.phone}`, '_self');
-  };
 
   const handleMessage = () => {
     setShowMessengerModal(true);
@@ -158,41 +154,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Contact */}
           <div className="space-y-2">
-            {showContact && (
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <i className="ri-phone-line text-blue-500"></i>
-                  <span className="font-medium text-blue-700">{product.seller.phone}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleCall}
-                    className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors text-sm cursor-pointer flex items-center gap-1"
-                    suppressHydrationWarning={true}
-                  >
-                    <i className="ri-phone-line w-4 h-4 flex items-center justify-center"></i>
-                    Gọi
-                  </button>
-                  <button
-                    onClick={handleMessage}
-                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors text-sm cursor-pointer flex items-center gap-1"
-                    suppressHydrationWarning={true}
-                  >
-                    <i className="ri-message-line w-4 h-4 flex items-center justify-center"></i>
-                    Nhắn tin
-                  </button>
-                </div>
-              </div>
-            )}
-
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setShowContact(!showContact)}
+                onClick={handleMessage}
                 className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap cursor-pointer"
                 suppressHydrationWarning={true}
               >
-                <i className="ri-phone-line w-4 h-4 flex items-center justify-center mr-2 inline-flex"></i>
-                {showContact ? 'Ẩn liên hệ' : 'Hiện số điện thoại'}
+                <i className="ri-message-3-line w-4 h-4 flex items-center justify-center mr-2 inline-flex"></i>
+                Nhắn tin
               </button>
               <button
                 onClick={handleShare}

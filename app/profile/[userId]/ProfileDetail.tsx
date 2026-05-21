@@ -34,11 +34,6 @@ export default function ProfileDetail({ userId }: { userId: string }) {
     } catch { alert('Không thể mở chat'); }
   }
 
-  function handleCall() {
-    const phone = profile?.phone?.replace(/\D/g, '');
-    if (phone) window.open(`tel:${phone}`, '_self');
-    else alert('Người dùng chưa cung cấp số điện thoại');
-  }
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -111,10 +106,6 @@ export default function ProfileDetail({ userId }: { userId: string }) {
               </div>
 
               <div className="flex gap-2 flex-wrap">
-                <button onClick={handleCall}
-                  className="flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium">
-                  <i className="ri-phone-line"></i> Gọi điện
-                </button>
                 <button onClick={handleMessage}
                   className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">
                   <i className="ri-message-3-line"></i> Nhắn tin

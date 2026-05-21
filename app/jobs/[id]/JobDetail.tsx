@@ -200,12 +200,13 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                     <button
                       onClick={async () => {
                         if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
-                        if (job.user?.phone) {
-                          window.location.href = `tel:${job.user.phone}`;
-                        }
+                        try {
+                          const conv2 = await messagesApi.getOrCreate(job.user?.id) as any;
+                          window.location.href = `/messages/${conv2.id}`;
+                        } catch { alert('Khong the mo chat'); }
                       }}
                       className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-sm text-base">
-                      <i className={isEmployer ? 'ri-send-plane-fill' : 'ri-phone-fill'}></i>
+                      <i className='ri-send-plane-fill'></i>
                       {isEmployer ? 'Ứng tuyển ngay' : 'Liên hệ tuyển dụng'}
                     </button>
                     <button
@@ -288,12 +289,6 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                         Xem
                       </Link>
                     </div>
-                    {job.user?.phone && (
-                      <a href={`tel:${job.user.phone}`}
-                        className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl hover:bg-blue-700 transition-colors text-sm font-medium mt-3">
-                        <i className="ri-phone-line"></i> {job.user.phone}
-                      </a>
-                    )}
                     <Link href={`/profile/${job.user?.id}`}
                       className="w-full flex items-center justify-center gap-2 border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm mt-2">
                       Xem trang người đăng

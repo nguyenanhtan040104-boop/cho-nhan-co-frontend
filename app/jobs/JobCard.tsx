@@ -37,7 +37,6 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job }: JobCardProps) {
-  const [showContact, setShowContact] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
   const [showMessengerModal, setShowMessengerModal] = useState(false);
@@ -109,9 +108,6 @@ export default function JobCard({ job }: JobCardProps) {
     window.location.href = `/profile/${userId}`;
   };
 
-  const handleCall = () => {
-    window.open(`tel:${job.contact.phone}`, '_self');
-  };
 
   const handleMessageClick = () => {
     setShowMessengerModal(true);
@@ -300,36 +296,7 @@ export default function JobCard({ job }: JobCardProps) {
               </button>
             </div>
           </div>
-          
-          {showContact && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <i className="ri-phone-line text-indigo-500"></i>
-                  <span className="text-indigo-600 font-semibold">{job.contact.phone}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleCall}
-                    className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors text-sm cursor-pointer flex items-center space-x-1"
-                  >
-                    <i className="ri-phone-line"></i>
-                    <span>Gọi</span>
-                  </button>
-                  <button
-                    onClick={handleMessageClick}
-                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors text-sm cursor-pointer flex items-center space-x-1"
-                  >
-                    <i className="ri-message-line"></i>
-                    <span>Nhắn tin</span>
-                  </button>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                * Vui lòng liên hệ để biết thêm chi tiết
-              </p>
-            </div>
-          )}
+
 
           {hasApplied && (
             <div className="mt-4 pt-4 border-t border-gray-200">

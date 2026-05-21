@@ -276,13 +276,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
 
                   {/* Action buttons */}
                   <div className="space-y-2 pt-1">
-                    {item.user?.phone && (
-                      <a href={`tel:${item.user.phone}`}
-                        className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-sm">
-                        <i className="ri-phone-line"></i>
-                        Liên hệ xem nhà
-                      </a>
-                    )}
+
                     <button
                       onClick={async () => {
                         if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }

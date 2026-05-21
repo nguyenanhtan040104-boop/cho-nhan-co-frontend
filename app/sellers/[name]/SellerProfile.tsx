@@ -145,10 +145,7 @@ export default function SellerProfile({ sellerName }: SellerProfileProps) {
     setShowContactModal(true);
   };
 
-  const handleCallClick = () => {
-    const phoneNumber = seller.phone.replace(/\D/g, '');
-    window.open(`tel:${phoneNumber}`, '_self');
-  };
+
 
   const handleZaloClick = () => {
     const phoneNumber = seller.phone.replace(/\D/g, '');
@@ -617,14 +614,6 @@ export default function SellerProfile({ sellerName }: SellerProfileProps) {
                 </div>
                 
                 <div className="space-y-3">
-                  <button
-                    onClick={handleCallClick}
-                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
-                  >
-                    <i className="ri-phone-line w-5 h-5 flex items-center justify-center"></i>
-                    Gọi điện ngay
-                  </button>
-                  
                   {seller.socialLinks?.zalo && (
                     <button
                       onClick={handleZaloClick}
