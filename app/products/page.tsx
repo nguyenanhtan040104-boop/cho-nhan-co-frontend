@@ -109,9 +109,9 @@ function ProductsInner() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-green-300 text-sm font-medium uppercase tracking-wider">Chợ Nhân Cơ</span>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-1">Sản phẩm nông nghiệp</h1>
+              {search && !category ? <h1 className="text-3xl font-bold text-white mb-1">Kết quả tìm kiếm</h1> : <h1 className="text-3xl font-bold text-white mb-1">Sản phẩm nông nghiệp</h1>}
               <p className="text-green-200 text-sm">
-                <span className="font-semibold text-white">{total}</span> sản phẩm từ bà con địa phương
+                {search && !category ? <><span className="font-semibold text-white">{total}</span> kết quả cho &ldquo;<span className="text-yellow-300">{search}</span>&rdquo;</> : <><span className="font-semibold text-white">{total}</span> sản phẩm từ bà con địa phương</>}
               </p>
             </div>
 
@@ -122,7 +122,7 @@ function ProductsInner() {
                   <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                   <input
                     type="text"
-                    placeholder="Tìm nông sản, thực phẩm..."
+                    placeholder="Tìm sản phẩm..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white/90 backdrop-blur"

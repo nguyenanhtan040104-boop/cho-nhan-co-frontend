@@ -112,20 +112,24 @@ const postItems = [
 
 // Danh sách tìm kiếm nhanh theo từ khóa → route
 const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
-  { keywords: ['bất động sản', 'bds', 'nhà', 'đất', 'phòng trọ', 'căn hộ'], route: '/real-estate' },
-  { keywords: ['việc làm', 'tuyển dụng', 'tuyển', 'xin việc', 'nhân công'], route: '/jobs' },
-  { keywords: ['diễn đàn', 'forum', 'hỏi đáp'], route: '/forum' },
-  { keywords: ['cảnh báo', 'lừa đảo', 'mất đồ'], route: '/canh-bao' },
-  { keywords: ['quảng cáo', 'khai trương', 'khuyến mãi'], route: '/advertisements' },
-  { keywords: ['nông sản', 'rau', 'củ', 'thực phẩm'], route: '/products?category=NONG_SAN' },
-  { keywords: ['vật nuôi', 'chó', 'mèo', 'gà', 'heo', 'bò'], route: '/products?category=VAT_NUOI' },
+  { keywords: ['bất động sản', 'bat dong san', 'bds', 'nhà đất', 'phòng trọ', 'phong tro', 'căn hộ', 'can ho', 'mặt bằng', 'nhà ở', 'đất nền'], route: '/real-estate' },
+  { keywords: ['việc làm', 'viec lam', 'tuyển dụng', 'tuyen dung', 'xin việc', 'xin viec', 'nhân công', 'nhan cong', 'tìm việc', 'tuyển'], route: '/jobs' },
+  { keywords: ['dịch vụ', 'dich vu', 'sửa chữa', 'sua chua', 'vận chuyển', 'van chuyen', 'tư vấn', 'tu van', 'xây dựng', 'xay dung'], route: '/dich-vu' },
+  { keywords: ['vật nuôi', 'vat nuoi', 'thú cưng', 'thu cung', 'chó', 'mèo', 'gà', 'heo', 'bò', 'trâu', 'dê', 'thỏ', 'chim'], route: '/vat-nuoi' },
+  { keywords: ['diễn đàn', 'dien dan', 'forum', 'hỏi đáp', 'hoi dap'], route: '/forum' },
+  { keywords: ['cảnh báo', 'canh bao', 'lừa đảo', 'lua dao', 'tố cáo', 'giả mạo'], route: '/canh-bao' },
+  { keywords: ['quảng cáo', 'quang cao', 'khai trương', 'khai truong', 'khuyến mãi', 'khuyen mai'], route: '/advertisements' },
+  { keywords: ['nông sản', 'nong san', 'thực phẩm', 'thuc pham', 'rau củ', 'rau cu', 'trái cây', 'trai cay', 'lúa', 'gạo', 'cà phê', 'tiêu', 'điều'], route: '/products?category=NONG_SAN' },
 ];
 
 function smartSearch(q: string): string {
-  const lower = q.toLowerCase().trim();
+  const lower = q.toLowerCase().trim().normalize('NFC');
   for (const { keywords, route } of SEARCH_ROUTES) {
-    if (keywords.some(k => lower.includes(k))) return route + (route.includes('?') ? '&' : '?') + `search=${encodeURIComponent(q)}`;
+    if (keywords.some(k => lower.includes(k.normalize('NFC')))) {
+      return route + (route.includes('?') ? '&' : '?') + `search=${encodeURIComponent(q)}`;
+    }
   }
+  // Fallback: tìm trong tất cả sản phẩm (không lọc danh mục)
   return `/products?search=${encodeURIComponent(q)}`;
 }
 
