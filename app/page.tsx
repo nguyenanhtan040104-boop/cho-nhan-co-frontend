@@ -35,16 +35,16 @@ async function getHomeData() {
 }
 
 const categories = [
-  { title: 'Nông sản',     href: '/products?category=NONG_SAN', icon: 'ri-plant-line',       bg: 'bg-green-100',  color: 'text-green-600' },
-  { title: 'Bất động sản', href: '/real-estate',                icon: 'ri-home-4-line',       bg: 'bg-orange-100', color: 'text-orange-600' },
-  { title: 'Việc làm',     href: '/jobs',                       icon: 'ri-briefcase-line',    bg: 'bg-blue-100',   color: 'text-blue-600' },
-  { title: 'Vật nuôi',     href: '/vat-nuoi',                   icon: 'ri-bear-smile-line',   bg: 'bg-amber-100',  color: 'text-amber-600' },
-  { title: 'Dịch vụ',      href: '/dich-vu',                    icon: 'ri-service-line',      bg: 'bg-purple-100', color: 'text-purple-600' },
-  { title: 'Diễn đàn',     href: '/forum',                      icon: 'ri-discuss-line',      bg: 'bg-cyan-100',   color: 'text-cyan-600' },
-  { title: 'Quảng cáo',    href: '/advertisements',             icon: 'ri-megaphone-line',    bg: 'bg-red-100',    color: 'text-red-500' },
-  { title: 'Cảnh báo',     href: '/canh-bao',                   icon: 'ri-alert-line',        bg: 'bg-yellow-100', color: 'text-yellow-600' },
-  { title: 'Bảng giá',     href: '/market-prices',              icon: 'ri-bar-chart-line',    bg: 'bg-teal-100',   color: 'text-teal-600' },
-  { title: 'Sản phẩm',     href: '/products',                   icon: 'ri-store-line',        bg: 'bg-lime-100',   color: 'text-lime-600' },
+  { title: 'Nông sản',     href: '/products?category=NONG_SAN', icon: 'ri-seedling-line',          bg: 'bg-green-100',  color: 'text-green-600' },
+  { title: 'Bất động sản', href: '/real-estate',                icon: 'ri-home-4-line',            bg: 'bg-orange-100', color: 'text-orange-600' },
+  { title: 'Việc làm',     href: '/jobs',                       icon: 'ri-briefcase-4-line',       bg: 'bg-blue-100',   color: 'text-blue-600' },
+  { title: 'Vật nuôi',     href: '/vat-nuoi',                   icon: 'ri-bear-smile-line',        bg: 'bg-amber-100',  color: 'text-amber-600' },
+  { title: 'Dịch vụ',      href: '/dich-vu',                    icon: 'ri-customer-service-2-line',bg: 'bg-purple-100', color: 'text-purple-600' },
+  { title: 'Diễn đàn',     href: '/forum',                      icon: 'ri-discuss-line',           bg: 'bg-cyan-100',   color: 'text-cyan-600' },
+  { title: 'Quảng cáo',    href: '/advertisements',             icon: 'ri-megaphone-line',         bg: 'bg-red-100',    color: 'text-red-500' },
+  { title: 'Cảnh báo',     href: '/canh-bao',                   icon: 'ri-alert-line',             bg: 'bg-yellow-100', color: 'text-yellow-600' },
+  { title: 'Bảng giá',     href: '/market-prices',              icon: 'ri-bar-chart-2-line',       bg: 'bg-teal-100',   color: 'text-teal-600' },
+  { title: 'Sản phẩm',     href: '/products',                   icon: 'ri-shopping-bag-3-line',    bg: 'bg-lime-100',   color: 'text-lime-600' },
 ];
 
 function timeAgo(dateStr: string) {
