@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
 
+const WS_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api').replace('/api', '');
+
 const navLinks = [
   { href: '/', label: 'Chợ NC' },
   { href: '/products', label: 'Nông sản' },
@@ -185,9 +187,11 @@ export default function Header() {
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [showSavedDropdown, setShowSavedDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifs, setNotifs] = useState<any[]>([]);
   const [notifTab, setNotifTab] = useState<'activity'|'news'>('activity');
   const [savedProducts, setSavedProducts] = useState<any[]>([]);
+  const [msgToast, setMsgToast] = useState<{ title: string; body: string; conversationId: string } | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -226,6 +230,7 @@ export default function Header() {
     setShowNotifDropdown(false);
     setShowSavedDropdown(false);
     if (pathname === '/dashboard') setUnreadCount(0);
+    if (pathname.startsWith('/messages')) setUnreadMessages(0);
   }, [pathname]);
 
   function openNotifDropdown() {
@@ -263,10 +268,47 @@ export default function Header() {
         .then(r => r.ok ? r.json() : null)
         .then(data => { if (data?.count !== undefined) setUnreadCount(data.count); })
         .catch(() => {});
+      fetch(`${API}/conversations/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data?.count !== undefined) setUnreadMessages(data.count); })
+        .catch(() => {});
     }
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
+    const interval = setInterval(fetchUnread, 15000);
     return () => clearInterval(interval);
+  }, []);
+
+  // WebSocket — nhận thông báo realtime khi có tin nhắn mới
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) return;
+    let socket: any;
+    import('socket.io-client').then(({ io }) => {
+      socket = io(`${WS_URL}/messaging`, {
+        auth: { token },
+        transports: ['websocket'],
+        reconnectionAttempts: 5,
+      });
+      socket.on('new_notification', (data: any) => {
+        if (data.type === 'MESSAGE') {
+          setUnreadMessages(prev => prev + 1);
+          setUnreadCount(prev => prev + 1);
+          // Hiện toast popup
+          setMsgToast({
+            title: data.title || 'Tin nhắn mới',
+            body: data.body || '',
+            conversationId: data.data?.conversationId || '',
+          });
+          // Tự ẩn sau 5 giây
+          setTimeout(() => setMsgToast(null), 5000);
+        } else {
+          setUnreadCount(prev => prev + 1);
+        }
+      });
+    }).catch(() => {});
+    return () => { if (socket) socket.disconnect(); };
   }, []);
 
   function handlePostClick() {
@@ -518,9 +560,14 @@ export default function Header() {
 
           {/* Liên hệ → trang nhắn tin */}
           <Link href="/messages"
-            className="hidden lg:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
+            className="hidden lg:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition relative">
             <i className="ri-chat-1-line text-sm"></i>
             <span>Liên hệ</span>
+            {unreadMessages > 0 && (
+              <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none ml-0.5">
+                {unreadMessages > 99 ? '99+' : unreadMessages}
+              </span>
+            )}
           </Link>
 
           {/* Quản lý tin → dashboard tab products */}
@@ -560,6 +607,34 @@ export default function Header() {
           </Link>
         </div>
       </div>
+
+      {/* 💬 Toast thông báo tin nhắn mới */}
+      {msgToast && (
+        <div
+          className="fixed bottom-5 right-5 z-[9999] bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-start gap-3 max-w-xs cursor-pointer animate-slideIn"
+          style={{ animation: 'slideUp 0.3s ease' }}
+          onClick={() => {
+            if (msgToast.conversationId) router.push(`/messages/${msgToast.conversationId}`);
+            else router.push('/messages');
+            setMsgToast(null);
+          }}
+        >
+          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i className="ri-chat-1-fill text-green-600 text-lg"></i>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-gray-900 leading-snug">{msgToast.title}</p>
+            {msgToast.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{msgToast.body}</p>}
+            <p className="text-[10px] text-gray-400 mt-1">Nhấn để xem tin nhắn</p>
+          </div>
+          <button
+            className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+            onClick={(e) => { e.stopPropagation(); setMsgToast(null); }}
+          >
+            <i className="ri-close-line text-base"></i>
+          </button>
+        </div>
+      )}
     </header>
   );
 }
