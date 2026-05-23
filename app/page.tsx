@@ -35,16 +35,16 @@ async function getHomeData() {
 }
 
 const categories = [
-  { title: 'Nông sản',     href: '/products?category=NONG_SAN', icon: 'ri-seedling-line',          bg: 'bg-green-100',  color: 'text-green-600' },
-  { title: 'Bất động sản', href: '/real-estate',                icon: 'ri-home-4-line',            bg: 'bg-orange-100', color: 'text-orange-600' },
-  { title: 'Việc làm',     href: '/jobs',                       icon: 'ri-briefcase-4-line',       bg: 'bg-blue-100',   color: 'text-blue-600' },
-  { title: 'Vật nuôi',     href: '/vat-nuoi',                   icon: 'ri-bear-smile-line',        bg: 'bg-amber-100',  color: 'text-amber-600' },
-  { title: 'Dịch vụ',      href: '/dich-vu',                    icon: 'ri-customer-service-2-line',bg: 'bg-purple-100', color: 'text-purple-600' },
-  { title: 'Diễn đàn',     href: '/forum',                      icon: 'ri-discuss-line',           bg: 'bg-cyan-100',   color: 'text-cyan-600' },
-  { title: 'Quảng cáo',    href: '/advertisements',             icon: 'ri-megaphone-line',         bg: 'bg-red-100',    color: 'text-red-500' },
-  { title: 'Cảnh báo',     href: '/canh-bao',                   icon: 'ri-alert-line',             bg: 'bg-yellow-100', color: 'text-yellow-600' },
-  { title: 'Bảng giá',     href: '/market-prices',              icon: 'ri-bar-chart-2-line',       bg: 'bg-teal-100',   color: 'text-teal-600' },
-  { title: 'Sản phẩm',     href: '/products',                   icon: 'ri-shopping-bag-3-line',    bg: 'bg-lime-100',   color: 'text-lime-600' },
+  { title: 'Nông sản',     href: '/products?category=NONG_SAN', img: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=120&h=120&fit=crop&q=80', icon: 'ri-seedling-line',           bg: 'bg-green-100',  color: 'text-green-600' },
+  { title: 'Bất động sản', href: '/real-estate',                img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=120&h=120&fit=crop&q=80', icon: 'ri-home-4-line',             bg: 'bg-orange-100', color: 'text-orange-600' },
+  { title: 'Việc làm',     href: '/jobs',                       img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=120&h=120&fit=crop&q=80', icon: 'ri-briefcase-4-line',        bg: 'bg-blue-100',   color: 'text-blue-600' },
+  { title: 'Vật nuôi',     href: '/vat-nuoi',                   img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=120&h=120&fit=crop&q=80', icon: 'ri-bear-smile-line',         bg: 'bg-amber-100',  color: 'text-amber-600' },
+  { title: 'Dịch vụ',      href: '/dich-vu',                    img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=120&h=120&fit=crop&q=80', icon: 'ri-customer-service-2-line', bg: 'bg-purple-100', color: 'text-purple-600' },
+  { title: 'Diễn đàn',     href: '/forum',                      img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&h=120&fit=crop&q=80', icon: 'ri-discuss-line',            bg: 'bg-cyan-100',   color: 'text-cyan-600' },
+  { title: 'Quảng cáo',    href: '/advertisements',             img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&h=120&fit=crop&q=80', icon: 'ri-megaphone-line',          bg: 'bg-red-100',    color: 'text-red-500' },
+  { title: 'Cảnh báo',     href: '/canh-bao',                   img: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=120&h=120&fit=crop&q=80', icon: 'ri-alert-line',              bg: 'bg-yellow-100', color: 'text-yellow-600' },
+  { title: 'Bảng giá',     href: '/market-prices',              img: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=120&h=120&fit=crop&q=80', icon: 'ri-bar-chart-2-line',        bg: 'bg-teal-100',   color: 'text-teal-600' },
+  { title: 'Sản phẩm',     href: '/products',                   img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop&q=80',    icon: 'ri-shopping-bag-3-line',     bg: 'bg-lime-100',   color: 'text-lime-600' },
 ];
 
 function timeAgo(dateStr: string) {
@@ -122,8 +122,8 @@ export default async function HomePage() {
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
                 className="flex flex-col items-center gap-1.5 py-2 hover:opacity-80 transition-opacity">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${cat.bg}`}>
-                  <i className={`${cat.icon} text-2xl ${cat.color}`}></i>
+                <div className="w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0">
+                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover" />
                 </div>
                 <span className="text-[10px] text-gray-600 font-medium text-center leading-tight">{cat.title}</span>
               </Link>
