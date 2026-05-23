@@ -728,6 +728,37 @@ export const advertisements = {
   },
 };
 
+// =================== REVIEWS ===================
+
+export const reviews = {
+  getByProduct: (productId: string) =>
+    fetch(`${API_URL}/reviews/product/${productId}`).then(r => r.json()),
+  create: (data: { productId: string; rating: number; comment?: string }) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
+    return fetch(`${API_URL}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    }).then(r => r.json());
+  },
+  delete: (id: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
+    return fetch(`${API_URL}/reviews/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(r => r.json());
+  },
+};
+
+export const sellerStats = {
+  getMyStats: () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
+    return fetch(`${API_URL}/products/my-stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(r => r.json());
+  },
+};
+
 // =================== ITEM COMMENTS ===================
 
 export const itemComments = {

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi, forum, advertisements } from '../../lib/api';
+import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi, forum, advertisements, sellerStats } from '../../lib/api';
 
 // Tab mapping từ URL param → tab id trong dashboard
 const TAB_MAP: Record<string, string> = {
@@ -48,6 +48,7 @@ function DashboardContent() {
   const [myCanhBao, setMyCanhBao] = useState<any[]>([]);
   const [notifs, setNotifs] = useState<any[]>([]);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [productStats, setProductStats] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -109,6 +110,7 @@ function DashboardContent() {
     if (results[6].status === 'fulfilled') setMyForumPosts((results[6].value as any).data || []);
     if (results[7].status === 'fulfilled') setMyCanhBao((results[7].value as any).data || []);
     walletApi.get().then((w: any) => setWalletBalance(Number(w.balance))).catch(() => {});
+    sellerStats.getMyStats().then((s: any) => setProductStats(s)).catch(() => {});
   } catch (e: any) {
     setError(e.message || 'Lỗi tải dữ liệu');
   } finally {
@@ -362,6 +364,41 @@ function DashboardContent() {
                     ))}
                   </div>
                 </div>
+
+                {/* Seller Stats - Top sản phẩm theo lượt xem */}
+                {productStats && productStats.topProducts?.length > 0 && (
+                  <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-900">📊 Tin đăng của bạn</h3>
+                      <div className="flex gap-4 text-sm">
+                        <span className="text-gray-500">Tổng lượt xem: <span className="font-bold text-blue-600">{(productStats.totalViews || 0).toLocaleString('vi-VN')}</span></span>
+                        <span className="text-gray-500">Đang duyệt: <span className="font-bold text-orange-500">{productStats.pendingCount || 0}</span></span>
+                        <span className="text-gray-500">Đang đăng: <span className="font-bold text-green-600">{productStats.activeCount || 0}</span></span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {productStats.topProducts.map((p: any, i: number) => (
+                        <div key={p.id} className="flex items-center gap-3">
+                          <span className="text-sm font-bold text-gray-400 w-5 text-center">{i + 1}</span>
+                          {p.images?.[0]?.url
+                            ? <img src={p.images[0].url} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                            : <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0"><i className="ri-image-line text-gray-300"></i></div>
+                          }
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-800 truncate">{p.title}</p>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${['pending','PENDING'].includes(p.status) ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}`}>
+                              {['pending','PENDING'].includes(p.status) ? 'Đang duyệt' : 'Đang đăng'}
+                            </span>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-sm font-bold text-blue-600">{(p.viewCount || 0).toLocaleString('vi-VN')}</p>
+                            <p className="text-xs text-gray-400">lượt xem</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Quick Actions */}
                 <div className="bg-white rounded-xl p-6 shadow-sm">

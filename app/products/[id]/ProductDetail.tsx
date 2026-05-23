@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import MessengerModal from '../../../components/MessengerModal';
 import { products as productsApi, messages as messagesApi, auth, wallet as walletApi } from '../../../lib/api';
 import CommentSection from '../../../components/CommentSection';
+import ReviewSection from '../../../components/ReviewSection';
+import ShareButton from '../../../components/ShareButton';
 
 interface ProductDetailProps {
   productId: string;
@@ -35,6 +37,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [buyingVip, setBuyingVip] = useState(false);
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
   const [likedIds, setLikedIds] = useState<string[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,6 +47,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         const data = await res.json();
         setProduct(data);
         setLikeCount(data.likeCount || 0);
+        // Load related products
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}/related`)
+          .then(r => r.json())
+          .then(data => setRelatedProducts(Array.isArray(data) ? data : []))
+          .catch(() => {});
       } catch (e) {
         console.error('Lỗi tải sản phẩm:', e);
       } finally {
@@ -364,6 +372,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               )}
             </div>
 
+            {/* Share Button */}
+            <ShareButton title={product?.title || ''} />
+
             {/* Seller Info */}
             {product.user && (
               <div className={`bg-white border ${theme.border} rounded-2xl p-5`}>
@@ -462,6 +473,36 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       <div className="max-w-screen-xl mx-auto px-4 pb-6">
         <CommentSection targetType="PRODUCT" targetId={productId} />
       </div>
+
+      {/* Review Section */}
+      <div className="max-w-screen-xl mx-auto px-4 pb-6">
+        {product && <ReviewSection productId={productId} sellerId={product.user?.id || ''} />}
+      </div>
+
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="max-w-screen-xl mx-auto px-4 pb-6">
+          <div className="bg-white rounded-xl p-5 mt-4">
+            <h3 className="font-bold text-gray-900 text-base mb-4">Có thể bạn cũng thích</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {relatedProducts.map((p: any) => (
+                <a key={p.id} href={`/products/${p.id}`}
+                  className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-md transition group">
+                  <div className="aspect-square overflow-hidden bg-gray-200">
+                    {p.images?.[0]?.url
+                      ? <img src={p.images[0].url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      : <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-2xl text-gray-300"></i></div>}
+                  </div>
+                  <div className="p-2">
+                    <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug">{p.title}</p>
+                    <p className="text-xs font-bold text-red-500 mt-1">{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Contact Modal */}
       {showContactModal && product.user && (
