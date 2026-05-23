@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, messages as messagesApi } from '../../lib/api';
 
-type FilterTab = 'all' | 'unread' | 'spam';
+type FilterTab = 'all' | 'unread';
 
 const COLORS = ['bg-yellow-400', 'bg-blue-400', 'bg-green-400', 'bg-pink-400', 'bg-purple-400'];
 
@@ -40,7 +40,6 @@ export default function MessagesPage() {
 
   const filtered = conversations.filter(c => {
     if (filter === 'unread' && !c.unreadCount) return false;
-    if (filter === 'spam') return false;
     const other = c.otherUser;
     const name = other?.fullName || other?.username || '';
     if (search && !name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -67,7 +66,7 @@ export default function MessagesPage() {
             />
           </div>
           <div className="flex gap-1 mt-3">
-            {([['all', 'Tất cả'], ['unread', 'Chưa đọc'], ['spam', 'Tin rác']] as [FilterTab, string][]).map(([key, label]) => (
+            {([['all', 'Tất cả'], ['unread', 'Chưa đọc']] as [FilterTab, string][]).map(([key, label]) => (
               <button key={key} onClick={() => setFilter(key as FilterTab)}
                 className={`text-xs font-medium px-3 py-1.5 rounded-full transition ${filter === key ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                 {label}
@@ -81,11 +80,6 @@ export default function MessagesPage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : filter === 'spam' ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
-              <i className="ri-spam-2-line text-4xl mb-2"></i>
-              <p className="text-sm">Không có tin rác</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
