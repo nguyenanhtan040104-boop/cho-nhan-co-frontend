@@ -226,6 +226,13 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Khoi tao suppress tu localStorage khi reload trang
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('msgSuppressed') === '1') {
+      msgSuppressRef.current = true;
+    }
+  }, []);
+
   useEffect(() => {
     setShowPostMenu(false);
     setShowHamburger(false);
@@ -235,7 +242,8 @@ export default function Header() {
     if (pathname === '/dashboard') setUnreadCount(0);
     if (pathname.startsWith('/messages')) {
       setUnreadMessages(0);
-      msgSuppressRef.current = true; // An badge cho den khi co tin moi
+      msgSuppressRef.current = true;
+      if (typeof window !== 'undefined') localStorage.setItem('msgSuppressed', '1');
     }
     isOnMessagesRef.current = pathname.startsWith('/messages');
   }, [pathname]);
@@ -301,7 +309,8 @@ export default function Header() {
       socket.on('new_notification', (data: any) => {
         if (data.type === 'MESSAGE') {
           if (!isOnMessagesRef.current) {
-            msgSuppressRef.current = false; // Co tin moi -> hien badge tro lai
+            msgSuppressRef.current = false;
+            if (typeof window !== 'undefined') localStorage.removeItem('msgSuppressed');
             setUnreadMessages(prev => prev + 1);
           }
           setUnreadCount(prev => prev + 1);
