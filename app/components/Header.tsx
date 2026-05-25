@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -200,6 +200,7 @@ export default function Header() {
   const hamburgerRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const savedRef = useRef<HTMLDivElement>(null);
+  const isOnMessagesRef = useRef(false);
 
   function navDashboard(tab: string) {
     if (pathname === '/dashboard') {
@@ -231,6 +232,7 @@ export default function Header() {
     setShowSavedDropdown(false);
     if (pathname === '/dashboard') setUnreadCount(0);
     if (pathname.startsWith('/messages')) setUnreadMessages(0);
+    isOnMessagesRef.current = pathname.startsWith('/messages');
   }, [pathname]);
 
   function openNotifDropdown() {
@@ -272,7 +274,7 @@ export default function Header() {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(r => r.ok ? r.json() : null)
-        .then(data => { if (data?.count !== undefined) setUnreadMessages(data.count); })
+        .then(data => { if (data?.count !== undefined && !isOnMessagesRef.current) setUnreadMessages(data.count); })
         .catch(() => {});
     }
     fetchUnread();
@@ -293,7 +295,7 @@ export default function Header() {
       });
       socket.on('new_notification', (data: any) => {
         if (data.type === 'MESSAGE') {
-          setUnreadMessages(prev => prev + 1);
+          if (!isOnMessagesRef.current) setUnreadMessages(prev => prev + 1);
           setUnreadCount(prev => prev + 1);
           // Hiện toast popup
           setMsgToast({
@@ -309,6 +311,16 @@ export default function Header() {
       });
     }).catch(() => {});
     return () => { if (socket) socket.disconnect(); };
+  }, []);
+
+  // Lang nghe khi user click vao 1 cuoc tro chuyen → giam badge
+  useEffect(() => {
+    function handleConvRead(e: Event) {
+      const count = (e as CustomEvent).detail?.unreadCount || 0;
+      if (count > 0) setUnreadMessages(prev => Math.max(0, prev - count));
+    }
+    window.addEventListener('conversation-read', handleConvRead);
+    return () => window.removeEventListener('conversation-read', handleConvRead);
   }, []);
 
   function handlePostClick() {

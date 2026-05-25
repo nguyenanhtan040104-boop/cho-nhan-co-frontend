@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -45,6 +45,20 @@ export default function MessagesPage() {
     if (search && !name.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
+
+  function handleConvClick(conv: any) {
+    if (conv.unreadCount > 0) {
+      // Xoa bold ngay lap tuc trong local state
+      setConversations(prev => prev.map(c =>
+        c.id === conv.id ? { ...c, unreadCount: 0 } : c
+      ));
+      // Bao Header giam badge xuong dung so
+      window.dispatchEvent(new CustomEvent('conversation-read', {
+        detail: { unreadCount: conv.unreadCount }
+      }));
+    }
+    router.push(`/messages/${conv.id}`);
+  }
 
   return (
     <div className="flex h-[calc(100vh-56px)] bg-white">
@@ -94,7 +108,7 @@ export default function MessagesPage() {
               const lastMsg = conv.messages?.[0];
               const lastText = lastMsg?.type === 'IMAGE' ? '🖼 Đã gửi ảnh' : (lastMsg?.content || 'Bắt đầu trò chuyện');
               return (
-                <button key={conv.id} onClick={() => router.push(`/messages/${conv.id}`)}
+                <button key={conv.id} onClick={() => handleConvClick(conv)}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition text-left border-b border-gray-50">
                   <div className="relative flex-shrink-0">
                     {other?.avatarUrl ? (
