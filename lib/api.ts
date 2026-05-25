@@ -733,30 +733,14 @@ export const advertisements = {
 export const reviews = {
   getByProduct: (productId: string) =>
     fetch(`${API_URL}/reviews/product/${productId}`).then(r => r.json()),
-  create: (data: { productId: string; rating: number; comment?: string }) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
-    return fetch(`${API_URL}/reviews`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data),
-    }).then(r => r.json());
-  },
-  delete: (id: string) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
-    return fetch(`${API_URL}/reviews/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    }).then(r => r.json());
-  },
+  create: (data: { productId: string; rating: number; comment?: string }) =>
+    request<any>('/reviews', { method: 'POST', body: JSON.stringify(data) }),
+  delete: (id: string) =>
+    request<any>(`/reviews/${id}`, { method: 'DELETE' }),
 };
 
 export const sellerStats = {
-  getMyStats: () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
-    return fetch(`${API_URL}/products/my-stats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then(r => r.json());
-  },
+  getMyStats: () => request<any>('/products/my-stats'),
 };
 
 // =================== ITEM COMMENTS ===================
