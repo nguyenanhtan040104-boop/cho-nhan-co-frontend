@@ -257,7 +257,7 @@ function Section({ title, icon, iconColor, href, badge, children }: {
           {title}
           {badge && <span className="bg-amber-400 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm ml-1">{badge}</span>}
         </h2>
-        <Link href={href} className="text-xs text-red-600 font-medium">Xem tat ca →</Link>
+        <Link href={href} className="text-xs text-red-600 font-medium">Xem tất cả →</Link>
       </div>
       {children}
     </section>

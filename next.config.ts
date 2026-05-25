@@ -14,6 +14,12 @@ const nextConfig: NextConfig = {
   experimental: {
     webpackBuildWorker: false,
   },
+  async redirects() {
+    return [
+      { source: '/cho-nc', destination: '/', permanent: false },
+      { source: '/nong-san', destination: '/products?category=NONG_SAN', permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

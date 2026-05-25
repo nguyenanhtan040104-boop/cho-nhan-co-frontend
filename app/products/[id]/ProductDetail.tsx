@@ -199,7 +199,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-gray-500 hover:text-gray-800">Trang chu</Link>
+            <Link href="/" className="text-gray-500 hover:text-gray-800">Trang chủ</Link>
             <i className="ri-arrow-right-s-line text-gray-400"></i>
             <Link href="/products" className={`text-gray-500 ${theme.accent.replace('text-', 'hover:text-')}`}>Sản phẩm</Link>
             <i className="ri-arrow-right-s-line text-gray-400"></i>
@@ -339,11 +339,18 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
             {/* Action Buttons */}
             <div className="flex gap-2 md:gap-3 flex-wrap">
-              <button onClick={handleContactClick}
-                className={`flex-1 ${theme.bg} ${theme.bgHover} text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-semibold text-sm md:text-base shadow-sm`}>
-                <i className={theme.ctaIcon}></i>
-                {theme.ctaLabel}
-              </button>
+              {isOwner ? (
+                <div className={`flex-1 ${theme.bgLight} border ${theme.border} py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium ${theme.accent}`}>
+                  <i className="ri-store-2-line"></i>
+                  Đây là sản phẩm của bạn
+                </div>
+              ) : (
+                <button onClick={handleContactClick}
+                  className={`flex-1 ${theme.bg} ${theme.bgHover} text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-semibold text-sm md:text-base shadow-sm`}>
+                  <i className={theme.ctaIcon}></i>
+                  {theme.ctaLabel}
+                </button>
+              )}
               <button onClick={handleLikeClick}
                 className={`px-4 py-3 border rounded-xl transition-colors flex items-center gap-1.5 ${liked ? 'border-red-400 bg-red-50 text-red-500' : 'border-gray-300 hover:bg-gray-50 text-gray-600'}`}>
                 <i className={liked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
