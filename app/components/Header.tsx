@@ -201,6 +201,8 @@ export default function Header() {
   const notifRef = useRef<HTMLDivElement>(null);
   const savedRef = useRef<HTMLDivElement>(null);
   const isOnMessagesRef = useRef(false);
+  // Sau khi user vao /messages, an badge cho den khi co tin moi
+  const msgSuppressRef = useRef(false);
 
   function navDashboard(tab: string) {
     if (pathname === '/dashboard') {
@@ -231,7 +233,10 @@ export default function Header() {
     setShowNotifDropdown(false);
     setShowSavedDropdown(false);
     if (pathname === '/dashboard') setUnreadCount(0);
-    if (pathname.startsWith('/messages')) setUnreadMessages(0);
+    if (pathname.startsWith('/messages')) {
+      setUnreadMessages(0);
+      msgSuppressRef.current = true; // An badge cho den khi co tin moi
+    }
     isOnMessagesRef.current = pathname.startsWith('/messages');
   }, [pathname]);
 
@@ -274,7 +279,7 @@ export default function Header() {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(r => r.ok ? r.json() : null)
-        .then(data => { if (data?.count !== undefined && !isOnMessagesRef.current) setUnreadMessages(data.count); })
+        .then(data => { if (data?.count !== undefined && !isOnMessagesRef.current && !msgSuppressRef.current) setUnreadMessages(data.count); })
         .catch(() => {});
     }
     fetchUnread();
@@ -295,7 +300,10 @@ export default function Header() {
       });
       socket.on('new_notification', (data: any) => {
         if (data.type === 'MESSAGE') {
-          if (!isOnMessagesRef.current) setUnreadMessages(prev => prev + 1);
+          if (!isOnMessagesRef.current) {
+            msgSuppressRef.current = false; // Co tin moi -> hien badge tro lai
+            setUnreadMessages(prev => prev + 1);
+          }
           setUnreadCount(prev => prev + 1);
           // Hiện toast popup
           setMsgToast({
@@ -317,7 +325,13 @@ export default function Header() {
   useEffect(() => {
     function handleConvRead(e: Event) {
       const count = (e as CustomEvent).detail?.unreadCount || 0;
-      if (count > 0) setUnreadMessages(prev => Math.max(0, prev - count));
+      if (count > 0) {
+        setUnreadMessages(prev => {
+          const next = Math.max(0, prev - count);
+          if (next === 0) msgSuppressRef.current = true;
+          return next;
+        });
+      }
     }
     window.addEventListener('conversation-read', handleConvRead);
     return () => window.removeEventListener('conversation-read', handleConvRead);
