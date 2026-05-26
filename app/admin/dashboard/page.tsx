@@ -73,7 +73,13 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [me, setMe] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set(['overview']));
   const [loading, setLoading] = useState(true);
+
+  function handleTabChange(tabId: string) {
+    setActiveTab(tabId);
+    setVisitedTabs(prev => new Set(prev).add(tabId));
+  }
 
   const [stats, setStats] = useState<any>(null);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -192,14 +198,14 @@ export default function AdminDashboard() {
   const sidebarTabs = [
     { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-3-line' },
     { id: 'users', label: 'Người dùng', icon: 'ri-group-line', badge: allUsers.length },
-    { id: 'security', label: 'Bảo mật / IP', icon: 'ri-shield-keyhole-line', badge: suspiciousIPs > 0 ? suspiciousIPs : undefined, badgeColor: 'bg-red-500' },
+    { id: 'security', label: 'Bảo mật / IP', icon: 'ri-shield-keyhole-line', badge: (!visitedTabs.has('security') && suspiciousIPs > 0) ? suspiciousIPs : undefined, badgeColor: 'bg-red-500' },
     { id: 'moderation', label: 'Kiểm duyệt', icon: 'ri-shield-check-line', badge: pendingPosts.length || undefined, badgeColor: 'bg-orange-500' },
     { id: 'products', label: 'Sản phẩm', icon: 'ri-leaf-line', badge: allProducts.length },
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line', badge: allRealEstates.length },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line', badge: allJobs.length },
     { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line', badge: allPosts.length },
     { id: 'ads', label: 'Quảng cáo', icon: 'ri-megaphone-line', badge: allAds.length },
-    { id: 'vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', badge: vipItems.length || undefined, badgeColor: 'bg-yellow-500' },
+    { id: 'vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', badge: (!visitedTabs.has('vip') && vipItems.length > 0) ? vipItems.length : undefined, badgeColor: 'bg-yellow-500' },
     { id: 'wallet', label: 'Doanh thu', icon: 'ri-wallet-3-line' },
     { id: 'activity', label: 'Nhật ký', icon: 'ri-history-line' },
   ];
@@ -221,7 +227,7 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-2">
             {suspiciousIPs > 0 && (
-              <button onClick={() => setActiveTab('security')}
+              <button onClick={() => handleTabChange('security')}
                 className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold animate-pulse hover:animate-none hover:bg-red-100 transition-all">
                 <i className="ri-alarm-warning-line"></i> {suspiciousIPs} IP đáng ngờ
               </button>
@@ -244,7 +250,7 @@ export default function AdminDashboard() {
           <aside className="w-52 flex-shrink-0">
             <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sticky top-4">
               {sidebarTabs.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                <button key={tab.id} onClick={() => handleTabChange(tab.id)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all mb-0.5 ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-200'
@@ -267,7 +273,7 @@ export default function AdminDashboard() {
           {/* Main content */}
           <main className="flex-1 min-w-0">
             {activeTab === 'overview' && stats && (
-              <OverviewTab stats={stats} products={allProducts} recentActivity={recentActivity} walletTx={walletTx} loginHistory={loginHistory} onTabChange={setActiveTab} />
+              <OverviewTab stats={stats} products={allProducts} recentActivity={recentActivity} walletTx={walletTx} loginHistory={loginHistory} onTabChange={handleTabChange} />
             )}
             {activeTab === 'users' && (
               <UsersTab usersList={allUsers} loginHistory={loginHistory} onRefresh={loadAll} />
@@ -583,6 +589,60 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
 function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefresh: () => void }) {
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [blockedIps, setBlockedIps] = useState<any[]>([]);
+  const [blockingIp, setBlockingIp] = useState<string | null>(null);
+  const [manualIp, setManualIp] = useState('');
+  const [manualReason, setManualReason] = useState('');
+  const [addingManual, setAddingManual] = useState(false);
+
+  useEffect(() => {
+    loadBlockedIps();
+  }, []);
+
+  async function loadBlockedIps() {
+    try {
+      const data = await adminFetch('/users/admin/blocked-ips');
+      setBlockedIps(Array.isArray(data) ? data : []);
+    } catch { setBlockedIps([]); }
+  }
+
+  async function handleBlockIp(ip: string, reason?: string) {
+    setBlockingIp(ip);
+    try {
+      await adminFetch('/users/admin/block-ip', {
+        method: 'POST',
+        body: JSON.stringify({ ip, reason: reason || `Tự động chặn từ dashboard — ${new Date().toLocaleString('vi-VN')}` }),
+      });
+      await loadBlockedIps();
+    } catch (e: any) { alert(e?.message || 'Chặn IP thất bại'); }
+    finally { setBlockingIp(null); }
+  }
+
+  async function handleUnblockIp(ip: string) {
+    if (!confirm(`Bỏ chặn IP ${ip}?`)) return;
+    setBlockingIp(ip);
+    try {
+      await adminFetch(`/users/admin/block-ip/${encodeURIComponent(ip)}`, { method: 'DELETE' });
+      await loadBlockedIps();
+    } catch (e: any) { alert(e?.message || 'Bỏ chặn thất bại'); }
+    finally { setBlockingIp(null); }
+  }
+
+  async function handleManualBlock() {
+    if (!manualIp.trim()) { alert('Nhập địa chỉ IP'); return; }
+    setAddingManual(true);
+    try {
+      await adminFetch('/users/admin/block-ip', {
+        method: 'POST',
+        body: JSON.stringify({ ip: manualIp.trim(), reason: manualReason.trim() || undefined }),
+      });
+      setManualIp(''); setManualReason('');
+      await loadBlockedIps();
+    } catch (e: any) { alert(e?.message || 'Thêm IP thất bại'); }
+    finally { setAddingManual(false); }
+  }
+
+  const blockedIpSet = new Set(blockedIps.map((b: any) => b.ip));
 
   // Aggregate by IP
   const ipMap: Record<string, { failed: number; locked: number; success: number; total: number; lastSeen: string; users: string[] }> = {};
@@ -625,7 +685,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
           { label: 'Login hôm nay', value: successToday + failedToday + lockedToday, icon: 'ri-login-box-line', gradient: 'from-blue-500 to-blue-600' },
           { label: 'Thành công', value: successToday, icon: 'ri-checkbox-circle-line', gradient: 'from-emerald-500 to-green-600' },
           { label: 'Thất bại hôm nay', value: failedToday, icon: 'ri-close-circle-line', gradient: 'from-orange-500 to-amber-600' },
-          { label: 'IP đáng ngờ', value: suspiciousIPs.length, icon: 'ri-alarm-warning-line', gradient: 'from-red-500 to-red-700' },
+          { label: 'IP bị chặn', value: blockedIps.length, icon: 'ri-shield-cross-line', gradient: 'from-red-500 to-red-700' },
         ].map((c, i) => (
           <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
             <div className={`w-9 h-9 bg-gradient-to-br ${c.gradient} rounded-xl flex items-center justify-center mb-3`}>
@@ -646,47 +706,127 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
             <span className="text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">≥ 3 lần thất bại</span>
           </div>
           <div className="space-y-2">
-            {suspiciousIPs.map(([ip, data]) => (
-              <div key={ip} className="bg-white rounded-xl border border-red-100 p-3 flex items-center gap-4">
-                <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <i className="ri-spy-line text-red-500"></i>
+            {suspiciousIPs.map(([ip, data]) => {
+              const isBlocked = blockedIpSet.has(ip);
+              return (
+                <div key={ip} className={`bg-white rounded-xl border p-3 flex items-center gap-4 ${isBlocked ? 'border-gray-200 opacity-60' : 'border-red-100'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isBlocked ? 'bg-gray-100' : 'bg-red-100'}`}>
+                    <i className={`${isBlocked ? 'ri-lock-line text-gray-400' : 'ri-spy-line text-red-500'}`}></i>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-gray-900 font-mono text-sm">{ip}</p>
+                      {isBlocked && <span className="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-semibold">ĐÃ CHẶN</span>}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {data.users.length > 0 ? `Tài khoản: ${data.users.slice(0, 2).join(', ')}${data.users.length > 2 ? ` +${data.users.length - 2}` : ''}` : 'Không xác định'}
+                      {' · '}Lần cuối: {timeAgo(data.lastSeen)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-center flex-shrink-0">
+                    <div>
+                      <p className="text-lg font-black text-red-600">{data.failed}</p>
+                      <p className="text-[10px] text-gray-400">Thất bại</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-black text-orange-500">{data.locked}</p>
+                      <p className="text-[10px] text-gray-400">Bị khóa</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-black text-emerald-600">{data.success}</p>
+                      <p className="text-[10px] text-gray-400">Thành công</p>
+                    </div>
+                    <div className="ml-1 flex flex-col gap-1.5 items-end">
+                      <span className={`text-xs px-2 py-0.5 rounded-lg font-bold ${
+                        data.failed >= 10 ? 'bg-red-600 text-white' :
+                        data.failed >= 5 ? 'bg-red-100 text-red-700' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                        {data.failed >= 10 ? '🔴 Nguy hiểm' : data.failed >= 5 ? '🟠 Cao' : '🟡 Trung bình'}
+                      </span>
+                      {isBlocked ? (
+                        <button
+                          disabled={blockingIp === ip}
+                          onClick={() => handleUnblockIp(ip)}
+                          className="text-xs px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg font-semibold transition-all disabled:opacity-50">
+                          {blockingIp === ip ? '...' : 'Bỏ chặn'}
+                        </button>
+                      ) : (
+                        <button
+                          disabled={blockingIp === ip}
+                          onClick={() => handleBlockIp(ip, `${data.failed} lần đăng nhập thất bại`)}
+                          className="text-xs px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all disabled:opacity-50">
+                          {blockingIp === ip ? '...' : 'Chặn IP'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-gray-900 font-mono text-sm">{ip}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {data.users.length > 0 ? `Tài khoản: ${data.users.slice(0, 2).join(', ')}${data.users.length > 2 ? ` +${data.users.length - 2}` : ''}` : 'Không xác định'}
-                    {' · '}Lần cuối: {timeAgo(data.lastSeen)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 text-center flex-shrink-0">
-                  <div>
-                    <p className="text-lg font-black text-red-600">{data.failed}</p>
-                    <p className="text-[10px] text-gray-400">Thất bại</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-black text-orange-500">{data.locked}</p>
-                    <p className="text-[10px] text-gray-400">Bị khóa</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-black text-emerald-600">{data.success}</p>
-                    <p className="text-[10px] text-gray-400">Thành công</p>
-                  </div>
-                  <div className="ml-2 flex flex-col gap-1">
-                    <span className={`text-xs px-2 py-1 rounded-lg font-bold ${
-                      data.failed >= 10 ? 'bg-red-600 text-white' :
-                      data.failed >= 5 ? 'bg-red-100 text-red-700' :
-                      'bg-orange-100 text-orange-700'
-                    }`}>
-                      {data.failed >= 10 ? '🔴 Nguy hiểm' : data.failed >= 5 ? '🟠 Cao' : '🟡 Trung bình'}
-                    </span>
-                    <p className="text-[10px] text-gray-400 text-center">Tổng {data.total}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
+
+      {/* Blocked IPs management */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <i className="ri-shield-cross-line text-gray-500"></i>
+            <h3 className="font-bold text-gray-800">IP đang bị chặn ({blockedIps.length})</h3>
+          </div>
+          <button onClick={loadBlockedIps} className="text-xs text-gray-400 hover:text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-xl transition-all">
+            <i className="ri-refresh-line"></i>
+          </button>
+        </div>
+
+        {/* Manual block form */}
+        <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2 flex-wrap bg-gray-50/50">
+          <input
+            type="text" placeholder="Nhập địa chỉ IP..." value={manualIp} onChange={e => setManualIp(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleManualBlock()}
+            className="text-xs border border-gray-200 rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-red-300 bg-white" />
+          <input
+            type="text" placeholder="Lý do (tuỳ chọn)..." value={manualReason} onChange={e => setManualReason(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleManualBlock()}
+            className="text-xs border border-gray-200 rounded-xl px-3 py-2 flex-1 min-w-[160px] focus:outline-none focus:ring-2 focus:ring-red-300 bg-white" />
+          <button
+            disabled={addingManual || !manualIp.trim()}
+            onClick={handleManualBlock}
+            className="text-xs px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all disabled:opacity-50 flex-shrink-0">
+            {addingManual ? 'Đang chặn...' : <><i className="ri-add-line mr-1"></i>Chặn IP</>}
+          </button>
+        </div>
+
+        {blockedIps.length === 0 ? (
+          <div className="py-8 text-center text-gray-400 text-sm">
+            <i className="ri-shield-check-line text-2xl mb-2 block text-green-400"></i>
+            Không có IP nào bị chặn
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {blockedIps.map((b: any) => (
+              <div key={b.id} className="px-5 py-3 flex items-center gap-4 hover:bg-gray-50/50">
+                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i className="ri-lock-line text-red-500 text-sm"></i>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono font-bold text-gray-900 text-sm">{b.ip}</p>
+                  <p className="text-xs text-gray-400 mt-0.5 truncate">
+                    {b.reason || 'Không có lý do'} · {fmtTime(b.createdAt)}
+                  </p>
+                </div>
+                <button
+                  disabled={blockingIp === b.ip}
+                  onClick={() => handleUnblockIp(b.ip)}
+                  className="text-xs px-3 py-1.5 border border-gray-200 hover:bg-red-50 hover:border-red-300 hover:text-red-600 text-gray-500 rounded-xl font-semibold transition-all disabled:opacity-50 flex-shrink-0">
+                  {blockingIp === b.ip ? '...' : 'Bỏ chặn'}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* All IP table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -725,7 +865,14 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                     <p className="font-medium text-gray-800">{h.user?.fullName || '—'}</p>
                     <p className="text-gray-400 text-[10px]">{h.user?.email || h.user?.username}</p>
                   </td>
-                  <td className="px-4 py-2.5 font-mono text-gray-600">{h.ipAddress || '—'}</td>
+                  <td className="px-4 py-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-gray-600">{h.ipAddress || '—'}</span>
+                      {h.ipAddress && blockedIpSet.has(h.ipAddress) && (
+                        <span className="text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded font-bold">CHẶN</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-2.5 text-gray-400 max-w-[200px] truncate">{h.userAgent?.split(' ').slice(0, 3).join(' ') || '—'}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
