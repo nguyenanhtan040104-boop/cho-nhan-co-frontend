@@ -44,21 +44,7 @@ export default function AdRollingBanner() {
   const reel = [...ads, ...ads];
 
   return (
-    <>
-      <style jsx>{`
-        @keyframes ad-marquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .ad-track {
-          animation: ad-marquee 60s linear infinite;
-        }
-        .ad-track:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
-
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-orange-200 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 shadow-[0_-2px_8px_rgba(234,88,12,0.08)]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-orange-200 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 shadow-[0_-2px_8px_rgba(234,88,12,0.08)]">
         <div className="relative flex items-center">
           <div className="flex-shrink-0 px-3 sm:px-4 py-2 bg-orange-600 text-white text-xs font-black tracking-wider uppercase flex items-center gap-1.5">
             <i className="ri-megaphone-line text-sm"></i>
@@ -66,7 +52,7 @@ export default function AdRollingBanner() {
           </div>
 
           <div className="flex-1 overflow-hidden">
-            <div className="ad-track flex items-center gap-8 whitespace-nowrap py-2 will-change-transform">
+            <div className="ad-marquee-track flex items-center gap-8 whitespace-nowrap py-2">
               {reel.map((ad, i) => (
                 <Link
                   key={`${ad.id}-${i}`}
@@ -101,7 +87,6 @@ export default function AdRollingBanner() {
             <i className="ri-close-line text-lg"></i>
           </button>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

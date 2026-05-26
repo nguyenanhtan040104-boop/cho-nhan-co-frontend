@@ -50,16 +50,8 @@ export default function AdPopup() {
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="relative bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl"
-        style={{ animation: 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+        className="ad-popup-card relative bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl"
       >
-        <style jsx>{`
-          @keyframes popIn {
-            0%   { transform: scale(0.85); opacity: 0; }
-            100% { transform: scale(1);    opacity: 1; }
-          }
-        `}</style>
-
         {/* Close button */}
         <button
           onClick={close}
