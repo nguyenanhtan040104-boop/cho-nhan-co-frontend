@@ -11,7 +11,7 @@ const CATEGORIES = [
     desc: 'Lúa, gạo, rau, củ, trái cây',
     icon: 'ri-leaf-line',
     color: 'emerald',
-    prices: { vip7: 10000, vip30: 29000 },
+    prices: { vip7: 30000, vip30: 79000 },
   },
   {
     id: 'vat-nuoi',
@@ -19,7 +19,7 @@ const CATEGORIES = [
     desc: 'Trâu, bò, gà, vịt, heo',
     icon: 'ri-heart-pulse-line',
     color: 'orange',
-    prices: { vip7: 15000, vip30: 39000 },
+    prices: { vip7: 35000, vip30: 89000 },
   },
   {
     id: 'cay-giong',
@@ -27,7 +27,7 @@ const CATEGORIES = [
     desc: 'Hạt giống, cây con, cây ăn trái',
     icon: 'ri-plant-line',
     color: 'lime',
-    prices: { vip7: 10000, vip30: 25000 },
+    prices: { vip7: 30000, vip30: 75000 },
   },
   {
     id: 'may-nong-nghiep',
@@ -35,7 +35,7 @@ const CATEGORIES = [
     desc: 'Máy cày, máy xới, máy bơm',
     icon: 'ri-tools-fill',
     color: 'slate',
-    prices: { vip7: 20000, vip30: 49000 },
+    prices: { vip7: 50000, vip30: 129000 },
   },
   {
     id: 'dat-vuon',
@@ -43,7 +43,7 @@ const CATEGORIES = [
     desc: 'Ruộng, rẫy, vườn cây',
     icon: 'ri-landscape-line',
     color: 'amber',
-    prices: { vip7: 30000, vip30: 79000 },
+    prices: { vip7: 70000, vip30: 199000 },
   },
   {
     id: 'viec-lam',
@@ -51,7 +51,7 @@ const CATEGORIES = [
     desc: 'Thời vụ, mùa gặt, mùa hái',
     icon: 'ri-briefcase-line',
     color: 'blue',
-    prices: { vip7: 5000, vip30: 19000 },
+    prices: { vip7: 30000, vip30: 79000 },
   },
   {
     id: 'do-cu',
@@ -59,7 +59,7 @@ const CATEGORIES = [
     desc: 'Thanh lý, hàng đã qua sử dụng',
     icon: 'ri-shopping-bag-line',
     color: 'purple',
-    prices: { vip7: 5000, vip30: 15000 },
+    prices: { vip7: 30000, vip30: 69000 },
   },
   {
     id: 'dien-dan',
@@ -67,7 +67,7 @@ const CATEGORIES = [
     desc: 'Hỏi đáp, kinh nghiệm canh tác',
     icon: 'ri-chat-3-line',
     color: 'teal',
-    prices: { vip7: 5000, vip30: 15000 },
+    prices: { vip7: 30000, vip30: 69000 },
   },
 ];
 
