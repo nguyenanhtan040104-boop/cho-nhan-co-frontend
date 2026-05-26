@@ -723,6 +723,10 @@ export const advertisements = {
     return request<any>(`/advertisements/mine?page=${page}`);
   },
 
+  async getFeatured(limit = 10) {
+    return request<{ data: any[] }>(`/advertisements/featured?limit=${limit}`);
+  },
+
   async create(data: any) {
     return request('/advertisements', { method: 'POST', body: JSON.stringify(data) });
   },

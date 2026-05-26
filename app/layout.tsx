@@ -2,6 +2,8 @@ import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import Header from './components/Header';
 import PushNotificationSetup from './components/PushNotificationSetup';
+import AdRollingBanner from './components/AdRollingBanner';
+import AdPopup from './components/AdPopup';
 
 const inter = Be_Vietnam_Pro({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600', '700', '800'] });
 
@@ -83,6 +85,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <PushNotificationSetup />
         {children}
+        <AdRollingBanner />
+        <AdPopup />
       </body>
     </html>
   );
