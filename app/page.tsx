@@ -411,7 +411,6 @@ function ListingCard({ item }: { item: any }) {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
 
   return (
-    {/* Pinterest pin-card: 16px radius, flat default, single Airbnb shadow tier on hover via CSS */}
     <Link href={href}
       className="group block overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)]"
       style={{ background: CARD_BG, border: '1px solid rgba(0,0,0,0.06)' }}>
