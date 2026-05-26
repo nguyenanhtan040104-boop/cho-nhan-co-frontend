@@ -152,14 +152,10 @@ export default async function HomePage() {
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
                 className="flex flex-col items-center gap-1.5 group">
-                {/* Rounded square image thumbnail with icon overlay */}
+                {/* Rounded square image thumbnail — no icon overlay */}
                 <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-sm">
                   <img src={cat.img} alt={cat.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 ease-out" />
-                  {/* Dark scrim + icon on top */}
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <i className={`${cat.icon} text-white text-2xl drop-shadow-md`}></i>
-                  </div>
                 </div>
                 <span className="text-[10px] font-bold text-gray-700 text-center leading-tight line-clamp-1 w-full px-0.5">{cat.title}</span>
               </Link>
