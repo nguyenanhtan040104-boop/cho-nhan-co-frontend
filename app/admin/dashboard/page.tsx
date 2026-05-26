@@ -1372,6 +1372,28 @@ function WalletTab({ txList }: { txList: any[] }) {
   const [filter, setFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
 
+  // Manual credit form
+  const [creditUserId, setCreditUserId] = useState('');
+  const [creditAmount, setCreditAmount] = useState('');
+  const [creditNote, setCreditNote] = useState('');
+  const [crediting, setCrediting] = useState(false);
+  const [creditResult, setCreditResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const PRESET_AMOUNTS = [50000, 100000, 150000, 200000, 500000];
+
+  async function handleCredit() {
+    if (!creditUserId.trim()) { setCreditResult({ ok: false, msg: 'Vui lòng nhập User ID' }); return; }
+    const amount = parseInt(creditAmount);
+    if (!amount || amount <= 0) { setCreditResult({ ok: false, msg: 'Số tiền không hợp lệ' }); return; }
+    setCrediting(true); setCreditResult(null);
+    try {
+      const res = await wallet.adminCredit(creditUserId.trim(), amount, creditNote || undefined);
+      setCreditResult({ ok: true, msg: res.message || 'Cộng tiền thành công' });
+      setCreditUserId(''); setCreditAmount(''); setCreditNote('');
+    } catch (e: any) {
+      setCreditResult({ ok: false, msg: e.message || 'Lỗi khi cộng tiền' });
+    } finally { setCrediting(false); }
+  }
+
   const filtered = txList.filter(t => (!filter || t.status === filter) && (!typeFilter || t.type === typeFilter));
   const revenue = txList.filter(t => t.status === 'completed' && t.type === 'top_up').reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const pending = txList.filter(t => t.status === 'pending').reduce((s, t) => s + (Number(t.amount) || 0), 0);
@@ -1380,6 +1402,51 @@ function WalletTab({ txList }: { txList: any[] }) {
 
   return (
     <div>
+      {/* Manual Credit Form */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-5">
+        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">Công cụ test</p>
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Cộng tiền thủ công vào ví</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">User ID</label>
+            <input value={creditUserId} onChange={e => setCreditUserId(e.target.value)}
+              placeholder="Dán userId từ DB..."
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-green-400 focus:border-transparent font-mono" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Số tiền</label>
+            <input type="number" value={creditAmount} onChange={e => setCreditAmount(e.target.value)}
+              placeholder="0"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+            <div className="flex gap-1 mt-1.5 flex-wrap">
+              {PRESET_AMOUNTS.map(a => (
+                <button key={a} onClick={() => setCreditAmount(String(a))}
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${creditAmount === String(a) ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'}`}>
+                  {a / 1000}k
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Ghi chú (tùy chọn)</label>
+            <input value={creditNote} onChange={e => setCreditNote(e.target.value)}
+              placeholder="Lý do..."
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+          </div>
+        </div>
+        <div className="flex items-center gap-3 mt-3">
+          <button onClick={handleCredit} disabled={crediting}
+            className="px-5 py-2 bg-green-600 text-white rounded-xl text-xs font-bold hover:bg-green-700 disabled:opacity-50 transition">
+            {crediting ? 'Đang xử lý...' : `+ Cộng ${creditAmount ? new Intl.NumberFormat('vi-VN').format(parseInt(creditAmount) || 0) + 'đ' : 'tiền'}`}
+          </button>
+          {creditResult && (
+            <p className={`text-xs font-semibold ${creditResult.ok ? 'text-green-600' : 'text-red-500'}`}>
+              {creditResult.ok ? '✓ ' : '✗ '}{creditResult.msg}
+            </p>
+          )}
+        </div>
+      </div>
+
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-black text-gray-900">Doanh thu & Giao dịch</h2>
         <div className="flex gap-2">
