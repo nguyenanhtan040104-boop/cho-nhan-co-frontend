@@ -701,6 +701,9 @@ export const wallet = {
   async rejectTopUp(id: string, adminNote?: string) {
     return request(`/wallet/admin/reject/${id}`, { method: 'POST', body: JSON.stringify({ adminNote }) });
   },
+  async adminCredit(userId: string, amount: number, note?: string) {
+    return request('/wallet/admin/credit', { method: 'POST', body: JSON.stringify({ userId, amount, note }) });
+  },
 };
 
 // =================== ADVERTISEMENTS ===================

@@ -12,6 +12,15 @@ export default function AdminWalletPage() {
   const [processing, setProcessing] = useState<string | null>(null);
   const [note, setNote] = useState('');
 
+  // Credit form
+  const [creditUserId, setCreditUserId] = useState('');
+  const [creditAmount, setCreditAmount] = useState('');
+  const [creditNote, setCreditNote] = useState('');
+  const [crediting, setCrediting] = useState(false);
+  const [creditResult, setCreditResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const PRESET_AMOUNTS = [50000, 100000, 150000, 200000, 500000];
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || 'null');
     if (!auth.isLoggedIn() || user?.role?.toLowerCase() !== 'admin') { router.replace('/profile'); return; }
@@ -47,6 +56,26 @@ export default function AdminWalletPage() {
     finally { setProcessing(null); }
   }
 
+  async function handleCredit() {
+    if (!creditUserId.trim()) { setCreditResult({ ok: false, msg: 'Vui lòng nhập User ID' }); return; }
+    const amount = parseInt(creditAmount);
+    if (!amount || amount <= 0) { setCreditResult({ ok: false, msg: 'Số tiền không hợp lệ' }); return; }
+    setCrediting(true);
+    setCreditResult(null);
+    try {
+      const res = await walletApi.adminCredit(creditUserId.trim(), amount, creditNote || undefined);
+      setCreditResult({ ok: true, msg: res.message || 'Cộng tiền thành công' });
+      setCreditUserId('');
+      setCreditAmount('');
+      setCreditNote('');
+      await load();
+    } catch (e: any) {
+      setCreditResult({ ok: false, msg: e.message || 'Lỗi khi cộng tiền' });
+    } finally {
+      setCrediting(false);
+    }
+  }
+
   const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.abs(n)) + 'đ';
   const statusColor: Record<string, string> = { pending: 'text-yellow-700 bg-yellow-100', completed: 'text-green-700 bg-green-100', rejected: 'text-red-700 bg-red-100' };
   const statusLabel: Record<string, string> = { pending: 'Chờ duyệt', completed: 'Đã duyệt', rejected: 'Từ chối' };
@@ -68,6 +97,62 @@ export default function AdminWalletPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
+
+        {/* Manual Credit Form */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+          <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">Công cụ test</p>
+          <h2 className="text-base font-bold text-gray-900 mb-4">Cộng tiền thủ công vào ví</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">User ID</label>
+              <input
+                value={creditUserId}
+                onChange={e => setCreditUserId(e.target.value)}
+                placeholder="Dán userId từ DB..."
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Số tiền (VNĐ)</label>
+              <input
+                type="number"
+                value={creditAmount}
+                onChange={e => setCreditAmount(e.target.value)}
+                placeholder="0"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+              <div className="flex gap-1.5 mt-2 flex-wrap">
+                {PRESET_AMOUNTS.map(a => (
+                  <button key={a} onClick={() => setCreditAmount(String(a))}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${creditAmount === String(a) ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'}`}>
+                    {(a / 1000).toFixed(0)}k
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Ghi chú (tùy chọn)</label>
+              <input
+                value={creditNote}
+                onChange={e => setCreditNote(e.target.value)}
+                placeholder="Lý do cộng tiền..."
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-4 mt-4">
+            <button onClick={handleCredit} disabled={crediting}
+              className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-semibold text-sm hover:bg-green-700 disabled:opacity-50 transition">
+              {crediting ? 'Đang xử lý...' : `+ Cộng ${creditAmount ? fmt(parseInt(creditAmount) || 0) : 'tiền'}`}
+            </button>
+            {creditResult && (
+              <p className={`text-sm font-medium ${creditResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+                {creditResult.ok ? '✓ ' : '✗ '}{creditResult.msg}
+              </p>
+            )}
+          </div>
+        </div>
+
         <div className="flex gap-2 mb-6">
           {(['pending', 'all'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
