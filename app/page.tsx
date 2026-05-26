@@ -15,8 +15,6 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
 // ── Pinterest cream palette — warms the page without competing with product images
 const PAGE_BG = '#f5f4ee';
 const CARD_BG = '#ffffff';
-// Airbnb-spec single shadow tier — applied on hover only
-const CARD_SHADOW_HOVER = '0 0 0 1px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.08)';
 
 async function safeFetch(url: string) {
   try {
@@ -413,12 +411,10 @@ function ListingCard({ item }: { item: any }) {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
 
   return (
-    // Pinterest pin-card: 16px radius, flat by default, single Airbnb shadow on hover
+    {/* Pinterest pin-card: 16px radius, flat default, single Airbnb shadow tier on hover via CSS */}
     <Link href={href}
-      className="group block overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5"
-      style={{ background: CARD_BG, border: '1px solid rgba(0,0,0,0.06)' }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = CARD_SHADOW_HOVER)}
-      onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
+      className="group block overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)]"
+      style={{ background: CARD_BG, border: '1px solid rgba(0,0,0,0.06)' }}>
       {/* Photo — Pinterest pin-card: full-bleed, image IS the card */}
       <div className="relative overflow-hidden rounded-t-2xl bg-gray-100" style={{ aspectRatio: '4/3' }}>
         {imgUrl ? (
