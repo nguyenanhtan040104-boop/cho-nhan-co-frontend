@@ -1,221 +1,385 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-const PLANS = [
+// ─── Categories with per-category pricing ─────────────────────────────
+const CATEGORIES = [
   {
-    id: 'free',
-    name: 'Miễn phí',
-    price: 0,
-    priceLabel: '0đ',
-    period: 'mãi mãi',
-    badge: null,
-    highlight: false,
-    features: [
-      '1 tin đăng mỗi tháng',
-      'Hiển thị 30 ngày/tin',
-      'Tối đa 3 ảnh/tin',
-      'Danh sách thường',
-      'Không có nhãn nổi bật',
-    ],
-    cta: 'Đang sử dụng',
-    ctaHref: '/products/create',
-    ctaStyle: 'border border-gray-300 text-gray-600 bg-white',
-    disabled: true,
+    id: 'nong-san',
+    name: 'Nông sản',
+    desc: 'Lúa, gạo, rau, củ, trái cây',
+    icon: 'ri-leaf-line',
+    color: 'emerald',
+    prices: { vip7: 10000, vip30: 29000 },
   },
   {
-    id: 'vip-7',
-    name: 'VIP 7 ngày',
-    price: 50000,
-    priceLabel: '50.000đ',
-    period: '/ 7 ngày',
-    badge: null,
-    highlight: false,
-    features: [
-      'Hiển thị đầu trang 7 ngày',
-      'Nhãn VIP vàng nổi bật',
-      'Ảnh không giới hạn',
-      'Ưu tiên tìm kiếm',
-      'Tăng 3x lượt xem',
-    ],
-    cta: 'Mua ngay',
-    ctaHref: '/products/vip',
-    ctaStyle: 'bg-gray-900 text-white hover:bg-gray-700',
-    disabled: false,
+    id: 'vat-nuoi',
+    name: 'Vật nuôi',
+    desc: 'Trâu, bò, gà, vịt, heo',
+    icon: 'ri-heart-pulse-line',
+    color: 'orange',
+    prices: { vip7: 15000, vip30: 39000 },
   },
   {
-    id: 'vip-30',
-    name: 'VIP 30 ngày',
-    price: 150000,
-    priceLabel: '150.000đ',
-    period: '/ 30 ngày',
-    badge: 'Phổ biến nhất',
-    highlight: true,
-    features: [
-      'Hiển thị đầu trang 30 ngày',
-      'Nhãn VIP vàng nổi bật',
-      'Ảnh không giới hạn',
-      'Ưu tiên tìm kiếm cao nhất',
-      'Tăng 5x lượt xem',
-    ],
-    cta: 'Mua ngay',
-    ctaHref: '/products/vip',
-    ctaStyle: 'bg-yellow-400 text-yellow-900 hover:bg-yellow-500 font-bold',
-    disabled: false,
+    id: 'cay-giong',
+    name: 'Cây giống',
+    desc: 'Hạt giống, cây con, cây ăn trái',
+    icon: 'ri-plant-line',
+    color: 'lime',
+    prices: { vip7: 10000, vip30: 25000 },
   },
   {
-    id: 'vip-90',
-    name: 'VIP 90 ngày',
-    price: 350000,
-    priceLabel: '350.000đ',
-    period: '/ 90 ngày',
-    badge: 'Tiết kiệm 22%',
-    highlight: false,
-    features: [
-      'Hiển thị đầu trang 90 ngày',
-      'Nhãn VIP vàng nổi bật',
-      'Ảnh không giới hạn',
-      'Ưu tiên tìm kiếm cao nhất',
-      'Tăng 5x lượt xem',
-    ],
-    cta: 'Mua ngay',
-    ctaHref: '/products/vip',
-    ctaStyle: 'bg-gray-900 text-white hover:bg-gray-700',
-    disabled: false,
+    id: 'may-nong-nghiep',
+    name: 'Máy nông nghiệp',
+    desc: 'Máy cày, máy xới, máy bơm',
+    icon: 'ri-tools-fill',
+    color: 'slate',
+    prices: { vip7: 20000, vip30: 49000 },
+  },
+  {
+    id: 'dat-vuon',
+    name: 'Đất - Vườn',
+    desc: 'Ruộng, rẫy, vườn cây',
+    icon: 'ri-landscape-line',
+    color: 'amber',
+    prices: { vip7: 30000, vip30: 79000 },
+  },
+  {
+    id: 'viec-lam',
+    name: 'Việc làm',
+    desc: 'Thời vụ, mùa gặt, mùa hái',
+    icon: 'ri-briefcase-line',
+    color: 'blue',
+    prices: { vip7: 0, vip30: 19000 },
+  },
+  {
+    id: 'do-cu',
+    name: 'Đồ dùng cũ',
+    desc: 'Thanh lý, hàng đã qua sử dụng',
+    icon: 'ri-shopping-bag-line',
+    color: 'purple',
+    prices: { vip7: 0, vip30: 15000 },
+  },
+  {
+    id: 'dien-dan',
+    name: 'Bài diễn đàn',
+    desc: 'Hỏi đáp, kinh nghiệm canh tác',
+    icon: 'ri-chat-3-line',
+    color: 'teal',
+    prices: { vip7: 5000, vip30: 15000 },
   },
 ];
 
-const COMPARE_ROWS = [
-  { label: 'Số tin/tháng',      free: '1 tin',       vip7: 'Không giới hạn', vip30: 'Không giới hạn', vip90: 'Không giới hạn' },
-  { label: 'Thời gian hiển thị',free: '30 ngày',     vip7: '7 ngày VIP',     vip30: '30 ngày VIP',    vip90: '90 ngày VIP' },
-  { label: 'Số ảnh/tin',         free: 'Tối đa 3',   vip7: 'Không giới hạn', vip30: 'Không giới hạn', vip90: 'Không giới hạn' },
-  { label: 'Nhãn VIP vàng',      free: 'Không',      vip7: 'Có',             vip30: 'Có',             vip90: 'Có' },
-  { label: 'Vị trí hiển thị',    free: 'Danh sách thường', vip7: 'Đầu trang', vip30: 'Đầu trang',    vip90: 'Đầu trang' },
-  { label: 'Lượt xem ước tính',  free: '× 1',        vip7: '× 3',            vip30: '× 5',            vip90: '× 5' },
-];
+// Tailwind needs full class strings to scan — explicit color map
+const COLOR_MAP: Record<string, { bg: string; bgSoft: string; text: string; textDark: string; border: string; ring: string }> = {
+  emerald: { bg: 'bg-emerald-500', bgSoft: 'bg-emerald-50',  text: 'text-emerald-600', textDark: 'text-emerald-800', border: 'border-emerald-200', ring: 'ring-emerald-400' },
+  orange:  { bg: 'bg-orange-500',  bgSoft: 'bg-orange-50',   text: 'text-orange-600',  textDark: 'text-orange-800',  border: 'border-orange-200',  ring: 'ring-orange-400' },
+  lime:    { bg: 'bg-lime-500',    bgSoft: 'bg-lime-50',     text: 'text-lime-600',    textDark: 'text-lime-800',    border: 'border-lime-200',    ring: 'ring-lime-400' },
+  slate:   { bg: 'bg-slate-600',   bgSoft: 'bg-slate-50',    text: 'text-slate-600',   textDark: 'text-slate-800',   border: 'border-slate-200',   ring: 'ring-slate-400' },
+  amber:   { bg: 'bg-amber-500',   bgSoft: 'bg-amber-50',    text: 'text-amber-600',   textDark: 'text-amber-800',   border: 'border-amber-200',   ring: 'ring-amber-400' },
+  blue:    { bg: 'bg-blue-500',    bgSoft: 'bg-blue-50',     text: 'text-blue-600',    textDark: 'text-blue-800',    border: 'border-blue-200',    ring: 'ring-blue-400' },
+  purple:  { bg: 'bg-purple-500',  bgSoft: 'bg-purple-50',   text: 'text-purple-600',  textDark: 'text-purple-800',  border: 'border-purple-200',  ring: 'ring-purple-400' },
+  teal:    { bg: 'bg-teal-500',    bgSoft: 'bg-teal-50',     text: 'text-teal-600',    textDark: 'text-teal-800',    border: 'border-teal-200',    ring: 'ring-teal-400' },
+};
+
+function formatMoney(n: number) {
+  if (n === 0) return 'Miễn phí';
+  return n.toLocaleString('vi-VN') + 'đ';
+}
 
 export default function PricingPage() {
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
+  const [selectedId, setSelectedId] = useState<string>('nong-san');
+  const plansRef = useRef<HTMLDivElement | null>(null);
 
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-5xl mx-auto px-4 py-10 text-center">
-          <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Bảng giá</p>
-          <h1 className="text-2xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
-            Đăng tin hiệu quả hơn với VIP
-          </h1>
-          <p className="text-gray-400 text-sm max-w-md mx-auto">
-            Tài khoản miễn phí được đăng 1 tin mỗi tháng. Nâng lên VIP để hiển thị nổi bật và thu hút nhiều người mua hơn.
-          </p>
+  const selected = CATEGORIES.find(c => c.id === selectedId)!;
+  const c = COLOR_MAP[selected.color];
+
+  function pickCategory(id: string) {
+    setSelectedId(id);
+    setTimeout(() => plansRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#f7f7f3' }}>
+
+      {/* ─── Header ───────────────────────────────────────────────── */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <div className="flex items-start gap-5">
+            <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-green-100 to-emerald-50 items-center justify-center flex-shrink-0 border border-emerald-100">
+              <i className="ri-seedling-line text-emerald-600 text-3xl"></i>
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-2">Nâng cấp bài đăng</p>
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
+                Đẩy bài lên top, bán nhanh hơn
+              </h1>
+              <p className="text-gray-500 text-sm max-w-xl">
+                Phù hợp với bà con nông thôn — giá rẻ, dễ mua, không ràng buộc.
+                Chọn danh mục bạn muốn nâng cấp bên dưới.
+              </p>
+            </div>
+          </div>
+
+          {/* Current plan strip */}
+          <div className="mt-6 bg-gray-50 rounded-2xl border border-gray-100 px-5 py-3 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
+                <i className="ri-checkbox-circle-line text-gray-500"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Bạn đang dùng</p>
+                <p className="font-bold text-gray-900 text-sm">Gói Miễn phí · 3 tin / tháng</p>
+              </div>
+            </div>
+            <Link href="/dashboard" className="text-xs font-semibold text-gray-700 border border-gray-300 hover:border-gray-900 px-3 py-1.5 rounded-xl transition-all">
+              Quản lý bài đăng
+              <i className="ri-arrow-right-s-line ml-0.5"></i>
+            </Link>
+          </div>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
 
-        {/* Plan cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          {PLANS.map(plan => (
-            <div key={plan.id}
-              className={`rounded-2xl bg-white overflow-hidden flex flex-col ${
-                plan.highlight
-                  ? 'ring-2 ring-yellow-400 shadow-lg'
-                  : 'border border-gray-200'
-              }`}>
-
-              {/* Top badge */}
-              {plan.badge ? (
-                <div className={`text-center py-2 text-xs font-bold ${
-                  plan.highlight ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-900 text-white'
-                }`}>
-                  {plan.badge}
+        {/* ─── Category grid ──────────────────────────────────────── */}
+        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Chọn danh mục</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-10">
+          {CATEGORIES.map(cat => {
+            const col = COLOR_MAP[cat.color];
+            const isActive = cat.id === selectedId;
+            const minPrice = cat.prices.vip7 || cat.prices.vip30;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => pickCategory(cat.id)}
+                className={`group text-left bg-white rounded-2xl px-4 py-4 transition-all border ${
+                  isActive
+                    ? `${col.border} ring-2 ${col.ring} shadow-md`
+                    : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl ${col.bgSoft} ${col.text} flex items-center justify-center mb-3`}>
+                  <i className={`${cat.icon} text-xl`}></i>
                 </div>
-              ) : (
-                <div className="py-2" />
-              )}
-
-              <div className="px-5 pt-4 pb-5 flex flex-col flex-1">
-                {/* Name */}
-                <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">{plan.name}</p>
-
-                {/* Price */}
-                <div className="mb-5">
-                  <span className={`text-3xl font-black ${plan.highlight ? 'text-yellow-600' : 'text-gray-900'}`}>
-                    {plan.priceLabel}
-                  </span>
-                  <span className="text-sm text-gray-400 ml-1">{plan.period}</span>
+                <p className="font-bold text-gray-900 text-sm mb-0.5">{cat.name}</p>
+                <p className="text-[11px] text-gray-400 mb-2 leading-tight">{cat.desc}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500">
+                    Từ <span className={`font-bold ${col.text}`}>{formatMoney(minPrice)}</span>
+                  </p>
+                  <i className={`ri-arrow-right-s-line text-gray-300 group-hover:${col.text.replace('text-', 'text-')} transition-colors`}></i>
                 </div>
+              </button>
+            );
+          })}
+        </div>
 
-                {/* Features */}
-                <ul className="space-y-2.5 mb-6 flex-1">
-                  {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                      <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${
-                        plan.highlight ? 'bg-yellow-400' : plan.disabled ? 'bg-gray-300' : 'bg-gray-800'
-                      }`}></span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <Link href={plan.ctaHref}
-                  className={`block w-full text-center py-2.5 rounded-xl text-sm transition-all ${plan.ctaStyle} ${
-                    plan.disabled ? 'pointer-events-none opacity-60' : ''
-                  }`}>
-                  {plan.cta}
-                </Link>
-              </div>
+        {/* ─── Plans for selected category ────────────────────────── */}
+        <div ref={plansRef} className="scroll-mt-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className={`w-9 h-9 rounded-xl ${c.bgSoft} ${c.text} flex items-center justify-center`}>
+              <i className={`${selected.icon} text-lg`}></i>
             </div>
-          ))}
+            <div>
+              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Gói cho danh mục</p>
+              <h2 className="text-lg font-black text-gray-900">{selected.name}</h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            {/* Free */}
+            <PlanCard
+              title="Miễn phí"
+              price="0đ"
+              period="mãi mãi"
+              features={[
+                '3 tin / tháng',
+                'Hiển thị 30 ngày',
+                'Tối đa 5 ảnh / tin',
+                'Danh sách thường',
+              ]}
+              cta="Đang sử dụng"
+              ctaHref="/dashboard"
+              disabled
+            />
+
+            {/* 7 days */}
+            <PlanCard
+              title="Gói 7 ngày"
+              price={formatMoney(selected.prices.vip7)}
+              period={selected.prices.vip7 === 0 ? 'tặng miễn phí' : '/ 7 ngày'}
+              features={[
+                'Đẩy lên đầu danh sách',
+                'Hiển thị 7 ngày VIP',
+                'Ảnh không giới hạn',
+                'Có nhãn nổi bật',
+              ]}
+              cta={selected.prices.vip7 === 0 ? 'Dùng ngay' : 'Mua ngay'}
+              ctaHref={`/dashboard?upgrade=${selected.id}&plan=vip-7`}
+              color={selected.color}
+            />
+
+            {/* 30 days - highlighted */}
+            <PlanCard
+              title="Gói 30 ngày"
+              price={formatMoney(selected.prices.vip30)}
+              period="/ 30 ngày"
+              features={[
+                'Đẩy lên đầu danh sách',
+                'Hiển thị 30 ngày VIP',
+                'Ảnh không giới hạn',
+                'Có nhãn nổi bật',
+                'Ưu tiên hiển thị cao nhất',
+              ]}
+              cta="Mua ngay"
+              ctaHref={`/dashboard?upgrade=${selected.id}&plan=vip-30`}
+              color={selected.color}
+              highlight
+              badge="Tiết kiệm hơn"
+            />
+          </div>
         </div>
 
-        {/* Comparison table */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-8">
+        {/* ─── Bottom actions ─────────────────────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Link
+            href="/wallet"
+            className="bg-white rounded-2xl border border-gray-200 px-5 py-4 hover:border-gray-400 transition-all flex items-center gap-3"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <i className="ri-wallet-3-line text-gray-600 text-lg"></i>
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-gray-900 text-sm">Nạp tiền vào ví</p>
+              <p className="text-xs text-gray-400">Thanh toán qua PayOS · Tự động xác nhận</p>
+            </div>
+            <i className="ri-arrow-right-s-line text-gray-300"></i>
+          </Link>
+          <Link
+            href="/dashboard"
+            className="bg-white rounded-2xl border border-gray-200 px-5 py-4 hover:border-gray-400 transition-all flex items-center gap-3"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <i className="ri-file-list-3-line text-gray-600 text-lg"></i>
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-gray-900 text-sm">Quản lý bài đăng</p>
+              <p className="text-xs text-gray-400">Chọn bài cần nâng cấp từ dashboard</p>
+            </div>
+            <i className="ri-arrow-right-s-line text-gray-300"></i>
+          </Link>
+        </div>
+
+        {/* ─── FAQ ───────────────────────────────────────────────── */}
+        <div className="mt-10 bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
-            <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">So sánh chi tiết</p>
+            <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Câu hỏi thường gặp</p>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left px-6 py-3 text-gray-500 font-semibold w-1/4">Tính năng</th>
-                  <th className="text-center px-4 py-3 text-gray-500 font-semibold">Miễn phí</th>
-                  <th className="text-center px-4 py-3 text-gray-700 font-bold">VIP 7 ngày</th>
-                  <th className="text-center px-4 py-3 text-yellow-600 font-bold bg-yellow-50">VIP 30 ngày</th>
-                  <th className="text-center px-4 py-3 text-gray-700 font-bold">VIP 90 ngày</th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARE_ROWS.map((row, i) => (
-                  <tr key={i} className={`border-b border-gray-50 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                    <td className="px-6 py-3 text-gray-600 font-medium">{row.label}</td>
-                    <td className="px-4 py-3 text-center text-gray-400">{row.free}</td>
-                    <td className="px-4 py-3 text-center text-gray-700 font-medium">{row.vip7}</td>
-                    <td className="px-4 py-3 text-center text-yellow-700 font-semibold bg-yellow-50/50">{row.vip30}</td>
-                    <td className="px-4 py-3 text-center text-gray-700 font-medium">{row.vip90}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Bottom links */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link href="/wallet"
-            className="block bg-white rounded-2xl border border-gray-200 px-6 py-5 hover:border-yellow-400 transition-colors">
-            <p className="font-bold text-gray-900 mb-0.5">Nạp tiền vào ví</p>
-            <p className="text-sm text-gray-400">Thanh toán qua PayOS · Tự động xác nhận</p>
-          </Link>
-          <Link href="/dashboard"
-            className="block bg-white rounded-2xl border border-gray-200 px-6 py-5 hover:border-gray-400 transition-colors">
-            <p className="font-bold text-gray-900 mb-0.5">Quản lý sản phẩm</p>
-            <p className="text-sm text-gray-400">Chọn sản phẩm cần nâng VIP từ dashboard</p>
-          </Link>
+          <FaqItem
+            q="Mua gói rồi hết hạn có sao không?"
+            a="Bài đăng vẫn hiển thị bình thường trong danh sách thường, chỉ mất nhãn nổi bật và không còn được đẩy lên đầu nữa."
+          />
+          <FaqItem
+            q="Tôi có thể mua nhiều gói cho cùng một bài đăng không?"
+            a="Được. Mỗi lần mua sẽ cộng dồn thời gian VIP. Ví dụ: bài đang VIP còn 3 ngày, mua thêm gói 7 ngày sẽ thành 10 ngày."
+          />
+          <FaqItem
+            q="Tại sao giá khác nhau giữa các danh mục?"
+            a="Các danh mục như Đất - Vườn hoặc Máy nông nghiệp có giá trị cao và ít người mua hơn, nên cần thời gian hiển thị lâu hơn để tìm khách. Các danh mục như Việc làm thời vụ và Đồ dùng cũ thường có hỗ trợ miễn phí gói 7 ngày."
+          />
+          <FaqItem
+            q="Tôi có được hoàn tiền nếu bán được sớm không?"
+            a="Hiện chưa hỗ trợ hoàn tiền. Nhưng bạn có thể dùng phần thời gian còn lại để đẩy bài đăng khác cùng danh mục."
+          />
         </div>
 
       </div>
     </div>
+  );
+}
+
+// ─── Subcomponents ────────────────────────────────────────────────────
+
+function PlanCard({
+  title, price, period, features, cta, ctaHref, color, highlight, badge, disabled,
+}: {
+  title: string;
+  price: string;
+  period: string;
+  features: string[];
+  cta: string;
+  ctaHref: string;
+  color?: string;
+  highlight?: boolean;
+  badge?: string;
+  disabled?: boolean;
+}) {
+  const c = color ? COLOR_MAP[color] : null;
+
+  return (
+    <div className={`rounded-2xl bg-white overflow-hidden flex flex-col ${
+      highlight && c ? `ring-2 ${c.ring} shadow-lg` : 'border border-gray-200'
+    }`}>
+      {/* badge slot */}
+      {badge ? (
+        <div className={`text-center py-2 text-xs font-bold ${
+          highlight && c ? `${c.bg} text-white` : 'bg-gray-900 text-white'
+        }`}>
+          {badge}
+        </div>
+      ) : (
+        <div className="py-2" />
+      )}
+
+      <div className="px-5 pt-3 pb-5 flex flex-col flex-1">
+        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">{title}</p>
+        <div className="mb-5">
+          <span className={`text-3xl font-black ${highlight && c ? c.textDark : 'text-gray-900'}`}>{price}</span>
+          <span className="text-sm text-gray-400 ml-1">{period}</span>
+        </div>
+
+        <ul className="space-y-2.5 mb-6 flex-1">
+          {features.map((f, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+              <i className={`ri-check-line mt-0.5 flex-shrink-0 ${
+                disabled ? 'text-gray-300' : highlight && c ? c.text : 'text-gray-700'
+              }`}></i>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+
+        <Link
+          href={ctaHref}
+          className={`block w-full text-center py-2.5 rounded-xl text-sm transition-all ${
+            disabled
+              ? 'border border-gray-200 text-gray-400 bg-white pointer-events-none'
+              : highlight && c
+                ? `${c.bg} text-white hover:opacity-90 font-bold`
+                : 'bg-gray-900 text-white hover:bg-gray-700 font-semibold'
+          }`}
+        >
+          {cta}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      onClick={() => setOpen(o => !o)}
+      className="w-full text-left px-6 py-4 border-b border-gray-50 last:border-b-0 hover:bg-gray-50/50 transition-colors"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="font-semibold text-gray-800 text-sm flex-1">{q}</p>
+        <i className={`ri-arrow-down-s-line text-gray-400 transition-transform flex-shrink-0 mt-0.5 ${open ? 'rotate-180' : ''}`}></i>
+      </div>
+      {open && <p className="text-sm text-gray-500 mt-2 leading-relaxed">{a}</p>}
+    </button>
   );
 }
