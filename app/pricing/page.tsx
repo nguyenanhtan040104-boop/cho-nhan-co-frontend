@@ -106,36 +106,29 @@ export default function PricingPage() {
       {/* ─── Header ───────────────────────────────────────────────── */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 py-10">
-          <div className="flex items-start gap-5">
-            <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-green-100 to-emerald-50 items-center justify-center flex-shrink-0 border border-emerald-100">
-              <i className="ri-seedling-line text-emerald-600 text-3xl"></i>
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-2">Nâng cấp bài đăng</p>
-              <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
-                Đẩy bài lên top, bán nhanh hơn
-              </h1>
-              <p className="text-gray-500 text-sm max-w-xl">
-                Phù hợp với bà con nông thôn — giá rẻ, dễ mua, không ràng buộc.
-                Chọn danh mục bạn muốn nâng cấp bên dưới.
-              </p>
-            </div>
+          <div>
+            <p className="text-[10px] font-bold tracking-widest text-emerald-700 uppercase mb-2">
+              <span className="inline-block w-6 h-px bg-emerald-700 align-middle mr-2"></span>
+              Nâng cấp bài đăng
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
+              Đẩy bài lên top, bán nhanh hơn
+            </h1>
+            <p className="text-gray-500 text-sm max-w-xl">
+              Phù hợp với bà con nông thôn — giá rẻ, dễ mua, không ràng buộc.
+              Chọn danh mục bạn muốn nâng cấp bên dưới.
+            </p>
           </div>
 
           {/* Current plan strip */}
-          <div className="mt-6 bg-gray-50 rounded-2xl border border-gray-100 px-5 py-3 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
-                <i className="ri-checkbox-circle-line text-gray-500"></i>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Bạn đang dùng</p>
-                <p className="font-bold text-gray-900 text-sm">Gói Miễn phí · 3 tin / tháng</p>
-              </div>
+          <div className="mt-6 border-t border-gray-100 pt-4 flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-[11px] text-gray-400">Bạn đang dùng</p>
+              <p className="font-bold text-gray-900 text-sm">Gói Miễn phí · 3 tin / tháng</p>
             </div>
-            <Link href="/dashboard" className="text-xs font-semibold text-gray-700 border border-gray-300 hover:border-gray-900 px-3 py-1.5 rounded-xl transition-all">
+            <Link href="/dashboard" className="text-xs font-semibold text-gray-700 hover:text-gray-900 hover:underline underline-offset-4 transition-all">
               Quản lý bài đăng
-              <i className="ri-arrow-right-s-line ml-0.5"></i>
+              <i className="ri-arrow-right-line ml-1"></i>
             </Link>
           </div>
         </div>
@@ -154,22 +147,25 @@ export default function PricingPage() {
               <button
                 key={cat.id}
                 onClick={() => pickCategory(cat.id)}
-                className={`group text-left bg-white rounded-2xl px-4 py-4 transition-all border ${
+                className={`group relative text-left bg-white rounded-2xl pl-5 pr-4 py-4 transition-all overflow-hidden ${
                   isActive
-                    ? `${col.border} ring-2 ${col.ring} shadow-md`
-                    : 'border-gray-200 hover:border-gray-400 hover:shadow-sm'
+                    ? 'shadow-md ring-1 ring-gray-900'
+                    : 'border border-gray-200 hover:border-gray-400 hover:-translate-y-0.5'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl ${col.bgSoft} ${col.text} flex items-center justify-center mb-3`}>
-                  <i className={`${cat.icon} text-xl`}></i>
-                </div>
-                <p className="font-bold text-gray-900 text-sm mb-0.5">{cat.name}</p>
-                <p className="text-[11px] text-gray-400 mb-2 leading-tight">{cat.desc}</p>
+                {/* Left accent stripe — replaces the icon box */}
+                <span className={`absolute left-0 top-0 bottom-0 w-1 ${col.bg}`} />
+
+                {/* Subtle large icon as watermark in corner */}
+                <i className={`${cat.icon} absolute -bottom-2 -right-2 text-6xl ${col.text} opacity-[0.08] pointer-events-none`} />
+
+                <p className="font-black text-gray-900 text-base mb-1 leading-tight">{cat.name}</p>
+                <p className="text-[11px] text-gray-400 mb-4 leading-tight">{cat.desc}</p>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500">
-                    Từ <span className={`font-bold ${col.text}`}>{formatMoney(minPrice)}</span>
+                    Từ <span className={`font-black ${col.text}`}>{formatMoney(minPrice)}</span>
                   </p>
-                  <i className={`ri-arrow-right-s-line text-gray-300 group-hover:${col.text.replace('text-', 'text-')} transition-colors`}></i>
+                  <i className="ri-arrow-right-line text-gray-300 group-hover:text-gray-900 group-hover:translate-x-0.5 transition-all"></i>
                 </div>
               </button>
             );
@@ -178,13 +174,11 @@ export default function PricingPage() {
 
         {/* ─── Plans for selected category ────────────────────────── */}
         <div ref={plansRef} className="scroll-mt-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-9 h-9 rounded-xl ${c.bgSoft} ${c.text} flex items-center justify-center`}>
-              <i className={`${selected.icon} text-lg`}></i>
-            </div>
+          <div className="flex items-end gap-3 mb-5 pb-3 border-b border-gray-200">
+            <span className={`block w-1.5 h-10 ${c.bg} rounded-full`} />
             <div>
               <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Gói cho danh mục</p>
-              <h2 className="text-lg font-black text-gray-900">{selected.name}</h2>
+              <h2 className="text-xl font-black text-gray-900 leading-tight">{selected.name}</h2>
             </div>
           </div>
 
@@ -246,29 +240,23 @@ export default function PricingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Link
             href="/wallet"
-            className="bg-white rounded-2xl border border-gray-200 px-5 py-4 hover:border-gray-400 transition-all flex items-center gap-3"
+            className="group bg-white rounded-2xl border border-gray-200 px-5 py-4 hover:border-gray-900 transition-all flex items-center justify-between gap-3"
           >
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <i className="ri-wallet-3-line text-gray-600 text-lg"></i>
-            </div>
-            <div className="flex-1">
+            <div>
               <p className="font-bold text-gray-900 text-sm">Nạp tiền vào ví</p>
-              <p className="text-xs text-gray-400">Thanh toán qua PayOS · Tự động xác nhận</p>
+              <p className="text-xs text-gray-400 mt-0.5">Thanh toán qua PayOS · Tự động xác nhận</p>
             </div>
-            <i className="ri-arrow-right-s-line text-gray-300"></i>
+            <i className="ri-arrow-right-line text-gray-300 group-hover:text-gray-900 group-hover:translate-x-0.5 transition-all"></i>
           </Link>
           <Link
             href="/dashboard"
-            className="bg-white rounded-2xl border border-gray-200 px-5 py-4 hover:border-gray-400 transition-all flex items-center gap-3"
+            className="group bg-white rounded-2xl border border-gray-200 px-5 py-4 hover:border-gray-900 transition-all flex items-center justify-between gap-3"
           >
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <i className="ri-file-list-3-line text-gray-600 text-lg"></i>
-            </div>
-            <div className="flex-1">
+            <div>
               <p className="font-bold text-gray-900 text-sm">Quản lý bài đăng</p>
-              <p className="text-xs text-gray-400">Chọn bài cần nâng cấp từ dashboard</p>
+              <p className="text-xs text-gray-400 mt-0.5">Chọn bài cần nâng cấp từ dashboard</p>
             </div>
-            <i className="ri-arrow-right-s-line text-gray-300"></i>
+            <i className="ri-arrow-right-line text-gray-300 group-hover:text-gray-900 group-hover:translate-x-0.5 transition-all"></i>
           </Link>
         </div>
 
