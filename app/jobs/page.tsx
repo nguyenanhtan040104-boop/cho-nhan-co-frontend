@@ -84,7 +84,7 @@ function JobsContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
@@ -115,7 +115,7 @@ function JobsContent() {
             ))}
             <div className="w-px h-4 bg-white/20 mx-1"></div>
             <button onClick={() => setUrgentOnly(!urgentOnly)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${urgentOnly ? 'bg-red-400 text-white' : 'bg-white/15 text-white hover:bg-white/25'}`}>
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${urgentOnly ? 'bg-red-500 text-white' : 'bg-white/15 text-white hover:bg-white/25'}`}>
               Gấp
             </button>
           </div>
@@ -142,7 +142,7 @@ function JobsContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="w-full bg-gray-200" style={{ paddingBottom: '65%' }}></div>
+                <div className="w-full bg-gray-200" style={{ aspectRatio: '4/3' }}></div>
                 <div className="p-3 space-y-2">
                   <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -186,6 +186,8 @@ function JobCard({ item, bulkMode, selected, onToggle, onDeleted }: { item: any;
   const isEmployer = item.type === 'EMPLOYER';
   const thumb = item.images?.[0];
   const thumbUrl = typeof thumb === 'string' ? thumb : thumb?.url;
+  const authorName = item.user?.fullName || item.user?.name || '';
+  const authorInitial = authorName?.[0]?.toUpperCase() || 'U';
 
   return (
     <div className="relative group">
@@ -197,21 +199,23 @@ function JobCard({ item, bulkMode, selected, onToggle, onDeleted }: { item: any;
       )}
       <Link href={bulkMode ? '#' : `/jobs/${item.id}`}
         onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden ${selected ? 'ring-2 ring-indigo-500' : ''}`}>
+        className={`block bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 ${selected ? 'ring-2 ring-indigo-500' : ''}`}>
 
         {/* Ảnh hoặc placeholder */}
-        <div className="relative w-full bg-gray-100" style={{ paddingBottom: '65%' }}>
+        <div className="relative w-full bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {thumbUrl ? (
-            <img src={thumbUrl} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+            <img src={thumbUrl} alt={item.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center"
+            <div className="w-full h-full flex items-center justify-center"
               style={{ background: isEmployer ? 'linear-gradient(135deg,#4338ca,#6366f1)' : 'linear-gradient(135deg,#0369a1,#0ea5e9)' }}>
               <span className="text-4xl font-bold text-white/80">{(item.title || 'J')[0].toUpperCase()}</span>
             </div>
           )}
           {/* badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {item.isUrgent && <span className="text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded">Gấp</span>}
+            {item.isUrgent && (
+              <span className="text-[10px] bg-red-500 text-white font-black px-1.5 py-0.5 rounded shadow-sm shadow-red-500/40">Gấp</span>
+            )}
             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${isEmployer ? 'bg-indigo-600 text-white' : 'bg-sky-500 text-white'}`}>
               {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
             </span>
@@ -221,7 +225,7 @@ function JobCard({ item, bulkMode, selected, onToggle, onDeleted }: { item: any;
         {/* Info */}
         <div className="p-3">
           <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-1">{item.title}</h3>
-          {item.salary && <p className="text-green-600 font-bold text-sm">{item.salary}</p>}
+          {item.salary && <p className="text-green-600 font-black text-sm">{item.salary}</p>}
           <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
             {item.location && <><i className="ri-map-pin-line"></i><span className="truncate">{item.location}</span></>}
           </div>
@@ -229,6 +233,15 @@ function JobCard({ item, bulkMode, selected, onToggle, onDeleted }: { item: any;
             <span>{item.category}</span>
             <span>{timeAgo(item.createdAt)}</span>
           </div>
+          {/* Author */}
+          {authorName && (
+            <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-100">
+              <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[10px] flex-shrink-0">
+                {authorInitial}
+              </div>
+              <span className="text-[11px] text-gray-500 truncate">{authorName}</span>
+            </div>
+          )}
         </div>
       </Link>
       <div className="absolute top-2 right-2 z-10">

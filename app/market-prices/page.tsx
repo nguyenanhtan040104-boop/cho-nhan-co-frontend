@@ -48,7 +48,7 @@ export default function MarketPricesPage() {
   const currentCat = agriCategories.find(c => c.category === openCat);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #713f12 0%, #ca8a04 100%)' }} className="py-8">
         <div className="max-w-5xl mx-auto px-4">

@@ -82,7 +82,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f5f4ee' }}>
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải sản phẩm...</p>
@@ -194,7 +194,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const mainImage = images.length > 0 ? images[selectedImageIndex] : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">

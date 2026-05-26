@@ -38,18 +38,18 @@ async function getHomeData() {
   return { products, vatNuoi, dichVu, realEstate, jobs, ads, forum };
 }
 
-// Pinterest filter-chip style — horizontal scroll, icon + label
+// Image-based categories — real photos for each category
 const categories = [
-  { title: 'Nông sản',     href: '/products?category=NONG_SAN', icon: 'ri-seedling-fill',           bg: 'bg-green-100',  color: 'text-green-700',  ring: 'hover:ring-green-300' },
-  { title: 'Bất động sản', href: '/real-estate',                icon: 'ri-home-4-fill',             bg: 'bg-orange-100', color: 'text-orange-700', ring: 'hover:ring-orange-300' },
-  { title: 'Việc làm',     href: '/jobs',                       icon: 'ri-briefcase-4-fill',        bg: 'bg-blue-100',   color: 'text-blue-700',   ring: 'hover:ring-blue-300' },
-  { title: 'Vật nuôi',     href: '/vat-nuoi',                   icon: 'ri-bear-smile-fill',         bg: 'bg-amber-100',  color: 'text-amber-700',  ring: 'hover:ring-amber-300' },
-  { title: 'Dịch vụ',      href: '/dich-vu',                    icon: 'ri-customer-service-2-fill', bg: 'bg-purple-100', color: 'text-purple-700', ring: 'hover:ring-purple-300' },
-  { title: 'Diễn đàn',     href: '/forum',                      icon: 'ri-discuss-fill',            bg: 'bg-cyan-100',   color: 'text-cyan-700',   ring: 'hover:ring-cyan-300' },
-  { title: 'Quảng cáo',    href: '/advertisements',             icon: 'ri-megaphone-fill',          bg: 'bg-red-100',    color: 'text-red-600',    ring: 'hover:ring-red-300' },
-  { title: 'Cảnh báo',     href: '/canh-bao',                   icon: 'ri-alert-fill',              bg: 'bg-yellow-100', color: 'text-yellow-700', ring: 'hover:ring-yellow-300' },
-  { title: 'Bảng giá',     href: '/market-prices',              icon: 'ri-bar-chart-2-fill',        bg: 'bg-teal-100',   color: 'text-teal-700',   ring: 'hover:ring-teal-300' },
-  { title: 'Sản phẩm',     href: '/products',                   icon: 'ri-shopping-bag-3-fill',     bg: 'bg-lime-100',   color: 'text-lime-700',   ring: 'hover:ring-lime-300' },
+  { title: 'Nông sản',     href: '/products?category=NONG_SAN', img: 'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=120&h=120&fit=crop&q=80', icon: 'ri-seedling-fill',           color: 'text-green-600' },
+  { title: 'Bất động sản', href: '/real-estate',                img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=120&h=120&fit=crop&q=80', icon: 'ri-home-4-fill',             color: 'text-orange-600' },
+  { title: 'Việc làm',     href: '/jobs',                       img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=120&h=120&fit=crop&q=80', icon: 'ri-briefcase-4-fill',        color: 'text-blue-600' },
+  { title: 'Vật nuôi',     href: '/vat-nuoi',                   img: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=120&h=120&fit=crop&q=80', icon: 'ri-bear-smile-fill',         color: 'text-amber-600' },
+  { title: 'Dịch vụ',      href: '/dich-vu',                    img: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=120&h=120&fit=crop&q=80', icon: 'ri-customer-service-2-fill', color: 'text-purple-600' },
+  { title: 'Diễn đàn',     href: '/forum',                      img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&h=120&fit=crop&q=80', icon: 'ri-discuss-fill',            color: 'text-cyan-600' },
+  { title: 'Quảng cáo',    href: '/advertisements',             img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&h=120&fit=crop&q=80', icon: 'ri-megaphone-fill',          color: 'text-red-500' },
+  { title: 'Cảnh báo',     href: '/canh-bao',                   img: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=120&h=120&fit=crop&q=80', icon: 'ri-alert-fill',              color: 'text-yellow-600' },
+  { title: 'Bảng giá',     href: '/market-prices',              img: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=120&h=120&fit=crop&q=80', icon: 'ri-bar-chart-2-fill',        color: 'text-teal-600' },
+  { title: 'Sản phẩm',     href: '/products',                   img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop&q=80',    icon: 'ri-shopping-bag-3-fill',     color: 'text-lime-600' },
 ];
 
 function timeAgo(dateStr: string) {
@@ -145,17 +145,23 @@ export default async function HomePage() {
 
       <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-6">
 
-        {/* ===== DANH MỤC — Pinterest filter-chip horizontal scroll ===== */}
-        {/* Each chip: colored pill with icon + label, scrolls on mobile */}
-        <div className="bg-white mt-3 px-4 py-3 rounded-2xl shadow-sm">
-          {/* Linear eyebrow: uppercase tiny label with positive tracking */}
-          <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-2.5">Danh mục</p>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+        {/* ===== DANH MỤC — Image grid (real photos per category) ===== */}
+        <div className="bg-white mt-3 px-4 pt-3 pb-4 rounded-2xl" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Danh mục</p>
+          <div className="grid grid-cols-5 gap-x-2 gap-y-3">
             {categories.map(cat => (
               <Link key={cat.href} href={cat.href}
-                className={`group inline-flex items-center gap-1.5 px-3 py-2 rounded-full ${cat.bg} whitespace-nowrap flex-shrink-0 ring-2 ring-transparent ${cat.ring} transition-all duration-200 hover:scale-105`}>
-                <i className={`${cat.icon} ${cat.color} text-sm`}></i>
-                <span className={`text-xs font-bold ${cat.color}`}>{cat.title}</span>
+                className="flex flex-col items-center gap-1.5 group">
+                {/* Rounded square image thumbnail with icon overlay */}
+                <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-sm">
+                  <img src={cat.img} alt={cat.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 ease-out" />
+                  {/* Dark scrim + icon on top */}
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <i className={`${cat.icon} text-white text-2xl drop-shadow-md`}></i>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-gray-700 text-center leading-tight line-clamp-1 w-full px-0.5">{cat.title}</span>
               </Link>
             ))}
           </div>

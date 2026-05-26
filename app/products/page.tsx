@@ -10,18 +10,18 @@ import LikeButton from '../components/LikeButton';
 
 const categories = [
   { value: '', name: 'Tất cả sản phẩm', icon: '' },
-  { value: 'NONG_SAN', name: 'Nông sản', icon: '' },
-  { value: 'VAT_NUOI', name: 'Vật nuôi', icon: '' },
-  { value: 'DICH_VU', name: 'Dịch vụ', icon: '' },
-  { value: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng', icon: '' },
-  { value: 'HANG_TIEU_DUNG', name: 'Tiêu dùng', icon: '' },
+  { value: 'NONG_SAN', name: 'Nông sản', icon: '🌾' },
+  { value: 'VAT_NUOI', name: 'Vật nuôi', icon: '🐄' },
+  { value: 'DICH_VU', name: 'Dịch vụ', icon: '🔧' },
+  { value: 'DO_DUNG_GIA_DINH', name: 'Đồ dùng', icon: '🏠' },
+  { value: 'HANG_TIEU_DUNG', name: 'Tiêu dùng', icon: '🛒' },
 ];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }} />}>
       <ProductsInner />
     </Suspense>
   );
@@ -96,7 +96,7 @@ function ProductsInner() {
   const normalItems = items.filter(p => !p.isVip);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
 
       {/* Hero banner */}
       <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%)' }}>
@@ -148,7 +148,7 @@ function ProductsInner() {
             </div>
           </div>
 
-          {/* Category pills */}
+          {/* Category pills with emoji indicators */}
           <div className="flex gap-2 flex-wrap justify-center mt-5">
             {categories.map(cat => (
               <button
@@ -160,7 +160,8 @@ function ProductsInner() {
                     : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur'
                 }`}
               >
-                      <span>{cat.name}</span>
+                {cat.icon && <span className="text-base leading-none">{cat.icon}</span>}
+                <span>{cat.name}</span>
               </button>
             ))}
           </div>
@@ -180,7 +181,7 @@ function ProductsInner() {
               { value: 'popular', label: 'Phổ biến' },
             ].map(opt => (
               <button key={opt.value} onClick={() => { setSortBy(opt.value); setPage(1); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                   sortBy === opt.value
                     ? 'bg-green-700 text-white border-green-700'
                     : 'bg-white text-gray-600 border-gray-200 hover:border-green-400'
@@ -191,7 +192,7 @@ function ProductsInner() {
           </div>
           {isLoggedIn && (
             <button onClick={() => { setBulkMode(!bulkMode); setSelected(new Set()); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${bulkMode ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'}`}>
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${bulkMode ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'}`}>
               <i className="ri-checkbox-multiple-line"></i>
               {bulkMode ? 'Thoát chọn' : 'Chọn nhiều'}
             </button>
@@ -215,7 +216,13 @@ function ProductsInner() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse shadow-sm">
-                <div className="h-44 bg-gray-200"></div>
+                {/* Photo-placeholder shimmer on card image area */}
+                <div className="rounded-t-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                  <div className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200" style={{
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 1.5s infinite',
+                  }}></div>
+                </div>
                 <div className="p-3 space-y-2">
                   <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -237,12 +244,17 @@ function ProductsInner() {
             {/* VIP section */}
             {vipItems.length > 0 && (
               <div className="mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-px flex-1 bg-gradient-to-r from-yellow-300 to-transparent"></div>
-                  <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow">
-                    <i className="ri-vip-crown-fill"></i> Tin nổi bật VIP
+                {/* Linear eyebrow — amber gradient pill heading */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-amber-300/60 to-transparent"></div>
+                  <div
+                    className="flex items-center gap-2 text-white px-5 py-1.5 rounded-full text-sm font-bold shadow-md tracking-wide"
+                    style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)' }}
+                  >
+                    <i className="ri-vip-crown-fill text-yellow-100"></i>
+                    <span>Tin nổi bật VIP</span>
                   </div>
-                  <div className="h-px flex-1 bg-gradient-to-l from-yellow-300 to-transparent"></div>
+                  <div className="h-px flex-1 bg-gradient-to-l from-amber-300/60 to-transparent"></div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {vipItems.slice(0, 8).map(product => (
@@ -294,7 +306,7 @@ function ProductsInner() {
 
 function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUserId, onDeleted }: {
   product: any; isVip: boolean; bulkMode: boolean; selected: boolean; onToggle: () => void;
-  currentUserId: string | null; onDeleted: (id: string) => void;
+  currentUserId?: string | null; onDeleted: (id: string) => void;
 }) {
   return (
     <div className="relative group">
@@ -307,10 +319,17 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
       <Link
         href={bulkMode ? '#' : `/products/${product.id}`}
         onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 ${isVip ? 'ring-2 ring-yellow-400' : 'hover:-translate-y-0.5'} ${selected ? 'ring-2 ring-green-500' : ''}`}
+        className={`block bg-white rounded-2xl overflow-hidden shadow-sm transition-all duration-200 ${
+          isVip ? 'ring-2 ring-yellow-400' : ''
+        } ${
+          selected ? 'ring-2 ring-green-500' : ''
+        } hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)]`}
       >
-        {/* Image */}
-        <div className="relative overflow-hidden" style={{ height: '168px', backgroundColor: '#e8f5e9' }}>
+        {/* Image — full-bleed, aspect-ratio 4/3 */}
+        <div
+          className="relative overflow-hidden rounded-t-2xl"
+          style={{ aspectRatio: '4/3', backgroundColor: '#e8f5e9' }}
+        >
           {product.images?.[0] ? (
             <img src={product.images[0].url} alt={product.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -341,14 +360,22 @@ function ProductCard({ product, isVip, bulkMode, selected, onToggle, currentUser
             {product.title}
           </h4>
           <div className="flex items-baseline gap-1 mb-2">
-            <span className="text-base font-bold" style={{ color: '#2d6a4f' }}>
+            <span className="text-base font-bold" style={{ color: '#d0011b' }}>
               {fmt(Number(product.price))}đ
             </span>
             {product.unit && <span className="text-xs text-gray-400">/{product.unit}</span>}
           </div>
           <div className="flex items-center justify-between text-xs text-gray-400">
             <div className="flex items-center gap-1 min-w-0">
-              <i className="ri-map-pin-2-fill text-red-400 flex-shrink-0"></i>
+              {/* Map pin icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-3 h-3 text-red-400 flex-shrink-0"
+              >
+                <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.083 3.205-4.399 3.205-7.051a8.5 8.5 0 10-17 0c0 2.652 1.26 4.968 3.205 7.051a19.58 19.58 0 002.683 2.282 16.974 16.974 0 001.143.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+              </svg>
               <span className="truncate">{product.location || 'Đắk Nông'}</span>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0 ml-1">

@@ -60,7 +60,7 @@ export default function AdvertisementsPage() {
   useEffect(() => { loadData(1); }, [loadData]);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
@@ -95,10 +95,10 @@ export default function AdvertisementsPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {loading && items.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="h-44 bg-gray-200"></div>
+                <div className="bg-gray-200 rounded-t-2xl" style={{ aspectRatio: '4/3' }}></div>
                 <div className="p-4 space-y-2">
                   <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -116,7 +116,7 @@ export default function AdvertisementsPage() {
           />
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {items.map(item => (
                 <AdCard key={item.id} item={item} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
@@ -145,8 +145,8 @@ function AdCard({ item, currentUserId, onDeleted }: { item: any; currentUserId: 
   return (
     <div className="relative group">
     <Link href={`/advertisements/${item.id}`}
-      className="block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
-      <div className="relative h-44 bg-gray-50">
+      className="block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all group">
+      <div className="relative bg-gray-50 rounded-t-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
         {hasImage ? (
           <img src={hasImage} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (

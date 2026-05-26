@@ -79,7 +79,7 @@ function CanhBaoContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
@@ -157,7 +157,7 @@ function CanhBaoContent() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                    <div className="w-full bg-gray-200" style={{ paddingBottom: '65%' }}></div>
+                    <div className="w-full bg-gray-200 rounded-t-2xl" style={{ aspectRatio: '4/3' }}></div>
                     <div className="p-3 space-y-2">
                       <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                       <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -275,7 +275,7 @@ function CanhBaoContent() {
 export default function CanhBaoPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f8f5f0' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f5f4ee' }}>
         <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
@@ -289,12 +289,12 @@ function ReportCard({ post }: { post: any }) {
 
   return (
     <Link href={`/forum/${post.id}`}
-      className="block bg-white rounded-2xl border border-red-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden group">
-      <div className="relative w-full bg-red-50" style={{ paddingBottom: '65%' }}>
+      className="block bg-white rounded-2xl border border-red-100 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all overflow-hidden group">
+      <div className="relative w-full bg-red-50 rounded-t-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
         {thumb ? (
-          <img src={thumb} alt={post.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <img src={thumb} alt={post.title} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300 ease-out" />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
             <i className="ri-alarm-warning-line text-4xl text-red-400"></i>
           </div>
         )}

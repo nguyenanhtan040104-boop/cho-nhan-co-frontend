@@ -21,7 +21,7 @@ const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 export default function VatNuoiPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }} />}>
       <VatNuoiContent />
     </Suspense>
   );
@@ -78,7 +78,7 @@ function VatNuoiContent() {
   const normalItems = items.filter(p => !p.isVip);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Hero banner */}
       <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #78350f 0%, #b45309 60%, #d97706 100%)' }}>
         <div className="absolute inset-0 opacity-10" style={{
@@ -146,7 +146,7 @@ function VatNuoiContent() {
             { value: 'popular', label: 'Phổ biến' },
           ].map(opt => (
             <button key={opt.value} onClick={() => { setSortBy(opt.value); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                 sortBy === opt.value
                   ? 'bg-amber-600 text-white border-amber-600'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-amber-400'
@@ -160,7 +160,7 @@ function VatNuoiContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse shadow-sm">
-                <div className="h-44 bg-gray-200"></div>
+                <div className="bg-gray-200 rounded-t-2xl" style={{ aspectRatio: '4/3' }}></div>
                 <div className="p-3 space-y-2">
                   <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -228,11 +228,11 @@ function PetCard({ item, isVip }: { item: any; isVip?: boolean }) {
   return (
     <div className="relative group">
       <Link href={`/products/${item.id}`}
-        className={`block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 ${isVip ? 'ring-2 ring-yellow-400' : ''}`}>
-        <div className="relative overflow-hidden" style={{ height: '168px', backgroundColor: '#fef3c7' }}>
+        className={`block bg-white rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] ${isVip ? 'ring-2 ring-yellow-400 shadow-sm' : 'border border-gray-100'}`}>
+        <div className="relative overflow-hidden rounded-t-2xl" style={{ aspectRatio: '4/3', backgroundColor: '#fef3c7' }}>
           {item.images?.[0] ? (
             <img src={item.images[0].url} alt={item.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300 ease-out" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
               <i className="ri-bear-smile-line text-4xl text-amber-300"></i>

@@ -102,7 +102,7 @@ function ForumContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
@@ -164,7 +164,7 @@ function ForumContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="w-full bg-gray-200" style={{ paddingBottom: '65%' }}></div>
+                <div className="w-full bg-gray-200" style={{ aspectRatio: '4/3' }}></div>
                 <div className="p-3 space-y-2">
                   <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2"></div>
@@ -207,6 +207,8 @@ function ForumContent() {
 function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId?: string | null; onDeleted: (id: string) => void }) {
   const cat = catColors[post.category] || catColors.KHAC;
   const thumb = post.images?.[0]?.url || post.images?.[0];
+  const authorName = post.user?.fullName || post.user?.name || '';
+  const authorInitial = authorName?.[0]?.toUpperCase() || 'U';
 
   return (
     <div className="relative group">
@@ -218,35 +220,38 @@ function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: an
       )}
       <Link href={bulkMode ? '#' : `/forum/${post.id}`}
         onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden ${selected ? 'ring-2 ring-green-500' : ''}`}>
+        className={`block bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 ${selected ? 'ring-2 ring-green-500' : ''}`}>
         {/* Thumbnail */}
-        <div className="relative w-full bg-gray-100" style={{ paddingBottom: '65%' }}>
+        <div className="relative w-full bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {thumb ? (
-            <img src={thumb} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
+            <img src={thumb} alt={post.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}44)` }}>
+            <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}44)` }}>
               <i className="ri-article-line text-4xl" style={{ color: cat.color, opacity: 0.5 }}></i>
             </div>
           )}
           {post.category && (
-            <span className="absolute top-2 left-2 text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: cat.color, color: '#fff' }}>{cat.label}</span>
+            <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: cat.color, color: '#fff' }}>{cat.label}</span>
           )}
           {post.isPinned && <span className="absolute top-2 right-2 text-[10px] bg-yellow-400 text-yellow-900 font-bold px-1.5 py-0.5 rounded">Ghim</span>}
         </div>
         {/* Info */}
         <div className="p-3">
           <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2">{post.title}</h3>
-          <div className="flex items-center justify-between text-[11px] text-gray-400">
-            <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-[10px] flex-shrink-0">
-                {post.user?.fullName?.[0] || 'U'}
-              </div>
-              <span className="truncate max-w-[60px]">{post.user?.fullName}</span>
+          {/* Author */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-[10px] flex-shrink-0">
+              {authorInitial}
             </div>
+            <span className="text-[11px] text-gray-500 truncate max-w-[80px]">{authorName}</span>
+          </div>
+          {/* Stats */}
+          <div className="flex items-center justify-between text-[11px] text-gray-400">
             <span className="flex items-center gap-2">
-              <span><i className="ri-chat-3-line"></i> {post.commentCount || post._count?.comments || 0}</span>
-              <span>{timeAgo(post.createdAt)}</span>
+              <span className="flex items-center gap-0.5"><i className="ri-heart-line"></i> {post.likeCount || post._count?.likes || 0}</span>
+              <span className="flex items-center gap-0.5"><i className="ri-chat-3-line"></i> {post.commentCount || post._count?.comments || 0}</span>
             </span>
+            <span>{timeAgo(post.createdAt)}</span>
           </div>
         </div>
       </Link>

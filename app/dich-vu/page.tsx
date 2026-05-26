@@ -22,7 +22,7 @@ const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 export default function DichVuPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }} />}>
       <DichVuContent />
     </Suspense>
   );
@@ -79,7 +79,7 @@ function DichVuContent() {
   const normalItems = items.filter(p => !p.isVip);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Hero banner */}
       <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #3730a3 60%, #4f46e5 100%)' }}>
         <div className="absolute inset-0 opacity-10" style={{
@@ -147,7 +147,7 @@ function DichVuContent() {
             { value: 'popular', label: 'Phổ biến' },
           ].map(opt => (
             <button key={opt.value} onClick={() => { setSortBy(opt.value); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                 sortBy === opt.value
                   ? 'bg-indigo-600 text-white border-indigo-600'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-400'
@@ -161,7 +161,7 @@ function DichVuContent() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse shadow-sm">
-                <div className="h-44 bg-gray-200"></div>
+                <div className="bg-gray-200 rounded-t-2xl" style={{ aspectRatio: '4/3' }}></div>
                 <div className="p-3 space-y-2">
                   <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -229,8 +229,8 @@ function ServiceCard({ item, isVip }: { item: any; isVip?: boolean }) {
   return (
     <div className="relative group">
       <Link href={`/products/${item.id}`}
-        className={`block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 ${isVip ? 'ring-2 ring-yellow-400' : ''}`}>
-        <div className="relative overflow-hidden" style={{ height: '168px', backgroundColor: '#ede9fe' }}>
+        className={`block bg-white rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] ${isVip ? 'ring-2 ring-yellow-400 shadow-sm' : 'border border-gray-100'}`}>
+        <div className="relative overflow-hidden rounded-t-2xl" style={{ aspectRatio: '4/3', backgroundColor: '#ede9fe' }}>
           {item.images?.[0] ? (
             <img src={item.images[0].url} alt={item.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

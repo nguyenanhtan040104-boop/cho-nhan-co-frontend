@@ -22,6 +22,14 @@ function formatPrice(price: number) {
   return price.toLocaleString() + 'đ';
 }
 
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const h = Math.floor(diff / 3600000);
+  if (h < 24) return h < 1 ? 'Vừa đăng' : `${h} giờ trước`;
+  const d = Math.floor(h / 24);
+  return d < 30 ? `${d} ngày trước` : `${Math.floor(d / 30)} tháng trước`;
+}
+
 export default function RealEstatePage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Đang tải...</div>}>
@@ -90,7 +98,7 @@ function RealEstateContent() {
   const normalItems = items.filter(i => !i.isVip);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
@@ -150,11 +158,14 @@ function RealEstateContent() {
         )}
 
         {loading && items.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
-                <div className="p-4 space-y-2"><div className="h-4 bg-gray-200 rounded w-3/4"></div><div className="h-5 bg-gray-200 rounded w-1/2"></div></div>
+                <div className="rounded-t-2xl bg-gray-200" style={{ aspectRatio: '4/3' }}></div>
+                <div className="p-3 space-y-2">
+                  <div className="h-3.5 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
               </div>
             ))}
           </div>
@@ -175,13 +186,19 @@ function RealEstateContent() {
                   <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-4 py-1.5 rounded-full">Tin nổi bật VIP</span>
                   <div className="h-px flex-1 bg-gradient-to-l from-yellow-300 to-transparent"></div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {vipItems.map(item => <RECard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />)}
                 </div>
-                {normalItems.length > 0 && <div className="flex items-center gap-3 mt-8 mb-2"><div className="h-px flex-1 bg-gray-200"></div><span className="text-xs text-gray-400 uppercase tracking-wider">Tất cả tin đăng</span><div className="h-px flex-1 bg-gray-200"></div></div>}
+                {normalItems.length > 0 && (
+                  <div className="flex items-center gap-3 mt-8 mb-2">
+                    <div className="h-px flex-1 bg-gray-200"></div>
+                    <span className="text-xs text-gray-400 uppercase tracking-wider">Tất cả tin đăng</span>
+                    <div className="h-px flex-1 bg-gray-200"></div>
+                  </div>
+                )}
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {normalItems.map(item => <RECard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />)}
             </div>
             {totalPages > 1 && (
@@ -201,7 +218,7 @@ function RealEstateContent() {
   );
 }
 
-function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId: string | null; onDeleted: (id: string) => void }) {
+function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }: { item: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId?: string | null; onDeleted: (id: string) => void }) {
   const typeLabel: any = { NHA_O: 'Nhà ở', DAT_NEN: 'Đất nền', PHONG_TRO: 'Phòng trọ', MAT_BANG: 'Mặt bằng' };
   return (
     <div className="relative group">
@@ -210,30 +227,55 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}
-      <Link href={bulkMode ? '#' : `/real-estate/${item.id}`} onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 transition-all ${item.isVip ? 'ring-2 ring-yellow-400' : ''} ${selected ? 'ring-2 ring-blue-500' : ''}`}>
-        <div className="relative h-48 bg-gray-50">
+      <Link
+        href={bulkMode ? '#' : `/real-estate/${item.id}`}
+        onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
+        className={`block bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 ${item.isVip ? 'ring-2 ring-yellow-400' : ''} ${selected ? 'ring-2 ring-blue-500' : ''}`}
+      >
+        {/* Image area */}
+        <div className="relative bg-gray-50 rounded-t-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {item.images?.[0] ? (
             <img src={item.images[0].url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full flex items-center justify-center"><i className="ri-home-4-line text-4xl text-gray-200"></i></div>
           )}
-          {item.isVip && <span className="absolute top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VIP</span>}
-          {item.type && <span className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">{typeLabel[item.type] || item.type}</span>}
+          {/* Time badge — top left */}
+          {item.createdAt && (
+            <span className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full leading-tight">
+              {timeAgo(item.createdAt)}
+            </span>
+          )}
+          {/* Type badge — top right */}
+          {item.type && (
+            <span className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full leading-tight">
+              {typeLabel[item.type] || item.type}
+            </span>
+          )}
+          {item.isVip && (
+            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow">VIP</span>
+          )}
           <LikeButton itemId={String(item.id)} />
         </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-800 line-clamp-2 mb-2 group-hover:text-blue-700 transition-colors">{item.title}</h3>
-          <p className="text-lg font-bold text-blue-700 mb-2">{Number(item.price) >= 1e9 ? (Number(item.price)/1e9).toFixed(1)+' tỷ' : Number(item.price) >= 1e6 ? (Number(item.price)/1e6).toFixed(0)+' triệu' : Number(item.price).toLocaleString()+'đ'}</p>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
+
+        {/* Info */}
+        <div className="p-3">
+          <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-1 group-hover:text-blue-700 transition-colors">{item.title}</h3>
+          <p className="text-[#1d4ed8] font-bold text-sm mb-1">
+            {Number(item.price) >= 1e9
+              ? (Number(item.price) / 1e9).toFixed(1) + ' tỷ'
+              : Number(item.price) >= 1e6
+              ? (Number(item.price) / 1e6).toFixed(0) + ' triệu'
+              : Number(item.price).toLocaleString() + 'đ'}
+          </p>
+          <div className="flex items-center gap-2 text-[11px] text-gray-400">
             {item.area && <span><i className="ri-map-2-line mr-0.5"></i>{item.area}m²</span>}
             <span className="truncate flex-1"><i className="ri-map-pin-line mr-0.5"></i>{item.address || item.location}</span>
           </div>
           {item.user?.fullName && (
-            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-              <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs text-blue-700 font-bold flex-shrink-0">{item.user.fullName[0]}</div>
-              <span className="text-xs text-gray-400 truncate flex-1">{item.user.fullName}</span>
-              <span className="text-xs text-gray-400 flex items-center gap-0.5"><i className="ri-eye-line"></i>{item.viewCount || 0}</span>
+            <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-50">
+              <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[10px] text-blue-700 font-bold flex-shrink-0">{item.user.fullName[0]}</div>
+              <span className="text-[11px] text-gray-400 truncate flex-1">{item.user.fullName}</span>
+              <span className="text-[11px] text-gray-400 flex items-center gap-0.5"><i className="ri-eye-line"></i>{item.viewCount || 0}</span>
             </div>
           )}
         </div>
