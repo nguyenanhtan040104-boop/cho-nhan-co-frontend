@@ -6,8 +6,16 @@ import Link from 'next/link';
 // ─── Categories with per-category pricing ─────────────────────────────
 const CATEGORIES = [
   {
+    id: 'bat-dong-san',
+    name: 'Bất động sản',
+    desc: 'Đất ruộng, vườn cây, nhà vườn',
+    icon: 'ri-landscape-line',
+    color: 'amber',
+    prices: { vip7: 70000, vip30: 199000 },
+  },
+  {
     id: 'nong-san',
-    name: 'Nông sản',
+    name: 'Nông sản & Thực phẩm',
     desc: 'Lúa, gạo, rau, củ, trái cây',
     icon: 'ri-leaf-line',
     color: 'emerald',
@@ -22,52 +30,28 @@ const CATEGORIES = [
     prices: { vip7: 35000, vip30: 89000 },
   },
   {
-    id: 'cay-giong',
-    name: 'Cây giống',
-    desc: 'Hạt giống, cây con, cây ăn trái',
-    icon: 'ri-plant-line',
-    color: 'lime',
-    prices: { vip7: 30000, vip30: 75000 },
-  },
-  {
-    id: 'may-nong-nghiep',
-    name: 'Máy nông nghiệp',
-    desc: 'Máy cày, máy xới, máy bơm',
-    icon: 'ri-tools-fill',
-    color: 'slate',
-    prices: { vip7: 50000, vip30: 129000 },
-  },
-  {
-    id: 'dat-vuon',
-    name: 'Đất - Vườn',
-    desc: 'Ruộng, rẫy, vườn cây',
-    icon: 'ri-landscape-line',
-    color: 'amber',
-    prices: { vip7: 70000, vip30: 199000 },
-  },
-  {
     id: 'viec-lam',
-    name: 'Việc làm',
-    desc: 'Thời vụ, mùa gặt, mùa hái',
+    name: 'Tuyển dụng / Việc làm',
+    desc: 'Thời vụ, mùa gặt, công nhật',
     icon: 'ri-briefcase-line',
     color: 'blue',
     prices: { vip7: 30000, vip30: 79000 },
   },
   {
-    id: 'do-cu',
-    name: 'Đồ dùng cũ',
-    desc: 'Thanh lý, hàng đã qua sử dụng',
-    icon: 'ri-shopping-bag-line',
-    color: 'purple',
-    prices: { vip7: 30000, vip30: 69000 },
+    id: 'dich-vu',
+    name: 'Dịch vụ',
+    desc: 'Sửa chữa, vận chuyển, thuê thợ',
+    icon: 'ri-customer-service-2-line',
+    color: 'teal',
+    prices: { vip7: 30000, vip30: 75000 },
   },
   {
-    id: 'dien-dan',
-    name: 'Bài diễn đàn',
-    desc: 'Hỏi đáp, kinh nghiệm canh tác',
-    icon: 'ri-chat-3-line',
-    color: 'teal',
-    prices: { vip7: 30000, vip30: 69000 },
+    id: 'quang-cao',
+    name: 'Quảng cáo & Khuyến mãi',
+    desc: 'Đẩy thương hiệu, ưu đãi',
+    icon: 'ri-megaphone-line',
+    color: 'purple',
+    prices: { vip7: 50000, vip30: 129000 },
   },
 ];
 
@@ -89,7 +73,7 @@ function formatMoney(n: number) {
 }
 
 export default function PricingPage() {
-  const [selectedId, setSelectedId] = useState<string>('nong-san');
+  const [selectedId, setSelectedId] = useState<string>('bat-dong-san');
   const plansRef = useRef<HTMLDivElement | null>(null);
 
   const selected = CATEGORIES.find(c => c.id === selectedId)!;
@@ -138,7 +122,7 @@ export default function PricingPage() {
 
         {/* ─── Category grid ──────────────────────────────────────── */}
         <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Chọn danh mục</p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-10">
           {CATEGORIES.map(cat => {
             const col = COLOR_MAP[cat.color];
             const isActive = cat.id === selectedId;
