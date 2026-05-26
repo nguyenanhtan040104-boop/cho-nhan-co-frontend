@@ -6,13 +6,23 @@ import { advertisements } from '../../lib/api';
 
 /**
  * Fixed bottom marquee that scrolls active VIP ads horizontally.
+ * When no real VIP ads exist yet, shows a CTA inviting users to advertise.
  * - Hidden after user clicks the close (X) button — remembered in localStorage
  *   for 24h so they don't have to dismiss it every page reload.
- * - Auto-hidden if no featured ads are available.
- * - Each ad is clickable → /advertisements/<id>.
  */
+
+// Fallback CTAs shown when there are no live VIP ads yet — keeps the banner
+// useful from day one and demonstrates the feature.
+const FALLBACK_CTAS = [
+  { title: 'Cửa hàng của bạn?', desc: 'Đẩy quảng cáo lên đầu trang chỉ từ 50.000đ', href: '/advertisements/create' },
+  { title: 'Khai trương — Khuyến mãi', desc: 'Tiếp cận hàng nghìn bà con Đắk Nông', href: '/advertisements/create' },
+  { title: 'Đăng quảng cáo ngay', desc: 'Banner chạy + popup mở trang. Click để bắt đầu', href: '/advertisements/create' },
+  { title: 'Bán nhanh hơn với VIP', desc: 'Hiển thị nổi bật 7-30 ngày', href: '/advertisements' },
+];
+
 export default function AdRollingBanner() {
   const [ads, setAds] = useState<any[]>([]);
+  const [usingFallback, setUsingFallback] = useState(false);
   const [closed, setClosed] = useState(false);
 
   useEffect(() => {
@@ -27,8 +37,15 @@ export default function AdRollingBanner() {
 
     advertisements
       .getFeatured(15)
-      .then(res => setAds(res.data || []))
-      .catch(() => setAds([]));
+      .then(res => {
+        const list = res.data || [];
+        if (list.length > 0) {
+          setAds(list);
+        } else {
+          setUsingFallback(true);
+        }
+      })
+      .catch(() => setUsingFallback(true));
   }, []);
 
   function dismiss() {
@@ -38,34 +55,44 @@ export default function AdRollingBanner() {
     }
   }
 
-  if (closed || ads.length === 0) return null;
+  if (closed) return null;
+  if (ads.length === 0 && !usingFallback) return null; // still loading
 
-  // Duplicate the list so the marquee loops seamlessly
-  const reel = [...ads, ...ads];
+  // Build the reel: real ads first, otherwise fallback CTAs
+  const items = usingFallback
+    ? FALLBACK_CTAS.map((c, i) => ({ id: `fallback-${i}`, _fallback: true, title: c.title, businessName: c.desc, href: c.href }))
+    : ads.map(a => ({ ...a, href: `/advertisements/${a.id}` }));
+
+  // Duplicate so the marquee loops seamlessly
+  const reel = [...items, ...items];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-orange-200 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 shadow-[0_-2px_8px_rgba(234,88,12,0.08)]">
         <div className="relative flex items-center">
-          <div className="flex-shrink-0 px-3 sm:px-4 py-2 bg-orange-600 text-white text-xs font-black tracking-wider uppercase flex items-center gap-1.5">
-            <i className="ri-megaphone-line text-sm"></i>
-            <span className="hidden sm:inline">Quảng cáo</span>
+          <div className={`flex-shrink-0 px-3 sm:px-4 py-2 text-white text-xs font-black tracking-wider uppercase flex items-center gap-1.5 ${
+            usingFallback ? 'bg-gradient-to-r from-orange-500 to-amber-500' : 'bg-orange-600'
+          }`}>
+            <i className={`${usingFallback ? 'ri-megaphone-fill' : 'ri-megaphone-line'} text-sm`}></i>
+            <span className="hidden sm:inline">{usingFallback ? 'Quảng cáo của bạn?' : 'Quảng cáo'}</span>
           </div>
 
           <div className="flex-1 overflow-hidden">
             <div className="ad-marquee-track flex items-center gap-8 whitespace-nowrap py-2">
-              {reel.map((ad, i) => (
+              {reel.map((ad: any, i: number) => (
                 <Link
                   key={`${ad.id}-${i}`}
-                  href={`/advertisements/${ad.id}`}
+                  href={ad.href}
                   className="flex items-center gap-2.5 text-sm hover:opacity-80 transition-opacity"
                 >
-                  {ad.images?.[0] && (
+                  {ad._fallback ? (
+                    <i className="ri-rocket-2-fill text-orange-500 text-base"></i>
+                  ) : ad.images?.[0] ? (
                     <img
                       src={ad.images[0]}
                       alt=""
                       className="w-7 h-7 rounded-lg object-cover flex-shrink-0"
                     />
-                  )}
+                  ) : null}
                   <span className="font-bold text-orange-700">{ad.title}</span>
                   {ad.businessName && (
                     <span className="text-gray-500 hidden md:inline">· {ad.businessName}</span>
