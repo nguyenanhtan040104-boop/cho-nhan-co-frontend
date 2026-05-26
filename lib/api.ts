@@ -738,6 +738,13 @@ export const advertisements = {
   async delete(id: string) {
     return request(`/advertisements/${id}`, { method: 'DELETE' });
   },
+
+  async buyVip(id: string, durationDays: 7 | 30) {
+    return request<{ message: string; vipExpiresAt: string; price: number }>(
+      `/advertisements/${id}/buy-vip`,
+      { method: 'POST', body: JSON.stringify({ durationDays }) },
+    );
+  },
 };
 
 // =================== REVIEWS ===================

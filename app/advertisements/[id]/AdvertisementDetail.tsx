@@ -15,6 +15,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedImg, setSelectedImg] = useState(0);
+  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
 
   useEffect(() => {
     advertisements.getOne(adId)
@@ -77,11 +78,25 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
             {/* Content */}
             <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="flex flex-wrap gap-2 mb-3 items-center">
                 <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded font-medium">
                   {CATEGORIES[ad.category] || ad.category}
                 </span>
-                {ad.isVip && <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded">VIP</span>}
+                {ad.isVip && (
+                  <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs px-2 py-1 rounded font-bold flex items-center gap-1">
+                    <i className="ri-vip-crown-fill"></i>VIP
+                  </span>
+                )}
+                {/* Owner-only: upgrade button */}
+                {currentUserId && (ad.userId === currentUserId || ad.user?.id === currentUserId) && (
+                  <Link
+                    href={`/advertisements/${ad.id}/upgrade`}
+                    className="ml-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
+                  >
+                    <i className="ri-rocket-2-line"></i>
+                    {ad.isVip ? 'Gia hạn VIP' : 'Đẩy lên VIP'}
+                  </Link>
+                )}
               </div>
 
               <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{ad.title}</h1>
