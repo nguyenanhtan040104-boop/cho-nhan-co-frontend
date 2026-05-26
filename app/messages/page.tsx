@@ -33,7 +33,27 @@ export default function MessagesPage() {
   useEffect(() => {
     if (!auth.isLoggedIn()) { router.push('/profile'); return; }
     messagesApi.getConversations()
-      .then((data: any) => setConversations(Array.isArray(data) ? data : []))
+      .then((data: any) => {
+        const list: any[] = Array.isArray(data) ? data : [];
+        // Override unreadCount từ localStorage nếu user đã đọc conversation đó
+        // Chỉ override nếu tin nhắn cuối CHƯA có cái nào mới hơn thời điểm đọc
+        try {
+          const readMap: Record<string, string> = JSON.parse(localStorage.getItem('readConversations') || '{}');
+          setConversations(list.map(c => {
+            const readAt = readMap[c.id];
+            if (!readAt) return c;
+            const lastMsgTime = c.messages?.[0]?.createdAt;
+            // Tin nhắn cuối cũ hơn hoặc bằng thời điểm đọc → override về 0
+            if (!lastMsgTime || new Date(lastMsgTime) <= new Date(readAt)) {
+              return { ...c, unreadCount: 0 };
+            }
+            // Có tin mới hơn thời điểm đọc → giữ nguyên unreadCount từ API
+            return c;
+          }));
+        } catch {
+          setConversations(list);
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -47,12 +67,19 @@ export default function MessagesPage() {
   });
 
   function handleConvClick(conv: any) {
+    // Lưu timestamp vào localStorage — dùng để so sánh với tin nhắn mới
+    try {
+      const readMap: Record<string, string> = JSON.parse(localStorage.getItem('readConversations') || '{}');
+      readMap[conv.id] = new Date().toISOString();
+      localStorage.setItem('readConversations', JSON.stringify(readMap));
+    } catch {}
+
     if (conv.unreadCount > 0) {
-      // Xoa bold ngay lap tuc trong local state
+      // Xóa bold ngay lập tức trong local state
       setConversations(prev => prev.map(c =>
         c.id === conv.id ? { ...c, unreadCount: 0 } : c
       ));
-      // Bao Header giam badge xuong dung so
+      // Báo Header giảm badge xuống đúng số
       window.dispatchEvent(new CustomEvent('conversation-read', {
         detail: { unreadCount: conv.unreadCount }
       }));

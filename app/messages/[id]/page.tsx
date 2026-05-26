@@ -40,6 +40,14 @@ export default function ChatPage() {
     if (!auth.isLoggedIn()) { router.push('/profile'); return; }
     const uid = getCurrentUserId();
     setMyId(uid);
+
+    // Lưu timestamp đọc vào localStorage để trang danh sách biết đã xem
+    try {
+      const readMap: Record<string, string> = JSON.parse(localStorage.getItem('readConversations') || '{}');
+      readMap[conversationId] = new Date().toISOString();
+      localStorage.setItem('readConversations', JSON.stringify(readMap));
+    } catch {}
+
     loadData();
     initSocket(uid);
     return () => {
@@ -60,12 +68,21 @@ export default function ChatPage() {
       const [msgData, convData] = await Promise.allSettled([
         messages.getMessages(conversationId),
         messages.getConversations(),
+        // Đánh dấu đã đọc ngay qua REST — không chờ WebSocket
+        messages.markRead(conversationId),
       ]);
       if (msgData.status === 'fulfilled') setMsgs((msgData.value as any).data || []);
       if (convData.status === 'fulfilled') {
         const convs = convData.value as any[];
         const conv = convs.find((c: any) => c.id === conversationId);
         if (conv?.otherUser) setOtherUser(conv.otherUser);
+        // Cập nhật badge header ngay khi biết unreadCount
+        const unread = conv?.unreadCount || 0;
+        if (unread > 0) {
+          window.dispatchEvent(new CustomEvent('conversation-read', {
+            detail: { unreadCount: unread }
+          }));
+        }
       }
     } catch (e) {
       console.error('loadData error:', e);

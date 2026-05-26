@@ -566,6 +566,11 @@ export const messages = {
   async getBlockedUsers() {
     return request<any>('/conversations/blocks/list');
   },
+
+  // Đánh dấu đã đọc qua REST — gọi ngay khi vào trang chat để đảm bảo server cập nhật
+  async markRead(conversationId: string) {
+    return request(`/conversations/${conversationId}/read`, { method: 'PUT' });
+  },
 };
 
 // =================== NOTIFICATIONS ===================
