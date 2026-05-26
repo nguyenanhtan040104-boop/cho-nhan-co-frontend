@@ -133,9 +133,6 @@ function VipProductContent() {
 
         {/* Hero */}
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i className="ri-vip-crown-2-fill text-yellow-500 text-4xl"></i>
-          </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Tin VIP - Hiển thị nổi bật hơn</h2>
           <p className="text-gray-500 max-w-xl mx-auto">Sản phẩm VIP được ưu tiên hiển thị đầu trang, có nhãn VIP nổi bật, thu hút nhiều người mua hơn</p>
         </div>
@@ -143,14 +140,11 @@ function VipProductContent() {
         {/* Lợi ích */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           {[
-            { icon: 'ri-arrow-up-circle-line', title: 'Hiển thị đầu trang', desc: 'Luôn xuất hiện trên đầu danh sách tìm kiếm', color: 'text-green-600 bg-green-100' },
-            { icon: 'ri-medal-line', title: 'Nhãn VIP nổi bật', desc: 'Badge vàng đặc biệt thu hút sự chú ý', color: 'text-yellow-600 bg-yellow-100' },
-            { icon: 'ri-eye-line', title: 'Nhiều lượt xem hơn', desc: 'Tăng 3-5x lượt xem so với tin thường', color: 'text-blue-600 bg-blue-100' },
+            { title: 'Hiển thị đầu trang', desc: 'Luôn xuất hiện trên đầu danh sách tìm kiếm' },
+            { title: 'Nhãn VIP nổi bật', desc: 'Badge vàng đặc biệt thu hút sự chú ý' },
+            { title: 'Nhiều lượt xem hơn', desc: 'Tăng 3-5x lượt xem so với tin thường' },
           ].map((item, i) => (
             <div key={i} className="bg-white rounded-xl p-5 shadow-sm text-center">
-              <div className={`w-12 h-12 ${item.color} rounded-full flex items-center justify-center mx-auto mb-3`}>
-                <i className={`${item.icon} text-xl`}></i>
-              </div>
               <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
               <p className="text-sm text-gray-500">{item.desc}</p>
             </div>
@@ -198,9 +192,7 @@ function VipProductContent() {
                     {product.images?.[0] ? (
                       <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <i className="ri-image-line text-gray-400"></i>
-                      </div>
+                      <div className="w-full h-full bg-gray-100"></div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -213,7 +205,6 @@ function VipProductContent() {
                 </div>
               ) : !productId ? (
                 <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg mb-4 text-sm text-orange-700">
-                  <i className="ri-information-line mr-1"></i>
                   Chưa chọn sản phẩm. Vào <Link href="/dashboard" className="underline">Dashboard</Link> → Sản phẩm → Nâng VIP
                 </div>
               ) : null}
@@ -238,7 +229,6 @@ function VipProductContent() {
 
               {success ? (
                 <div className="text-center py-4">
-                  <i className="ri-checkbox-circle-fill text-green-500 text-4xl block mb-2"></i>
                   <p className="font-semibold text-green-700">Nâng cấp VIP thành công!</p>
                   <p className="text-sm text-gray-500 mt-1">Đang chuyển về trang quản lý...</p>
                 </div>
@@ -248,7 +238,7 @@ function VipProductContent() {
                   {creating ? (
                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang tạo...</>
                   ) : (
-                    <><i className="ri-bank-card-line"></i> Tiến hành thanh toán</>
+                    <>Tiến hành thanh toán</>
                   )}
                 </button>
               )}

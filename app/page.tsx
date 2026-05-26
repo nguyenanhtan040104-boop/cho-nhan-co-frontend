@@ -91,25 +91,6 @@ export default async function HomePage() {
 
       {/* ===== HERO BANNER ===== */}
       <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingTop: 44, paddingBottom: 24 }}>
-        {/* Organic floating icons */}
-        <div className="absolute top-4 left-6 hidden md:flex w-16 h-16 bg-white/25 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(-14deg)' }}>
-          <i className="ri-home-4-fill text-4xl" style={{ color: 'rgba(0,0,0,0.55)' }}></i>
-        </div>
-        <div className="absolute bottom-10 left-10 hidden md:flex w-12 h-12 bg-white/20 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(8deg)' }}>
-          <i className="ri-leaf-fill text-2xl" style={{ color: 'rgba(0,0,0,0.5)' }}></i>
-        </div>
-        <div className="absolute top-1/2 left-28 hidden lg:flex w-10 h-10 bg-white/20 rounded-xl items-center justify-center pointer-events-none" style={{ transform: 'translateY(-50%) rotate(-6deg)' }}>
-          <i className="ri-briefcase-fill text-xl" style={{ color: 'rgba(0,0,0,0.45)' }}></i>
-        </div>
-        <div className="absolute top-3 right-8 hidden md:flex w-16 h-16 bg-white/25 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(12deg)' }}>
-          <i className="ri-shopping-bag-3-fill text-4xl" style={{ color: 'rgba(0,0,0,0.55)' }}></i>
-        </div>
-        <div className="absolute bottom-8 right-12 hidden md:flex w-12 h-12 bg-white/20 rounded-2xl items-center justify-center pointer-events-none" style={{ transform: 'rotate(-9deg)' }}>
-          <i className="ri-bear-smile-fill text-2xl" style={{ color: 'rgba(0,0,0,0.5)' }}></i>
-        </div>
-        <div className="absolute top-1/2 right-28 hidden lg:flex w-10 h-10 bg-white/20 rounded-xl items-center justify-center pointer-events-none" style={{ transform: 'translateY(-50%) rotate(7deg)' }}>
-          <i className="ri-service-line text-xl" style={{ color: 'rgba(0,0,0,0.45)' }}></i>
-        </div>
 
         {/* Headline — Airbnb: trusts whitespace + tight weight over heavy type */}
         <div className="text-center px-4 relative z-10">
@@ -126,20 +107,11 @@ export default async function HomePage() {
 
         {/* Social proof — authentic, micro */}
         <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5 mt-3 text-xs font-semibold text-gray-800 flex-wrap px-4">
-          <span className="flex items-center gap-1">
-            <i className="ri-store-2-fill text-green-700 text-sm"></i>
-            {totalListings > 0 ? `${totalListings * 8}+ sản phẩm` : '200+ sản phẩm'}
-          </span>
+          <span>{totalListings > 0 ? `${totalListings * 8}+ sản phẩm` : '200+ sản phẩm'}</span>
           <span className="text-gray-600 hidden sm:inline">·</span>
-          <span className="flex items-center gap-1">
-            <i className="ri-user-3-fill text-blue-700 text-sm"></i>
-            Cộng đồng Nhân Cơ
-          </span>
+          <span>Cộng đồng Nhân Cơ</span>
           <span className="text-gray-600 hidden sm:inline">·</span>
-          <span className="flex items-center gap-1">
-            <i className="ri-shield-check-fill text-red-700 text-sm"></i>
-            Miễn phí đăng tin
-          </span>
+          <span>Miễn phí đăng tin</span>
         </div>
       </div>
 
@@ -173,7 +145,6 @@ export default async function HomePage() {
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-amber-800/70 uppercase">Được đề xuất</p>
                 <h2 className="font-extrabold text-amber-900 text-base flex items-center gap-2 mt-0.5" style={{ letterSpacing: '-0.3px' }}>
-                  <i className="ri-vip-crown-fill text-amber-700 text-lg"></i>
                   Tin nổi bật
                   <span className="bg-amber-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">VIP</span>
                 </h2>
@@ -257,19 +228,14 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 divide-x divide-y sm:divide-y-0 divide-gray-100">
             {[
-              { icon: 'ri-shield-check-fill', color: 'text-green-600', bg: 'bg-green-50', title: 'Miễn phí đăng tin', sub: 'Không mất phí cơ bản' },
-              { icon: 'ri-user-voice-fill',   color: 'text-blue-600',  bg: 'bg-blue-50',  title: 'Người thật, tin thật', sub: 'Tài khoản xác minh' },
-              { icon: 'ri-map-pin-fill',      color: 'text-orange-600',bg: 'bg-orange-50',title: 'Giao dịch tại chỗ', sub: 'Nhân Cơ, Đắk Nông' },
-              { icon: 'ri-customer-service-2-fill', color: 'text-purple-600', bg: 'bg-purple-50', title: 'Hỗ trợ nhanh', sub: '0888.317.289' },
+              { title: 'Miễn phí đăng tin', sub: 'Không mất phí cơ bản' },
+              { title: 'Người thật, tin thật', sub: 'Tài khoản xác minh' },
+              { title: 'Giao dịch tại chỗ', sub: 'Nhân Cơ, Đắk Nông' },
+              { title: 'Hỗ trợ nhanh', sub: '0888.317.289' },
             ].map(t => (
-              <div key={t.title} className="flex items-start gap-3 px-4 py-4">
-                <div className={`w-9 h-9 rounded-xl ${t.bg} flex items-center justify-center flex-shrink-0`}>
-                  <i className={`${t.icon} ${t.color} text-lg`}></i>
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-800 leading-tight">{t.title}</p>
-                  <p className="text-[11px] text-gray-400 leading-tight mt-0.5">{t.sub}</p>
-                </div>
+              <div key={t.title} className="px-4 py-4">
+                <p className="text-xs font-bold text-gray-800 leading-tight">{t.title}</p>
+                <p className="text-[11px] text-gray-400 leading-tight mt-0.5">{t.sub}</p>
               </div>
             ))}
           </div>
@@ -282,8 +248,7 @@ export default async function HomePage() {
         <div className="max-w-screen-xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-6">
             <div>
-              <h3 className="font-black text-lg mb-1 text-gray-900 flex items-center gap-1.5">
-                <i className="ri-store-2-fill text-yellow-500"></i>
+              <h3 className="font-black text-lg mb-1 text-gray-900">
                 Chợ Nhân Cơ
               </h3>
               <p className="text-gray-500 text-sm leading-relaxed" style={{ letterSpacing: '-0.1px' }}>
@@ -370,9 +335,6 @@ function Section({ eyebrow, title, icon, iconColor, iconBg, href, badge, childre
           )}
           {/* Airbnb-style section title: display-sm weight, modest size */}
           <h2 className="font-extrabold text-gray-900 flex items-center gap-2" style={{ fontSize: 15, letterSpacing: '-0.3px' }}>
-            <span className={`inline-flex items-center justify-center w-7 h-7 rounded-xl ${iconBg} flex-shrink-0`}>
-              <i className={`${icon} ${iconColor} text-base`}></i>
-            </span>
             {title}
             {badge && (
               <span className="bg-amber-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-0.5">{badge}</span>
@@ -422,9 +384,7 @@ function ListingCard({ item }: { item: any }) {
           <img src={imgUrl} alt={item.title}
             className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-400" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center" style={{ background: '#f5f4ee' }}>
-            <i className="ri-image-line text-3xl text-gray-300"></i>
-          </div>
+          <div className="w-full h-full" style={{ background: '#f5f4ee' }}></div>
         )}
         {/* LikeButton */}
         <LikeButton itemId={String(item.id)} />
@@ -439,8 +399,8 @@ function ListingCard({ item }: { item: any }) {
           <span className="absolute bottom-2 left-2 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">Mới</span>
         )}
         {imgCount > 1 && (
-          <span className="absolute bottom-2 right-2 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 backdrop-blur-sm">
-            <i className="ri-image-2-line text-[10px]"></i> {imgCount}
+          <span className="absolute bottom-2 right-2 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+            {imgCount} ảnh
           </span>
         )}
         {item.isVip && (
@@ -454,9 +414,7 @@ function ListingCard({ item }: { item: any }) {
           <p className="text-sm font-black" style={{ color: '#d0011b', letterSpacing: '-0.2px' }}>{price}</p>
         )}
         {(item.location || item.address) && (
-          <p className="text-[11px] text-gray-400 mt-0.5 truncate flex items-center gap-0.5">
-            <i className="ri-map-pin-line text-[11px]"></i> {item.location || item.address}
-          </p>
+          <p className="text-[11px] text-gray-400 mt-0.5 truncate">{item.location || item.address}</p>
         )}
       </div>
     </Link>
@@ -474,17 +432,15 @@ function ForumRow({ post }: { post: any }) {
           <img src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url}
             alt="" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-cyan-50">
-            <i className="ri-discuss-line text-xl text-cyan-300"></i>
-          </div>
+          <div className="w-full h-full bg-cyan-50"></div>
         )}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug" style={{ letterSpacing: '-0.1px' }}>{post.title}</p>
         <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
           <span className="font-semibold text-gray-600">{post.user?.fullName || post.user?.username || 'Ẩn danh'}</span>
-          <span className="flex items-center gap-0.5"><i className="ri-heart-line"></i> {post.likeCount || 0}</span>
-          <span className="flex items-center gap-0.5"><i className="ri-chat-1-line"></i> {post._count?.comments || 0}</span>
+          <span>{post.likeCount || 0} thích</span>
+          <span>{post._count?.comments || 0} bình luận</span>
           {post.createdAt && <span className="ml-auto">{timeAgo(post.createdAt)}</span>}
         </div>
       </div>
@@ -495,10 +451,7 @@ function ForumRow({ post }: { post: any }) {
 // EmptyBlock — Pinterest feature-card: warm surface-card, not cold gray
 function EmptyBlock({ label, icon = 'ri-inbox-line' }: { label: string; icon?: string }) {
   return (
-    <div className="py-10 text-center flex flex-col items-center mx-4 my-3 rounded-xl" style={{ background: PAGE_BG }}>
-      <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center mb-3 shadow-sm">
-        <i className={`${icon} text-2xl text-gray-300`}></i>
-      </div>
+    <div className="py-10 text-center mx-4 my-3 rounded-xl" style={{ background: PAGE_BG }}>
       <p className="text-sm text-gray-400 font-medium">{label}</p>
       <p className="text-xs text-gray-300 mt-1">Hãy là người đầu tiên đăng tin!</p>
     </div>
