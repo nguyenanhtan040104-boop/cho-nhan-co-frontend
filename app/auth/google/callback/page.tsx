@@ -1,22 +1,29 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 
 function GoogleCallbackContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const accessToken = searchParams.get('accessToken');
-    const refreshToken = searchParams.get('refreshToken');
-    const error = searchParams.get('error');
+    // Tokens are passed via URL fragment (#) — never sent to servers,
+    // never logged, never leaked via Referer headers.
+    const hash = window.location.hash.slice(1); // strip leading '#'
+    const params = new URLSearchParams(hash);
+
+    const accessToken = params.get('accessToken');
+    const refreshToken = params.get('refreshToken');
+    const error = params.get('error');
 
     if (error || !accessToken) {
       router.replace('/profile?error=google_failed');
       return;
     }
+
+    // Clear fragment immediately so tokens don't linger in browser history
+    window.history.replaceState(null, '', window.location.pathname);
 
     // Lưu tokens
     localStorage.setItem('accessToken', accessToken);
@@ -24,12 +31,12 @@ function GoogleCallbackContent() {
 
     // Lưu user info
     const user = {
-      id: searchParams.get('userId') || '',
-      fullName: searchParams.get('fullName') || '',
-      email: searchParams.get('email') || '',
-      username: searchParams.get('username') || '',
-      avatarUrl: searchParams.get('avatarUrl') || '',
-      role: searchParams.get('role') || 'USER',
+      id: params.get('userId') || '',
+      fullName: params.get('fullName') || '',
+      email: params.get('email') || '',
+      username: params.get('username') || '',
+      avatarUrl: params.get('avatarUrl') || '',
+      role: params.get('role') || 'USER',
     };
     localStorage.setItem('user', JSON.stringify(user));
 
