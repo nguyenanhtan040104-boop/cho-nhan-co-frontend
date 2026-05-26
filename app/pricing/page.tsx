@@ -45,14 +45,6 @@ const CATEGORIES = [
     color: 'teal',
     prices: { vip7: 30000, vip30: 75000 },
   },
-  {
-    id: 'quang-cao',
-    name: 'Quảng cáo & Khuyến mãi',
-    desc: 'Đẩy thương hiệu, ưu đãi',
-    icon: 'ri-megaphone-line',
-    color: 'purple',
-    prices: { vip7: 50000, vip30: 129000 },
-  },
 ];
 
 // Tailwind needs full class strings to scan — explicit color map
