@@ -51,7 +51,7 @@ const CATEGORIES = [
     desc: 'Thời vụ, mùa gặt, mùa hái',
     icon: 'ri-briefcase-line',
     color: 'blue',
-    prices: { vip7: 0, vip30: 19000 },
+    prices: { vip7: 5000, vip30: 19000 },
   },
   {
     id: 'do-cu',
@@ -59,7 +59,7 @@ const CATEGORIES = [
     desc: 'Thanh lý, hàng đã qua sử dụng',
     icon: 'ri-shopping-bag-line',
     color: 'purple',
-    prices: { vip7: 0, vip30: 15000 },
+    prices: { vip7: 5000, vip30: 15000 },
   },
   {
     id: 'dien-dan',
@@ -203,14 +203,14 @@ export default function PricingPage() {
             <PlanCard
               title="Gói 7 ngày"
               price={formatMoney(selected.prices.vip7)}
-              period={selected.prices.vip7 === 0 ? 'tặng miễn phí' : '/ 7 ngày'}
+              period="/ 7 ngày"
               features={[
                 'Đẩy lên đầu danh sách',
                 'Hiển thị 7 ngày VIP',
                 'Ảnh không giới hạn',
                 'Có nhãn nổi bật',
               ]}
-              cta={selected.prices.vip7 === 0 ? 'Dùng ngay' : 'Mua ngay'}
+              cta="Mua ngay"
               ctaHref={`/dashboard?upgrade=${selected.id}&plan=vip-7`}
               color={selected.color}
             />
@@ -275,7 +275,7 @@ export default function PricingPage() {
           />
           <FaqItem
             q="Tại sao giá khác nhau giữa các danh mục?"
-            a="Các danh mục như Đất - Vườn hoặc Máy nông nghiệp có giá trị cao và ít người mua hơn, nên cần thời gian hiển thị lâu hơn để tìm khách. Các danh mục như Việc làm thời vụ và Đồ dùng cũ thường có hỗ trợ miễn phí gói 7 ngày."
+            a="Các danh mục như Đất - Vườn hoặc Máy nông nghiệp có giá trị cao và ít người mua hơn, nên giá VIP cao hơn để bù lại thời gian tìm khách. Việc làm và Đồ dùng cũ có giá thấp hơn vì người mua chủ yếu trong vùng."
           />
           <FaqItem
             q="Tôi có được hoàn tiền nếu bán được sớm không?"
