@@ -613,15 +613,33 @@ export const analytics = {
 
 export const uploads = {
   async uploadImage(file: File): Promise<{ url: string; key: string }> {
-    const token = getToken();
-    const formData = new FormData();
-    formData.append('file', file);
+    const doUpload = async () => {
+      const token = getToken();
+      const formData = new FormData();
+      formData.append('file', file);
+      // NOTE: never set Content-Type here — the browser must add the
+      // multipart boundary automatically for FormData.
+      return fetch(`${API_URL}/uploads/image`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+    };
 
-    const res = await fetch(`${API_URL}/uploads/image`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    });
+    let res = await doUpload();
+
+    // Access token expired → refresh once and retry (same as request())
+    if (res.status === 401) {
+      const refreshed = await tryRefreshToken();
+      if (refreshed) {
+        res = await doUpload();
+      } else {
+        // Refresh failed → session truly expired
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+      }
+    }
 
     if (!res.ok) throw await res.json();
     return res.json();
