@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { advertisements } from '../../lib/api';
 
@@ -21,11 +22,16 @@ const FALLBACK_CTAS = [
 ];
 
 export default function AdRollingBanner() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+
   const [ads, setAds] = useState<any[]>([]);
   const [usingFallback, setUsingFallback] = useState(false);
   const [closed, setClosed] = useState(false);
 
   useEffect(() => {
+    if (!isHome) return; // only fetch/show on homepage
+
     // Respect user's recent dismissal (24h)
     if (typeof window !== 'undefined') {
       const until = Number(localStorage.getItem('adBannerHiddenUntil') || 0);
@@ -46,7 +52,9 @@ export default function AdRollingBanner() {
         }
       })
       .catch(() => setUsingFallback(true));
-  }, []);
+  }, [isHome]);
+
+  if (!isHome) return null;
 
   function dismiss() {
     setClosed(true);

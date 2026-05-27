@@ -11,6 +11,7 @@ const CATEGORIES = [
     desc: 'Đất ruộng, vườn cây, nhà vườn',
     icon: 'ri-landscape-line',
     color: 'amber',
+    dashboardTab: 'real-estate',
     prices: { vip7: 70000, vip30: 199000 },
   },
   {
@@ -19,6 +20,7 @@ const CATEGORIES = [
     desc: 'Lúa, gạo, rau, củ, trái cây',
     icon: 'ri-leaf-line',
     color: 'emerald',
+    dashboardTab: 'products',
     prices: { vip7: 30000, vip30: 79000 },
   },
   {
@@ -27,6 +29,7 @@ const CATEGORIES = [
     desc: 'Trâu, bò, gà, vịt, heo',
     icon: 'ri-heart-pulse-line',
     color: 'orange',
+    dashboardTab: 'vat-nuoi',
     prices: { vip7: 35000, vip30: 89000 },
   },
   {
@@ -35,6 +38,7 @@ const CATEGORIES = [
     desc: 'Thời vụ, mùa gặt, công nhật',
     icon: 'ri-briefcase-line',
     color: 'blue',
+    dashboardTab: 'jobs',
     prices: { vip7: 30000, vip30: 79000 },
   },
   {
@@ -43,6 +47,7 @@ const CATEGORIES = [
     desc: 'Sửa chữa, vận chuyển, thuê thợ',
     icon: 'ri-customer-service-2-line',
     color: 'teal',
+    dashboardTab: 'dich-vu',
     prices: { vip7: 30000, vip30: 75000 },
   },
 ];
@@ -186,8 +191,8 @@ export default function PricingPage() {
                 'Ảnh không giới hạn',
                 'Có nhãn nổi bật',
               ]}
-              cta="Mua ngay"
-              ctaHref={`/dashboard?upgrade=${selected.id}&plan=vip-7`}
+              cta="Chọn bài để nâng"
+              ctaHref={`/dashboard?tab=${selected.dashboardTab}`}
               color={selected.color}
             />
 
@@ -203,8 +208,8 @@ export default function PricingPage() {
                 'Có nhãn nổi bật',
                 'Ưu tiên hiển thị cao nhất',
               ]}
-              cta="Mua ngay"
-              ctaHref={`/dashboard?upgrade=${selected.id}&plan=vip-30`}
+              cta="Chọn bài để nâng"
+              ctaHref={`/dashboard?tab=${selected.dashboardTab}`}
               color={selected.color}
               highlight
               badge="Tiết kiệm hơn"
