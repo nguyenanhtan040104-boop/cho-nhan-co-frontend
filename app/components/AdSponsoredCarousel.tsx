@@ -1,85 +1,74 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { advertisements } from '../../lib/api';
 
-type SponsoredAd = {
+type Slide = {
   id: string;
   href: string;
   title: string;
   description?: string;
-  image?: string;
-  businessName?: string;
-  category?: string;
-  ownerName?: string;
-  packageLabel?: string;
-  _isFallback?: boolean;
+  image: string;
+  storeName?: string;
+  cta: string;
 };
 
-const FALLBACK_ADS: SponsoredAd[] = [
+// Local Nhân Cơ / Đắk Nông flavor — coffee, pepper, farmland, shops, services, events
+const FALLBACK_SLIDES: Slide[] = [
   {
-    id: 'cta-1',
+    id: 'fb-coffee',
     href: '/advertisements/create',
-    title: 'Cửa hàng tạp hóa, quán ăn, dịch vụ?',
-    description: 'Đẩy thương hiệu lên đầu trang chủ, tiếp cận hàng nghìn bà con tại Đắk Nông.',
-    image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=600&fit=crop&q=80',
-    businessName: 'Quảng cáo của bạn',
-    packageLabel: 'Gói 7 ngày · 50.000đ',
-    ownerName: 'Chợ Nhân Cơ',
-    _isFallback: true,
+    title: 'Cà phê Đắk Nông — Đẩy thương hiệu lên top',
+    description: 'Cho hộ rang xay, vườn cà phê, quán cà phê tại Nhân Cơ. Tiếp cận hàng nghìn khách hàng trong vùng.',
+    image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=1600&h=900&fit=crop&q=80',
+    storeName: 'Quảng cáo · Nông sản',
+    cta: 'Đăng quảng cáo ngay',
   },
   {
-    id: 'cta-2',
+    id: 'fb-pepper',
     href: '/advertisements/create',
-    title: 'Khai trương — Khuyến mãi mở cửa',
-    description: 'Cho cửa hàng tạp hóa, quán ăn — thông báo khai trương đến cả cộng đồng.',
-    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&h=600&fit=crop&q=80',
-    businessName: 'Quảng cáo của bạn',
-    packageLabel: 'Tiết kiệm 30%',
-    ownerName: 'Chợ Nhân Cơ',
-    _isFallback: true,
+    title: 'Hồ tiêu Nhân Cơ — Tăng đầu ra cho mùa vụ',
+    description: 'Quảng bá vườn tiêu, sản phẩm tiêu sạch đến thương lái và khách hàng tại Đắk Nông.',
+    image: 'https://images.unsplash.com/photo-1599909366516-6c1d0e5b3e9b?w=1600&h=900&fit=crop&q=80',
+    storeName: 'Quảng cáo · Nông sản',
+    cta: 'Đăng quảng cáo ngay',
   },
   {
-    id: 'cta-3',
+    id: 'fb-land',
     href: '/advertisements/create',
-    title: 'Sự kiện cộng đồng, hội chợ, lễ hội',
-    description: 'Đẩy thông tin sự kiện đến đông đảo bà con trong vùng với gói 30 ngày.',
-    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=600&fit=crop&q=80',
-    businessName: 'Quảng cáo của bạn',
-    packageLabel: 'Gói 30 ngày · 149.000đ',
-    ownerName: 'Chợ Nhân Cơ',
-    _isFallback: true,
+    title: 'Đất rẫy, vườn cây — Bán nhanh trong tuần',
+    description: 'Đẩy tin đất nông nghiệp, rẫy cà phê, vườn tiêu lên đầu trang. Khách thật, gần nhà.',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&h=900&fit=crop&q=80',
+    storeName: 'Quảng cáo · Bất động sản',
+    cta: 'Đăng quảng cáo ngay',
   },
   {
-    id: 'cta-4',
+    id: 'fb-shop',
     href: '/advertisements/create',
-    title: 'Bán nhanh hơn với nhãn VIP',
-    description: 'Bài đăng có nhãn VIP nổi bật, đẩy lên top tìm kiếm và carousel này.',
-    image: 'https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=800&h=600&fit=crop&q=80',
-    businessName: 'Quảng cáo của bạn',
-    packageLabel: 'Bắt đầu từ 50.000đ',
-    ownerName: 'Chợ Nhân Cơ',
-    _isFallback: true,
+    title: 'Tạp hóa, quán ăn — Khai trương, khuyến mãi',
+    description: 'Cửa hàng địa phương, dịch vụ sửa chữa, vận chuyển. Thông báo đến cả cộng đồng Nhân Cơ.',
+    image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1600&h=900&fit=crop&q=80',
+    storeName: 'Quảng cáo · Cửa hàng & Dịch vụ',
+    cta: 'Đăng quảng cáo ngay',
+  },
+  {
+    id: 'fb-event',
+    href: '/advertisements/create',
+    title: 'Sự kiện cộng đồng — Hội chợ, lễ hội',
+    description: 'Quảng bá hội chợ nông sản, ngày hội cà phê, sự kiện làng xã đến đông đảo bà con.',
+    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&h=900&fit=crop&q=80',
+    storeName: 'Quảng cáo · Sự kiện',
+    cta: 'Đăng quảng cáo ngay',
   },
 ];
-
-const CATEGORY_LABEL: Record<string, string> = {
-  KHAI_TRUONG: 'Khai trương',
-  KHUYEN_MAI: 'Khuyến mãi',
-  SAN_PHAM_MOI: 'Sản phẩm mới',
-  DICH_VU: 'Dịch vụ',
-  SU_KIEN: 'Sự kiện',
-  KHAC: 'Khác',
-};
 
 const AUTO_PLAY_MS = 5000;
 
 export default function AdSponsoredCarousel() {
-  const [ads, setAds] = useState<SponsoredAd[]>([]);
+  const [slides, setSlides] = useState<Slide[]>([]);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
-  const trackRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -87,72 +76,43 @@ export default function AdSponsoredCarousel() {
       .getFeatured(8)
       .then(res => {
         const list = res.data || [];
-        if (list.length > 0) {
-          setAds(list.map((ad: any) => ({
-            id: ad.id,
-            href: `/advertisements/${ad.id}`,
-            title: ad.title,
-            description: ad.description,
-            image: ad.images?.[0],
-            businessName: ad.businessName,
-            category: ad.category,
-            ownerName: ad.user?.fullName || ad.user?.username,
-            packageLabel: CATEGORY_LABEL[ad.category] || ad.category,
-          })));
+        if (list.length > 0 && list.some((ad: any) => ad.images?.[0])) {
+          setSlides(
+            list
+              .filter((ad: any) => ad.images?.[0])
+              .map((ad: any) => ({
+                id: ad.id,
+                href: `/advertisements/${ad.id}`,
+                title: ad.title,
+                description: ad.description,
+                image: ad.images[0],
+                storeName: ad.businessName || ad.user?.fullName,
+                cta: 'Xem chi tiết',
+              })),
+          );
         } else {
-          setAds(FALLBACK_ADS);
+          setSlides(FALLBACK_SLIDES);
         }
       })
-      .catch(() => setAds(FALLBACK_ADS));
-  }, []);
-
-  // Scroll helper — moves the track to the i-th card
-  const goTo = useCallback((i: number) => {
-    if (!trackRef.current) return;
-    const card = trackRef.current.children[0] as HTMLElement | undefined;
-    if (!card) return;
-    const cardWidth = card.offsetWidth + 16; // 16px gap
-    trackRef.current.scrollTo({ left: cardWidth * i, behavior: 'smooth' });
-    setActive(i);
+      .catch(() => setSlides(FALLBACK_SLIDES));
   }, []);
 
   const next = useCallback(() => {
-    if (ads.length === 0) return;
-    goTo((active + 1) % ads.length);
-  }, [active, ads.length, goTo]);
+    setActive(prev => (slides.length === 0 ? 0 : (prev + 1) % slides.length));
+  }, [slides.length]);
 
   const prev = useCallback(() => {
-    if (ads.length === 0) return;
-    goTo((active - 1 + ads.length) % ads.length);
-  }, [active, ads.length, goTo]);
+    setActive(prev => (slides.length === 0 ? 0 : (prev - 1 + slides.length) % slides.length));
+  }, [slides.length]);
 
   // Autoplay
   useEffect(() => {
-    if (paused || ads.length <= 1) return;
+    if (paused || slides.length <= 1) return;
     const t = setInterval(next, AUTO_PLAY_MS);
     return () => clearInterval(t);
-  }, [paused, ads.length, next]);
+  }, [paused, slides.length, next]);
 
-  // Track active index when user scrolls manually
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const card = track.children[0] as HTMLElement | undefined;
-        if (!card) return;
-        const cardWidth = card.offsetWidth + 16;
-        const i = Math.round(track.scrollLeft / cardWidth);
-        setActive(i);
-      });
-    };
-    track.addEventListener('scroll', onScroll, { passive: true });
-    return () => { track.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); };
-  }, [ads.length]);
-
-  // Touch swipe (in case browser doesn't auto-snap)
+  // Touch swipe
   function onTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX; }
   function onTouchEnd(e: React.TouchEvent) {
     if (touchStartX.current === null) return;
@@ -162,78 +122,66 @@ export default function AdSponsoredCarousel() {
     touchStartX.current = null;
   }
 
-  if (ads.length === 0) {
+  if (slides.length === 0) {
     return (
-      <section className="mt-3 bg-white rounded-2xl p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-        <div className="flex gap-3 overflow-hidden">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="flex-shrink-0 w-[85%] md:w-[48%] lg:w-[31%] bg-gray-100 rounded-2xl animate-pulse" style={{ aspectRatio: '4/5' }} />
-          ))}
-        </div>
-      </section>
+      <div
+        className="mt-3 w-full rounded-3xl bg-gradient-to-br from-orange-100 via-amber-50 to-orange-50 animate-pulse"
+        style={{ height: 'clamp(220px, 30vw, 380px)' }}
+      />
     );
   }
 
   return (
     <section
-      className="mt-3 bg-white rounded-2xl overflow-hidden"
-      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+      className="mt-3 relative w-full overflow-hidden rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-50">
-        <div>
-          <p className="text-[9px] font-bold tracking-widest text-orange-600 uppercase mb-1 flex items-center gap-1.5">
-            <i className="ri-megaphone-fill text-sm"></i>
-            Quảng cáo
-          </p>
-          <h2 className="font-extrabold text-gray-900 flex items-center gap-2" style={{ fontSize: 15, letterSpacing: '-0.3px' }}>
-            Tài trợ bởi cộng đồng
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
+      {/* Slides — each is absolutely positioned and cross-faded for smooth single-slide transitions */}
+      <div className="relative w-full h-[220px] md:h-[280px] lg:h-[380px]">
+        {slides.map((slide, i) => (
+          <SlideContent key={slide.id} slide={slide} active={i === active} />
+        ))}
+      </div>
+
+      {/* 'Quảng cáo' badge — top left */}
+      <div className="absolute top-4 left-4 z-20 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-black tracking-widest uppercase flex items-center gap-1.5 shadow-lg">
+        <i className="ri-megaphone-fill text-sm"></i>
+        Quảng cáo
+      </div>
+
+      {/* Prev/Next — grouped on the right side (top) */}
+      {slides.length > 1 && (
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
           <button
             onClick={prev}
             aria-label="Trước"
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/35 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-lg transition-all hover:scale-110"
           >
-            <i className="ri-arrow-left-s-line text-lg"></i>
+            <i className="ri-arrow-left-s-line text-xl"></i>
           </button>
           <button
             onClick={next}
             aria-label="Sau"
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/35 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-lg transition-all hover:scale-110"
           >
-            <i className="ri-arrow-right-s-line text-lg"></i>
+            <i className="ri-arrow-right-s-line text-xl"></i>
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Card track */}
-      <div
-        ref={trackRef}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        className="flex gap-4 px-4 py-4 overflow-x-auto snap-x snap-mandatory scroll-smooth"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' as any }}
-      >
-        <style jsx>{`
-          div::-webkit-scrollbar { display: none; }
-        `}</style>
-        {ads.map(ad => <AdCard key={ad.id} ad={ad} />)}
-      </div>
-
-      {/* Pagination dots */}
-      {ads.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 pb-4">
-          {ads.map((_, i) => (
+      {/* Pagination dots — bottom center */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md border border-white/15">
+          {slides.map((_, i) => (
             <button
               key={i}
-              onClick={() => goTo(i)}
-              aria-label={`Đến quảng cáo ${i + 1}`}
+              onClick={() => setActive(i)}
+              aria-label={`Đến slide ${i + 1}`}
               className={`transition-all rounded-full ${
-                i === active ? 'w-6 h-1.5 bg-orange-500' : 'w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400'
+                i === active ? 'w-7 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/45 hover:bg-white/80'
               }`}
             />
           ))}
@@ -243,73 +191,55 @@ export default function AdSponsoredCarousel() {
   );
 }
 
-// ─── Card ──────────────────────────────────────────────────────────────
-function AdCard({ ad }: { ad: SponsoredAd }) {
+// ─── Single slide ──────────────────────────────────────────────────────
+function SlideContent({ slide, active }: { slide: Slide; active: boolean }) {
   return (
     <Link
-      href={ad.href}
-      className="group flex-shrink-0 w-[85%] md:w-[48%] lg:w-[31%] snap-start bg-white rounded-2xl overflow-hidden border border-gray-100 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.10)] transition-all duration-300"
+      href={slide.href}
+      tabIndex={active ? 0 : -1}
+      aria-hidden={!active}
+      className={`absolute inset-0 block transition-opacity duration-700 ease-out ${
+        active ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+      }`}
     >
-      {/* Image */}
-      <div className="relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
-        {ad.image ? (
-          <img
-            src={ad.image}
-            alt={ad.title}
-            className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center">
-            <i className="ri-megaphone-line text-5xl text-white/80"></i>
-          </div>
-        )}
+      {/* Background image */}
+      <img
+        src={slide.image}
+        alt={slide.title}
+        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] ease-out ${
+          active ? 'scale-100' : 'scale-105'
+        }`}
+        loading={active ? 'eager' : 'lazy'}
+      />
 
-        {/* 'Quảng cáo' badge */}
-        <div className="absolute top-2.5 left-2.5 bg-white/85 backdrop-blur-md border border-white/40 text-orange-700 text-[10px] font-black tracking-wider uppercase px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
-          <i className="ri-megaphone-fill text-xs"></i>
-          Quảng cáo
-        </div>
+      {/* Dark gradient overlay — bottom-left to top-right so text on left is legible */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/50 to-transparent" />
+      {/* Extra bottom-vignette for dots/buttons contrast */}
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
 
-        {/* Package label badge — top right */}
-        {ad.packageLabel && (
-          <div className="absolute top-2.5 right-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
-            {ad.packageLabel}
-          </div>
-        )}
-
-        {/* Bottom glass info bar (business name) */}
-        {ad.businessName && (
-          <div className="absolute bottom-2.5 left-2.5 right-2.5">
-            <div className="bg-black/35 backdrop-blur-md border border-white/15 rounded-xl px-3 py-1.5 text-white text-xs font-semibold truncate">
-              {ad.businessName}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="p-4">
-        <h3 className="font-black text-gray-900 leading-tight line-clamp-2 mb-1.5" style={{ fontSize: 15, letterSpacing: '-0.2px' }}>
-          {ad.title}
-        </h3>
-        {ad.description && (
-          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-3">
-            {ad.description}
-          </p>
-        )}
-
-        {/* Footer: owner + CTA */}
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-50">
-          <div className="flex items-center gap-1.5 min-w-0 flex-1">
-            <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <i className="ri-store-2-line text-orange-600 text-xs"></i>
-            </div>
-            <span className="text-[11px] text-gray-500 font-medium truncate">{ad.ownerName || 'Quảng cáo'}</span>
-          </div>
-          <span className="inline-flex items-center gap-0.5 bg-orange-50 text-orange-700 text-[11px] font-bold px-2.5 py-1 rounded-full group-hover:bg-orange-600 group-hover:text-white transition-colors">
-            Xem
-            <i className="ri-arrow-right-line text-sm"></i>
+      {/* Content — glassmorphism box on the left */}
+      <div className="absolute inset-0 flex items-end md:items-center p-4 sm:p-6 lg:p-10">
+        <div className="w-full max-w-[88%] sm:max-w-md lg:max-w-lg bg-white/12 backdrop-blur-md border border-white/25 rounded-2xl p-4 sm:p-5 lg:p-6 shadow-2xl">
+          {slide.storeName && (
+            <p className="text-[10px] sm:text-xs font-black tracking-widest text-white/90 uppercase mb-1.5 sm:mb-2 flex items-center gap-2">
+              <span className="inline-block w-4 sm:w-5 h-px bg-white/80"></span>
+              {slide.storeName}
+            </p>
+          )}
+          <h3
+            className="text-white font-black leading-tight mb-1.5 sm:mb-2.5 line-clamp-2"
+            style={{ fontSize: 'clamp(1.05rem, 2.4vw, 1.75rem)', letterSpacing: '-0.5px' }}
+          >
+            {slide.title}
+          </h3>
+          {slide.description && (
+            <p className="text-white/85 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 line-clamp-2 lg:line-clamp-3">
+              {slide.description}
+            </p>
+          )}
+          <span className="inline-flex items-center gap-1.5 bg-white text-gray-900 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-lg group-hover:scale-105 transition-transform">
+            {slide.cta}
+            <i className="ri-arrow-right-line"></i>
           </span>
         </div>
       </div>
