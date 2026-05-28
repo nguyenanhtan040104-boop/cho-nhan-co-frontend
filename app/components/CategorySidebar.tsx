@@ -2,11 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { advertisements } from '../../lib/api';
+import { advertisements, search as searchApi } from '../../lib/api';
 
 type Props = {
   vipItems?: any[];                  // optional: featured VIP listings from the page
-  popularSearches?: string[];
+  /** Backend category slug — used to scope popular-search aggregation */
+  popularCategory?: string;
+  /** Fallback list shown only when the API returns zero rows */
+  fallbackSearches?: string[];
   searchHref?: (q: string) => string;
   postHref: string;
   postLabel: string;
@@ -22,15 +25,15 @@ const DEFAULT_TIPS = [
   'Không chia sẻ OTP / mật khẩu cho bất kỳ ai',
 ];
 
-const DEFAULT_SEARCHES = [
-  'Cà phê', 'Hồ tiêu', 'Sầu riêng', 'Bơ booth', 'Mít', 'Cao su', 'Điều', 'Mắc ca',
-];
+// Last-resort fallback if both popular-by-category and global return empty.
+const SEED_SEARCHES = ['Cà phê', 'Hồ tiêu', 'Sầu riêng', 'Bơ', 'Mít', 'Cao su'];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 export default function CategorySidebar({
   vipItems = [],
-  popularSearches = DEFAULT_SEARCHES,
+  popularCategory,
+  fallbackSearches = SEED_SEARCHES,
   searchHref,
   postHref,
   postLabel,
@@ -38,6 +41,34 @@ export default function CategorySidebar({
   showAd = true,
   itemHref = (item) => `/products/${item.id}`,
 }: Props) {
+  const [popular, setPopular] = useState<string[]>([]);
+
+  // Fetch popular searches: first scoped to this category, then global as fallback
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        if (popularCategory) {
+          const res = await searchApi.getPopular({ limit: 8, category: popularCategory });
+          if (!cancelled && res?.data?.length) {
+            setPopular(res.data.map(r => r.query));
+            return;
+          }
+        }
+        const global = await searchApi.getPopular({ limit: 8 });
+        if (!cancelled && global?.data?.length) {
+          setPopular(global.data.map(r => r.query));
+          return;
+        }
+        if (!cancelled) setPopular(fallbackSearches);
+      } catch {
+        if (!cancelled) setPopular(fallbackSearches);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [popularCategory, fallbackSearches]);
+
   return (
     <aside className="space-y-3 lg:sticky lg:top-4 self-start text-[13px]">
 
@@ -75,19 +106,27 @@ export default function CategorySidebar({
       {/* ── 2. Quảng cáo địa phương ────────────────────────────────── */}
       {showAd && <SidebarAdSlot />}
 
-      {/* ── 3. Từ khóa phổ biến ────────────────────────────────────── */}
+      {/* ── 3. Từ khóa phổ biến (realtime) ──────────────────────────── */}
       <Widget title="Từ khóa phổ biến" eyebrow="Bà con đang tìm">
-        <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1.5">
-          {popularSearches.map((q) => (
-            <Link
-              key={q}
-              href={searchHref ? searchHref(q) : `/products?search=${encodeURIComponent(q)}`}
-              className="px-2 py-0.5 text-[12px] text-gray-600 border border-stone-200 rounded hover:border-stone-400 hover:text-gray-900 transition-colors"
-            >
-              {q}
-            </Link>
-          ))}
-        </div>
+        {popular.length === 0 ? (
+          <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1.5">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="h-5 w-14 bg-stone-100 rounded animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1.5">
+            {popular.map((q) => (
+              <Link
+                key={q}
+                href={searchHref ? searchHref(q) : `/products?search=${encodeURIComponent(q)}`}
+                className="px-2 py-0.5 text-[12px] text-gray-600 border border-stone-200 rounded hover:border-stone-400 hover:text-gray-900 transition-colors capitalize"
+              >
+                {q}
+              </Link>
+            ))}
+          </div>
+        )}
       </Widget>
 
       {/* ── 4. Mẹo mua bán an toàn ─────────────────────────────────── */}

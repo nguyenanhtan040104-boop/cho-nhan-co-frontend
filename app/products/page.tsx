@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { products as productsApi, auth } from '../../lib/api';
+import { products as productsApi, auth, search as searchApi } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 import LikeButton from '../components/LikeButton';
@@ -88,6 +88,8 @@ function ProductsInner() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setPage(1);
+    // Log popular-search tracking (fire-and-forget)
+    if (search.trim()) searchApi.log(search, 'products');
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (category) params.set('category', category);
@@ -278,11 +280,13 @@ function ProductsInner() {
           <div className="hidden lg:block">
             <CategorySidebar
               vipItems={vipItems}
-              popularSearches={POPULAR_SEARCHES}
+              popularCategory="products"
+              fallbackSearches={POPULAR_SEARCHES}
               searchHref={(q) => `/products?search=${encodeURIComponent(q)}`}
               itemHref={(item) => `/products/${item.id}`}
               postHref="/products/create"
               postLabel="Đăng tin sản phẩm"
+              showAd={false}
             />
           </div>
         </div>

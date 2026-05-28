@@ -765,6 +765,30 @@ export const advertisements = {
   },
 };
 
+// =================== SEARCH ===================
+
+export const search = {
+  /** Log a search query (fire-and-forget — caller doesn't need to await) */
+  log(query: string, category = '') {
+    const q = (query || '').trim();
+    if (q.length < 2) return;
+    // Don't await — failures must not break UX
+    request('/search/log', {
+      method: 'POST',
+      body: JSON.stringify({ query: q, category }),
+    }).catch(() => {});
+  },
+
+  async getPopular(opts: { limit?: number; category?: string } = {}) {
+    const params = new URLSearchParams();
+    if (opts.limit) params.set('limit', String(opts.limit));
+    if (opts.category !== undefined) params.set('category', opts.category);
+    return request<{ data: { query: string; count: number; category: string }[] }>(
+      `/search/popular?${params.toString()}`,
+    );
+  },
+};
+
 // =================== REVIEWS ===================
 
 export const reviews = {
