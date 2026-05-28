@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { products as productsApi, uploads, users as usersApi } from '../../../lib/api';
 import { auth as _auth } from '../../../lib/api';
+import GPSLocationPicker from '../../components/GPSLocationPicker';
 
 const CATEGORY_CONFIG: Record<string, { label: string; backHref: string; successHref: string; color: string }> = {
   NONG_SAN:        { label: 'Nông sản',  backHref: '/products', successHref: '/products', color: 'green' },
@@ -54,6 +55,7 @@ function CreateProductContent() {
     contactPhone: '',
     quantity: '',
   });
+  const [gps, setGps] = useState<{ latitude: number | null; longitude: number | null }>({ latitude: null, longitude: null });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -118,6 +120,8 @@ function CreateProductContent() {
         unit: formData.unit,
         description: descWithSub,
         location: formData.location,
+        latitude: gps.latitude ?? undefined,
+        longitude: gps.longitude ?? undefined,
         contactPhone: formData.contactPhone || undefined,
         quantity: formData.quantity ? Number(formData.quantity) : undefined,
         images: imageUrls,
@@ -327,6 +331,18 @@ function CreateProductContent() {
                   placeholder="0912345678"
                   className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 outline-none ${ringClass}`} />
               </div>
+            </div>
+
+            {/* Vị trí GPS (tùy chọn) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Vị trí GPS <span className="text-gray-400 font-normal">(tùy chọn)</span>
+              </label>
+              <GPSLocationPicker
+                value={gps}
+                onChange={setGps}
+                label="Lấy vị trí GPS hiện tại của tôi"
+              />
             </div>
 
             {/* Buttons */}

@@ -231,6 +231,8 @@ export const products = {
     unit: string;
     quantity?: number;
     location: string;
+    latitude?: number;
+    longitude?: number;
     contactPhone?: string;
     images?: string[];
   }) {

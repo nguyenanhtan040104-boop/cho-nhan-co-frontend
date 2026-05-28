@@ -8,6 +8,7 @@ import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 import LikeButton from '../components/LikeButton';
 import CategorySidebar from '../components/CategorySidebar';
+import { getUserLocation, captureUserLocation, clearUserLocation, distanceKm, formatDistance, type UserLocation } from '../../lib/userLocation';
 
 const CATEGORIES = [
   { value: '', name: 'Tất cả' },
@@ -64,6 +65,23 @@ function ProductsInner() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
+  const [locating, setLocating] = useState(false);
+
+  // Load user GPS from localStorage on mount + listen for updates
+  useEffect(() => {
+    setUserLoc(getUserLocation());
+    const onChange = () => setUserLoc(getUserLocation());
+    window.addEventListener('userLocation:changed', onChange);
+    return () => window.removeEventListener('userLocation:changed', onChange);
+  }, []);
+
+  async function handleUpdateLocation() {
+    setLocating(true);
+    const loc = await captureUserLocation();
+    setLocating(false);
+    if (!loc) alert('Không lấy được vị trí. Vui lòng kiểm tra quyền GPS trong trình duyệt.');
+  }
 
   useEffect(() => {
     setCategory(searchParams.get('category') || '');
@@ -97,14 +115,31 @@ function ProductsInner() {
     loadProducts(search);
   }
 
+  // Annotate items with distance when user GPS is available
+  const itemsWithDistance = items.map(item => {
+    if (userLoc && typeof item.latitude === 'number' && typeof item.longitude === 'number') {
+      return { ...item, _distanceKm: distanceKm(userLoc, { latitude: item.latitude, longitude: item.longitude }) };
+    }
+    return item;
+  });
+
   // Quick filter applied client-side
-  const filtered = items.filter(item => {
+  let filtered = itemsWithDistance.filter(item => {
     if (quickFilter === 'vip') return item.isVip;
     if (quickFilter === 'image') return item.images?.length > 0;
     if (quickFilter === 'today') return Date.now() - new Date(item.createdAt).getTime() < 86400000;
-    if (quickFilter === 'near') return (item.location || '').toLowerCase().includes('nhân cơ') || (item.location || '').toLowerCase().includes('đắk nông');
+    if (quickFilter === 'near') {
+      // Real GPS distance < 30km if user location set; fallback to text match
+      if (userLoc && typeof item._distanceKm === 'number') return item._distanceKm <= 30;
+      return (item.location || '').toLowerCase().includes('nhân cơ') || (item.location || '').toLowerCase().includes('đắk nông');
+    }
     return true;
   });
+
+  // When "near" filter active and user has GPS, sort by distance ascending
+  if (quickFilter === 'near' && userLoc) {
+    filtered = [...filtered].sort((a, b) => (a._distanceKm ?? 999) - (b._distanceKm ?? 999));
+  }
 
   const vipItems = filtered.filter(p => p.isVip);
   const lowData = !loading && filtered.length < 8;
@@ -201,6 +236,18 @@ function ProductsInner() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 ml-auto">
+            {/* User GPS status / update */}
+            <button
+              onClick={userLoc ? clearUserLocation : handleUpdateLocation}
+              disabled={locating}
+              title={userLoc ? `Vị trí của bạn: ${userLoc.latitude.toFixed(3)}, ${userLoc.longitude.toFixed(3)}` : 'Chia sẻ GPS để xem khoảng cách'}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
+                userLoc ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'text-gray-600 hover:bg-stone-200'
+              } disabled:opacity-50`}
+            >
+              <i className={`${locating ? 'ri-loader-4-line animate-spin' : userLoc ? 'ri-map-pin-2-fill' : 'ri-map-pin-line'}`}></i>
+              {locating ? 'Đang lấy...' : userLoc ? 'Đã có GPS' : 'Vị trí của tôi'}
+            </button>
             <span className="text-[12px] text-gray-500">Sắp xếp:</span>
             <select
               value={sortBy}
@@ -427,12 +474,17 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
             {product.unit && <span className="text-[11px] text-gray-400">/{product.unit}</span>}
           </div>
 
-          {/* Meta row — location + views */}
+          {/* Meta row — location + (distance) + views */}
           <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
             <span className="flex items-center gap-0.5 min-w-0 flex-1">
               <i className="ri-map-pin-line text-gray-400 flex-shrink-0"></i>
               <span className="truncate">{product.location || 'Đắk Nông'}</span>
             </span>
+            {typeof product._distanceKm === 'number' && (
+              <span className="flex items-center gap-0.5 text-emerald-700 font-semibold flex-shrink-0" title="Khoảng cách từ vị trí của bạn">
+                <i className="ri-navigation-fill text-emerald-600"></i>{formatDistance(product._distanceKm)}
+              </span>
+            )}
             {product.viewCount !== undefined && (
               <span className="flex items-center gap-0.5 text-gray-400 flex-shrink-0">
                 <i className="ri-eye-line"></i>{product.viewCount}
