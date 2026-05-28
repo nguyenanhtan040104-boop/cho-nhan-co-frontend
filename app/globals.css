@@ -35,19 +35,6 @@ button, a {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Ad rolling banner marquee */
-@keyframes adMarquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.ad-marquee-track {
-  animation: adMarquee 60s linear infinite;
-  will-change: transform;
-}
-.ad-marquee-track:hover {
-  animation-play-state: paused;
-}
-
 /* Ad popup spring-in */
 @keyframes adPopIn {
   0%   { transform: scale(0.85); opacity: 0; }
