@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import HomepageClient from './HomepageClient';
 import LikeButton from './components/LikeButton';
 import MarketPriceWidget from './components/MarketPriceWidget';
-import AdHeroCarousel from './components/AdHeroCarousel';
+import AdSponsoredCarousel from './components/AdSponsoredCarousel';
 
 export const metadata: Metadata = {
   title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản, việc làm tại Đắk Nông',
@@ -136,8 +136,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* ===== QUẢNG CÁO HERO CAROUSEL ===== */}
-        <AdHeroCarousel />
+        {/* ===== QUẢNG CÁO TÀI TRỢ — CAROUSEL CARDS ===== */}
+        <AdSponsoredCarousel />
 
         {/* ===== GIÁ THỊ TRƯỜNG ===== */}
         <MarketPriceWidget />
