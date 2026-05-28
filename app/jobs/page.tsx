@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { jobs, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
+import { getUserLocation, distanceKm, formatDistance, type UserLocation } from '../../lib/userLocation';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -43,8 +44,24 @@ function JobsContent() {
   const [bulkMode, setBulkMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
+  const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
   const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
+
+  useEffect(() => {
+    setUserLoc(getUserLocation());
+    const onChange = () => setUserLoc(getUserLocation());
+    window.addEventListener('userLocation:changed', onChange);
+    return () => window.removeEventListener('userLocation:changed', onChange);
+  }, []);
+
+  // Attach distance to items whose creator stored GPS
+  const itemsWithDistance = items.map(item => {
+    if (userLoc && typeof item.latitude === 'number' && typeof item.longitude === 'number') {
+      return { ...item, _distanceKm: distanceKm(userLoc, { latitude: item.latitude, longitude: item.longitude }) };
+    }
+    return item;
+  });
 
   // Đọc query params từ URL (từ header dropdown)
   useEffect(() => {
@@ -161,7 +178,7 @@ function JobsContent() {
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {items.map(item => (
+              {itemsWithDistance.map(item => (
                 <JobCard key={item.id} item={item} bulkMode={bulkMode} selected={selected.has(item.id)} onToggle={() => toggleSelect(item.id)} onDeleted={id => setItems(prev => prev.filter(p => p.id !== id))} />
               ))}
             </div>
@@ -226,8 +243,18 @@ function JobCard({ item, bulkMode, selected, onToggle, onDeleted }: { item: any;
         <div className="p-3">
           <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-1">{item.title}</h3>
           {item.salary && <p className="text-green-600 font-black text-sm">{item.salary}</p>}
-          <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
-            {item.location && <><i className="ri-map-pin-line"></i><span className="truncate">{item.location}</span></>}
+          <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+            {item.location && (
+              <span className="flex items-center gap-1 min-w-0 flex-1">
+                <i className="ri-map-pin-line"></i>
+                <span className="truncate">{item.location}</span>
+              </span>
+            )}
+            {typeof item._distanceKm === 'number' && (
+              <span className="text-emerald-700 font-semibold flex items-center gap-0.5 flex-shrink-0" title="Khoảng cách từ vị trí của bạn">
+                <i className="ri-navigation-fill text-emerald-600"></i>{formatDistance(item._distanceKm)}
+              </span>
+            )}
           </div>
           <div className="flex items-center justify-between mt-2 text-[11px] text-gray-400">
             <span>{item.category}</span>

@@ -7,6 +7,7 @@ import { realEstate, auth } from '../../lib/api';
 import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 import LikeButton from '../components/LikeButton';
+import { getUserLocation, distanceKm, formatDistance, type UserLocation } from '../../lib/userLocation';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -52,8 +53,25 @@ function RealEstateContent() {
   const [bulkMode, setBulkMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
+  const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
   const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
+
+  // Track viewer's GPS for distance badges
+  useEffect(() => {
+    setUserLoc(getUserLocation());
+    const onChange = () => setUserLoc(getUserLocation());
+    window.addEventListener('userLocation:changed', onChange);
+    return () => window.removeEventListener('userLocation:changed', onChange);
+  }, []);
+
+  // Annotate items with distance when both sides have GPS
+  const itemsWithDistance = items.map(item => {
+    if (userLoc && typeof item.latitude === 'number' && typeof item.longitude === 'number') {
+      return { ...item, _distanceKm: distanceKm(userLoc, { latitude: item.latitude, longitude: item.longitude }) };
+    }
+    return item;
+  });
 
   // Đọc query params từ URL (từ header dropdown)
   useEffect(() => {
@@ -94,8 +112,8 @@ function RealEstateContent() {
     } catch (e: any) { alert(e.message); } finally { setDeleting(false); }
   }
 
-  const vipItems = items.filter(i => i.isVip);
-  const normalItems = items.filter(i => !i.isVip);
+  const vipItems = itemsWithDistance.filter(i => i.isVip);
+  const normalItems = itemsWithDistance.filter(i => !i.isVip);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
@@ -270,6 +288,11 @@ function RECard({ item, bulkMode, selected, onToggle, currentUserId, onDeleted }
           <div className="flex items-center gap-2 text-[11px] text-gray-400">
             {item.area && <span><i className="ri-map-2-line mr-0.5"></i>{item.area}m²</span>}
             <span className="truncate flex-1"><i className="ri-map-pin-line mr-0.5"></i>{item.address || item.location}</span>
+            {typeof item._distanceKm === 'number' && (
+              <span className="text-emerald-700 font-semibold flex items-center gap-0.5 flex-shrink-0" title="Khoảng cách từ vị trí của bạn">
+                <i className="ri-navigation-fill text-emerald-600"></i>{formatDistance(item._distanceKm)}
+              </span>
+            )}
           </div>
           {item.user?.fullName && (
             <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-50">
