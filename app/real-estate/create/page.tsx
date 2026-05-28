@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { realEstate, uploads } from '../../../lib/api';
 import { auth as _auth } from '../../../lib/api';
+import GPSLocationPicker from '../../components/GPSLocationPicker';
 
 const typeOptions = [
   { value: 'NHA_O', label: 'Nhà ở' },
@@ -27,6 +28,7 @@ export default function CreateRealEstatePage() {
     title: '', description: '', type: 'NHA_O',
     price: '', area: '', address: '', legalStatus: '',
   });
+  const [gps, setGps] = useState<{ latitude: number | null; longitude: number | null }>({ latitude: null, longitude: null });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -75,8 +77,10 @@ export default function CreateRealEstatePage() {
         price: Number(form.price),
         area: Number(form.area),
         address: form.address,
+        latitude: gps.latitude ?? undefined,
+        longitude: gps.longitude ?? undefined,
         legalStatus: form.legalStatus || undefined,
-      });
+      } as any);
 
       // Thêm ảnh nếu có
       if (imageUrls.length > 0 && created.id) {
@@ -201,6 +205,19 @@ export default function CreateRealEstatePage() {
             <input type="text" name="address" required value={form.address} onChange={handleChange}
               placeholder="Xã/Phường, Huyện/Quận, Tỉnh/TP"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+          </div>
+
+          {/* GPS — tùy chọn */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Vị trí GPS <span className="text-gray-400 font-normal">(tùy chọn)</span>
+            </label>
+            <GPSLocationPicker
+              value={gps}
+              onChange={setGps}
+              label="Lấy vị trí GPS của khu đất / nhà"
+              hint="Đứng tại khu đất / căn nhà rồi bấm nút này. Giúp người mua tính khoảng cách chính xác."
+            />
           </div>
 
           {/* Mô tả */}

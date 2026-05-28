@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { jobs, uploads } from '../../../lib/api';
 import { auth as _auth } from '../../../lib/api';
+import GPSLocationPicker from '../../components/GPSLocationPicker';
 
 const typeOptions = [
   { value: 'EMPLOYER', label: 'Tuyển dụng' },
@@ -26,6 +27,7 @@ export default function CreateJobPage() {
     salary: '', location: '', experience: '', benefits: '',
     deadline: '', isUrgent: false,
   });
+  const [gps, setGps] = useState<{ latitude: number | null; longitude: number | null }>({ latitude: null, longitude: null });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -71,6 +73,8 @@ export default function CreateJobPage() {
         category: form.category,
         salary: form.salary || undefined,
         location: form.location,
+        latitude: gps.latitude ?? undefined,
+        longitude: gps.longitude ?? undefined,
         experience: form.experience || undefined,
         benefits: form.benefits || undefined,
         deadline: form.deadline ? new Date(form.deadline) : undefined,
@@ -153,6 +157,19 @@ export default function CreateJobPage() {
                 placeholder="Xã/Huyện/Tỉnh"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
             </div>
+          </div>
+
+          {/* GPS — tùy chọn */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Vị trí GPS <span className="text-gray-400 font-normal">(tùy chọn)</span>
+            </label>
+            <GPSLocationPicker
+              value={gps}
+              onChange={setGps}
+              label="Lấy vị trí GPS của nơi làm việc"
+              hint="Đứng tại địa điểm làm việc rồi bấm. Giúp người tìm việc thấy việc gần nhà."
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
