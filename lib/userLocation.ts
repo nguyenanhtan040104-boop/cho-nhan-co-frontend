@@ -98,20 +98,75 @@ export function formatDistance(km: number): string {
 }
 
 /**
- * Reverse geocode a GPS coordinate to a Vietnamese-readable address using
- * OpenStreetMap Nominatim. Free, no API key required.
+ * Reverse geocode a GPS coordinate to a Vietnamese-readable address.
  *
- * Returns a short locality string like 'Xã Nhân Cơ, Huyện Đắk R'Lấp, Đắk Nông'.
- * Returns null on any failure (network, rate limit, malformed response).
+ * Tries Google Maps Geocoding first (more accurate Vietnamese addresses)
+ * when NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is set, then falls back to the free
+ * OpenStreetMap Nominatim service. Returns null on total failure.
+ *
+ * Setup for Google Maps:
+ *   1. https://console.cloud.google.com → create project
+ *   2. Enable "Geocoding API"
+ *   3. Credentials → Create API key
+ *   4. Restrict the key to HTTP referrer 'https://chonhanco.com/*'
+ *      (and 'http://localhost:*' for dev)
+ *   5. Set env var on Vercel:  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...
+ *
+ * Pricing: ~$200/month free credit covers ~40.000 reverse-geocode calls.
+ * Beyond that, $5 per 1000 requests.
  */
 export async function reverseGeocode(latitude: number, longitude: number): Promise<string | null> {
+  // 1. Try Google Maps if key is configured
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (apiKey) {
+    const fromGoogle = await reverseGeocodeGoogle(latitude, longitude, apiKey);
+    if (fromGoogle) return fromGoogle;
+  }
+  // 2. Fall back to OpenStreetMap Nominatim
+  return reverseGeocodeNominatim(latitude, longitude);
+}
+
+async function reverseGeocodeGoogle(lat: number, lng: number, apiKey: string): Promise<string | null> {
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=vi&key=${apiKey}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.status !== 'OK' || !data.results?.length) return null;
+
+    // Prefer the "neighborhood/sublocality/locality" result for short locality;
+    // otherwise pick the most specific street-level result and strip the country tail.
+    const localityResult = data.results.find((r: any) =>
+      r.types?.some((t: string) => ['administrative_area_level_3', 'locality', 'sublocality', 'neighborhood'].includes(t)),
+    );
+    const result = localityResult || data.results[0];
+
+    // Build short address from components: commune/ward, district, province
+    const components: any[] = result.address_components || [];
+    const find = (...types: string[]) =>
+      components.find((c) => c.types?.some((t: string) => types.includes(t)))?.long_name;
+
+    const commune = find('administrative_area_level_3', 'sublocality_level_1', 'locality');
+    const district = find('administrative_area_level_2');
+    const province = find('administrative_area_level_1');
+
+    const parts = [commune, district, province].filter(Boolean);
+    if (parts.length > 0) return parts.join(', ');
+
+    // Fallback: trim ", Vietnam" tail off the formatted_address
+    return (result.formatted_address as string).replace(/,\s*(Vietnam|Việt Nam)\s*$/i, '').trim();
+  } catch {
+    return null;
+  }
+}
+
+async function reverseGeocodeNominatim(latitude: number, longitude: number): Promise<string | null> {
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=vi&zoom=14`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) return null;
     const data = await res.json();
     const a = data?.address || {};
-    // Build a short locality: commune, district, province (skip street/house for privacy)
     const parts: string[] = [];
     const commune = a.village || a.suburb || a.hamlet || a.quarter || a.neighbourhood;
     const district = a.county || a.town || a.city_district || a.district;
@@ -120,7 +175,6 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
     if (district) parts.push(district);
     if (province) parts.push(province);
     if (parts.length === 0 && data.display_name) {
-      // Fallback: take first 3 comma-separated parts of display_name
       return data.display_name.split(',').slice(0, 3).map((s: string) => s.trim()).join(', ');
     }
     return parts.join(', ') || null;
