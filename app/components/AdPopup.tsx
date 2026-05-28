@@ -32,22 +32,36 @@ export default function AdPopup() {
     // Only once per day
     if (localStorage.getItem(STORAGE_KEY) === todayKey()) return;
 
-    advertisements
-      .getFeatured(1)
-      .then(res => {
-        const top = res.data?.[0];
+    let cancelled = false;
+    async function load() {
+      try {
+        // 1. Prefer top featured VIP ad
+        const featured = await advertisements.getFeatured(1).catch(() => ({ data: [] }));
+        let top = featured.data?.[0];
+
+        // 2. Fallback to most recent user-submitted ad if no VIP
+        if (!top) {
+          const recent = await advertisements.getAll({ limit: 1 }).catch(() => ({ data: [] }));
+          top = recent.data?.[0];
+        }
+
+        if (cancelled) return;
+
         if (top) {
           setAd(top);
           setIsFallback(false);
         } else {
           setIsFallback(true);
         }
-        setTimeout(() => setVisible(true), DELAY_MS);
-      })
-      .catch(() => {
+        setTimeout(() => { if (!cancelled) setVisible(true); }, DELAY_MS);
+      } catch {
+        if (cancelled) return;
         setIsFallback(true);
-        setTimeout(() => setVisible(true), DELAY_MS);
-      });
+        setTimeout(() => { if (!cancelled) setVisible(true); }, DELAY_MS);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
   }, [isHome]);
 
   function close() {

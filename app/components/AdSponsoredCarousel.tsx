@@ -72,29 +72,61 @@ export default function AdSponsoredCarousel() {
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
-    advertisements
-      .getFeatured(8)
-      .then(res => {
-        const list = res.data || [];
-        if (list.length > 0 && list.some((ad: any) => ad.images?.[0])) {
-          setSlides(
-            list
-              .filter((ad: any) => ad.images?.[0])
-              .map((ad: any) => ({
-                id: ad.id,
-                href: `/advertisements/${ad.id}`,
-                title: ad.title,
-                description: ad.description,
-                image: ad.images[0],
-                storeName: ad.businessName || ad.user?.fullName,
-                cta: 'Xem chi tiết',
-              })),
-          );
-        } else {
-          setSlides(FALLBACK_SLIDES);
+    let cancelled = false;
+
+    const CATEGORY_LABEL: Record<string, string> = {
+      KHAI_TRUONG: 'Khai trương',
+      KHUYEN_MAI: 'Khuyến mãi',
+      SAN_PHAM_MOI: 'Sản phẩm mới',
+      DICH_VU: 'Dịch vụ',
+      SU_KIEN: 'Sự kiện',
+      KHAC: 'Quảng cáo',
+    };
+
+    const toSlide = (ad: any): Slide | null => {
+      const image = ad.images?.[0];
+      if (!image) return null;
+      const categoryLabel = CATEGORY_LABEL[ad.category] || 'Quảng cáo';
+      return {
+        id: ad.id,
+        href: `/advertisements/${ad.id}`,
+        title: ad.title,
+        description: ad.description,
+        image,
+        storeName: ad.businessName
+          ? `Quảng cáo · ${ad.businessName}`
+          : `Quảng cáo · ${categoryLabel}`,
+        cta: 'Xem chi tiết',
+      };
+    };
+
+    async function load() {
+      try {
+        // 1. Prefer VIP/featured ads (paid sponsorships go first)
+        const featured = await advertisements.getFeatured(8).catch(() => ({ data: [] }));
+        const vipSlides = (featured.data || []).map(toSlide).filter(Boolean) as Slide[];
+        if (vipSlides.length > 0) {
+          if (!cancelled) setSlides(vipSlides);
+          return;
         }
-      })
-      .catch(() => setSlides(FALLBACK_SLIDES));
+
+        // 2. No VIP yet — show recent user-submitted ads as carousel fill
+        const recent = await advertisements.getAll({ limit: 8 }).catch(() => ({ data: [] }));
+        const recentSlides = (recent.data || []).map(toSlide).filter(Boolean) as Slide[];
+        if (recentSlides.length > 0) {
+          if (!cancelled) setSlides(recentSlides);
+          return;
+        }
+
+        // 3. DB has zero ads at all — last resort: themed CTA placeholders
+        if (!cancelled) setSlides(FALLBACK_SLIDES);
+      } catch {
+        if (!cancelled) setSlides(FALLBACK_SLIDES);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   const next = useCallback(() => {
