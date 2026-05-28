@@ -416,8 +416,6 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
               MỚI
             </span>
           )}
-
-          <LikeButton itemId={String(product.id)} />
         </div>
 
         <div className="p-3">
@@ -429,35 +427,36 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
             {product.unit && <span className="text-[11px] text-gray-400">/{product.unit}</span>}
           </div>
 
-          {/* Meta row */}
+          {/* Meta row — location + views */}
           <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
             <span className="flex items-center gap-0.5 min-w-0 flex-1">
               <i className="ri-map-pin-line text-gray-400 flex-shrink-0"></i>
               <span className="truncate">{product.location || 'Đắk Nông'}</span>
             </span>
-            {product.createdAt && (
+            {product.viewCount !== undefined && (
               <span className="flex items-center gap-0.5 text-gray-400 flex-shrink-0">
-                <i className="ri-time-line"></i>{timeAgo(product.createdAt)}
+                <i className="ri-eye-line"></i>{product.viewCount}
               </span>
             )}
           </div>
 
-          {/* Seller row */}
-          {(product.user?.fullName || product.viewCount !== undefined) && (
-            <div className="flex items-center justify-between gap-2 pt-2 border-t border-stone-100 text-[11px] text-gray-500">
-              {product.user?.fullName && (
-                <span className="flex items-center gap-1 min-w-0 flex-1">
-                  <i className="ri-user-line text-gray-400"></i>
-                  <span className="truncate">{product.user.fullName}</span>
+          {/* Bottom row — seller (left) + time + like (right) */}
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-stone-100 text-[11px] text-gray-500">
+            {product.user?.fullName ? (
+              <span className="flex items-center gap-1 min-w-0 flex-1">
+                <i className="ri-user-line text-gray-400 flex-shrink-0"></i>
+                <span className="truncate">{product.user.fullName}</span>
+              </span>
+            ) : <span className="flex-1" />}
+            <div className="flex items-center gap-2 flex-shrink-0 text-gray-400">
+              {product.createdAt && (
+                <span className="flex items-center gap-0.5">
+                  <i className="ri-time-line"></i>{timeAgo(product.createdAt)}
                 </span>
               )}
-              {product.viewCount !== undefined && (
-                <span className="flex items-center gap-0.5 text-gray-400 flex-shrink-0">
-                  <i className="ri-eye-line"></i>{product.viewCount}
-                </span>
-              )}
+              <LikeButton itemId={String(product.id)} inline />
             </div>
-          )}
+          </div>
         </div>
       </Link>
       <div className="absolute top-1 right-1 z-10">
@@ -515,10 +514,13 @@ function ProductListRow({ product, onDeleted }: { product: any; onDeleted: (id: 
               </span>
             )}
             {product.viewCount !== undefined && (
-              <span className="flex items-center gap-0.5 text-gray-400 ml-auto">
+              <span className="flex items-center gap-0.5 text-gray-400">
                 <i className="ri-eye-line"></i>{product.viewCount}
               </span>
             )}
+            <span className="ml-auto">
+              <LikeButton itemId={String(product.id)} inline />
+            </span>
           </div>
         </div>
       </Link>

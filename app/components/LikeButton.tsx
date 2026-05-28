@@ -14,7 +14,15 @@ function setLikedLocal(id: string, liked: boolean) {
   localStorage.setItem(LIKED_KEY, JSON.stringify(next));
 }
 
-export default function LikeButton({ itemId, targetType = 'PRODUCT' }: { itemId: string; targetType?: string }) {
+type LikeButtonProps = {
+  itemId: string;
+  targetType?: string;
+  /** When true, renders without absolute positioning — for use inside meta rows */
+  inline?: boolean;
+  className?: string;
+};
+
+export default function LikeButton({ itemId, targetType = 'PRODUCT', inline, className }: LikeButtonProps) {
   const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -40,10 +48,23 @@ export default function LikeButton({ itemId, targetType = 'PRODUCT' }: { itemId:
     }
   }
 
+  if (inline) {
+    return (
+      <button
+        onClick={handleClick}
+        aria-label={liked ? 'Bỏ thích' : 'Thích'}
+        className={`flex items-center justify-center hover:scale-110 transition-transform ${className || ''}`}
+      >
+        <i className={`${liked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400 hover:text-red-400'} text-base transition-colors`}></i>
+      </button>
+    );
+  }
+
   return (
     <button
       onClick={handleClick}
-      className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-10"
+      aria-label={liked ? 'Bỏ thích' : 'Thích'}
+      className={`absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-10 ${className || ''}`}
     >
       <i className={`${liked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400'} text-sm transition-colors`}></i>
     </button>
