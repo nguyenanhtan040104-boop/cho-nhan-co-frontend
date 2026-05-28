@@ -5,140 +5,140 @@ import { useEffect, useState } from 'react';
 import { advertisements } from '../../lib/api';
 
 type Props = {
+  vipItems?: any[];                  // optional: featured VIP listings from the page
   popularSearches?: string[];
-  searchHref?: (q: string) => string; // builds href from a tag
+  searchHref?: (q: string) => string;
   postHref: string;
   postLabel: string;
   safetyTips?: string[];
   showAd?: boolean;
+  /** Builds an href for a VIP listing thumbnail (depends on category type) */
+  itemHref?: (item: any) => string;
 };
 
 const DEFAULT_TIPS = [
   'Gặp trực tiếp ở nơi đông người, không chuyển tiền trước',
   'Kiểm tra kỹ hàng hóa trước khi thanh toán',
   'Không chia sẻ OTP / mật khẩu cho bất kỳ ai',
-  'Báo cáo tin xấu qua nút "Báo cáo" ở mỗi bài đăng',
 ];
 
 const DEFAULT_SEARCHES = [
-  'Cà phê', 'Hồ tiêu', 'Sầu riêng', 'Bơ', 'Mít', 'Tiêu sọ', 'Cà phê nhân',
+  'Cà phê', 'Hồ tiêu', 'Sầu riêng', 'Bơ booth', 'Mít', 'Cao su', 'Điều', 'Mắc ca',
 ];
 
-/**
- * Right-column sidebar with supporting widgets to fill empty space
- * on category listing pages. Used across /products, /real-estate, /jobs,
- * /vat-nuoi, /dich-vu.
- */
+const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
+
 export default function CategorySidebar({
+  vipItems = [],
   popularSearches = DEFAULT_SEARCHES,
   searchHref,
   postHref,
   postLabel,
   safetyTips = DEFAULT_TIPS,
   showAd = true,
+  itemHref = (item) => `/products/${item.id}`,
 }: Props) {
   return (
-    <aside className="space-y-4 lg:sticky lg:top-4 self-start">
-      {/* ── Post CTA ─────────────────────────────────────────────── */}
-      <div
-        className="relative overflow-hidden rounded-2xl text-white p-5"
-        style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%)' }}
-      >
-        <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
-        <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-white/10 rounded-full" />
-        <div className="relative">
-          <p className="text-[10px] font-bold tracking-widest text-emerald-200 uppercase mb-1.5">
-            <span className="inline-block w-5 h-px bg-emerald-200 align-middle mr-1.5"></span>
-            Miễn phí đăng tin
-          </p>
-          <h3 className="font-black text-lg leading-tight mb-2">Bán hàng của bạn ngay hôm nay</h3>
-          <p className="text-emerald-100 text-xs leading-relaxed mb-3">
-            Hàng nghìn bà con tại Nhân Cơ, Đắk Nông đang chờ. Đăng tin chỉ mất 1 phút.
-          </p>
-          <Link
-            href={postHref}
-            className="inline-flex items-center gap-1.5 bg-white text-emerald-800 px-4 py-2 rounded-full text-sm font-bold hover:scale-105 transition-transform shadow-lg"
-          >
-            <i className="ri-add-line"></i>
-            {postLabel}
-          </Link>
-        </div>
-      </div>
+    <aside className="space-y-3 lg:sticky lg:top-4 self-start text-[13px]">
 
-      {/* ── Popular searches ─────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-        <div className="px-4 pt-4 pb-2">
-          <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Tìm kiếm phổ biến</p>
-          <h4 className="font-bold text-gray-900 mt-0.5 text-sm">Bà con đang tìm</h4>
-        </div>
-        <div className="px-4 pb-4 flex flex-wrap gap-1.5">
+      {/* ── 1. Tin nổi bật VIP ─────────────────────────────────────── */}
+      {vipItems.length > 0 && (
+        <Widget title="Tin nổi bật VIP" eyebrow="Được đề xuất">
+          <div className="divide-y divide-gray-50">
+            {vipItems.slice(0, 4).map((item) => {
+              const img = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
+              return (
+                <Link key={item.id} href={itemHref(item)} className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-stone-50 transition-colors">
+                  <div className="w-12 h-12 rounded-md bg-stone-100 flex-shrink-0 overflow-hidden border border-stone-200">
+                    {img ? (
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <i className="ri-image-line text-stone-300 text-lg"></i>
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12.5px] font-medium text-gray-900 line-clamp-1 leading-snug">{item.title}</p>
+                    {item.price !== undefined && (
+                      <p className="text-[12px] font-semibold text-red-700 mt-0.5">{fmt(Number(item.price))}đ</p>
+                    )}
+                    <p className="text-[11px] text-gray-400 truncate">{item.location || 'Đắk Nông'}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </Widget>
+      )}
+
+      {/* ── 2. Quảng cáo địa phương ────────────────────────────────── */}
+      {showAd && <SidebarAdSlot />}
+
+      {/* ── 3. Từ khóa phổ biến ────────────────────────────────────── */}
+      <Widget title="Từ khóa phổ biến" eyebrow="Bà con đang tìm">
+        <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1.5">
           {popularSearches.map((q) => (
             <Link
               key={q}
               href={searchHref ? searchHref(q) : `/products?search=${encodeURIComponent(q)}`}
-              className="px-2.5 py-1 bg-gray-50 hover:bg-emerald-50 hover:text-emerald-700 border border-gray-200 hover:border-emerald-300 rounded-full text-xs font-medium text-gray-600 transition-colors"
+              className="px-2 py-0.5 text-[12px] text-gray-600 border border-stone-200 rounded hover:border-stone-400 hover:text-gray-900 transition-colors"
             >
-              <i className="ri-search-line text-[10px] mr-1 opacity-60"></i>
               {q}
             </Link>
           ))}
         </div>
-      </div>
+      </Widget>
 
-      {/* ── Safety tips ──────────────────────────────────────────── */}
-      <div className="bg-amber-50 rounded-2xl border border-amber-100 overflow-hidden">
-        <div className="px-4 pt-4 pb-2 flex items-start gap-2">
-          <i className="ri-shield-check-fill text-amber-600 text-lg mt-0.5"></i>
-          <div>
-            <p className="text-[10px] font-bold tracking-widest text-amber-700 uppercase">Mẹo an toàn</p>
-            <h4 className="font-bold text-amber-900 mt-0.5 text-sm">Giao dịch an toàn</h4>
-          </div>
-        </div>
-        <ul className="px-4 pb-4 pt-1 space-y-1.5">
+      {/* ── 4. Mẹo mua bán an toàn ─────────────────────────────────── */}
+      <Widget title="Mẹo an toàn" eyebrow="Trước khi giao dịch">
+        <ul className="px-3 pb-3 pt-1 space-y-1.5">
           {safetyTips.map((tip, i) => (
-            <li key={i} className="text-xs text-amber-900/80 leading-relaxed flex items-start gap-2">
-              <i className="ri-checkbox-circle-fill text-amber-600 text-sm flex-shrink-0 mt-0.5"></i>
+            <li key={i} className="text-[12px] text-gray-600 leading-relaxed flex gap-1.5">
+              <span className="text-gray-400 mt-0.5 flex-shrink-0">{i + 1}.</span>
               <span>{tip}</span>
             </li>
           ))}
         </ul>
         <Link
           href="/canh-bao"
-          className="block mx-4 mb-4 text-center text-xs font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 py-2 rounded-xl transition-colors"
+          className="block px-3 pb-3 text-[12px] font-semibold text-gray-700 hover:text-gray-900 hover:underline underline-offset-4"
         >
-          Xem cảnh báo lừa đảo →
+          Xem tất cả cảnh báo →
         </Link>
-      </div>
+      </Widget>
 
-      {/* ── Sponsored ad slot ────────────────────────────────────── */}
-      {showAd && <SidebarAdSlot />}
-
-      {/* ── Community trust ──────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Cộng đồng</p>
-        <div className="space-y-2.5">
-          <TrustRow icon="ri-map-pin-2-fill" iconColor="text-red-500" title="Nhân Cơ, Đắk Nông" sub="Giao dịch tại chỗ, gần nhà" />
-          <TrustRow icon="ri-shield-user-fill" iconColor="text-emerald-600" title="Người thật, tin thật" sub="Tài khoản xác minh" />
-          <TrustRow icon="ri-phone-fill" iconColor="text-blue-600" title="Hỗ trợ" sub="0888.317.289" />
-        </div>
+      {/* ── 5. CTA đăng tin (compact, no gradient) ─────────────────── */}
+      <div className="bg-white border border-stone-200 rounded-lg p-4">
+        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">Miễn phí đăng tin</p>
+        <p className="text-[13px] text-gray-700 leading-relaxed mb-3">
+          Đăng tin bán cà phê, hồ tiêu, đất rẫy, tuyển công nhật... gần nhà bạn tại Nhân Cơ.
+        </p>
+        <Link
+          href={postHref}
+          className="block text-center bg-emerald-700 hover:bg-emerald-800 text-white text-[13px] font-semibold py-2 rounded transition-colors"
+        >
+          {postLabel}
+        </Link>
       </div>
     </aside>
   );
 }
 
-function TrustRow({ icon, iconColor, title, sub }: { icon: string; iconColor: string; title: string; sub: string }) {
+// ─── Reusable subtle-styled widget shell ─────────────────────────────
+function Widget({ title, eyebrow, children }: { title: string; eyebrow?: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-2.5">
-      <i className={`${icon} ${iconColor} text-base mt-0.5 flex-shrink-0`}></i>
-      <div className="min-w-0">
-        <p className="text-xs font-bold text-gray-800 truncate">{title}</p>
-        <p className="text-[11px] text-gray-400 truncate">{sub}</p>
+    <div className="bg-white border border-stone-200 rounded-lg overflow-hidden">
+      <div className="px-3 pt-3 pb-1.5 border-b border-stone-100">
+        {eyebrow && <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">{eyebrow}</p>}
+        <h4 className="text-[13px] font-bold text-gray-900 mt-0.5">{title}</h4>
       </div>
+      {children}
     </div>
   );
 }
 
-// ─── Sidebar ad slot — small sponsored card ──────────────────────────
+// ─── Sponsored ad slot (real ad from /advertisements/featured) ────────
 function SidebarAdSlot() {
   const [ad, setAd] = useState<any>(null);
 
@@ -152,30 +152,30 @@ function SidebarAdSlot() {
           const recent = await advertisements.getAll({ limit: 1 }).catch(() => ({ data: [] }));
           top = recent.data?.[0];
         }
-        if (!cancelled && top) setAd(top);
+        if (!cancelled) setAd(top || null);
       } catch {}
     }
     load();
     return () => { cancelled = true; };
   }, []);
 
-  // Fallback CTA if no ads at all
+  // Fallback compact CTA when no ads exist
   if (!ad) {
     return (
       <Link
         href="/advertisements/create"
-        className="block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+        className="block bg-white border border-stone-200 rounded-lg overflow-hidden hover:border-stone-400 transition-colors"
       >
-        <div className="relative bg-gradient-to-br from-orange-400 to-amber-500 p-5 text-white">
-          <div className="absolute top-2 left-2 bg-white/25 backdrop-blur-md border border-white/30 text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full">
-            Quảng cáo
+        <div className="px-3 pt-3 pb-1.5 border-b border-stone-100 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">Quảng cáo</p>
+            <h4 className="text-[13px] font-bold text-gray-900 mt-0.5">Cửa hàng của bạn?</h4>
           </div>
-          <i className="ri-rocket-2-fill text-3xl mb-2 inline-block mt-3"></i>
-          <p className="font-black text-base leading-tight">Cửa hàng của bạn ở đây</p>
-          <p className="text-xs opacity-90 mt-1">Đẩy thương hiệu chỉ từ 50.000đ</p>
+          <i className="ri-megaphone-line text-stone-400 text-lg"></i>
         </div>
-        <div className="p-3 text-center">
-          <span className="text-xs font-bold text-orange-700">Đăng quảng cáo ngay →</span>
+        <div className="px-3 py-3 text-[12px] text-gray-600 leading-relaxed">
+          Đẩy thương hiệu lên đầu trang chủ chỉ từ <b className="text-gray-900">50.000đ / 7 ngày</b>.
+          <span className="block mt-2 text-emerald-700 font-semibold">Tìm hiểu →</span>
         </div>
       </Link>
     );
@@ -185,37 +185,25 @@ function SidebarAdSlot() {
   return (
     <Link
       href={`/advertisements/${ad.id}`}
-      className="block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group"
+      className="block bg-white border border-stone-200 rounded-lg overflow-hidden hover:border-stone-400 transition-colors"
     >
-      {image ? (
-        <div className="relative" style={{ aspectRatio: '4/3' }}>
-          <img src={image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <div className="absolute top-2 left-2 bg-white/85 backdrop-blur-md border border-white/40 text-orange-700 text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full flex items-center gap-1">
-            <i className="ri-megaphone-fill text-[10px]"></i>
-            Quảng cáo
-          </div>
-          {ad.businessName && (
-            <p className="absolute bottom-2 left-2 right-2 text-white text-xs font-bold drop-shadow truncate">{ad.businessName}</p>
-          )}
-        </div>
-      ) : (
-        <div className="relative bg-gradient-to-br from-orange-400 to-amber-500 p-5 text-white">
-          <div className="absolute top-2 left-2 bg-white/25 backdrop-blur-md text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full">
-            Quảng cáo
-          </div>
-          <i className="ri-megaphone-fill text-3xl mb-2 inline-block mt-3"></i>
+      <div className="px-3 pt-3 pb-1.5 border-b border-stone-100 flex items-center justify-between">
+        <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">Quảng cáo địa phương</p>
+        <i className="ri-megaphone-line text-stone-400"></i>
+      </div>
+      {image && (
+        <div className="relative" style={{ aspectRatio: '16/10' }}>
+          <img src={image} alt={ad.title} className="w-full h-full object-cover" />
         </div>
       )}
-      <div className="p-3">
-        <p className="font-bold text-sm text-gray-900 line-clamp-2 leading-snug">{ad.title}</p>
-        {ad.description && (
-          <p className="text-xs text-gray-500 line-clamp-2 mt-1">{ad.description}</p>
+      <div className="px-3 py-2.5">
+        {ad.businessName && (
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 truncate">{ad.businessName}</p>
         )}
-        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-orange-700 mt-2 group-hover:underline">
-          Xem chi tiết
-          <i className="ri-arrow-right-line text-sm"></i>
-        </span>
+        <p className="text-[13px] font-bold text-gray-900 line-clamp-2 leading-snug">{ad.title}</p>
+        {ad.description && (
+          <p className="text-[12px] text-gray-500 line-clamp-2 mt-1 leading-relaxed">{ad.description}</p>
+        )}
       </div>
     </Link>
   );

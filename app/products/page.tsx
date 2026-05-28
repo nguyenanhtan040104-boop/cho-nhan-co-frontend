@@ -9,7 +9,7 @@ import EmptyState from '../components/EmptyState';
 import LikeButton from '../components/LikeButton';
 import CategorySidebar from '../components/CategorySidebar';
 
-const categories = [
+const CATEGORIES = [
   { value: '', name: 'Tất cả' },
   { value: 'NONG_SAN', name: 'Nông sản' },
   { value: 'VAT_NUOI', name: 'Vật nuôi' },
@@ -20,10 +20,13 @@ const categories = [
 
 const QUICK_FILTERS = [
   { value: '', label: 'Tất cả' },
-  { value: 'vip', label: 'Chỉ VIP' },
+  { value: 'vip', label: 'VIP' },
   { value: 'image', label: 'Có ảnh' },
-  { value: 'today', label: 'Đăng hôm nay' },
+  { value: 'near', label: 'Gần bạn' },
+  { value: 'today', label: 'Mới hôm nay' },
 ];
+
+const POPULAR_SEARCHES = ['Cà phê nhân', 'Hồ tiêu', 'Sầu riêng', 'Bơ booth', 'Mít Thái', 'Cao su', 'Điều khô', 'Mắc ca'];
 
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
@@ -42,7 +45,7 @@ function timeAgo(dateStr?: string) {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#faf8f4' }} />}>
       <ProductsInner />
     </Suspense>
   );
@@ -62,13 +65,9 @@ function ProductsInner() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
-
   useEffect(() => {
-    const cat = searchParams.get('category') || '';
-    const q = searchParams.get('search') || '';
-    setCategory(cat);
-    setSearch(q);
+    setCategory(searchParams.get('category') || '');
+    setSearch(searchParams.get('search') || '');
     setPage(1);
   }, [searchParams]);
 
@@ -96,80 +95,73 @@ function ProductsInner() {
     loadProducts(search);
   }
 
-  // Apply quick filter client-side
-  const filteredItems = items.filter(item => {
+  // Quick filter applied client-side
+  const filtered = items.filter(item => {
     if (quickFilter === 'vip') return item.isVip;
     if (quickFilter === 'image') return item.images?.length > 0;
-    if (quickFilter === 'today') {
-      const d = new Date(item.createdAt).getTime();
-      return Date.now() - d < 86400000;
-    }
+    if (quickFilter === 'today') return Date.now() - new Date(item.createdAt).getTime() < 86400000;
+    if (quickFilter === 'near') return (item.location || '').toLowerCase().includes('nhân cơ') || (item.location || '').toLowerCase().includes('đắk nông');
     return true;
   });
 
-  const vipItems = filteredItems.filter(p => p.isVip);
-  const normalItems = filteredItems.filter(p => !p.isVip);
-  const showRecommendedFill = !loading && filteredItems.length < 6 && filteredItems.length > 0;
+  const vipItems = filtered.filter(p => p.isVip);
+  const lowData = !loading && filtered.length < 8;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#faf8f4' }}>
 
-      {/* ── Compact Hero ───────────────────────────────────────────── */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 60%, #40916c 100%)' }}>
-        <div className="absolute inset-0 opacity-[0.08]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }} />
-        <div className="relative max-w-7xl mx-auto px-4 py-5">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
-            {/* Title block */}
-            <div className="flex-shrink-0">
-              <p className="text-[10px] font-bold tracking-widest text-emerald-200 uppercase mb-1">
-                <span className="inline-block w-5 h-px bg-emerald-200 align-middle mr-1.5"></span>
-                Chợ Nhân Cơ
-              </p>
-              <h1 className="text-xl sm:text-2xl font-black text-white leading-tight">
-                {search && !category ? 'Kết quả tìm kiếm' : 'Nông sản & Sản phẩm'}
+      {/* ── Compact category header ──────────────────────────────── */}
+      <header className="border-b border-stone-200" style={{ backgroundColor: '#1b4332' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
+          {/* Title row */}
+          <div className="flex items-end justify-between gap-3 mb-4">
+            <div>
+              <nav className="text-[11px] text-emerald-200/80 mb-1 flex items-center gap-1">
+                <Link href="/" className="hover:text-white">Trang chủ</Link>
+                <i className="ri-arrow-right-s-line"></i>
+                <span className="text-emerald-200">Sản phẩm</span>
+              </nav>
+              <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
+                {search && !category ? `Kết quả "${search}"` : 'Mua bán sản phẩm tại Nhân Cơ'}
               </h1>
-              <p className="text-emerald-200 text-xs mt-0.5">
-                <span className="font-bold text-white">{total}</span>{' '}
-                {search && !category ? <>kết quả cho &ldquo;<span className="text-yellow-300">{search}</span>&rdquo;</> : 'tin đang rao'}
+              <p className="text-[12px] text-emerald-200/90 mt-0.5">
+                <b className="text-white">{fmt(total)}</b> tin đang rao · Đắk Nông
               </p>
             </div>
-
-            {/* Search + Post button */}
-            <form onSubmit={handleSearch} className="flex flex-1 gap-2 min-w-0">
-              <div className="relative flex-1 min-w-0">
-                <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input
-                  type="text"
-                  placeholder="Tìm sản phẩm..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 bg-white"
-                />
-              </div>
-              <button type="submit" className="bg-yellow-500 hover:bg-yellow-400 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition whitespace-nowrap">
-                Tìm
-              </button>
-              <Link href="/products/create"
-                className="bg-white text-emerald-800 px-3 sm:px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-50 transition whitespace-nowrap flex items-center gap-1.5">
-                <i className="ri-add-line"></i>
-                <span className="hidden sm:inline">Đăng tin</span>
-              </Link>
-            </form>
+            <Link href="/products/create"
+              className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap flex items-center gap-1.5 shadow-sm">
+              <i className="ri-add-line"></i>
+              <span className="hidden sm:inline">Đăng tin</span>
+            </Link>
           </div>
 
+          {/* Search */}
+          <form onSubmit={handleSearch} className="flex gap-2 mb-3">
+            <div className="relative flex-1">
+              <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input
+                type="text"
+                placeholder="Tìm cà phê, hồ tiêu, sầu riêng..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+              />
+            </div>
+            <button type="submit" className="bg-white hover:bg-stone-100 text-gray-900 px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap">
+              Tìm
+            </button>
+          </form>
+
           {/* Subcategory chips */}
-          <div className="flex gap-1.5 mt-3 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-none">
-            {categories.map(cat => (
+          <div className="flex gap-1.5 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-none">
+            {CATEGORIES.map(cat => (
               <button
                 key={cat.value}
                 onClick={() => { setCategory(cat.value); setPage(1); }}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   category === cat.value
-                    ? 'bg-yellow-500 text-white shadow'
-                    : 'bg-white/15 text-white hover:bg-white/25 backdrop-blur'
+                    ? 'bg-white text-emerald-900'
+                    : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
                 {cat.name}
@@ -177,37 +169,41 @@ function ProductsInner() {
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
 
         {/* ── Toolbar ─────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 mb-5 flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 flex-wrap flex-1">
-            <span className="text-sm font-bold text-gray-800">
-              {fmt(total)} <span className="font-medium text-gray-500">tin</span>
-            </span>
-            <span className="hidden sm:inline text-gray-300">·</span>
-            <div className="flex items-center gap-1 flex-wrap">
-              {QUICK_FILTERS.map(f => (
-                <button key={f.value}
-                  onClick={() => setQuickFilter(f.value)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${
-                    quickFilter === f.value
-                      ? 'bg-emerald-700 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}>
-                  {f.label}
-                </button>
-              ))}
-            </div>
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {/* Result count */}
+          <span className="text-[12px] text-gray-500">
+            <b className="text-gray-900">{fmt(filtered.length || total)}</b> kết quả
+          </span>
+
+          <div className="w-px h-4 bg-stone-300 mx-1" />
+
+          {/* Quick filters */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {QUICK_FILTERS.map(f => (
+              <button key={f.value}
+                onClick={() => setQuickFilter(f.value)}
+                className={`px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
+                  quickFilter === f.value
+                    ? 'bg-emerald-700 text-white'
+                    : 'text-gray-600 hover:bg-stone-200'
+                }`}>
+                {f.label}
+              </button>
+            ))}
           </div>
 
+          {/* Right side */}
           <div className="flex items-center gap-2 ml-auto">
+            <span className="text-[12px] text-gray-500">Sắp xếp:</span>
             <select
               value={sortBy}
               onChange={e => { setSortBy(e.target.value); setPage(1); }}
-              className="text-xs border border-gray-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-300 font-medium text-gray-700"
+              className="text-[12px] border border-stone-300 rounded px-2 py-1 focus:outline-none focus:border-emerald-700 bg-white font-medium text-gray-700"
             >
               <option value="newest">Mới nhất</option>
               <option value="price_asc">Giá thấp</option>
@@ -215,15 +211,15 @@ function ProductsInner() {
               <option value="popular">Phổ biến</option>
             </select>
             {/* Grid / List toggle */}
-            <div className="flex items-center bg-gray-100 rounded-xl p-0.5">
+            <div className="flex items-center border border-stone-300 rounded overflow-hidden">
               <button onClick={() => setView('grid')}
                 aria-label="Lưới"
-                className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${view === 'grid' ? 'bg-white shadow text-emerald-700' : 'text-gray-400'}`}>
+                className={`w-7 h-7 flex items-center justify-center transition-colors ${view === 'grid' ? 'bg-stone-200 text-gray-900' : 'text-gray-400 hover:bg-stone-100'}`}>
                 <i className="ri-grid-fill text-sm"></i>
               </button>
               <button onClick={() => setView('list')}
                 aria-label="Danh sách"
-                className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${view === 'list' ? 'bg-white shadow text-emerald-700' : 'text-gray-400'}`}>
+                className={`w-7 h-7 flex items-center justify-center transition-colors border-l border-stone-300 ${view === 'list' ? 'bg-stone-200 text-gray-900' : 'text-gray-400 hover:bg-stone-100'}`}>
                 <i className="ri-list-check text-sm"></i>
               </button>
             </div>
@@ -231,23 +227,12 @@ function ProductsInner() {
         </div>
 
         {/* ── Two-column layout ───────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
-
-          {/* MAIN column */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
           <main className="min-w-0">
+
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                    <div className="bg-gray-100" style={{ aspectRatio: '4/3' }} />
-                    <div className="p-3 space-y-2">
-                      <div className="h-3 bg-gray-100 rounded w-3/4" />
-                      <div className="h-4 bg-gray-100 rounded w-1/2" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : filteredItems.length === 0 ? (
+              <GridSkeleton view={view} />
+            ) : filtered.length === 0 ? (
               <EmptyState
                 keyword={search || category ? (search || category) : undefined}
                 entityLabel="sản phẩm"
@@ -255,104 +240,142 @@ function ProductsInner() {
                 createLabel="+ Đăng sản phẩm ngay"
                 onClearSearch={search || category ? () => { setSearch(''); setCategory(''); router.replace('/products'); } : undefined}
               />
+            ) : view === 'grid' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {filtered.map(p => <ProductCard key={p.id} product={p} onDeleted={id => setItems(prev => prev.filter(x => x.id !== id))} />)}
+              </div>
             ) : (
-              <>
-                {/* VIP section */}
-                {vipItems.length > 0 && (
-                  <section className="mb-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-                        <i className="ri-vip-crown-fill"></i>
-                        Tin VIP nổi bật
-                      </span>
-                      <span className="text-xs text-gray-400">{vipItems.length} tin</span>
-                    </div>
-                    {view === 'grid' ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {vipItems.slice(0, 6).map(p => <ProductCard key={p.id} product={p} onDeleted={id => setItems(prev => prev.filter(x => x.id !== id))} />)}
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {vipItems.slice(0, 6).map(p => <ProductListRow key={p.id} product={p} onDeleted={id => setItems(prev => prev.filter(x => x.id !== id))} />)}
-                      </div>
-                    )}
-                  </section>
-                )}
+              <div className="space-y-2">
+                {filtered.map(p => <ProductListRow key={p.id} product={p} onDeleted={id => setItems(prev => prev.filter(x => x.id !== id))} />)}
+              </div>
+            )}
 
-                {/* Section header for normal items if VIP shown */}
-                {vipItems.length > 0 && normalItems.length > 0 && (
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-xs font-bold tracking-widest text-gray-400 uppercase">Tất cả tin đăng</span>
-                    <div className="h-px flex-1 bg-gray-200" />
-                  </div>
-                )}
+            {/* Low-data fill — below grid when sparse */}
+            {lowData && filtered.length > 0 && <LowDataFill currentCategory={category} />}
 
-                {/* Normal items */}
-                {view === 'grid' ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {normalItems.map(p => <ProductCard key={p.id} product={p} onDeleted={id => setItems(prev => prev.filter(x => x.id !== id))} />)}
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {normalItems.map(p => <ProductListRow key={p.id} product={p} onDeleted={id => setItems(prev => prev.filter(x => x.id !== id))} />)}
-                  </div>
-                )}
-
-                {/* Recommended fill — only when category is sparse */}
-                {showRecommendedFill && (
-                  <section className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <i className="ri-lightbulb-flash-fill text-amber-500 text-lg"></i>
-                      <div>
-                        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Gợi ý cho bạn</p>
-                        <h3 className="font-black text-gray-900 text-sm">Có thể bạn quan tâm</h3>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5">
-                      {categories.filter(c => c.value && c.value !== category).slice(0, 6).map(c => (
-                        <Link key={c.value} href={`/products?category=${c.value}`}
-                          className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 hover:bg-emerald-50 rounded-xl border border-gray-100 hover:border-emerald-200 transition-colors">
-                          <i className="ri-arrow-right-circle-line text-emerald-600"></i>
-                          <span className="text-xs font-bold text-gray-700">{c.name}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-1.5 mt-8">
-                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 disabled:opacity-40 hover:bg-gray-50">
-                      <i className="ri-arrow-left-s-line"></i>
-                    </button>
-                    {[...Array(totalPages)].map((_, i) => (
-                      <button key={i} onClick={() => setPage(i + 1)}
-                        className={`w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${page === i + 1 ? 'bg-emerald-700 text-white shadow' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                        {i + 1}
-                      </button>
-                    )).slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))}
-                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                      className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 disabled:opacity-40 hover:bg-gray-50">
-                      <i className="ri-arrow-right-s-line"></i>
-                    </button>
-                  </div>
-                )}
-              </>
+            {/* Pagination */}
+            {totalPages > 1 && !loading && (
+              <div className="flex justify-center items-center gap-1 mt-8">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-stone-300 bg-white text-gray-600 disabled:opacity-40 hover:bg-stone-50">
+                  <i className="ri-arrow-left-s-line"></i>
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button key={i} onClick={() => setPage(i + 1)}
+                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-emerald-700 text-white' : 'bg-white border border-stone-300 text-gray-700 hover:bg-stone-50'}`}>
+                    {i + 1}
+                  </button>
+                )).slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))}
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-stone-300 bg-white text-gray-600 disabled:opacity-40 hover:bg-stone-50">
+                  <i className="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
             )}
           </main>
 
           {/* SIDEBAR */}
           <div className="hidden lg:block">
             <CategorySidebar
+              vipItems={vipItems}
+              popularSearches={POPULAR_SEARCHES}
+              searchHref={(q) => `/products?search=${encodeURIComponent(q)}`}
+              itemHref={(item) => `/products/${item.id}`}
               postHref="/products/create"
               postLabel="Đăng tin sản phẩm"
-              searchHref={(q) => `/products?search=${encodeURIComponent(q)}`}
             />
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Skeleton ────────────────────────────────────────────────────────
+function GridSkeleton({ view }: { view: 'grid' | 'list' }) {
+  if (view === 'list') {
+    return (
+      <div className="space-y-2">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex gap-3 bg-white border border-stone-200 rounded-lg overflow-hidden animate-pulse">
+            <div className="w-32 h-28 bg-stone-100 flex-shrink-0" />
+            <div className="flex-1 p-3 space-y-2">
+              <div className="h-3 bg-stone-100 rounded w-3/4" />
+              <div className="h-4 bg-stone-100 rounded w-1/3" />
+              <div className="h-2 bg-stone-100 rounded w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {[...Array(9)].map((_, i) => (
+        <div key={i} className="bg-white border border-stone-200 rounded-lg overflow-hidden animate-pulse">
+          <div className="bg-stone-100" style={{ aspectRatio: '4/3' }} />
+          <div className="p-3 space-y-2">
+            <div className="h-3 bg-stone-100 rounded w-3/4" />
+            <div className="h-4 bg-stone-100 rounded w-1/2" />
+            <div className="h-2 bg-stone-100 rounded w-2/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Low-data fill blocks ────────────────────────────────────────────
+function LowDataFill({ currentCategory }: { currentCategory: string }) {
+  const otherCats = CATEGORIES.filter(c => c.value && c.value !== currentCategory);
+
+  return (
+    <div className="mt-8 space-y-5">
+      {/* Có thể bạn quan tâm */}
+      <section className="bg-white border border-stone-200 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">Có thể bạn quan tâm</p>
+            <h3 className="text-[14px] font-bold text-gray-900 mt-0.5">Danh mục phổ biến</h3>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {otherCats.map(c => (
+            <Link key={c.value} href={`/products?category=${c.value}`}
+              className="flex items-center justify-between px-3 py-2 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded text-[13px] font-medium text-gray-700 transition-colors">
+              <span>{c.name}</span>
+              <i className="ri-arrow-right-s-line text-gray-400"></i>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Đăng tin đầu tiên trong khu vực */}
+      <section className="bg-white border border-stone-200 rounded-lg p-5 flex items-center gap-4 flex-wrap">
+        <div className="flex-1 min-w-[200px]">
+          <p className="text-[10px] font-semibold tracking-wider text-emerald-700 uppercase">Cộng đồng Nhân Cơ</p>
+          <h3 className="text-[15px] font-bold text-gray-900 mt-0.5 mb-1">Đăng tin đầu tiên trong khu vực của bạn</h3>
+          <p className="text-[12.5px] text-gray-600 leading-relaxed">
+            Bà con tại Nhân Cơ, Đắk Nông đang tìm những mặt hàng này. Đăng ngay để bán nhanh, gần nhà.
+          </p>
+        </div>
+        <Link href="/products/create"
+          className="bg-emerald-700 hover:bg-emerald-800 text-white text-[13px] font-semibold px-4 py-2 rounded transition-colors">
+          + Đăng tin ngay
+        </Link>
+      </section>
+
+      {/* Safety reminder */}
+      <section className="bg-amber-50/60 border border-amber-200/60 rounded-lg p-4 flex gap-3">
+        <i className="ri-shield-check-line text-amber-700 text-xl flex-shrink-0 mt-0.5"></i>
+        <div className="min-w-0">
+          <p className="text-[13px] font-bold text-amber-900 mb-1">Mua bán an toàn</p>
+          <p className="text-[12px] text-amber-900/80 leading-relaxed">
+            Gặp trực tiếp ở nơi đông người · Kiểm tra hàng trước khi trả tiền · Không chuyển khoản trước · Không chia sẻ OTP.
+            <Link href="/canh-bao" className="text-amber-900 font-bold hover:underline ml-1">Xem cảnh báo</Link>
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
@@ -366,37 +389,27 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
     <div className="relative group">
       <Link
         href={`/products/${product.id}`}
-        className={`block bg-white rounded-2xl overflow-hidden border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] ${
-          product.isVip ? 'border-amber-300 ring-1 ring-amber-200' : 'border-gray-100'
-        }`}
+        className="block bg-white border border-stone-200 rounded-lg overflow-hidden transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-stone-300"
       >
-        <div className="relative overflow-hidden rounded-t-2xl bg-emerald-50/30" style={{ aspectRatio: '4/3' }}>
+        <div className="relative bg-stone-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {imgUrl ? (
             <img src={imgUrl} alt={product.title}
-              className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300" />
+              className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-emerald-50 to-emerald-100/40">
-              <i className="ri-image-2-line text-3xl text-emerald-300"></i>
-              <span className="text-[10px] font-medium text-emerald-400">Chưa có ảnh</span>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+              <i className="ri-image-line text-3xl text-stone-300"></i>
+              <span className="text-[10px] text-stone-400">Chưa có ảnh</span>
             </div>
           )}
 
-          {/* Top-left badges */}
-          <div className="absolute top-2 left-2 flex items-center gap-1">
-            {product.isVip && (
-              <span className="inline-flex items-center gap-0.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">
-                <i className="ri-vip-crown-fill text-[10px]"></i>VIP
-              </span>
-            )}
-            {isNew && !product.isVip && (
-              <span className="bg-emerald-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full shadow">MỚI</span>
-            )}
-          </div>
-
-          {/* Time badge — top right */}
-          {product.createdAt && (
-            <span className="absolute top-2 right-2 bg-black/45 backdrop-blur-sm text-white text-[10px] px-1.5 py-0.5 rounded-full font-semibold">
-              {timeAgo(product.createdAt)}
+          {/* Single corner badge — VIP takes priority, else MỚI */}
+          {product.isVip ? (
+            <span className="absolute top-2 left-2 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200 flex items-center gap-0.5">
+              <i className="ri-vip-crown-fill"></i>VIP
+            </span>
+          ) : isNew && (
+            <span className="absolute top-2 left-2 bg-white/95 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-200">
+              MỚI
             </span>
           )}
 
@@ -404,49 +417,53 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
         </div>
 
         <div className="p-3">
-          <h4 className="font-bold text-gray-900 text-sm line-clamp-2 leading-snug mb-1.5 group-hover:text-emerald-700 transition-colors min-h-[2.5em]">
+          <h4 className="text-[13.5px] font-medium text-gray-900 line-clamp-2 leading-snug min-h-[2.5em] mb-1.5 group-hover:text-emerald-800 transition-colors">
             {product.title}
           </h4>
           <div className="flex items-baseline gap-1 mb-2">
-            <span className="text-base font-black" style={{ color: '#d0011b' }}>{fmt(Number(product.price))}đ</span>
+            <span className="text-[15px] font-bold text-red-700">{fmt(Number(product.price))}đ</span>
             {product.unit && <span className="text-[11px] text-gray-400">/{product.unit}</span>}
           </div>
 
           {/* Meta row */}
-          <div className="flex items-center gap-2 text-[11px] text-gray-400 mb-1.5">
+          <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
             <span className="flex items-center gap-0.5 min-w-0 flex-1">
-              <i className="ri-map-pin-2-line text-red-400 flex-shrink-0"></i>
+              <i className="ri-map-pin-line text-gray-400 flex-shrink-0"></i>
               <span className="truncate">{product.location || 'Đắk Nông'}</span>
             </span>
-            <span className="flex items-center gap-0.5 flex-shrink-0">
-              <i className="ri-eye-line"></i>
-              <span>{product.viewCount || 0}</span>
-            </span>
+            {product.createdAt && (
+              <span className="flex items-center gap-0.5 text-gray-400 flex-shrink-0">
+                <i className="ri-time-line"></i>{timeAgo(product.createdAt)}
+              </span>
+            )}
           </div>
 
           {/* Seller row */}
-          {product.user?.fullName && (
-            <div className="flex items-center gap-1.5 pt-1.5 border-t border-gray-50">
-              <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                {product.user.avatarUrl ? (
-                  <img src={product.user.avatarUrl} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <i className="ri-user-fill text-emerald-600" style={{ fontSize: 9 }}></i>
-                )}
-              </div>
-              <span className="text-[11px] text-gray-500 font-medium truncate">{product.user.fullName}</span>
+          {(product.user?.fullName || product.viewCount !== undefined) && (
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-stone-100 text-[11px] text-gray-500">
+              {product.user?.fullName && (
+                <span className="flex items-center gap-1 min-w-0 flex-1">
+                  <i className="ri-user-line text-gray-400"></i>
+                  <span className="truncate">{product.user.fullName}</span>
+                </span>
+              )}
+              {product.viewCount !== undefined && (
+                <span className="flex items-center gap-0.5 text-gray-400 flex-shrink-0">
+                  <i className="ri-eye-line"></i>{product.viewCount}
+                </span>
+              )}
             </div>
           )}
         </div>
       </Link>
-      <div className="absolute top-2 right-9 z-10">
+      <div className="absolute top-1 right-1 z-10">
         <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
       </div>
     </div>
   );
 }
 
-// ─── Product list row (compact horizontal view) ──────────────────────
+// ─── Product list row ────────────────────────────────────────────────
 function ProductListRow({ product, onDeleted }: { product: any; onDeleted: (id: string) => void }) {
   const isNew = product.createdAt && (Date.now() - new Date(product.createdAt).getTime()) < 86400000;
   const imgUrl = product.images?.[0]?.url || (typeof product.images?.[0] === 'string' ? product.images[0] : null);
@@ -455,60 +472,53 @@ function ProductListRow({ product, onDeleted }: { product: any; onDeleted: (id: 
     <div className="relative group">
       <Link
         href={`/products/${product.id}`}
-        className={`flex gap-3 bg-white rounded-2xl overflow-hidden border transition-all hover:shadow-md ${
-          product.isVip ? 'border-amber-300' : 'border-gray-100'
-        }`}
+        className="flex gap-3 bg-white border border-stone-200 rounded-lg overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-stone-300 transition-all"
       >
-        <div className="relative w-32 h-32 sm:w-40 sm:h-32 flex-shrink-0 bg-emerald-50/30">
+        <div className="relative w-32 sm:w-40 flex-shrink-0 bg-stone-100" style={{ aspectRatio: '4/3' }}>
           {imgUrl ? (
             <img src={imgUrl} alt={product.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <i className="ri-image-2-line text-3xl text-emerald-300"></i>
+              <i className="ri-image-line text-3xl text-stone-300"></i>
             </div>
           )}
-          <div className="absolute top-1.5 left-1.5 flex gap-1">
-            {product.isVip && (
-              <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">VIP</span>
-            )}
-            {isNew && !product.isVip && (
-              <span className="bg-emerald-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">MỚI</span>
-            )}
-          </div>
+          {product.isVip ? (
+            <span className="absolute top-1.5 left-1.5 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">VIP</span>
+          ) : isNew && (
+            <span className="absolute top-1.5 left-1.5 bg-white/95 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-200">MỚI</span>
+          )}
         </div>
-        <div className="flex-1 min-w-0 p-3 pr-12">
-          <h4 className="font-bold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
+        <div className="flex-1 min-w-0 py-2.5 pr-10">
+          <h4 className="text-[14px] font-medium text-gray-900 line-clamp-2 leading-snug group-hover:text-emerald-800 transition-colors">
             {product.title}
           </h4>
-          <p className="text-base font-black mt-1" style={{ color: '#d0011b' }}>
+          <p className="text-[15px] font-bold text-red-700 mt-1">
             {fmt(Number(product.price))}đ
-            {product.unit && <span className="text-[11px] text-gray-400 ml-0.5">/{product.unit}</span>}
+            {product.unit && <span className="text-[11px] font-normal text-gray-400 ml-0.5">/{product.unit}</span>}
           </p>
-          <div className="flex items-center gap-3 text-[11px] text-gray-400 mt-2 flex-wrap">
+          <div className="flex items-center gap-3 text-[11px] text-gray-500 mt-2 flex-wrap">
             <span className="flex items-center gap-0.5">
-              <i className="ri-map-pin-2-line text-red-400"></i>
-              {product.location || 'Đắk Nông'}
-            </span>
-            <span className="flex items-center gap-0.5">
-              <i className="ri-eye-line"></i>
-              {product.viewCount || 0}
+              <i className="ri-map-pin-line text-gray-400"></i>{product.location || 'Đắk Nông'}
             </span>
             {product.createdAt && (
-              <span className="flex items-center gap-0.5">
-                <i className="ri-time-line"></i>
-                {timeAgo(product.createdAt)}
+              <span className="flex items-center gap-0.5 text-gray-400">
+                <i className="ri-time-line"></i>{timeAgo(product.createdAt)}
               </span>
             )}
             {product.user?.fullName && (
-              <span className="flex items-center gap-0.5 ml-auto">
-                <i className="ri-user-line"></i>
-                {product.user.fullName}
+              <span className="flex items-center gap-0.5 text-gray-400">
+                <i className="ri-user-line"></i>{product.user.fullName}
+              </span>
+            )}
+            {product.viewCount !== undefined && (
+              <span className="flex items-center gap-0.5 text-gray-400 ml-auto">
+                <i className="ri-eye-line"></i>{product.viewCount}
               </span>
             )}
           </div>
         </div>
       </Link>
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-1.5 right-1.5 z-10">
         <PostOptionsMenu postId={product.id} ownerId={product.userId || product.user?.id} onDelete={async (id) => { await productsApi.delete(id); onDeleted(id); }} editHref={`/products/${product.id}/edit`} />
       </div>
     </div>
