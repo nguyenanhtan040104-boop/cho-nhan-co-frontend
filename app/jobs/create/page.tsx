@@ -169,6 +169,7 @@ export default function CreateJobPage() {
               onChange={setGps}
               label="Lấy vị trí GPS của nơi làm việc"
               hint="Đứng tại địa điểm làm việc rồi bấm. Giúp người tìm việc thấy việc gần nhà."
+              onAddressDetected={(addr) => setForm(prev => ({ ...prev, location: prev.location || addr }))}
             />
           </div>
 

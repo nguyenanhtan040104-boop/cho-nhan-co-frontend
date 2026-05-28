@@ -8,6 +8,7 @@ import PostOptionsMenu from '../components/PostOptionsMenu';
 import EmptyState from '../components/EmptyState';
 import LikeButton from '../components/LikeButton';
 import { getUserLocation, distanceKm, formatDistance, type UserLocation } from '../../lib/userLocation';
+import NearbyToggle from '../components/NearbyToggle';
 
 const typeOptions = [
   { value: '', label: 'Tất cả' },
@@ -54,6 +55,7 @@ function RealEstateContent() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
+  const [nearbyOnly, setNearbyOnly] = useState(false);
   const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
   const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
 
@@ -66,12 +68,19 @@ function RealEstateContent() {
   }, []);
 
   // Annotate items with distance when both sides have GPS
-  const itemsWithDistance = items.map(item => {
+  let itemsWithDistance = items.map(item => {
     if (userLoc && typeof item.latitude === 'number' && typeof item.longitude === 'number') {
       return { ...item, _distanceKm: distanceKm(userLoc, { latitude: item.latitude, longitude: item.longitude }) };
     }
     return item;
   });
+
+  // 'Nearby only' filter (active when user has GPS)
+  if (nearbyOnly && userLoc) {
+    itemsWithDistance = itemsWithDistance
+      .filter(i => typeof i._distanceKm === 'number' && i._distanceKm <= 30)
+      .sort((a, b) => (a._distanceKm ?? 999) - (b._distanceKm ?? 999));
+  }
 
   // Đọc query params từ URL (từ header dropdown)
   useEffect(() => {
@@ -159,6 +168,16 @@ function RealEstateContent() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* GPS toolbar */}
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <NearbyToggle active={nearbyOnly} onChange={setNearbyOnly} />
+          {nearbyOnly && userLoc && (
+            <p className="text-[12px] text-gray-500">
+              Đang lọc tin trong <b className="text-gray-900">bán kính 30km</b> · sắp xếp theo gần nhất
+            </p>
+          )}
+        </div>
+
         {/* Bulk bar */}
         {isLoggedIn && (
           <div className="flex justify-end mb-4 gap-2">

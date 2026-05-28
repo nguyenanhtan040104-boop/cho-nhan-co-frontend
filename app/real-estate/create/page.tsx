@@ -217,6 +217,7 @@ export default function CreateRealEstatePage() {
               onChange={setGps}
               label="Lấy vị trí GPS của khu đất / nhà"
               hint="Đứng tại khu đất / căn nhà rồi bấm nút này. Giúp người mua tính khoảng cách chính xác."
+              onAddressDetected={(addr) => setForm(prev => ({ ...prev, address: prev.address || addr }))}
             />
           </div>
 

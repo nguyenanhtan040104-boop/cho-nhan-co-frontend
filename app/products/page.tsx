@@ -89,13 +89,20 @@ function ProductsInner() {
     setPage(1);
   }, [searchParams]);
 
-  useEffect(() => { loadProducts(); }, [category, sortBy, page]);
+  useEffect(() => { loadProducts(); }, [category, sortBy, page, quickFilter, userLoc]);
   useEffect(() => { if (search === '') { setPage(1); loadProducts(''); } }, [search]);
 
   async function loadProducts(searchQuery?: string) {
     setLoading(true);
     try {
-      const res = await productsApi.getAll({ search: searchQuery ?? search, category: category || undefined, sortBy, page, limit: 12 });
+      const params: any = { search: searchQuery ?? search, category: category || undefined, sortBy, page, limit: 12 };
+      // 'Gần bạn' → ask server to filter by proximity (efficient at scale)
+      if (quickFilter === 'near' && userLoc) {
+        params.nearLat = userLoc.latitude;
+        params.nearLng = userLoc.longitude;
+        params.radiusKm = 30;
+      }
+      const res = await productsApi.getAll(params);
       setItems(res.data || []);
       setTotal(res.total || 0);
       setTotalPages(res.totalPages || 1);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { reverseGeocode } from '../../lib/userLocation';
 
 type Props = {
   value: { latitude?: number | null; longitude?: number | null };
@@ -9,6 +10,8 @@ type Props = {
   label?: string;
   /** Subtitle hint, shown under the button */
   hint?: string;
+  /** Called with a reverse-geocoded address string after a successful capture. */
+  onAddressDetected?: (address: string) => void;
 };
 
 /**
@@ -21,9 +24,11 @@ export default function GPSLocationPicker({
   onChange,
   label = 'Lấy vị trí GPS của tôi',
   hint = 'Giúp người mua thấy bài đăng gần họ hơn. Vị trí chỉ dùng để tính khoảng cách, không lộ địa chỉ cụ thể.',
+  onAddressDetected,
 }: Props) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [detectedAddress, setDetectedAddress] = useState<string | null>(null);
 
   const hasGPS = typeof value.latitude === 'number' && typeof value.longitude === 'number';
 
@@ -35,13 +40,18 @@ export default function GPSLocationPicker({
     }
     setStatus('loading');
     setError(null);
+    setDetectedAddress(null);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        onChange({
-          latitude: Number(pos.coords.latitude.toFixed(6)),
-          longitude: Number(pos.coords.longitude.toFixed(6)),
-        });
+      async (pos) => {
+        const lat = Number(pos.coords.latitude.toFixed(6));
+        const lng = Number(pos.coords.longitude.toFixed(6));
+        onChange({ latitude: lat, longitude: lng });
         setStatus('idle');
+        // Best-effort reverse geocoding to suggest an address
+        if (onAddressDetected) {
+          const addr = await reverseGeocode(lat, lng);
+          if (addr) setDetectedAddress(addr);
+        }
       },
       (err) => {
         setStatus('error');
@@ -63,6 +73,14 @@ export default function GPSLocationPicker({
     onChange({ latitude: null, longitude: null });
     setStatus('idle');
     setError(null);
+    setDetectedAddress(null);
+  }
+
+  function applyDetectedAddress() {
+    if (detectedAddress && onAddressDetected) {
+      onAddressDetected(detectedAddress);
+      setDetectedAddress(null);
+    }
   }
 
   return (
@@ -102,6 +120,24 @@ export default function GPSLocationPicker({
           <i className={`${status === 'loading' ? 'ri-loader-4-line animate-spin' : 'ri-map-pin-add-line'} text-lg`}></i>
           {status === 'loading' ? 'Đang lấy vị trí...' : label}
         </button>
+      )}
+
+      {/* Reverse-geocoded address suggestion */}
+      {hasGPS && detectedAddress && onAddressDetected && (
+        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+          <i className="ri-magic-line text-amber-700 mt-0.5"></i>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-semibold text-amber-700 mb-0.5">Gợi ý địa chỉ từ GPS</p>
+            <p className="text-[12.5px] text-amber-900 line-clamp-2">{detectedAddress}</p>
+          </div>
+          <button
+            type="button"
+            onClick={applyDetectedAddress}
+            className="text-[12px] font-bold text-amber-800 hover:underline whitespace-nowrap"
+          >
+            Dùng
+          </button>
+        </div>
       )}
 
       {status === 'error' && error && (

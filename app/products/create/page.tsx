@@ -342,6 +342,7 @@ function CreateProductContent() {
                 value={gps}
                 onChange={setGps}
                 label="Lấy vị trí GPS hiện tại của tôi"
+                onAddressDetected={(addr) => setFormData(prev => ({ ...prev, location: prev.location || addr }))}
               />
             </div>
 

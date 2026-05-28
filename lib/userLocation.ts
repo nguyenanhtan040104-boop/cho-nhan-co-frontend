@@ -96,3 +96,35 @@ export function formatDistance(km: number): string {
   if (km < 10) return `${km.toFixed(1).replace('.0', '')}km`;
   return `${Math.round(km)}km`;
 }
+
+/**
+ * Reverse geocode a GPS coordinate to a Vietnamese-readable address using
+ * OpenStreetMap Nominatim. Free, no API key required.
+ *
+ * Returns a short locality string like 'Xã Nhân Cơ, Huyện Đắk R'Lấp, Đắk Nông'.
+ * Returns null on any failure (network, rate limit, malformed response).
+ */
+export async function reverseGeocode(latitude: number, longitude: number): Promise<string | null> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=vi&zoom=14`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const a = data?.address || {};
+    // Build a short locality: commune, district, province (skip street/house for privacy)
+    const parts: string[] = [];
+    const commune = a.village || a.suburb || a.hamlet || a.quarter || a.neighbourhood;
+    const district = a.county || a.town || a.city_district || a.district;
+    const province = a.state || a.province || a.region;
+    if (commune) parts.push(commune);
+    if (district) parts.push(district);
+    if (province) parts.push(province);
+    if (parts.length === 0 && data.display_name) {
+      // Fallback: take first 3 comma-separated parts of display_name
+      return data.display_name.split(',').slice(0, 3).map((s: string) => s.trim()).join(', ');
+    }
+    return parts.join(', ') || null;
+  } catch {
+    return null;
+  }
+}
