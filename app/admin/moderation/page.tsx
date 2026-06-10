@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { forum, auth } from '../../../lib/api';
+import { forum, auth, users } from '../../../lib/api';
 
 const STATUS_OPTS = [
   { value: '', label: 'Tất cả' },
@@ -30,7 +30,10 @@ export default function ModerationPage() {
 
   useEffect(() => {
     if (!auth.isLoggedIn()) { router.replace('/profile'); return; }
-    loadPosts(1);
+    users.getMe().then(me => {
+      if (me?.role?.toLowerCase() !== 'admin') { router.replace('/dashboard'); }
+      else loadPosts(1);
+    }).catch(() => router.replace('/profile'));
   }, [statusFilter]);
 
   const loadPosts = useCallback(async (p: number) => {

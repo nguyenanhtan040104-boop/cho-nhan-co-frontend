@@ -146,14 +146,14 @@ export const auth = {
 
   logout() {
     const refreshToken = localStorage.getItem('refreshToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     if (refreshToken) {
       request('/auth/logout', {
         method: 'POST',
         body: JSON.stringify({ refreshToken }),
-      }).catch(() => {});
+      }).catch((err) => console.warn('[Logout] Token revocation failed:', err?.message));
     }
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
   },
 
   isLoggedIn(): boolean {

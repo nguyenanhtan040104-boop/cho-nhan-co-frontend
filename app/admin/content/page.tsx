@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { products, realEstate, jobs, forum, auth } from '../../../lib/api';
+import { products, realEstate, jobs, forum, auth, users } from '../../../lib/api';
 
 type TabType = 'products' | 'real-estate' | 'jobs' | 'forum';
 
@@ -50,20 +50,22 @@ export default function AdminContentPage() {
 
   useEffect(() => {
     if (!auth.isLoggedIn()) { router.replace('/profile'); return; }
-    // Load badge counts for all tabs
-    Promise.allSettled([
-      products.adminGetPending(1, 1),
-      realEstate.adminGetPending(1, 1),
-      jobs.adminGetPending(1, 1),
-      forum.getPendingPosts({ page: 1, limit: 1 }),
-    ]).then(([p, r, j, f]) => {
-      setCounts({
-        products:     p.status === 'fulfilled' ? (p.value as any).total || 0 : 0,
-        'real-estate':r.status === 'fulfilled' ? (r.value as any).total || 0 : 0,
-        jobs:         j.status === 'fulfilled' ? (j.value as any).total || 0 : 0,
-        forum:        f.status === 'fulfilled' ? (f.value as any).total || 0 : 0,
+    users.getMe().then(me => {
+      if (me?.role?.toLowerCase() !== 'admin') { router.replace('/dashboard'); return; }
+      Promise.allSettled([
+        products.adminGetPending(1, 1),
+        realEstate.adminGetPending(1, 1),
+        jobs.adminGetPending(1, 1),
+        forum.getPendingPosts({ page: 1, limit: 1 }),
+      ]).then(([p, r, j, f]) => {
+        setCounts({
+          products:      p.status === 'fulfilled' ? (p.value as any).total || 0 : 0,
+          'real-estate': r.status === 'fulfilled' ? (r.value as any).total || 0 : 0,
+          jobs:          j.status === 'fulfilled' ? (j.value as any).total || 0 : 0,
+          forum:         f.status === 'fulfilled' ? (f.value as any).total || 0 : 0,
+        });
       });
-    });
+    }).catch(() => router.replace('/profile'));
   }, []);
 
   const load = useCallback(async (p: number) => {
