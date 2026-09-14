@@ -207,7 +207,7 @@ function DashboardContent() {
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="" className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover flex-shrink-0 border-2 border-green-200" />
             ) : (
-              <div className="w-10 h-10 md:w-14 md:h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
+              <div className="w-10 h-10 md:w-14 md:h-14 bg-brand-500 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
                 {user?.fullName?.[0] || 'U'}
               </div>
             )}
@@ -328,7 +328,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Wallet Balance Card */}
-                <Link href="/wallet" className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-xl p-5 shadow-sm block hover:opacity-90 transition mb-6">
+                <Link href="/wallet" className="bg-gradient-to-r from-brand-600 to-forest-500 rounded-xl p-5 shadow-sm block hover:opacity-90 transition mb-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -405,7 +405,7 @@ function DashboardContent() {
                   <h3 className="font-semibold text-gray-900 mb-4">Đăng tin mới</h3>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     {[
-                      { href: '/products/create', label: 'Đăng sản phẩm', icon: 'ri-plant-line', color: 'bg-green-600' },
+                      { href: '/products/create', label: 'Đăng sản phẩm', icon: 'ri-plant-line', color: 'bg-brand-500' },
                       { href: '/real-estate/create', label: 'Đăng BĐS', icon: 'ri-home-4-line', color: 'bg-blue-600' },
                       { href: '/jobs/create', label: 'Đăng tuyển dụng', icon: 'ri-briefcase-line', color: 'bg-indigo-600' },
                       { href: '/forum/create', label: 'Viết bài', icon: 'ri-chat-3-line', color: 'bg-purple-600' },
@@ -520,7 +520,7 @@ function DashboardContent() {
                           <Link href={`/real-estate/${item.id}`} className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <Link href={`/real-estate/${item.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                          <Link href={`/real-estate/${item.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
                             <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={() => handleDeleteRealEstate(item.id)} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
@@ -579,7 +579,7 @@ function DashboardContent() {
                           <Link href={`/jobs/${job.id}`} className="p-2 text-gray-500 hover:text-indigo-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <Link href={`/jobs/${job.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                          <Link href={`/jobs/${job.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
                             <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={() => handleDeleteJob(job.id)} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
@@ -638,7 +638,7 @@ function DashboardContent() {
                           <Link href={`/advertisements/${ad.id}`} className="p-2 text-gray-500 hover:text-orange-500 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <Link href={`/advertisements/${ad.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                          <Link href={`/advertisements/${ad.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
                             <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={async () => {
@@ -701,7 +701,7 @@ function DashboardContent() {
                           <Link href={`/forum/${post.id}`} className="p-2 text-gray-500 hover:text-purple-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <Link href={`/forum/${post.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                          <Link href={`/forum/${post.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
                             <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={async () => {
@@ -754,7 +754,7 @@ function DashboardContent() {
                           <Link href={`/canh-bao/${post.id}`} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
-                          <Link href={`/canh-bao/${post.id}/edit`} className="p-2 text-gray-500 hover:text-green-600 transition-colors">
+                          <Link href={`/canh-bao/${post.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
                             <i className="ri-edit-line text-lg"></i>
                           </Link>
                           <button onClick={async () => {
@@ -778,7 +778,7 @@ function DashboardContent() {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Thông báo</h2>
                   {notifs.some(n => !n.isRead) && (
-                    <button onClick={handleMarkAllRead} className="text-sm text-green-600 hover:text-green-700">
+                    <button onClick={handleMarkAllRead} className="text-sm text-green-600 hover:text-brand-700">
                       Đánh dấu tất cả đã đọc
                     </button>
                   )}
@@ -1086,7 +1086,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           )}
           <div>
             {user.isEmailVerified ? (
-              <label className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${avatarUploading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}>
+              <label className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${avatarUploading ? 'bg-gray-400' : 'bg-brand-500 hover:bg-brand-600'}`}>
                 <i className={avatarUploading ? 'ri-loader-4-line animate-spin' : 'ri-camera-line'}></i>
                 {avatarUploading ? 'Đang tải...' : 'Đổi ảnh đại diện'}
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={avatarUploading} />
@@ -1119,7 +1119,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 type="text"
                 value={form.fullName}
                 onChange={e => setForm({ ...form, fullName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -1128,7 +1128,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 type="text"
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -1137,7 +1137,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 type="text"
                 value={form.address}
                 onChange={e => setForm({ ...form, address: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -1160,7 +1160,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           <button
             type="submit"
             disabled={saving}
-            className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="mt-4 bg-brand-500 text-white px-6 py-2 rounded-lg hover:bg-brand-600 transition-colors disabled:opacity-50"
           >
             {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
@@ -1178,7 +1178,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 type="password"
                 value={pwForm.currentPassword}
                 onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
               />
             </div>
@@ -1188,7 +1188,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 type="password"
                 value={pwForm.newPassword}
                 onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
                 minLength={6}
               />
@@ -1199,7 +1199,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 type="password"
                 value={pwForm.confirmPassword}
                 onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
               />
             </div>
@@ -1242,11 +1242,11 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                   onChange={e => setEmailInput(e.target.value)}
                   placeholder="email@example.com"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 />
               </div>
               <button type="submit" disabled={emailLoading}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+                className="bg-brand-500 text-white px-6 py-2 rounded-lg hover:bg-brand-600 transition-colors disabled:opacity-50">
                 {emailLoading ? 'Đang gửi...' : 'Gửi mã xác thực'}
               </button>
             </form>
@@ -1260,12 +1260,12 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                   onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   maxLength={6}
-                  className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 font-mono"
+                  className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 font-mono"
                 />
               </div>
               <div className="flex gap-2">
                 <button type="submit" disabled={emailLoading || otpInput.length !== 6}
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+                  className="bg-brand-500 text-white px-6 py-2 rounded-lg hover:bg-brand-600 transition-colors disabled:opacity-50">
                   {emailLoading ? 'Đang xác nhận...' : 'Xác nhận'}
                 </button>
                 <button type="button" onClick={handleSendEmailOtp} disabled={countdown > 0 || emailLoading}
@@ -1445,7 +1445,7 @@ function ProductsTab({
 
                 {!product.isDeleted && (
                   <Link href={`/products/${product.id}/edit`}
-                    className="flex items-center gap-1 text-xs text-gray-600 hover:text-green-600 px-2 py-1 rounded hover:bg-green-50">
+                    className="flex items-center gap-1 text-xs text-gray-600 hover:text-brand-600 px-2 py-1 rounded hover:bg-green-50">
                     <i className="ri-edit-line"></i> Sửa
                   </Link>
                 )}
@@ -1538,7 +1538,7 @@ function AnalyticsTab() {
                   <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex-1 bg-gray-100 rounded-full h-1.5">
-                      <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${(p.viewCount / maxViews) * 100}%` }}></div>
+                      <div className="bg-brand-500 h-1.5 rounded-full" style={{ width: `${(p.viewCount / maxViews) * 100}%` }}></div>
                     </div>
                     <span className="text-xs text-gray-500 whitespace-nowrap">{p.viewCount} lượt xem</span>
                   </div>
@@ -1703,7 +1703,7 @@ function EngagementTab() {
                 </div>
                 <div className="px-2 py-2">
                   <p className="text-xs font-medium text-gray-800 line-clamp-1">{p.title}</p>
-                  <p className="text-sm font-bold mt-0.5" style={{ color: '#d0011b' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                  <p className="text-sm font-bold mt-0.5" style={{ color: '#B32E1D' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
                 </div>
               </a>
             ))}

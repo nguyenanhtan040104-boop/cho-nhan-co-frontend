@@ -4,6 +4,7 @@ import HomepageClient from './HomepageClient';
 import LikeButton from './components/LikeButton';
 import MarketPriceWidget from './components/MarketPriceWidget';
 import AdSponsoredCarousel from './components/AdSponsoredCarousel';
+import { mockProducts, mockRealEstate, mockJobs, mockForum, isDev } from '../lib/devMock';
 
 export const metadata: Metadata = {
   title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản, việc làm tại Đắk Nông',
@@ -13,10 +14,6 @@ export const metadata: Metadata = {
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
 
-// ── Pinterest cream palette — warms the page without competing with product images
-const PAGE_BG = '#f5f4ee';
-const CARD_BG = '#ffffff';
-
 async function safeFetch(url: string) {
   try {
     const res = await fetch(url, { next: { revalidate: 60 } });
@@ -25,6 +22,9 @@ async function safeFetch(url: string) {
     return json.data || [];
   } catch { return []; }
 }
+
+// Fall back to sample data in dev when the API is unreachable, so the UI stays reviewable.
+const orMock = (real: any[], mock: any[]) => (real.length === 0 && isDev ? mock : real);
 
 async function getHomeData() {
   const [products, vatNuoi, dichVu, realEstate, jobs, ads, forum] = await Promise.all([
@@ -36,21 +36,29 @@ async function getHomeData() {
     safeFetch(`${API}/advertisements?limit=6`),
     safeFetch(`${API}/forum/posts?limit=6`),
   ]);
-  return { products, vatNuoi, dichVu, realEstate, jobs, ads, forum };
+  return {
+    products: orMock(products, mockProducts),
+    vatNuoi: orMock(vatNuoi, mockProducts.slice(0, 3)),
+    dichVu,
+    realEstate: orMock(realEstate, mockRealEstate),
+    jobs: orMock(jobs, mockJobs),
+    ads,
+    forum: orMock(forum, mockForum),
+  };
 }
 
-// Image-based categories — real photos for each category
+// Categories as branded tiles — grounded in the highland market, no generic stock photos.
 const categories = [
-  { title: 'Nông sản',     href: '/products?category=NONG_SAN', img: 'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=120&h=120&fit=crop&q=80', icon: 'ri-seedling-fill',           color: 'text-green-600' },
-  { title: 'Bất động sản', href: '/real-estate',                img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=120&h=120&fit=crop&q=80', icon: 'ri-home-4-fill',             color: 'text-orange-600' },
-  { title: 'Việc làm',     href: '/jobs',                       img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=120&h=120&fit=crop&q=80', icon: 'ri-briefcase-4-fill',        color: 'text-blue-600' },
-  { title: 'Vật nuôi',     href: '/vat-nuoi',                   img: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=120&h=120&fit=crop&q=80', icon: 'ri-bear-smile-fill',         color: 'text-amber-600' },
-  { title: 'Dịch vụ',      href: '/dich-vu',                    img: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=120&h=120&fit=crop&q=80', icon: 'ri-customer-service-2-fill', color: 'text-purple-600' },
-  { title: 'Diễn đàn',     href: '/forum',                      img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&h=120&fit=crop&q=80', icon: 'ri-discuss-fill',            color: 'text-cyan-600' },
-  { title: 'Quảng cáo',    href: '/advertisements',             img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&h=120&fit=crop&q=80', icon: 'ri-megaphone-fill',          color: 'text-red-500' },
-  { title: 'Cảnh báo',     href: '/canh-bao',                   img: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=120&h=120&fit=crop&q=80', icon: 'ri-alert-fill',              color: 'text-yellow-600' },
-  { title: 'Bảng giá',     href: '/market-prices',              img: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=120&h=120&fit=crop&q=80', icon: 'ri-bar-chart-2-fill',        color: 'text-teal-600' },
-  { title: 'Sản phẩm',     href: '/products',                   img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop&q=80',    icon: 'ri-shopping-bag-3-fill',     color: 'text-lime-600' },
+  { title: 'Nông sản',     href: '/products?category=NONG_SAN', icon: 'ri-seedling-fill',           tint: 'bg-brand-500 text-white' },
+  { title: 'Bất động sản', href: '/real-estate',                icon: 'ri-home-4-fill',             tint: 'bg-forest-500 text-white' },
+  { title: 'Việc làm',     href: '/jobs',                       icon: 'ri-briefcase-4-fill',        tint: 'bg-ink text-white' },
+  { title: 'Vật nuôi',     href: '/vat-nuoi',                   icon: 'ri-bear-smile-fill',         tint: 'bg-gold-500 text-ink' },
+  { title: 'Dịch vụ',      href: '/dich-vu',                    icon: 'ri-tools-fill',              tint: 'bg-brand-100 text-brand-700' },
+  { title: 'Diễn đàn',     href: '/forum',                      icon: 'ri-chat-3-fill',             tint: 'bg-forest-100 text-forest-700' },
+  { title: 'Quảng cáo',    href: '/advertisements',             icon: 'ri-megaphone-fill',          tint: 'bg-ink/5 text-ink' },
+  { title: 'Cảnh báo',     href: '/canh-bao',                   icon: 'ri-alarm-warning-fill',      tint: 'bg-brand-50 text-brand-600' },
+  { title: 'Bảng giá',     href: '/market-prices',              icon: 'ri-line-chart-fill',         tint: 'bg-forest-50 text-forest-600' },
+  { title: 'Sản phẩm',     href: '/products',                   icon: 'ri-shopping-bag-3-fill',     tint: 'bg-gold-400/20 text-gold-600' },
 ];
 
 function timeAgo(dateStr: string) {
@@ -84,286 +92,177 @@ export default async function HomePage() {
     ...realEstate.filter((p: any) => p.isVip).map((p: any) => ({ ...p, _type: 'real-estate' })),
   ];
 
-  const totalListings = products.length + realEstate.length + jobs.length + vatNuoi.length + dichVu.length;
-
   return (
-    // Pinterest warm cream canvas — gets out of the product images' way
-    <main className="min-h-screen" style={{ background: PAGE_BG }}>
+    <main className="min-h-screen bg-paper">
 
-      {/* ===== HERO BANNER ===== */}
-      <div className="relative overflow-hidden" style={{ background: '#ffd400', paddingTop: 44, paddingBottom: 24 }}>
+      {/* ===== HERO — one bold espresso panel; the boldness budget lives here ===== */}
+      <section className="relative overflow-hidden bg-ink text-white">
+        {/* warm basalt glow, not a decorative gradient wash */}
+        <div className="pointer-events-none absolute -top-24 -right-16 h-80 w-80 rounded-full bg-brand-500/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 -left-10 h-72 w-72 rounded-full bg-forest-500/20 blur-3xl" />
 
-        {/* Headline — Airbnb: trusts whitespace + tight weight over heavy type */}
-        <div className="text-center px-4 relative z-10">
-          <h1 className="font-black text-gray-900 leading-tight tracking-tight" style={{ fontSize: 'clamp(1.6rem, 5vw, 2.4rem)' }}>
-            Giá tốt, gần nhà, chốt nhanh!
+        <div className="relative mx-auto max-w-content px-5 pt-12 pb-9 sm:pt-16 sm:pb-12 animate-rise">
+          <span className="kicker text-brand-300 before:bg-brand-400">Chợ của người Nhân Cơ</span>
+          <h1 className="mt-3 font-black leading-[1.03] tracking-tight"
+              style={{ fontSize: 'clamp(2rem, 6vw, 3.4rem)' }}>
+            Mua bán nông sản,<br className="hidden sm:block" /> nhà đất và việc làm<br className="hidden sm:block" />
+            <span className="text-brand-400">ngay tại quê mình.</span>
           </h1>
-          <p className="text-gray-700 text-sm font-semibold mt-1">Mua bán · Bất động sản · Việc làm tại Nhân Cơ, Đắk Nông</p>
+          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
+            Từ cà phê, tiêu, bơ tới đất rẫy và việc mùa vụ — đăng tin và tìm người mua ngay trong xã Nhân Cơ, Đắk Nông.
+          </p>
+
+          <div className="mt-6 max-w-2xl">
+            <HomepageClient />
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2.5">
+            <Link href="/products" className="btn-primary">Xem tất cả tin đăng</Link>
+            <Link href="/dashboard" className="btn-ghost bg-white/10 border-white/20 text-white hover:border-white/50">
+              <i className="ri-add-line text-base" /> Đăng tin miễn phí
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {/* Search — Airbnb pill-shaped search bar */}
-        <div className="relative z-10 max-w-2xl mx-auto px-4 mt-4">
-          <HomepageClient />
-        </div>
+      <div className="mx-auto max-w-content px-4 pb-10 sm:px-5">
 
-        {/* Social proof — authentic, micro */}
-        <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5 mt-3 text-xs font-semibold text-gray-800 flex-wrap px-4">
-          <span>{totalListings > 0 ? `${totalListings * 8}+ sản phẩm` : '200+ sản phẩm'}</span>
-          <span className="text-gray-600 hidden sm:inline">·</span>
-          <span>Cộng đồng Nhân Cơ</span>
-          <span className="text-gray-600 hidden sm:inline">·</span>
-          <span>Miễn phí đăng tin</span>
-        </div>
-      </div>
-
-      <div className="max-w-screen-xl mx-auto px-3 sm:px-4 pb-6">
-
-        {/* ===== DANH MỤC — Image grid (real photos per category) ===== */}
-        <div className="bg-white mt-3 px-4 pt-3 pb-4 rounded-2xl" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Danh mục</p>
-          <div className="grid grid-cols-5 gap-x-2 gap-y-3">
+        {/* ===== DANH MỤC — branded tiles ===== */}
+        <section className="mt-6">
+          <h2 className="mb-3 text-lg font-extrabold text-ink">Bạn đang tìm gì?</h2>
+          <div className="grid grid-cols-5 gap-2.5 sm:gap-3">
             {categories.map(cat => (
-              <Link key={cat.href} href={cat.href}
-                className="flex flex-col items-center gap-1.5 group">
-                {/* Rounded square image thumbnail — no icon overlay */}
-                <div className="relative w-full aspect-square rounded-2xl overflow-hidden shadow-sm">
-                  <img src={cat.img} alt={cat.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 ease-out" />
-                </div>
-                <span className="text-[10px] font-bold text-gray-700 text-center leading-tight line-clamp-1 w-full px-0.5">{cat.title}</span>
+              <Link key={cat.href} href={cat.href} className="group flex flex-col items-center gap-2">
+                <span className={`flex aspect-square w-full items-center justify-center rounded-card ${cat.tint}
+                                  shadow-card transition-transform duration-150 group-hover:-translate-y-0.5`}>
+                  <i className={`${cat.icon} text-2xl sm:text-3xl`} />
+                </span>
+                <span className="text-center text-[11px] font-bold leading-tight text-ink-soft sm:text-xs">{cat.title}</span>
               </Link>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* ===== QUẢNG CÁO TÀI TRỢ — CAROUSEL CARDS ===== */}
-        <AdSponsoredCarousel />
+        <div className="mt-6"><AdSponsoredCarousel /></div>
+        <div className="mt-6"><MarketPriceWidget /></div>
 
-        {/* ===== GIÁ THỊ TRƯỜNG ===== */}
-        <MarketPriceWidget />
-
-        {/* ===== VIP / NỔI BẬT — Framer gradient-spotlight-card treatment ===== */}
+        {/* ===== NỔI BẬT (VIP) — restrained gold accent, not a loud gradient ===== */}
         {vipListings.length > 0 && (
-          <section className="mt-3 overflow-hidden rounded-2xl" style={{ background: 'linear-gradient(135deg, #fff6c0 0%, #ffdc00 60%, #f5b800 100%)' }}>
-            <div className="flex items-center justify-between px-4 py-3">
-              <div>
-                <p className="text-[10px] font-bold tracking-widest text-amber-800/70 uppercase">Được đề xuất</p>
-                <h2 className="font-extrabold text-amber-900 text-base flex items-center gap-2 mt-0.5" style={{ letterSpacing: '-0.3px' }}>
-                  Tin nổi bật
-                  <span className="bg-amber-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">VIP</span>
-                </h2>
-              </div>
-              <Link href="/products" className="text-xs text-amber-800 font-bold flex items-center gap-0.5 bg-white/40 px-2.5 py-1.5 rounded-full">
-                Xem tất cả <i className="ri-arrow-right-s-line text-sm"></i>
-              </Link>
-            </div>
-            {/* Cards on white surface lifted from gradient — Airbnb card pattern */}
-            <div className="bg-white rounded-2xl mx-2 mb-2">
-              <Grid>
-                {vipListings.slice(0, 10).map((item: any) => (
-                  <ListingCard key={`vip-${item.id}`} item={item} />
-                ))}
-              </Grid>
-            </div>
+          <section className="mt-8">
+            <SectionHead kicker="Được đề xuất" title="Tin nổi bật" href="/products" accent="gold" />
+            <Grid>
+              {vipListings.slice(0, 10).map((item: any) => <ListingCard key={`vip-${item.id}`} item={item} />)}
+            </Grid>
           </section>
         )}
 
         {/* ===== SẢN PHẨM MỚI ===== */}
-        <Section eyebrow="Mới nhất" title="Sản phẩm mới đăng" icon="ri-store-line" iconColor="text-green-600" iconBg="bg-green-50" href="/products">
-          {products.length === 0
-            ? <EmptyBlock label="Chưa có sản phẩm nào" icon="ri-store-2-line" />
-            : <Grid>{products.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />)}</Grid>
-          }
+        <Section kicker="Mới nhất" title="Sản phẩm mới đăng" href="/products"
+          empty={products.length === 0} emptyLabel="Chưa có sản phẩm nào">
+          <Grid>{products.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />)}</Grid>
         </Section>
 
         {/* ===== BẤT ĐỘNG SẢN ===== */}
-        <Section eyebrow="Nhà đất" title="Bất động sản" icon="ri-home-4-line" iconColor="text-orange-600" iconBg="bg-orange-50" href="/real-estate">
-          {realEstate.length === 0
-            ? <EmptyBlock label="Chưa có tin bất động sản" icon="ri-home-2-line" />
-            : <Grid>{realEstate.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />)}</Grid>
-          }
+        <Section kicker="Nhà đất" title="Bất động sản" href="/real-estate"
+          empty={realEstate.length === 0} emptyLabel="Chưa có tin bất động sản">
+          <Grid>{realEstate.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'real-estate' }} />)}</Grid>
         </Section>
 
         {/* ===== VẬT NUÔI ===== */}
-        <Section eyebrow="Chăn nuôi" title="Vật nuôi" icon="ri-bear-smile-line" iconColor="text-amber-600" iconBg="bg-amber-50" href="/vat-nuoi">
-          {vatNuoi.length === 0
-            ? <EmptyBlock label="Chưa có tin vật nuôi" icon="ri-bear-smile-line" />
-            : <Grid>{vatNuoi.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />)}</Grid>
-          }
+        <Section kicker="Chăn nuôi" title="Vật nuôi" href="/vat-nuoi"
+          empty={vatNuoi.length === 0} emptyLabel="Chưa có tin vật nuôi">
+          <Grid>{vatNuoi.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />)}</Grid>
         </Section>
 
         {/* ===== DỊCH VỤ ===== */}
-        <Section eyebrow="Phục vụ" title="Dịch vụ" icon="ri-service-line" iconColor="text-purple-600" iconBg="bg-purple-50" href="/dich-vu">
-          {dichVu.length === 0
-            ? <EmptyBlock label="Chưa có tin dịch vụ" icon="ri-customer-service-2-line" />
-            : <Grid>{dichVu.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />)}</Grid>
-          }
-        </Section>
+        {dichVu.length > 0 && (
+          <Section kicker="Phục vụ" title="Dịch vụ" href="/dich-vu" empty={false} emptyLabel="">
+            <Grid>{dichVu.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'product' }} />)}</Grid>
+          </Section>
+        )}
 
         {/* ===== VIỆC LÀM ===== */}
-        <Section eyebrow="Cơ hội" title="Tuyển dụng mới" icon="ri-briefcase-line" iconColor="text-blue-600" iconBg="bg-blue-50" href="/jobs">
-          {jobs.length === 0
-            ? <EmptyBlock label="Chưa có tin tuyển dụng" icon="ri-briefcase-4-line" />
-            : <Grid>{jobs.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'job' }} />)}</Grid>
-          }
+        <Section kicker="Cơ hội" title="Tuyển dụng mới" href="/jobs"
+          empty={jobs.length === 0} emptyLabel="Chưa có tin tuyển dụng">
+          <Grid>{jobs.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'job' }} />)}</Grid>
         </Section>
 
         {/* ===== QUẢNG CÁO ===== */}
         {ads.length > 0 && (
-          <Section eyebrow="Khuyến mãi" title="Quảng cáo & Khuyến mãi" icon="ri-megaphone-line" iconColor="text-red-500" iconBg="bg-red-50" href="/advertisements">
+          <Section kicker="Khuyến mãi" title="Quảng cáo & Khuyến mãi" href="/advertisements" empty={false} emptyLabel="">
             <Grid>{ads.map((item: any) => <ListingCard key={item.id} item={{ ...item, _type: 'ad' }} />)}</Grid>
           </Section>
         )}
 
         {/* ===== DIỄN ĐÀN ===== */}
-        <Section eyebrow="Cộng đồng" title="Diễn đàn cộng đồng" icon="ri-discuss-line" iconColor="text-cyan-600" iconBg="bg-cyan-50" href="/forum">
+        <section className="mt-8">
+          <SectionHead kicker="Cộng đồng" title="Diễn đàn cộng đồng" href="/forum" />
           {forum.length === 0
-            ? <EmptyBlock label="Chưa có bài viết nào" icon="ri-discuss-line" />
-            : <div className="px-4 py-3 space-y-1">
+            ? <EmptyBlock label="Chưa có bài viết nào" />
+            : <div className="mt-3 divide-y divide-line rounded-card border border-line bg-surface">
                 {forum.map((post: any) => <ForumRow key={post.id} post={post} />)}
-              </div>
-          }
-        </Section>
+              </div>}
+        </section>
 
-        {/* ===== TRUST SIGNALS — Linear surface-1 card lift ===== */}
-        <div className="mt-4 rounded-2xl overflow-hidden" style={{ background: CARD_BG, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-          <div className="px-4 pt-4 pb-1">
-            <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Cam kết</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 divide-x divide-y sm:divide-y-0 divide-gray-100">
+        {/* ===== CAM KẾT ===== */}
+        <section className="mt-8 overflow-hidden rounded-card border border-line bg-surface">
+          <div className="grid grid-cols-2 divide-x divide-y divide-line sm:grid-cols-4 sm:divide-y-0">
             {[
-              { title: 'Miễn phí đăng tin', sub: 'Không mất phí cơ bản' },
-              { title: 'Người thật, tin thật', sub: 'Tài khoản xác minh' },
-              { title: 'Giao dịch tại chỗ', sub: 'Nhân Cơ, Đắk Nông' },
-              { title: 'Hỗ trợ nhanh', sub: '0888.317.289' },
+              { icon: 'ri-price-tag-3-line',  title: 'Miễn phí đăng tin', sub: 'Không mất phí cơ bản' },
+              { icon: 'ri-shield-check-line',  title: 'Người thật, tin thật', sub: 'Tài khoản xác minh' },
+              { icon: 'ri-map-pin-2-line',     title: 'Giao dịch tại chỗ', sub: 'Trong xã Nhân Cơ' },
+              { icon: 'ri-customer-service-2-line', title: 'Hỗ trợ nhanh', sub: '0888.317.289' },
             ].map(t => (
-              <div key={t.title} className="px-4 py-4">
-                <p className="text-xs font-bold text-gray-800 leading-tight">{t.title}</p>
-                <p className="text-[11px] text-gray-400 leading-tight mt-0.5">{t.sub}</p>
+              <div key={t.title} className="flex items-start gap-3 px-4 py-4">
+                <i className={`${t.icon} mt-0.5 text-xl text-brand-500`} />
+                <div>
+                  <p className="text-[13px] font-bold leading-tight text-ink">{t.title}</p>
+                  <p className="mt-0.5 text-[11px] leading-tight text-ink-faint">{t.sub}</p>
+                </div>
               </div>
             ))}
           </div>
-        </div>
-
+        </section>
       </div>
 
-      {/* ===== FOOTER — Airbnb: canvas-matching footer, no contrast band ===== */}
-      <footer style={{ background: CARD_BG, borderTop: '1px solid #e8e7e1' }}>
-        <div className="max-w-screen-xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-6">
-            <div>
-              <h3 className="font-black text-lg mb-1 text-gray-900">
-                Chợ Nhân Cơ
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed" style={{ letterSpacing: '-0.1px' }}>
-                Kết nối giao thương, gắn kết cộng đồng nông thôn tại Nhân Cơ, Đắk Nông.
-              </p>
-              <div className="flex gap-2 mt-3">
-                <a href="https://www.facebook.com/trungnguyenanhtan" target="_blank" rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-600 text-gray-400 hover:text-white transition-all flex items-center justify-center">
-                  <i className="ri-facebook-fill text-base"></i>
-                </a>
-                <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-500 text-gray-400 hover:text-white transition-all flex items-center justify-center">
-                  <i className="ri-phone-fill text-base"></i>
-                </a>
-              </div>
-            </div>
-            <div>
-              {/* Linear eyebrow style for footer column heads */}
-              <h4 className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Danh mục</h4>
-              <ul className="space-y-1.5 text-sm text-gray-500">
-                {[
-                  ['Sản phẩm', '/products'],
-                  ['Bất động sản', '/real-estate'],
-                  ['Tuyển dụng', '/jobs'],
-                  ['Vật nuôi', '/vat-nuoi'],
-                  ['Dịch vụ', '/dich-vu'],
-                  ['Diễn đàn', '/forum'],
-                  ['Cảnh báo', '/canh-bao'],
-                ].map(([label, href]) => (
-                  <li key={href}>
-                    <Link href={href} className="hover:text-gray-900 transition-colors duration-150">{label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Liên hệ</h4>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-center gap-2">
-                  <i className="ri-phone-fill text-gray-400 flex-shrink-0"></i>
-                  <a href="tel:0888317289" className="hover:text-gray-900 transition-colors">0888.317.289</a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <i className="ri-mail-fill text-gray-400 flex-shrink-0"></i>
-                  <a href="mailto:chonhanco41@gmail.com" className="hover:text-gray-900 transition-colors">chonhanco41@gmail.com</a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <i className="ri-map-pin-fill text-gray-400 flex-shrink-0"></i>
-                  Xã Nhân Cơ, Đắk Nông
-                </li>
-              </ul>
-              <a href="https://www.facebook.com/share/g/1Gwg2sziS1/" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-                <i className="ri-facebook-circle-fill"></i>
-                Tham gia nhóm Facebook →
-              </a>
-            </div>
-          </div>
-          {/* Airbnb legal band — muted, caption-sm */}
-          <div className="pt-4 text-center text-xs text-gray-400" style={{ borderTop: '1px solid #e8e7e1' }}>
-            © 2025 Chợ Nhân Cơ. Tất cả quyền được bảo lưu.
-          </div>
-        </div>
-      </footer>
-
+      <SiteFooter />
     </main>
   );
 }
 
 // ── Shared layout components ──────────────────────────────────────────────────
 
-// Section — Linear eyebrow + Airbnb display hierarchy + Pinterest 16px radius
-function Section({ eyebrow, title, icon, iconColor, iconBg, href, badge, children }: {
-  eyebrow?: string;
-  title: string; icon: string; iconColor: string; iconBg: string; href: string; badge?: string; children: React.ReactNode;
+function SectionHead({ kicker, title, href, accent }: { kicker: string; title: string; href: string; accent?: 'gold' }) {
+  return (
+    <div className="mb-3 flex items-end justify-between gap-3">
+      <div>
+        <span className={`kicker ${accent === 'gold' ? 'text-gold-600 before:bg-gold-500' : ''}`}>{kicker}</span>
+        <h2 className="mt-1.5 text-xl font-extrabold text-ink sm:text-2xl">{title}</h2>
+      </div>
+      <Link href={href} className="chip shrink-0">Xem tất cả</Link>
+    </div>
+  );
+}
+
+function Section({ kicker, title, href, empty, emptyLabel, children }: {
+  kicker: string; title: string; href: string; empty: boolean; emptyLabel: string; children: React.ReactNode;
 }) {
   return (
-    <section className="mt-3 overflow-hidden rounded-2xl" style={{ background: CARD_BG, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-      <div className="flex items-center justify-between px-4 pt-4 pb-3" style={{ borderBottom: '1px solid #f0efe9' }}>
-        <div>
-          {/* Linear-style eyebrow: positive tracking, all-caps, muted */}
-          {eyebrow && (
-            <p className="text-[9px] font-bold tracking-widest text-gray-400 uppercase mb-1">{eyebrow}</p>
-          )}
-          {/* Airbnb-style section title: display-sm weight, modest size */}
-          <h2 className="font-extrabold text-gray-900 flex items-center gap-2" style={{ fontSize: 15, letterSpacing: '-0.3px' }}>
-            {title}
-            {badge && (
-              <span className="bg-amber-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-0.5">{badge}</span>
-            )}
-          </h2>
-        </div>
-        <Link href={href} className="text-xs text-gray-500 font-semibold hover:text-gray-900 transition-colors flex items-center gap-0.5 bg-gray-100 hover:bg-gray-200 px-2.5 py-1.5 rounded-full">
-          Xem tất cả <i className="ri-arrow-right-s-line text-sm"></i>
-        </Link>
-      </div>
-      {children}
+    <section className="mt-8">
+      <SectionHead kicker={kicker} title={title} href={href} />
+      {empty ? <EmptyBlock label={emptyLabel} /> : children}
     </section>
   );
 }
 
-// Grid — Pinterest 8px gutter inside cards
 function Grid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 px-3 py-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {children}
     </div>
   );
 }
 
-// ListingCard — Pinterest 16px radius + Airbnb single-shadow-tier on hover
 function ListingCard({ item }: { item: any }) {
   const href = item._type === 'product'     ? `/products/${item.id}`
              : item._type === 'real-estate' ? `/real-estate/${item.id}`
@@ -376,75 +275,52 @@ function ListingCard({ item }: { item: any }) {
     || item.imageUrl || null;
   const imgCount = item.images?.length || 0;
   const price = fmtPrice(item, item._type);
-  const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
 
   return (
-    <Link href={href}
-      className="group block overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)]"
-      style={{ background: CARD_BG, border: '1px solid rgba(0,0,0,0.06)' }}>
-      {/* Photo — Pinterest pin-card: full-bleed, image IS the card */}
-      <div className="relative overflow-hidden rounded-t-2xl bg-gray-100" style={{ aspectRatio: '4/3' }}>
-        {imgUrl ? (
-          <img src={imgUrl} alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-400" />
-        ) : (
-          <div className="w-full h-full" style={{ background: '#f5f4ee' }}></div>
-        )}
-        {/* LikeButton */}
+    <Link href={href} className="group block overflow-hidden rounded-card border border-line bg-surface
+                                 shadow-card transition-shadow duration-200 hover:shadow-lift">
+      <div className="relative aspect-[4/3] overflow-hidden bg-paper">
+        {imgUrl
+          ? <img src={imgUrl} alt={item.title} className="h-full w-full object-cover" />
+          : <div className="flex h-full w-full items-center justify-center bg-paper text-ink-faint">
+              <i className="ri-image-line text-2xl" />
+            </div>}
         <LikeButton itemId={String(item.id)} />
-        {/* Time badge — Airbnb overlay pill style */}
-        {item.createdAt && (
-          <span className="absolute top-2 left-2 bg-black/55 text-white text-[10px] px-2 py-0.5 rounded-full font-medium backdrop-blur-sm">
-            {timeAgo(item.createdAt)}
-          </span>
-        )}
-        {/* "Mới" badge for < 24h — Pinterest pin-overlay-pill */}
-        {isNew && !item.isVip && (
-          <span className="absolute bottom-2 left-2 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">Mới</span>
+        {item.isVip && (
+          <span className="absolute left-2 top-2 rounded-pill bg-gold-500 px-2 py-0.5 text-[10px] font-black text-ink">VIP</span>
         )}
         {imgCount > 1 && (
-          <span className="absolute bottom-2 right-2 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+          <span className="absolute bottom-2 right-2 rounded-pill bg-ink/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
             {imgCount} ảnh
           </span>
         )}
-        {item.isVip && (
-          <span className="absolute bottom-2 left-2 bg-amber-400 text-gray-900 text-[10px] font-black px-1.5 py-0.5 rounded-full">VIP</span>
-        )}
       </div>
-      {/* Meta — Airbnb: 4–5 lines of metadata beneath photo */}
-      <div className="px-3 pt-2 pb-3">
-        <p className="text-[13px] font-semibold leading-snug line-clamp-2 text-gray-800 mb-1" style={{ letterSpacing: '-0.1px' }}>{item.title}</p>
-        {price && (
-          <p className="text-sm font-black" style={{ color: '#d0011b', letterSpacing: '-0.2px' }}>{price}</p>
-        )}
+      <div className="px-3 pb-3 pt-2.5">
+        <p className="line-clamp-2 text-[13px] font-semibold leading-snug text-ink">{item.title}</p>
+        {price && <p className="mt-1 text-[15px] font-black text-brand-600">{price}</p>}
         {(item.location || item.address) && (
-          <p className="text-[11px] text-gray-400 mt-0.5 truncate">{item.location || item.address}</p>
+          <p className="mt-1 flex items-center gap-1 truncate text-[11px] text-ink-faint">
+            <i className="ri-map-pin-line" />{item.location || item.address}
+          </p>
         )}
       </div>
     </Link>
   );
 }
 
-// ForumRow — Pinterest editorial: article-layout with clear info hierarchy
 function ForumRow({ post }: { post: any }) {
+  const img = post.images?.[0] ? (typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url) : null;
   return (
-    <Link href={`/forum/${post.id}`}
-      className="flex items-start gap-3 py-2.5 px-2 rounded-xl transition-colors duration-150 hover:bg-[#f5f4ee] last:border-0"
-      style={{ borderBottom: '1px solid #f0efe9' }}>
-      <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0" style={{ background: '#f5f4ee' }}>
-        {post.images?.[0] ? (
-          <img src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url}
-            alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-cyan-50"></div>
-        )}
+    <Link href={`/forum/${post.id}`} className="flex items-start gap-3 px-3 py-3 transition-colors hover:bg-paper">
+      <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-forest-50 text-forest-500">
+        {img ? <img src={img} alt="" className="h-full w-full object-cover" /> : <i className="ri-chat-3-line text-xl" />}
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug" style={{ letterSpacing: '-0.1px' }}>{post.title}</p>
-        <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
-          <span className="font-semibold text-gray-600">{post.user?.fullName || post.user?.username || 'Ẩn danh'}</span>
-          <span>{post.likeCount || 0} thích</span>
-          <span>{post._count?.comments || 0} bình luận</span>
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-ink">{post.title}</p>
+        <div className="mt-1.5 flex items-center gap-4 text-xs text-ink-faint">
+          <span className="font-semibold text-ink-soft">{post.user?.fullName || post.user?.username || 'Ẩn danh'}</span>
+          <span className="flex items-center gap-1"><i className="ri-heart-line" />{post.likeCount || 0}</span>
+          <span className="flex items-center gap-1"><i className="ri-chat-1-line" />{post._count?.comments || 0}</span>
           {post.createdAt && <span className="ml-auto">{timeAgo(post.createdAt)}</span>}
         </div>
       </div>
@@ -452,12 +328,58 @@ function ForumRow({ post }: { post: any }) {
   );
 }
 
-// EmptyBlock — Pinterest feature-card: warm surface-card, not cold gray
-function EmptyBlock({ label, icon = 'ri-inbox-line' }: { label: string; icon?: string }) {
+function EmptyBlock({ label }: { label: string }) {
   return (
-    <div className="py-10 text-center mx-4 my-3 rounded-xl" style={{ background: PAGE_BG }}>
-      <p className="text-sm text-gray-400 font-medium">{label}</p>
-      <p className="text-xs text-gray-300 mt-1">Hãy là người đầu tiên đăng tin!</p>
+    <div className="rounded-card border border-dashed border-line bg-surface px-6 py-12 text-center">
+      <p className="text-sm font-semibold text-ink-soft">{label}</p>
+      <p className="mt-1 text-xs text-ink-faint">Hãy là người đầu tiên đăng tin ở mục này.</p>
+      <Link href="/dashboard" className="btn-primary mt-4">Đăng tin ngay</Link>
     </div>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="mt-4 bg-ink text-white/70">
+      <div className="mx-auto max-w-content px-6 py-12">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+          <div>
+            <p className="text-lg font-black text-white">Chợ Nhân Cơ</p>
+            <p className="mt-2 max-w-xs text-sm leading-relaxed">
+              Kết nối giao thương, gắn kết cộng đồng nông thôn tại Nhân Cơ, Đắk Nông.
+            </p>
+            <div className="mt-4 flex gap-2">
+              <a href="https://www.facebook.com/trungnguyenanhtan" target="_blank" rel="noopener noreferrer"
+                className="grid h-9 w-9 place-items-center rounded-pill bg-white/10 text-white transition-colors hover:bg-brand-500">
+                <i className="ri-facebook-fill" />
+              </a>
+              <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer"
+                className="grid h-9 w-9 place-items-center rounded-pill bg-white/10 text-white transition-colors hover:bg-forest-500">
+                <i className="ri-phone-fill" />
+              </a>
+            </div>
+          </div>
+          <div>
+            <p className="mb-3 font-bold text-white">Danh mục</p>
+            <ul className="space-y-2 text-sm">
+              {[['Sản phẩm','/products'],['Bất động sản','/real-estate'],['Tuyển dụng','/jobs'],['Vật nuôi','/vat-nuoi'],['Dịch vụ','/dich-vu'],['Diễn đàn','/forum'],['Cảnh báo','/canh-bao']].map(([label, href]) => (
+                <li key={href}><Link href={href} className="transition-colors hover:text-white">{label}</Link></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="mb-3 font-bold text-white">Liên hệ</p>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-center gap-2"><i className="ri-phone-fill" /><a href="tel:0888317289" className="hover:text-white">0888.317.289</a></li>
+              <li className="flex items-center gap-2"><i className="ri-mail-fill" /><a href="mailto:chonhanco41@gmail.com" className="hover:text-white">chonhanco41@gmail.com</a></li>
+              <li className="flex items-center gap-2"><i className="ri-map-pin-fill" />Xã Nhân Cơ, Đắk Nông</li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-8 border-t border-white/10 pt-5 text-center text-xs text-white/50">
+          © 2025 Chợ Nhân Cơ. Tất cả quyền được bảo lưu.
+        </div>
+      </div>
+    </footer>
   );
 }

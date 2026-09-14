@@ -213,7 +213,7 @@ export default function ModerationPage() {
                   <div className="flex flex-col gap-1.5 flex-shrink-0">
                     {post.status === 'hidden' ? (
                       <button onClick={() => handleUnhide(post.id)} disabled={processing === post.id}
-                        className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-xs whitespace-nowrap">
+                        className="px-3 py-1.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 text-xs whitespace-nowrap">
                         {processing === post.id ? '...' : 'Hiện lại'}
                       </button>
                     ) : (

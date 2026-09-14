@@ -79,7 +79,7 @@ function CanhBaoContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
       <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
@@ -275,7 +275,7 @@ function CanhBaoContent() {
 export default function CanhBaoPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f5f4ee' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FBF9F5' }}>
         <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>

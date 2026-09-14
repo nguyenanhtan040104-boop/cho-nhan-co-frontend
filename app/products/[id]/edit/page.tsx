@@ -148,7 +148,7 @@ export default function EditProductPage() {
                   <img src={src} className="w-full h-full object-cover rounded-lg border border-green-300" alt="" />
                   <button type="button" onClick={() => removeNew(i)}
                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
-                  <span className="absolute bottom-0 left-0 right-0 bg-green-500 text-white text-xs text-center py-0.5 rounded-b-lg">Mới</span>
+                  <span className="absolute bottom-0 left-0 right-0 bg-brand-500 text-white text-xs text-center py-0.5 rounded-b-lg">Mới</span>
                 </div>
               ))}
               {existingImages.length + newFiles.length < 10 && (
@@ -166,7 +166,7 @@ export default function EditProductPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tên sản phẩm *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
           </div>
 
           {/* Danh mục & Giá */}
@@ -174,7 +174,7 @@ export default function EditProductPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục *</label>
               <select name="category" required value={form.category} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 <option value="">Chọn danh mục</option>
                 {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
@@ -183,9 +183,9 @@ export default function EditProductPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Giá bán *</label>
               <div className="flex gap-2">
                 <input type="number" name="price" required min="0" value={form.price} onChange={handleChange}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
                 <input type="text" name="unit" required value={form.unit} onChange={handleChange}
-                  placeholder="kg/cái..." className="w-28 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                  placeholder="kg/cái..." className="w-28 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
               </div>
             </div>
           </div>
@@ -195,14 +195,14 @@ export default function EditProductPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Số lượng</label>
             <input type="number" name="quantity" min="0" value={form.quantity} onChange={handleChange}
               placeholder="Để trống nếu không giới hạn"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
           </div>
 
           {/* Mô tả */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả *</label>
             <textarea name="description" required rows={4} value={form.description} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 resize-none"
               maxLength={1000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/1000</p>
           </div>
@@ -212,12 +212,12 @@ export default function EditProductPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Địa điểm *</label>
               <input type="text" name="location" required value={form.location} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
               <input type="tel" name="contactPhone" value={form.contactPhone} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
             </div>
           </div>
 
@@ -226,7 +226,7 @@ export default function EditProductPage() {
               Hủy
             </Link>
             <button type="submit" disabled={saving}
-              className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50">
+              className="flex-1 bg-brand-500 text-white px-6 py-3 rounded-lg hover:bg-brand-600 disabled:opacity-50">
               {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
             </button>
           </div>

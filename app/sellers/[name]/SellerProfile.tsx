@@ -173,11 +173,11 @@ export default function SellerProfile({ sellerName }: SellerProfileProps) {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <nav className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-gray-500 hover:text-green-600 cursor-pointer">
+            <Link href="/" className="text-gray-500 hover:text-brand-600 cursor-pointer">
               Trang chủ
             </Link>
             <i className="ri-arrow-right-s-line text-gray-400 w-4 h-4 flex items-center justify-center"></i>
-            <Link href="/products" className="text-gray-500 hover:text-green-600 cursor-pointer">
+            <Link href="/products" className="text-gray-500 hover:text-brand-600 cursor-pointer">
               Sản phẩm
             </Link>
             <i className="ri-arrow-right-s-line text-gray-400 w-4 h-4 flex items-center justify-center"></i>
@@ -264,7 +264,7 @@ export default function SellerProfile({ sellerName }: SellerProfileProps) {
               <div className="flex flex-col gap-3 lg:w-48">
                 <button
                   onClick={handleContactClick}
-                  className="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium whitespace-nowrap cursor-pointer"
+                  className="bg-brand-500 text-white py-3 px-6 rounded-lg hover:bg-brand-600 transition-colors flex items-center justify-center gap-2 font-medium whitespace-nowrap cursor-pointer"
                 >
                   <i className="ri-phone-line w-5 h-5 flex items-center justify-center"></i>
                   Liên hệ ngay
@@ -349,7 +349,7 @@ export default function SellerProfile({ sellerName }: SellerProfileProps) {
                                 />
                               </div>
                               <div className="flex-1">
-                                <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
+                                <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-brand-600 transition-colors">
                                   {product.name}
                                 </h4>
                                 <div className="text-lg font-bold text-green-600 mb-2">

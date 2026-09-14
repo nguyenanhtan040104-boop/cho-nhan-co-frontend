@@ -10,26 +10,26 @@ export default function ForumHeader() {
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2 cursor-pointer">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">KT</span>
               </div>
               <span className="text-xl font-['Pacifico'] text-gray-900">Kon Tum</span>
             </Link>
             
             <nav className="hidden md:flex space-x-6">
-              <Link href="/" className="text-gray-700 hover:text-green-600 font-medium cursor-pointer">
+              <Link href="/" className="text-gray-700 hover:text-brand-600 font-medium cursor-pointer">
                 Trang chủ
               </Link>
               <Link href="/forum" className="text-green-600 font-medium cursor-pointer">
                 Diễn đàn
               </Link>
-              <Link href="/products" className="text-gray-700 hover:text-green-600 font-medium cursor-pointer">
+              <Link href="/products" className="text-gray-700 hover:text-brand-600 font-medium cursor-pointer">
                 Sản phẩm
               </Link>
-              <Link href="/market-prices" className="text-gray-700 hover:text-green-600 font-medium cursor-pointer">
+              <Link href="/market-prices" className="text-gray-700 hover:text-brand-600 font-medium cursor-pointer">
                 Giá thị trường
               </Link>
-              <Link href="/events" className="text-gray-700 hover:text-green-600 font-medium cursor-pointer">
+              <Link href="/events" className="text-gray-700 hover:text-brand-600 font-medium cursor-pointer">
                 Sự kiện
               </Link>
             </nav>
@@ -37,7 +37,7 @@ export default function ForumHeader() {
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
-            <button className="relative p-2 text-gray-600 hover:text-green-600 cursor-pointer">
+            <button className="relative p-2 text-gray-600 hover:text-brand-600 cursor-pointer">
               <div className="w-5 h-5 flex items-center justify-center">
                 <i className="ri-notification-3-line"></i>
               </div>

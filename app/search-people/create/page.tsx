@@ -83,7 +83,7 @@ export default function CreateSearchPeoplePage() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
               <Link href="/" className="flex items-center space-x-3 cursor-pointer">
-                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center">
                   <i className="ri-store-2-line text-white text-xl"></i>
                 </div>
                 <div>

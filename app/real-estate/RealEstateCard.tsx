@@ -184,14 +184,14 @@ export default function RealEstateCard({ item, isSaved, onSave }: Props) {
       <div className="p-4">
         {/* Title */}
         <Link href={`/real-estate/${item.id}`}>
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-green-600 cursor-pointer">
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-brand-600 cursor-pointer">
             {item.title}
           </h3>
         </Link>
 
         {/* Price and Area */}
         <div className="flex items-center justify-between mb-3">
-          <div className="text-lg font-bold text-green-600">
+          <div className="text-lg font-black text-brand-600">
             {formatPrice(item.price, item.transactionType)}
           </div>
           <div className="text-sm text-gray-600">
@@ -233,7 +233,7 @@ export default function RealEstateCard({ item, isSaved, onSave }: Props) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleContactProfile}
-                  className="text-sm font-medium text-gray-900 hover:text-green-600 transition-colors cursor-pointer"
+                  className="text-sm font-medium text-gray-900 hover:text-brand-600 transition-colors cursor-pointer"
                 >
                   {item.seller.name}
                 </button>
@@ -255,7 +255,7 @@ export default function RealEstateCard({ item, isSaved, onSave }: Props) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleMessageClick}
-              className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium whitespace-nowrap cursor-pointer"
+              className="flex-1 bg-brand-500 text-white py-2 px-4 rounded-pill hover:bg-brand-600 transition-colors text-sm font-medium whitespace-nowrap cursor-pointer"
             >
               <i className="ri-message-3-line w-4 h-4 flex items-center justify-center mr-2 inline-flex"></i>
               Nhắn tin
@@ -268,7 +268,7 @@ export default function RealEstateCard({ item, isSaved, onSave }: Props) {
             </button>
             <Link
               href={`/real-estate/${item.id}`}
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+              className="p-2 bg-forest-500 text-white rounded-pill hover:bg-forest-600 cursor-pointer"
             >
               <i className="ri-eye-line w-5 h-5 flex items-center justify-center"></i>
             </Link>

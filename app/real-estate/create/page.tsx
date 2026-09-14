@@ -161,7 +161,7 @@ export default function CreateRealEstatePage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
               placeholder="Ví dụ: Bán đất vườn 1000m² mặt tiền đường xã..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
           </div>
 
           {/* Loại & Giá */}
@@ -169,7 +169,7 @@ export default function CreateRealEstatePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Loại bất động sản *</label>
               <select name="type" value={form.type} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 {typeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
@@ -177,7 +177,7 @@ export default function CreateRealEstatePage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Giá (đồng) *</label>
               <input type="number" name="price" required min="0" value={form.price} onChange={handleChange}
                 placeholder="Ví dụ: 500000000"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
             </div>
           </div>
 
@@ -187,12 +187,12 @@ export default function CreateRealEstatePage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Diện tích (m²) *</label>
               <input type="number" name="area" required min="1" value={form.area} onChange={handleChange}
                 placeholder="Ví dụ: 500"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Pháp lý</label>
               <select name="legalStatus" value={form.legalStatus} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 <option value="">Chưa rõ</option>
                 {legalOptions.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
@@ -204,7 +204,7 @@ export default function CreateRealEstatePage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ *</label>
             <input type="text" name="address" required value={form.address} onChange={handleChange}
               placeholder="Xã/Phường, Huyện/Quận, Tỉnh/TP"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
           </div>
 
           {/* GPS — tùy chọn */}
@@ -226,7 +226,7 @@ export default function CreateRealEstatePage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả chi tiết *</label>
             <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
               placeholder="Mô tả về vị trí, hiện trạng, tiện ích xung quanh..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 resize-none"
               maxLength={2000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
           </div>
@@ -236,7 +236,7 @@ export default function CreateRealEstatePage() {
               Hủy
             </Link>
             <button type="submit" disabled={loading}
-              className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50">
+              className="flex-1 bg-brand-500 text-white px-6 py-3 rounded-lg hover:bg-brand-600 disabled:opacity-50">
               {loading ? 'Đang đăng...' : 'Đăng tin'}
             </button>
           </div>

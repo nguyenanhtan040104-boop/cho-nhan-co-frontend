@@ -60,9 +60,9 @@ export default function AdvertisementsPage() {
   useEffect(() => { loadData(1); }, [loadData]);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)' }} className="py-8">
+      <div style={{ background: 'linear-gradient(135deg, #241C15 0%, #ea580c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>

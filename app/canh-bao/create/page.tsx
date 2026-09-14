@@ -209,7 +209,7 @@ export default function CreateReportPage() {
           {/* Stepper */}
           <div className="flex items-center justify-center gap-2 mb-7">
             <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center">
                 <i className="ri-check-line text-white text-sm"></i>
               </div>
               <span className="text-[10px] text-green-600 font-medium">Đã gửi</span>

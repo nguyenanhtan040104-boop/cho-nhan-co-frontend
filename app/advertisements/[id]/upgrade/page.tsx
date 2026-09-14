@@ -174,7 +174,7 @@ export default function AdvertisementUpgradePage() {
             <p className="font-black text-gray-900 truncate">{ad.title}</p>
             {ad.businessName && <p className="text-xs text-gray-500 truncate">{ad.businessName}</p>}
             {vipActive ? (
-              <p className="text-xs text-emerald-600 mt-1 font-semibold">
+              <p className="text-xs text-forest-600 mt-1 font-semibold">
                 <i className="ri-vip-crown-fill mr-1"></i>
                 VIP đến {new Date(ad.vipExpiresAt).toLocaleDateString('vi-VN')}
               </p>
@@ -200,13 +200,13 @@ export default function AdvertisementUpgradePage() {
 
         {/* ─── Result message ───────────────────────────────────────── */}
         {resultMsg && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4 mb-5 flex items-start gap-3">
-            <i className="ri-checkbox-circle-fill text-emerald-600 text-xl flex-shrink-0"></i>
+          <div className="bg-forest-50 border border-forest-200 rounded-2xl px-5 py-4 mb-5 flex items-start gap-3">
+            <i className="ri-checkbox-circle-fill text-forest-600 text-xl flex-shrink-0"></i>
             <div className="flex-1">
-              <p className="font-bold text-emerald-800 text-sm">Thanh toán thành công</p>
-              <p className="text-xs text-emerald-700 mt-0.5">{resultMsg}</p>
+              <p className="font-bold text-forest-800 text-sm">Thanh toán thành công</p>
+              <p className="text-xs text-forest-700 mt-0.5">{resultMsg}</p>
             </div>
-            <Link href={`/advertisements/${adId}`} className="text-xs font-semibold text-emerald-700 underline whitespace-nowrap">
+            <Link href={`/advertisements/${adId}`} className="text-xs font-semibold text-forest-700 underline whitespace-nowrap">
               Xem ad
             </Link>
           </div>

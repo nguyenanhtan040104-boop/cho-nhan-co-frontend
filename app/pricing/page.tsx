@@ -54,7 +54,7 @@ const CATEGORIES = [
 
 // Tailwind needs full class strings to scan — explicit color map
 const COLOR_MAP: Record<string, { bg: string; bgSoft: string; text: string; textDark: string; border: string; ring: string }> = {
-  emerald: { bg: 'bg-emerald-500', bgSoft: 'bg-emerald-50',  text: 'text-emerald-600', textDark: 'text-emerald-800', border: 'border-emerald-200', ring: 'ring-emerald-400' },
+  emerald: { bg: 'bg-forest-500', bgSoft: 'bg-forest-50',  text: 'text-forest-600', textDark: 'text-forest-800', border: 'border-forest-200', ring: 'ring-forest-400' },
   orange:  { bg: 'bg-orange-500',  bgSoft: 'bg-orange-50',   text: 'text-orange-600',  textDark: 'text-orange-800',  border: 'border-orange-200',  ring: 'ring-orange-400' },
   lime:    { bg: 'bg-lime-500',    bgSoft: 'bg-lime-50',     text: 'text-lime-600',    textDark: 'text-lime-800',    border: 'border-lime-200',    ring: 'ring-lime-400' },
   slate:   { bg: 'bg-slate-600',   bgSoft: 'bg-slate-50',    text: 'text-slate-600',   textDark: 'text-slate-800',   border: 'border-slate-200',   ring: 'ring-slate-400' },
@@ -88,8 +88,8 @@ export default function PricingPage() {
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 py-10">
           <div>
-            <p className="text-[10px] font-bold tracking-widest text-emerald-700 uppercase mb-2">
-              <span className="inline-block w-6 h-px bg-emerald-700 align-middle mr-2"></span>
+            <p className="text-[10px] font-bold tracking-widest text-forest-700 uppercase mb-2">
+              <span className="inline-block w-6 h-px bg-forest-700 align-middle mr-2"></span>
               Nâng cấp bài đăng
             </p>
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>

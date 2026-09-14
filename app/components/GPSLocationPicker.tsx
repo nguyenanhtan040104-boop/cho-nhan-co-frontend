@@ -86,18 +86,18 @@ export default function GPSLocationPicker({
   return (
     <div className="space-y-2">
       {hasGPS ? (
-        <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2.5">
-          <i className="ri-map-pin-2-fill text-emerald-700"></i>
+        <div className="flex items-center gap-2 bg-forest-50 border border-forest-200 rounded-md px-3 py-2.5">
+          <i className="ri-map-pin-2-fill text-forest-700"></i>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-emerald-900">Đã lưu vị trí GPS</p>
-            <p className="text-[11px] text-emerald-700 font-mono">
+            <p className="text-[13px] font-semibold text-forest-900">Đã lưu vị trí GPS</p>
+            <p className="text-[11px] text-forest-700 font-mono">
               {value.latitude!.toFixed(5)}, {value.longitude!.toFixed(5)}
             </p>
           </div>
           <button
             type="button"
             onClick={capture}
-            className="text-[12px] font-semibold text-emerald-700 hover:underline"
+            className="text-[12px] font-semibold text-forest-700 hover:underline"
           >
             Cập nhật lại
           </button>
@@ -105,7 +105,7 @@ export default function GPSLocationPicker({
             type="button"
             onClick={clear}
             aria-label="Xóa vị trí GPS"
-            className="w-7 h-7 flex items-center justify-center text-emerald-700 hover:bg-emerald-100 rounded"
+            className="w-7 h-7 flex items-center justify-center text-forest-700 hover:bg-forest-100 rounded"
           >
             <i className="ri-close-line"></i>
           </button>
@@ -115,7 +115,7 @@ export default function GPSLocationPicker({
           type="button"
           onClick={capture}
           disabled={status === 'loading'}
-          className="w-full flex items-center justify-center gap-2 border border-stone-300 hover:border-emerald-700 text-gray-700 hover:text-emerald-800 rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 border border-stone-300 hover:border-forest-700 text-gray-700 hover:text-forest-800 rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50"
         >
           <i className={`${status === 'loading' ? 'ri-loader-4-line animate-spin' : 'ri-map-pin-add-line'} text-lg`}></i>
           {status === 'loading' ? 'Đang lấy vị trí...' : label}

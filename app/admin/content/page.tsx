@@ -260,7 +260,7 @@ export default function AdminContentPage() {
                       </button>
 
                       <button onClick={() => handleApprove(item.id)} disabled={isProcessing}
-                        className="px-4 py-2 bg-green-600 text-white rounded-xl text-xs font-semibold hover:bg-green-700 disabled:opacity-50 transition">
+                        className="px-4 py-2 bg-brand-500 text-white rounded-xl text-xs font-semibold hover:bg-brand-600 disabled:opacity-50 transition">
                         {isProcessing ? '...' : 'Duyet dang'}
                       </button>
                     </div>

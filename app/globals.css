@@ -3,35 +3,100 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent horizontal overflow globally */
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
+/* ─────────────────────────────────────────────────────────────────────────
+   Chợ Nhân Cơ — design tokens (mirror of tailwind.config brand identity)
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --font-sans: 'Be Vietnam Pro', system-ui, sans-serif;
+  --brand: #D23B27;
+  --brand-600: #B32E1D;
+  --forest: #1F6B4A;
+  --gold: #E8A317;
+  --ink: #241C15;
+  --ink-soft: #5B5048;
+  --paper: #FBF9F5;
+  --surface: #FFFFFF;
+  --line: #EAE4DB;
 }
 
-/* Fix long text overflow in cards */
-.truncate-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+@layer base {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Bold, tight display headings — type as a design element */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  /* Visible keyboard focus everywhere */
+  a:focus-visible, button:focus-visible,
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  ::selection { background: #F2B3A6; color: var(--ink); }
 }
 
-/* Smooth mobile tap */
-button, a {
-  -webkit-tap-highlight-color: transparent;
-}
+@layer components {
+  /* Reusable primitives — every page inherits the same system */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-bold rounded-pill
+           px-5 py-2.5 text-sm transition-transform duration-150 active:scale-[0.97]
+           whitespace-nowrap select-none;
+  }
+  .btn-primary { @apply btn bg-brand-500 text-white shadow-brand hover:bg-brand-600; }
+  .btn-forest  { @apply btn bg-forest-500 text-white hover:bg-forest-600; }
+  .btn-ghost   { @apply btn bg-white text-ink border border-line hover:border-ink/30; }
+  .btn-dark    { @apply btn bg-ink text-white hover:bg-black; }
 
-/* Better mobile input */
-@media (max-width: 640px) {
-  input, textarea, select {
-    font-size: 16px; /* Prevent iOS zoom on focus */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5
+           text-xs font-semibold border border-line bg-white text-ink-soft
+           hover:border-brand-300 hover:text-brand-600 transition-colors;
+  }
+
+  .card {
+    @apply bg-surface rounded-card border border-line shadow-card;
+  }
+
+  /* A structural device that is NOT a tracked-out all-caps eyebrow:
+     a short brand rule followed by a sentence-case kicker. */
+  .kicker {
+    @apply inline-flex items-center gap-2 text-[13px] font-bold text-brand-600;
+  }
+  .kicker::before {
+    content: '';
+    @apply inline-block h-[3px] w-6 rounded-pill bg-brand-500;
   }
 }
 
-/* Toast slide-up animation */
+/* Long text clamp helpers */
+.truncate-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+button, a { -webkit-tap-highlight-color: transparent; }
+
+@media (max-width: 640px) {
+  input, textarea, select { font-size: 16px; } /* prevent iOS zoom */
+}
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}

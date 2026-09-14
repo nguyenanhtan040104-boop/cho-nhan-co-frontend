@@ -233,7 +233,7 @@ export default function CreatePostPage() {
             <p className="text-gray-400 text-xs">Sau khi được duyệt, bài sẽ xuất hiện công khai.</p>
             <div className="mt-4 flex justify-center gap-3">
               <div className="flex flex-col items-center gap-1">
-                <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center"><i className="ri-check-line text-white text-xs"></i></div>
+                <div className="w-7 h-7 rounded-full bg-brand-500 flex items-center justify-center"><i className="ri-check-line text-white text-xs"></i></div>
                 <span className="text-[10px] text-green-600">Đã gửi</span>
               </div>
               <div className="flex-1 h-0.5 bg-amber-200 mt-3.5 max-w-[32px]"></div>

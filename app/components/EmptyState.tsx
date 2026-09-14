@@ -78,7 +78,7 @@ export default function EmptyState({
         {createHref && createLabel && (
           <Link
             href={createHref}
-            className="px-6 py-2.5 bg-green-600 text-white rounded-full font-medium text-sm hover:bg-green-700 transition-colors"
+            className="px-6 py-2.5 bg-brand-500 text-white rounded-full font-medium text-sm hover:bg-brand-600 transition-colors"
           >
             {createLabel}
           </Link>

@@ -116,7 +116,7 @@ export default function HomepageClient() {
   return (
     <div ref={wrapperRef} className="relative">
       <form onSubmit={handleSubmit}>
-        <div className="flex items-center bg-white rounded-full shadow-xl overflow-hidden border border-gray-100" style={{ height: 52 }}>
+        <div className="flex items-center bg-white rounded-full shadow-xl overflow-hidden border border-gray-100" style={{ height: 56 }}>
           <i className="ri-search-line text-gray-400 pl-4 text-lg flex-shrink-0"></i>
           <input
             type="text"
@@ -132,8 +132,7 @@ export default function HomepageClient() {
             </button>
           )}
           <button type="submit"
-            className="h-[44px] px-6 mr-1 text-sm font-bold text-gray-900 rounded-full transition hover:opacity-90 flex-shrink-0 whitespace-nowrap"
-            style={{ backgroundColor: '#ffd400' }}>
+            className="h-[46px] px-6 mr-1 text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-full transition flex-shrink-0 whitespace-nowrap">
             Tìm kiếm
           </button>
         </div>

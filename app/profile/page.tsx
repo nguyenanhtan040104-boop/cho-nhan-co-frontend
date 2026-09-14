@@ -247,12 +247,12 @@ export default function ProfilePage() {
   const showTabs = tab === 'login' || tab === 'register';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-forest-50 py-12 px-4">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
 
         {/* Logo */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-brand-500 rounded-xl flex items-center justify-center mx-auto mb-3">
             <i className="ri-store-2-line text-white text-2xl"></i>
           </div>
           <h1 className="font-bold text-gray-800 text-lg">Chợ Nhân Cơ</h1>
@@ -317,19 +317,19 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập hoặc email</label>
               <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="username hoặc email@example.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
               <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
+              className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang xử lý...' : 'Đăng nhập'}
             </button>
             <button type="button" onClick={() => { setTab('forgot-password'); setError(''); setMessage(''); setFormData(prev => ({ ...prev, email: '' })); }}
-              className="w-full text-green-600 text-sm hover:text-green-700 transition">
+              className="w-full text-green-600 text-sm hover:text-brand-700 transition">
               Quên mật khẩu?
             </button>
           </form>
@@ -341,40 +341,40 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tên đăng nhập *</label>
               <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="vd: nguyen_van_a" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
               <p className="text-xs text-gray-500 mt-1">Chỉ chữ cái, số và dấu _, ít nhất 3 ký tự</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
               <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Nguyễn Văn A"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu *</label>
               <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu *</label>
               <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email <span className="text-red-500">*</span>
               </label>
               <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
               <p className="text-xs text-gray-500 mt-1">Dùng để xác thực tài khoản qua OTP</p>
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
+              className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang xử lý...' : 'Đăng ký'}
             </button>
             <p className="text-center text-sm text-gray-500 mt-2">
               Đã có tài khoản?{' '}
               <button type="button" onClick={() => { setTab('login'); setError(''); setMessage(''); }}
-                className="text-green-600 hover:text-green-700 font-medium">
+                className="text-green-600 hover:text-brand-700 font-medium">
                 Đăng nhập
               </button>
             </p>
@@ -391,13 +391,13 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mã OTP (6 chữ số)</label>
               <input type="text" name="otp" value={formData.otp} onChange={handleChange} placeholder="000000" maxLength={6}
-                className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono" />
+                className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent font-mono" />
             </div>
             {otpAttempts > 0 && otpAttempts < 5 && (
               <p className="text-xs text-orange-600 text-center">Còn {5 - otpAttempts} lần thử</p>
             )}
             <button type="submit" disabled={loading || formData.otp.length !== 6 || otpAttempts >= 5}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
+              className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang xác nhận...' : 'Xác nhận'}
             </button>
             <button type="button" onClick={handleResendOtp} disabled={countdown > 0 || loading}
@@ -421,10 +421,10 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
+              className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang gửi...' : 'Gửi mã OTP'}
             </button>
             <button type="button" onClick={() => { setTab('login'); setError(''); setMessage(''); }}
@@ -444,10 +444,10 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mã OTP (6 chữ số)</label>
               <input type="text" name="otp" value={formData.otp} onChange={handleChange} placeholder="000000" maxLength={6}
-                className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono" />
+                className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent font-mono" />
             </div>
             <button type="submit" disabled={formData.otp.length !== 6}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
+              className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
               Xác nhận mã OTP
             </button>
             <button type="button" onClick={handleResendOtp} disabled={countdown > 0 || loading}
@@ -471,15 +471,15 @@ export default function ProfilePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
               <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
               <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••" required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent" />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition font-medium">
+              className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
               {loading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
             </button>
           </form>
@@ -488,7 +488,7 @@ export default function ProfilePage() {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t text-center text-sm text-gray-600">
           <p>Cần giúp?{' '}
-            <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 font-medium">
+            <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-brand-700 font-medium">
               Liên hệ hỗ trợ
             </a>
           </p>

@@ -14,13 +14,13 @@ interface ProductDetailProps {
 }
 
 const CATEGORY_THEME: Record<string, { accent: string; bg: string; bgHover: string; border: string; bgLight: string; badge: string; icon: string; label: string; ctaLabel: string; ctaIcon: string }> = {
-  NONG_SAN:   { accent: 'text-green-600',  bg: 'bg-green-600',  bgHover: 'hover:bg-green-700',  border: 'border-green-200', bgLight: 'bg-green-50',  badge: 'bg-green-100 text-green-700',  icon: 'ri-plant-line',        label: 'Nông sản',  ctaLabel: 'Liên hệ đặt hàng', ctaIcon: 'ri-shopping-basket-line' },
+  NONG_SAN:   { accent: 'text-green-600',  bg: 'bg-brand-500',  bgHover: 'hover:bg-brand-600',  border: 'border-green-200', bgLight: 'bg-green-50',  badge: 'bg-green-100 text-green-700',  icon: 'ri-plant-line',        label: 'Nông sản',  ctaLabel: 'Liên hệ đặt hàng', ctaIcon: 'ri-shopping-basket-line' },
   VAT_NUOI:   { accent: 'text-amber-600',  bg: 'bg-amber-500',  bgHover: 'hover:bg-amber-600',  border: 'border-amber-200', bgLight: 'bg-amber-50',  badge: 'bg-amber-100 text-amber-700',  icon: 'ri-bear-smile-line',   label: 'Vật nuôi', ctaLabel: 'Liên hệ xem thú',  ctaIcon: 'ri-paw-print-line' },
   DICH_VU:    { accent: 'text-purple-600', bg: 'bg-purple-600', bgHover: 'hover:bg-purple-700', border: 'border-purple-200', bgLight: 'bg-purple-50', badge: 'bg-purple-100 text-purple-700',icon: 'ri-service-line',      label: 'Dịch vụ',  ctaLabel: 'Yêu cầu dịch vụ', ctaIcon: 'ri-customer-service-2-line' },
   DO_DUNG_GIA_DINH: { accent: 'text-blue-600', bg: 'bg-blue-600', bgHover: 'hover:bg-blue-700', border: 'border-blue-200', bgLight: 'bg-blue-50', badge: 'bg-blue-100 text-blue-700', icon: 'ri-home-gear-line',    label: 'Đồ dùng',  ctaLabel: 'Liên hệ người bán', ctaIcon: 'ri-message-line' },
   HANG_TIEU_DUNG: { accent: 'text-teal-600', bg: 'bg-teal-600', bgHover: 'hover:bg-teal-700', border: 'border-teal-200', bgLight: 'bg-teal-50', badge: 'bg-teal-100 text-teal-700',  icon: 'ri-shopping-bag-line', label: 'Hàng tiêu dùng', ctaLabel: 'Liên hệ người bán', ctaIcon: 'ri-message-line' },
 };
-const DEFAULT_THEME = { accent: 'text-green-600', bg: 'bg-green-600', bgHover: 'hover:bg-green-700', border: 'border-green-200', bgLight: 'bg-green-50', badge: 'bg-green-100 text-green-700', icon: 'ri-leaf-line', label: 'Sản phẩm', ctaLabel: 'Liên hệ mua hàng', ctaIcon: 'ri-message-line' };
+const DEFAULT_THEME = { accent: 'text-green-600', bg: 'bg-brand-500', bgHover: 'hover:bg-brand-600', border: 'border-green-200', bgLight: 'bg-green-50', badge: 'bg-green-100 text-green-700', icon: 'ri-leaf-line', label: 'Sản phẩm', ctaLabel: 'Liên hệ mua hàng', ctaIcon: 'ri-message-line' };
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -82,7 +82,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f5f4ee' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FBF9F5' }}>
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải sản phẩm...</p>
@@ -97,7 +97,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         <div className="text-center">
           <i className="ri-alert-line text-6xl text-red-500 mb-4 block"></i>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy sản phẩm</h2>
-          <Link href="/products" className="text-green-600 hover:text-green-700">
+          <Link href="/products" className="text-green-600 hover:text-brand-700">
             ← Quay lại danh sách sản phẩm
           </Link>
         </div>
@@ -194,7 +194,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const mainImage = images.length > 0 ? images[selectedImageIndex] : null;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
       {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -466,7 +466,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug mb-1">{p.title}</p>
-                    <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                    <p className="text-sm font-bold" style={{ color: '#B32E1D' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
                     {p.location && <p className="text-[10px] text-gray-400 mt-0.5 truncate"><i className="ri-map-pin-line"></i> {p.location}</p>}
                   </div>
                 </a>

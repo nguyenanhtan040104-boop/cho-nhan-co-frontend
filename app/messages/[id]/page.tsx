@@ -269,7 +269,7 @@ export default function ChatPage() {
                       className={`rounded-2xl max-w-full max-h-60 object-cover cursor-pointer ${isMe ? 'rounded-br-sm' : 'rounded-bl-sm'}`} />
                   ) : (
                     <div className={`px-4 py-2.5 rounded-2xl text-sm ${isMe
-                      ? 'bg-green-600 text-white rounded-br-sm'
+                      ? 'bg-brand-500 text-white rounded-br-sm'
                       : 'bg-white text-gray-900 rounded-bl-sm shadow-sm border border-gray-100'}`}>
                       {msg.content}
                     </div>
@@ -295,16 +295,16 @@ export default function ChatPage() {
             <form onSubmit={handleSend} className="flex items-center gap-2">
               <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSend} className="hidden" />
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImg}
-                className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-colors disabled:opacity-50">
+                className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-brand-600 hover:bg-green-50 rounded-full transition-colors disabled:opacity-50">
                 {uploadingImg
                   ? <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
                   : <i className="ri-image-line text-xl"></i>}
               </button>
               <input value={text} onChange={handleTextChange}
                 placeholder="Nhập tin nhắn..."
-                className="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-colors" />
+                className="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-colors" />
               <button type="submit" disabled={!text.trim()}
-                className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center hover:bg-green-700 disabled:opacity-40 transition-colors">
+                className="w-10 h-10 bg-brand-500 text-white rounded-full flex items-center justify-center hover:bg-brand-600 disabled:opacity-40 transition-colors">
                 <i className="ri-send-plane-fill"></i>
               </button>
             </form>

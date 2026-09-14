@@ -69,7 +69,7 @@ function PaymentContent() {
           <i className="ri-error-warning-line text-5xl text-red-400 block mb-4"></i>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Không tìm thấy gói dịch vụ</h2>
           <p className="text-gray-500 mb-6">Vui lòng chọn gói từ trang bảng giá</p>
-          <Link href="/pricing" className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition font-medium">
+          <Link href="/pricing" className="bg-brand-500 text-white px-6 py-3 rounded-xl hover:bg-brand-600 transition font-medium">
             Quay lại bảng giá
           </Link>
         </div>
@@ -93,7 +93,7 @@ function PaymentContent() {
             <p>⏱ Thời hạn: <strong>{pkg.duration}</strong></p>
           </div>
           <div className="flex flex-col gap-3">
-            <Link href="/wallet" className="bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition block">
+            <Link href="/wallet" className="bg-brand-500 text-white py-3 rounded-xl font-semibold hover:bg-brand-600 transition block">
               Xem ví của tôi
             </Link>
             <Link href="/pricing" className="border border-gray-300 text-gray-700 py-3 rounded-xl hover:bg-gray-50 transition block">
@@ -114,7 +114,7 @@ function PaymentContent() {
             <i className="ri-arrow-left-line"></i>
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
               <i className="ri-store-2-line text-white text-sm"></i>
             </div>
             <span className="font-bold text-gray-900">Chợ Nhân Cơ</span>
@@ -186,7 +186,7 @@ function PaymentContent() {
                   </div>
                 </div>
                 <p className="text-sm text-green-700 mb-4">Bạn có thể dùng số dư ví để mua VIP trực tiếp trên trang tin đăng mà không cần nạp thêm.</p>
-                <Link href="/products" className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-green-700 transition text-sm">
+                <Link href="/products" className="inline-flex items-center gap-2 bg-brand-500 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-brand-600 transition text-sm">
                   <i className="ri-arrow-right-line"></i> Đến trang sản phẩm để mua VIP
                 </Link>
               </div>
@@ -206,7 +206,7 @@ function PaymentContent() {
                         <span className="text-gray-600">Số TK:</span>
                         <div className="flex items-center gap-1.5">
                           <span className={`font-bold ${acc.color === 'green' ? 'text-green-700' : 'text-blue-700'}`}>{acc.number}</span>
-                          <button onClick={() => copy(acc.number)} title="Sao chép" className={`${acc.color === 'green' ? 'text-green-600 hover:text-green-700' : 'text-blue-600 hover:text-blue-700'}`}>
+                          <button onClick={() => copy(acc.number)} title="Sao chép" className={`${acc.color === 'green' ? 'text-green-600 hover:text-brand-700' : 'text-blue-600 hover:text-blue-700'}`}>
                             <i className="ri-file-copy-line text-xs"></i>
                           </button>
                         </div>
@@ -238,7 +238,7 @@ function PaymentContent() {
               <div className="mb-4">
                 <label className="text-sm font-medium text-gray-700 mb-2 block">Nội dung chuyển khoản đã dùng</label>
                 <input type="text" value={transferNote} onChange={e => setTransferNote(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500" />
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500" />
               </div>
 
               {user && (
@@ -251,7 +251,7 @@ function PaymentContent() {
               {err && <p className="text-red-600 text-sm mb-4">{err}</p>}
 
               <button type="submit" disabled={submitting}
-                className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full bg-brand-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-600 transition disabled:opacity-50 flex items-center justify-center gap-2">
                 {submitting ? (
                   <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang gửi...</>
                 ) : (

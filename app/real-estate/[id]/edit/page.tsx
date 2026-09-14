@@ -218,21 +218,21 @@ export default function EditRealEstatePage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Loại bất động sản *</label>
               <select name="type" value={form.type} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 {typeOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Giá (đồng) *</label>
               <input type="number" name="price" required min="0" value={form.price} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
             </div>
           </div>
 
@@ -240,12 +240,12 @@ export default function EditRealEstatePage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Diện tích (m²) *</label>
               <input type="number" name="area" required min="1" value={form.area} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Pháp lý</label>
               <select name="legalStatus" value={form.legalStatus} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500">
                 <option value="">Chưa rõ</option>
                 {legalOptions.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
@@ -255,20 +255,20 @@ export default function EditRealEstatePage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ *</label>
             <input type="text" name="address" required value={form.address} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả chi tiết *</label>
             <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 resize-none"
               maxLength={2000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
           </div>
 
           <div className="flex justify-end pt-4 border-t">
             <button type="submit" disabled={saving}
-              className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium">
+              className="bg-brand-500 text-white px-8 py-3 rounded-lg hover:bg-brand-600 disabled:opacity-50 font-medium">
               {saving ? 'Đang lưu...' : 'Lưu thông tin'}
             </button>
           </div>
@@ -291,7 +291,7 @@ export default function EditRealEstatePage() {
                   <div key={i} className="relative w-24 h-24 group">
                     <img src={img.url} className="w-full h-full object-cover rounded-lg border" alt="" />
                     {i === 0 && (
-                      <span className="absolute bottom-0 left-0 right-0 bg-green-600 text-white text-xs text-center py-0.5 rounded-b-lg">
+                      <span className="absolute bottom-0 left-0 right-0 bg-brand-500 text-white text-xs text-center py-0.5 rounded-b-lg">
                         Ảnh bìa
                       </span>
                     )}
@@ -327,7 +327,7 @@ export default function EditRealEstatePage() {
           {newImageFiles.length > 0 && (
             <div className="flex justify-end mt-4 pt-4 border-t">
               <button onClick={handleSaveGallery} disabled={gallerySaving}
-                className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium flex items-center gap-2">
+                className="bg-brand-500 text-white px-8 py-3 rounded-lg hover:bg-brand-600 disabled:opacity-50 font-medium flex items-center gap-2">
                 {gallerySaving ? (
                   <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang upload...</>
                 ) : (

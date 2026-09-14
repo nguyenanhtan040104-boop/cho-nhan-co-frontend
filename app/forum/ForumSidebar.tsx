@@ -176,7 +176,7 @@ export default function ForumSidebar({
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-brand-600 to-brand-700 rounded-xl p-6 text-white">
         <h3 className="text-lg font-semibold mb-3">Bắt đầu thảo luận</h3>
         <p className="text-green-100 text-sm mb-4">
           Chia sẻ kinh nghiệm, đặt câu hỏi hoặc tìm kiếm sự giúp đỡ từ cộng đồng

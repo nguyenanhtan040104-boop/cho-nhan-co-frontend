@@ -127,7 +127,7 @@ export default function ProfileDetail({ userId }: { userId: string }) {
             <img src={profile.avatarUrl} alt=""
               className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-white shadow-lg" />
           ) : (
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-green-600 border-4 border-white shadow-lg flex items-center justify-center">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-brand-500 border-4 border-white shadow-lg flex items-center justify-center">
               <span className="text-white font-bold text-3xl">
                 {(profile.fullName || profile.username || 'U')[0].toUpperCase()}
               </span>
@@ -183,7 +183,7 @@ export default function ProfileDetail({ userId }: { userId: string }) {
             {/* Actions */}
             <div className="flex gap-2 flex-wrap">
               <button onClick={handleMessage}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full text-sm font-semibold transition shadow-sm">
+                className="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-5 py-2 rounded-full text-sm font-semibold transition shadow-sm">
                 <i className="ri-message-3-fill"></i> Nhắn tin
               </button>
               <button onClick={handleShare}

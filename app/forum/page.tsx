@@ -32,8 +32,8 @@ function timeAgo(dateStr: string) {
 }
 
 const catColors: any = {
-  NONG_NGHIEP: { bg: '#f0fdf4', color: '#166534', label: 'Nông nghiệp' },
-  CHAN_NUOI: { bg: '#fff7ed', color: '#9a3412', label: 'Chăn nuôi' },
+  NONG_NGHIEP: { bg: '#FBF9F5', color: '#241C15', label: 'Nông nghiệp' },
+  CHAN_NUOI: { bg: '#FBF9F5', color: '#9a3412', label: 'Chăn nuôi' },
   THI_TRUONG: { bg: '#eff6ff', color: '#1e40af', label: 'Thị trường' },
   KY_THUAT: { bg: '#fdf4ff', color: '#6b21a8', label: 'Kỹ thuật' },
   KINH_NGHIEM: { bg: '#fefce8', color: '#854d0e', label: 'Kinh nghiệm' },
@@ -102,9 +102,9 @@ function ForumContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f4ee' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%)' }} className="py-8">
+      <div style={{ background: 'linear-gradient(135deg, #14532d 0%, #241C15 50%, #15803d 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
@@ -119,7 +119,7 @@ function ForumContent() {
                   className="px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-green-200 focus:outline-none focus:bg-white/20 w-52" />
                 <button type="submit" className="bg-white text-green-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-50">Tìm</button>
               </form>
-              <Link href="/forum/create" className="bg-green-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-400 whitespace-nowrap">
+              <Link href="/forum/create" className="bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-400 whitespace-nowrap">
                 + Viết bài
               </Link>
             </div>
@@ -191,7 +191,7 @@ function ForumContent() {
               <div className="flex justify-center gap-2 mt-10">
                 {[...Array(totalPages)].map((_, i) => (
                   <button key={i} onClick={() => loadData(i + 1)}
-                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-brand-500 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
                     {i + 1}
                   </button>
                 ))}
@@ -214,7 +214,7 @@ function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: an
     <div className="relative group">
       {bulkMode && (
         <button onClick={onToggle}
-          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}>
+          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-brand-500 border-green-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}

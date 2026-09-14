@@ -352,7 +352,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm" suppressHydrationWarning>
+    <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur-md" suppressHydrationWarning>
       <div className="w-full px-3 flex items-center gap-2 h-14" suppressHydrationWarning>
 
         {/* Hamburger → Danh mục */}
@@ -368,8 +368,8 @@ export default function Header() {
                 <p className="text-sm font-bold text-gray-900 px-4 py-2">Danh mục</p>
                 {mainCategories.map((cat, idx) => (
                   <button key={idx} onMouseEnter={() => setHoveredCat(idx)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${hoveredCat === idx ? 'bg-yellow-50 text-gray-900' : 'hover:bg-gray-50 text-gray-700'}`}>
-                    <i className={`${cat.icon} text-lg w-5 flex-shrink-0 ${hoveredCat === idx ? 'text-yellow-500' : 'text-gray-400'}`}></i>
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${hoveredCat === idx ? 'bg-brand-50 text-ink' : 'hover:bg-gray-50 text-gray-700'}`}>
+                    <i className={`${cat.icon} text-lg w-5 flex-shrink-0 ${hoveredCat === idx ? 'text-brand-500' : 'text-gray-400'}`}></i>
                     <span className="text-sm font-medium flex-1">{cat.label}</span>
                     <i className="ri-arrow-right-s-line text-gray-300 text-base"></i>
                   </button>
@@ -382,7 +382,7 @@ export default function Header() {
                   {mainCategories[hoveredCat]?.sub.map((sub, i) => (
                     <Link key={i} href={sub.href} onClick={() => setShowHamburger(false)}
                       className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-sm text-gray-700 hover:text-gray-900 font-medium">
-                      <i className="ri-arrow-right-s-line text-yellow-400"></i>
+                      <i className="ri-arrow-right-s-line text-brand-400"></i>
                       {sub.label}
                     </Link>
                   ))}
@@ -394,7 +394,7 @@ export default function Header() {
 
         {/* Logo */}
         <Link href="/" className="flex-shrink-0">
-          <div className="flex items-center gap-1 bg-yellow-400 px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-1.5 bg-brand-500 px-3 py-1.5 rounded-pill shadow-brand">
             <i className="ri-store-2-fill text-white text-sm"></i>
             <span className="font-black text-white text-sm leading-none">chợ<span className="uppercase">NC</span></span>
           </div>
@@ -418,8 +418,8 @@ export default function Header() {
                 </div>
               </Link>
               <Link href="/pricing" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <i className="ri-vip-crown-line text-yellow-600 text-sm"></i>
+                <div className="w-8 h-8 bg-gold-400/20 rounded-lg flex items-center justify-center">
+                  <i className="ri-vip-crown-line text-gold-600 text-sm"></i>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Gói VIP</p>
@@ -427,8 +427,8 @@ export default function Header() {
                 </div>
               </Link>
               <Link href="/advertisements/create" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <i className="ri-megaphone-line text-orange-600 text-sm"></i>
+                <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center">
+                  <i className="ri-megaphone-line text-brand-600 text-sm"></i>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Đăng quảng cáo</p>
@@ -446,9 +446,9 @@ export default function Header() {
         <nav className="hidden lg:flex items-center gap-1 flex-shrink-0">
           {navLinks.map(link => (
             <Link key={link.href} href={link.href}
-              className={`text-sm font-medium px-3 py-1.5 rounded-full transition whitespace-nowrap ${
-                link.href === '/' ? (pathname === '/' ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900')
-                : pathname.startsWith(link.href) ? 'text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'
+              className={`text-sm font-semibold px-3 py-1.5 rounded-pill transition whitespace-nowrap ${
+                link.href === '/' ? (pathname === '/' ? 'text-brand-600 font-bold' : 'text-ink-soft hover:text-ink')
+                : pathname.startsWith(link.href) ? 'text-brand-600 font-bold' : 'text-ink-soft hover:text-ink'
               }`}>
               {link.label}
             </Link>
@@ -472,7 +472,7 @@ export default function Header() {
                 <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                   <h3 className="font-bold text-gray-900">Tin đăng đã lưu</h3>
                   <button onClick={() => { setShowSavedDropdown(false); navDashboard('liked'); }}
-                    className="text-xs text-yellow-500 font-medium hover:underline">Xem tất cả</button>
+                    className="text-xs text-brand-600 font-semibold hover:underline">Xem tất cả</button>
                 </div>
                 {savedProducts.length === 0 ? (
                   <div className="py-10 text-center text-gray-400">
@@ -492,7 +492,7 @@ export default function Header() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 line-clamp-1">{p.title}</p>
-                          <p className="text-sm font-bold" style={{ color: '#d0011b' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                          <p className="text-sm font-bold text-brand-600">{Number(p.price).toLocaleString('vi-VN')}đ</p>
                         </div>
                       </Link>
                     ))}
@@ -520,7 +520,7 @@ export default function Header() {
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-bold text-gray-900">Thông Báo</h3>
                     <button onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}
-                      className="text-xs text-yellow-500 font-semibold hover:underline">Xem tất cả</button>
+                      className="text-xs text-brand-600 font-semibold hover:underline">Xem tất cả</button>
                   </div>
                   {/* Tabs */}
                   <div className="flex gap-0 border-b border-gray-100">
@@ -554,8 +554,8 @@ export default function Header() {
                       {notifs.map((n: any) => {
                         const isLike = n.type?.includes('LIKE');
                         const isComment = n.type?.includes('COMMENT');
-                        const iconClass = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : 'ri-notification-2-fill text-yellow-600';
-                        const iconBg = isLike ? 'bg-red-50' : isComment ? 'bg-blue-50' : 'bg-yellow-50';
+                        const iconClass = isLike ? 'ri-heart-fill text-brand-500' : isComment ? 'ri-chat-1-fill text-forest-500' : 'ri-notification-2-fill text-gold-600';
+                        const iconBg = isLike ? 'bg-brand-50' : isComment ? 'bg-forest-50' : 'bg-gold-400/15';
                         return (
                           <div key={n.id}
                             className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-amber-50/60' : ''}`}
@@ -614,8 +614,8 @@ export default function Header() {
           {/* Đăng tin */}
           <div className="relative" ref={postMenuRef}>
             <button onClick={handlePostClick}
-              className="flex items-center gap-1 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-800 transition">
-              Đăng tin
+              className="flex items-center gap-1 bg-brand-500 text-white text-sm font-bold px-4 py-2 rounded-pill shadow-brand hover:bg-brand-600 transition">
+              <i className="ri-add-line text-base"></i>Đăng tin
             </button>
             {showPostMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
@@ -637,7 +637,7 @@ export default function Header() {
 
           {/* Avatar */}
           <Link href="/dashboard"
-            className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0 hover:bg-gray-700 transition">
+            className="w-8 h-8 rounded-full bg-ink flex items-center justify-center flex-shrink-0 hover:bg-black transition">
             <i className="ri-user-line text-white text-sm"></i>
           </Link>
         </div>

@@ -47,7 +47,7 @@ function timeAgo(dateStr?: string) {
 
 export default function VatNuoiPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#faf8f4' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }} />}>
       <VatNuoiInner />
     </Suspense>
   );
@@ -148,10 +148,10 @@ function VatNuoiInner() {
   const lowData = !loading && filtered.length < 8;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#faf8f4' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
 
       {/* Header */}
-      <header className="border-b border-stone-200" style={{ backgroundColor: '#78350f' }}>
+      <header className="border-b border-stone-200" style={{ backgroundColor: '#241C15' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
           <div className="flex items-end justify-between gap-3 mb-4">
             <div>
@@ -168,7 +168,7 @@ function VatNuoiInner() {
               </p>
             </div>
             <Link href="/products/create?category=VAT_NUOI"
-              className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap flex items-center gap-1.5 shadow-sm">
+              className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-pill text-[13px] font-bold transition-colors whitespace-nowrap flex items-center gap-1.5 shadow-brand">
               <i className="ri-add-line"></i>
               <span className="hidden sm:inline">Đăng tin</span>
             </Link>
@@ -182,7 +182,7 @@ function VatNuoiInner() {
                 placeholder="Tìm chó, mèo, gà, bò..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
               />
             </div>
             <button type="submit" className="bg-white hover:bg-stone-100 text-gray-900 px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap">
@@ -196,7 +196,7 @@ function VatNuoiInner() {
                 onClick={() => { setSubCat(cat.value); setPage(1); }}
                 className={`flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   subCat === cat.value
-                    ? 'bg-white text-amber-900'
+                    ? 'bg-white text-ink'
                     : 'bg-white/10 text-white hover:bg-white/20'
                 }`}>
                 {cat.name}
@@ -370,10 +370,10 @@ function LowDataFill({ createHref, accentColor }: { createHref: string; accentCo
       <section className="bg-amber-50/60 border border-amber-200/60 rounded-lg p-4 flex gap-3">
         <i className="ri-shield-check-line text-amber-700 text-xl flex-shrink-0 mt-0.5"></i>
         <div>
-          <p className="text-[13px] font-bold text-amber-900 mb-1">Mua bán an toàn</p>
-          <p className="text-[12px] text-amber-900/80 leading-relaxed">
+          <p className="text-[13px] font-bold text-ink mb-1">Mua bán an toàn</p>
+          <p className="text-[12px] text-ink/80 leading-relaxed">
             Gặp trực tiếp ở nơi đông người · Kiểm tra kỹ vật nuôi trước khi trả tiền · Không chuyển khoản trước.
-            <Link href="/canh-bao" className="text-amber-900 font-bold hover:underline ml-1">Xem cảnh báo</Link>
+            <Link href="/canh-bao" className="text-ink font-bold hover:underline ml-1">Xem cảnh báo</Link>
           </p>
         </div>
       </section>

@@ -53,7 +53,7 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <div className={`bg-white rounded-xl shadow-sm border transition-all hover:shadow-md ${
-      post.isVip ? 'border-yellow-300 ring-1 ring-yellow-200' : 'border-gray-200'
+      post.isVip ? 'border-gold-400 ring-1 ring-gold-400/40' : 'border-gray-200'
     } ${post.isPinned ? 'ring-2 ring-green-200' : ''}`}>
       {/* Header */}
       <div className="p-6 pb-4">
@@ -111,7 +111,7 @@ export default function PostCard({ post }: PostCardProps) {
       {/* Content */}
       <div className="px-6 pb-4">
         <Link href={`/forum/${post.id}`} className="cursor-pointer">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3 hover:text-green-600 transition-colors line-clamp-2">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3 hover:text-brand-600 transition-colors line-clamp-2">
             {post.title}
           </h2>
           <p className="text-gray-600 leading-relaxed line-clamp-3">
@@ -153,13 +153,13 @@ export default function PostCard({ post }: PostCardProps) {
           </div>
           
           <div className="flex items-center space-x-2">
-            <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-sm cursor-pointer">
+            <button className="flex items-center space-x-2 text-forest-600 hover:text-forest-700 text-sm cursor-pointer">
               <i className="ri-facebook-line"></i>
               <span>Chia sẻ</span>
             </button>
             <Link 
               href={`/forum/${post.id}`}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium cursor-pointer"
+              className="bg-brand-500 text-white px-4 py-2 rounded-pill hover:bg-brand-600 transition-colors text-sm font-medium cursor-pointer"
             >
               Xem chi tiết
             </Link>

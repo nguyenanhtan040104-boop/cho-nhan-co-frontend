@@ -167,7 +167,7 @@ function WalletContent() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
 
         {/* Balance card */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-2xl p-6 text-white shadow-lg">
+        <div className="bg-gradient-to-r from-brand-600 to-forest-500 rounded-2xl p-6 text-white shadow-lg">
           <p className="text-green-100 text-sm mb-1">Số dư hiện tại</p>
           {loading ? (
             <div className="h-10 w-40 bg-white/20 rounded animate-pulse"></div>
@@ -297,7 +297,7 @@ function WalletContent() {
                       key={p}
                       onClick={() => setAmount(String(p))}
                       className={`py-3 rounded-xl border-2 text-sm font-semibold transition ${amount === String(p)
-                        ? 'bg-green-600 border-green-600 text-white'
+                        ? 'bg-brand-500 border-green-600 text-white'
                         : 'border-gray-200 hover:border-green-400 text-gray-700 bg-gray-50'}`}
                     >
                       {fmt(p)}
@@ -311,7 +311,7 @@ function WalletContent() {
                   placeholder="Hoặc nhập số tiền khác..."
                   min="10000"
                   step="1000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 text-sm"
                 />
               </div>
 
@@ -325,7 +325,7 @@ function WalletContent() {
               <button
                 onClick={handleCreatePayment}
                 disabled={creatingPayment || !amount || Number(amount) < 10000}
-                className="w-full py-3.5 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 font-semibold text-sm flex items-center justify-center gap-2 transition"
+                className="w-full py-3.5 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 font-semibold text-sm flex items-center justify-center gap-2 transition"
               >
                 {creatingPayment ? (
                   <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang tạo QR...</>
@@ -411,7 +411,7 @@ function WalletContent() {
         <div className="bg-white rounded-2xl shadow-sm border">
           <div className="px-5 py-4 border-b flex items-center justify-between">
             <h2 className="font-bold text-gray-900">Lịch sử giao dịch</h2>
-            <button onClick={load} className="text-sm text-gray-400 hover:text-green-600">
+            <button onClick={load} className="text-sm text-gray-400 hover:text-brand-600">
               <i className="ri-refresh-line"></i>
             </button>
           </div>

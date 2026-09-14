@@ -69,7 +69,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow" data-product-shop>
+      <div className="bg-surface rounded-card shadow-card border border-line hover:shadow-lift transition-shadow" data-product-shop>
         {/* Image */}
         <div className="relative">
           <Link href={`/products/${product.id}`} className="cursor-pointer">
@@ -82,7 +82,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           
           {/* VIP Badge */}
           {product.isVip && (
-            <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-1 rounded text-xs font-semibold">
+            <div className="absolute top-3 left-3 bg-gold-500 text-ink px-2 py-1 rounded-pill text-xs font-black">
               VIP
             </div>
           )}
@@ -101,13 +101,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="p-4">
           {/* Title */}
           <Link href={`/products/${product.id}`}>
-            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-green-600 cursor-pointer">
+            <h3 className="font-semibold text-ink mb-2 line-clamp-2 hover:text-brand-600 cursor-pointer">
               {product.name}
             </h3>
           </Link>
 
           {/* Price */}
-          <div className="text-lg font-bold text-green-600 mb-2">
+          <div className="text-lg font-black text-brand-600 mb-2">
             {formatPrice(product.price)}
             <span className="text-sm text-gray-500 font-normal">/{product.unit}</span>
           </div>
@@ -115,7 +115,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Rating and Sold */}
           <div className="flex items-center gap-4 mb-3 text-sm text-gray-600">
             <div className="flex items-center gap-1">
-              <i className="ri-star-fill text-yellow-400 w-4 h-4 flex items-center justify-center"></i>
+              <i className="ri-star-fill text-gold-500 w-4 h-4 flex items-center justify-center"></i>
               <span>{product.rating}</span>
             </div>
             <span>|</span>
@@ -136,16 +136,16 @@ export default function ProductCard({ product }: ProductCardProps) {
               <div>
                 <button
                   onClick={handleContactProfile}
-                  className="text-sm font-medium text-gray-900 hover:text-green-600 transition-colors cursor-pointer"
+                  className="text-sm font-medium text-ink hover:text-brand-600 transition-colors cursor-pointer"
                 >
                   {product.seller.name}
                 </button>
                 <div className="flex items-center gap-2 text-xs text-gray-600">
                   <div className="flex items-center gap-1">
-                    <i className="ri-star-fill text-yellow-400 w-3 h-3 flex items-center justify-center"></i>
+                    <i className="ri-star-fill text-gold-500 w-3 h-3 flex items-center justify-center"></i>
                     <span>{product.seller.rating}</span>
                   </div>
-                  <span>•</span>
+                  <span className="text-gray-300">·</span>
                   <span>{product.seller.location}</span>
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleMessage}
-                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap cursor-pointer"
+                className="flex-1 bg-brand-500 text-white py-2 px-4 rounded-pill hover:bg-brand-600 transition-colors text-sm font-bold whitespace-nowrap cursor-pointer"
                 suppressHydrationWarning={true}
               >
                 <i className="ri-message-3-line w-4 h-4 flex items-center justify-center mr-2 inline-flex"></i>
@@ -172,7 +172,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </button>
               <Link
                 href={`/products/${product.id}`}
-                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                className="p-2 bg-forest-500 text-white rounded-pill hover:bg-forest-600 cursor-pointer"
               >
                 <i className="ri-eye-line w-5 h-5 flex items-center justify-center"></i>
               </Link>

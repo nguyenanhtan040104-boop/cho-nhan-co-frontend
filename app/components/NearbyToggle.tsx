@@ -48,7 +48,7 @@ export default function NearbyToggle({ active, onChange, className = '' }: Props
         title={userLoc ? `Vị trí của bạn: ${userLoc.latitude.toFixed(3)}, ${userLoc.longitude.toFixed(3)}` : 'Chia sẻ GPS để xem khoảng cách'}
         className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
           userLoc
-            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+            ? 'bg-forest-100 text-forest-800 hover:bg-forest-200'
             : 'bg-stone-100 text-gray-700 hover:bg-stone-200'
         } disabled:opacity-50`}
       >
@@ -64,7 +64,7 @@ export default function NearbyToggle({ active, onChange, className = '' }: Props
         title={userLoc ? 'Lọc tin trong bán kính 30km' : 'Cần GPS để dùng bộ lọc này'}
         className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
           active
-            ? 'bg-emerald-700 text-white'
+            ? 'bg-forest-700 text-white'
             : 'bg-stone-100 text-gray-700 hover:bg-stone-200'
         } disabled:opacity-40 disabled:cursor-not-allowed`}
       >

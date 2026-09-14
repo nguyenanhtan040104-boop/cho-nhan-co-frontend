@@ -155,7 +155,7 @@ export default function CategorySidebar({
         </p>
         <Link
           href={postHref}
-          className="block text-center bg-emerald-700 hover:bg-emerald-800 text-white text-[13px] font-semibold py-2 rounded transition-colors"
+          className="block text-center bg-forest-700 hover:bg-forest-800 text-white text-[13px] font-semibold py-2 rounded transition-colors"
         >
           {postLabel}
         </Link>
@@ -214,7 +214,7 @@ function SidebarAdSlot() {
         </div>
         <div className="px-3 py-3 text-[12px] text-gray-600 leading-relaxed">
           Đẩy thương hiệu lên đầu trang chủ chỉ từ <b className="text-gray-900">50.000đ / 7 ngày</b>.
-          <span className="block mt-2 text-emerald-700 font-semibold">Tìm hiểu →</span>
+          <span className="block mt-2 text-forest-700 font-semibold">Tìm hiểu →</span>
         </div>
       </Link>
     );

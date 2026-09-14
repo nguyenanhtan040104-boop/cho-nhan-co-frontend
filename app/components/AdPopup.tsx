@@ -142,11 +142,11 @@ export default function AdPopup() {
           {isFallback && (
             <div className="bg-orange-50 rounded-xl px-4 py-3 mb-4 space-y-1.5">
               <p className="text-xs text-gray-600 flex items-center gap-2">
-                <i className="ri-check-line text-emerald-600"></i>
+                <i className="ri-check-line text-forest-600"></i>
                 Gói 7 ngày — <b className="text-orange-700">50.000đ</b>
               </p>
               <p className="text-xs text-gray-600 flex items-center gap-2">
-                <i className="ri-check-line text-emerald-600"></i>
+                <i className="ri-check-line text-forest-600"></i>
                 Gói 30 ngày — <b className="text-orange-700">149.000đ</b>
               </p>
             </div>

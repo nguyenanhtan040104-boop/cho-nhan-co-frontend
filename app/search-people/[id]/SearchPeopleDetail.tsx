@@ -134,7 +134,7 @@ export default function SearchPeopleDetail({ personId }: SearchPeopleDetailProps
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
               <Link href="/" className="flex items-center space-x-3 cursor-pointer">
-                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-brand-500 rounded-lg flex items-center justify-center">
                   <i className="ri-store-2-line text-white text-xl"></i>
                 </div>
                 <div>
@@ -478,7 +478,7 @@ export default function SearchPeopleDetail({ personId }: SearchPeopleDetailProps
                 >
                   <div className={`max-w-[80%] ${
                     msg.sender === 'me' 
-                      ? 'bg-green-600 text-white' 
+                      ? 'bg-brand-500 text-white' 
                       : 'bg-gray-100 text-gray-900'
                   } rounded-lg px-4 py-2`}>
                     <p className="text-sm">{msg.text}</p>
@@ -500,12 +500,12 @@ export default function SearchPeopleDetail({ personId }: SearchPeopleDetailProps
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Nhập tin nhắn..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
                 />
                 <button
                   type="submit"
                   disabled={!message.trim()}
-                  className="w-10 h-10 flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="w-10 h-10 flex items-center justify-center bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   <i className="ri-send-plane-line"></i>
                 </button>

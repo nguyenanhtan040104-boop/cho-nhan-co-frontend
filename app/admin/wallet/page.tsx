@@ -109,7 +109,7 @@ export default function AdminWalletPage() {
                 value={creditUserId}
                 onChange={e => setCreditUserId(e.target.value)}
                 placeholder="Dán userId từ DB..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent font-mono"
               />
             </div>
             <div>
@@ -119,12 +119,12 @@ export default function AdminWalletPage() {
                 value={creditAmount}
                 onChange={e => setCreditAmount(e.target.value)}
                 placeholder="0"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
               <div className="flex gap-1.5 mt-2 flex-wrap">
                 {PRESET_AMOUNTS.map(a => (
                   <button key={a} onClick={() => setCreditAmount(String(a))}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${creditAmount === String(a) ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'}`}>
+                    className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${creditAmount === String(a) ? 'bg-brand-500 text-white border-green-600' : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'}`}>
                     {(a / 1000).toFixed(0)}k
                   </button>
                 ))}
@@ -136,13 +136,13 @@ export default function AdminWalletPage() {
                 value={creditNote}
                 onChange={e => setCreditNote(e.target.value)}
                 placeholder="Lý do cộng tiền..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="flex items-center gap-4 mt-4">
             <button onClick={handleCredit} disabled={crediting}
-              className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-semibold text-sm hover:bg-green-700 disabled:opacity-50 transition">
+              className="px-6 py-2.5 bg-brand-500 text-white rounded-xl font-semibold text-sm hover:bg-brand-600 disabled:opacity-50 transition">
               {crediting ? 'Đang xử lý...' : `+ Cộng ${creditAmount ? fmt(parseInt(creditAmount) || 0) : 'tiền'}`}
             </button>
             {creditResult && (
@@ -156,7 +156,7 @@ export default function AdminWalletPage() {
         <div className="flex gap-2 mb-6">
           {(['pending', 'all'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`px-5 py-2 rounded-lg font-medium text-sm transition ${tab === t ? 'bg-green-600 text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'}`}>
+              className={`px-5 py-2 rounded-lg font-medium text-sm transition ${tab === t ? 'bg-brand-500 text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'}`}>
               {t === 'pending' ? `Chờ duyệt (${pending.length})` : 'Tất cả giao dịch'}
             </button>
           ))}
@@ -190,9 +190,9 @@ export default function AdminWalletPage() {
                   </div>
                   <div className="mt-4 flex items-center gap-3">
                     <input value={note} onChange={e => setNote(e.target.value)} placeholder="Ghi chú (tùy chọn)..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500" />
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500" />
                     <button onClick={() => handleConfirm(tx.id)} disabled={processing === tx.id}
-                      className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium">
+                      className="px-5 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 text-sm font-medium">
                       {processing === tx.id ? '...' : '✓ Xác nhận'}
                     </button>
                     <button onClick={() => handleReject(tx.id)} disabled={processing === tx.id}

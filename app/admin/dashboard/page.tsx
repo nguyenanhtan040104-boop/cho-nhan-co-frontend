@@ -411,7 +411,7 @@ function StatusBadge({ status, isVip }: { status?: string; isVip?: boolean }) {
       {isVip && <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-semibold">VIP</span>}
       {status && (
         <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-          status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700' :
+          status === 'ACTIVE' ? 'bg-forest-100 text-forest-700' :
           status === 'HIDDEN' ? 'bg-gray-100 text-gray-500' : 'bg-red-100 text-red-600'
         }`}>{status === 'ACTIVE' ? 'Hiển thị' : status === 'HIDDEN' ? 'Đã ẩn' : status}</span>
       )}
@@ -426,7 +426,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
   const pendingTx = walletTx.filter((t: any) => t.status === 'pending');
 
   const cards = [
-    { label: 'Tổng sản phẩm', value: stats.totalProducts, icon: 'ri-leaf-line', gradient: 'from-emerald-500 to-green-600', tab: 'products' },
+    { label: 'Tổng sản phẩm', value: stats.totalProducts, icon: 'ri-leaf-line', gradient: 'from-forest-500 to-brand-600', tab: 'products' },
     { label: 'Bất động sản', value: stats.totalRE, icon: 'ri-home-4-line', gradient: 'from-blue-500 to-blue-600', tab: 'real-estate' },
     { label: 'Tuyển dụng', value: stats.totalJobs, icon: 'ri-briefcase-line', gradient: 'from-violet-500 to-purple-600', tab: 'jobs' },
     { label: 'Bài diễn đàn', value: stats.totalPosts, icon: 'ri-chat-3-line', gradient: 'from-cyan-500 to-sky-600', tab: 'forum' },
@@ -475,7 +475,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
           <p className="text-sm font-bold text-gray-800 mb-4">Giao dịch nạp tiền</p>
           <div className="space-y-3">
             {[
-              { label: 'Đã xác nhận', value: fmtMoney(revenue), color: 'text-emerald-600', dot: 'bg-emerald-500' },
+              { label: 'Đã xác nhận', value: fmtMoney(revenue), color: 'text-forest-600', dot: 'bg-forest-500' },
               { label: 'Chờ xác nhận', value: `${pendingTx.length} giao dịch`, color: 'text-orange-500', dot: 'bg-orange-400' },
               { label: 'Tổng giao dịch', value: walletTx.length, color: 'text-gray-700', dot: 'bg-gray-400' },
             ].map((r, i) => (
@@ -519,7 +519,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="ri-leaf-line text-emerald-500"></i>
+              <i className="ri-leaf-line text-forest-500"></i>
               <h3 className="font-bold text-gray-800 text-sm">Sản phẩm mới nhất</h3>
             </div>
             <button onClick={() => onTabChange('products')} className="text-xs text-red-500 hover:underline">Quản lý</button>
@@ -536,7 +536,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
                   <p className="text-xs font-semibold text-gray-800 truncate">{p.title}</p>
                   <p className="text-[10px] text-gray-400">{p.user?.fullName} · {timeAgo(p.createdAt)}</p>
                 </div>
-                <span className="text-xs font-bold text-emerald-600 flex-shrink-0">{fmtMoney(Number(p.price))}</span>
+                <span className="text-xs font-bold text-forest-600 flex-shrink-0">{fmtMoney(Number(p.price))}</span>
               </div>
             ))}
           </div>
@@ -568,7 +568,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
                     <td className="px-4 py-2.5 text-gray-500 font-mono">{h.ipAddress || '—'}</td>
                     <td className="px-4 py-2.5 text-center">
                       <span className={`px-2 py-0.5 rounded-full font-semibold ${
-                        h.status === 'SUCCESS' ? 'bg-emerald-100 text-emerald-700' :
+                        h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
                         h.status === 'FAILED' ? 'bg-red-100 text-red-600' :
                         'bg-orange-100 text-orange-700'
                       }`}>{h.status === 'SUCCESS' ? 'Thành công' : h.status === 'FAILED' ? 'Thất bại' : 'Bị khóa'}</span>
@@ -683,7 +683,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
       <div className="grid grid-cols-4 gap-3">
         {[
           { label: 'Login hôm nay', value: successToday + failedToday + lockedToday, icon: 'ri-login-box-line', gradient: 'from-blue-500 to-blue-600' },
-          { label: 'Thành công', value: successToday, icon: 'ri-checkbox-circle-line', gradient: 'from-emerald-500 to-green-600' },
+          { label: 'Thành công', value: successToday, icon: 'ri-checkbox-circle-line', gradient: 'from-forest-500 to-brand-600' },
           { label: 'Thất bại hôm nay', value: failedToday, icon: 'ri-close-circle-line', gradient: 'from-orange-500 to-amber-600' },
           { label: 'IP bị chặn', value: blockedIps.length, icon: 'ri-shield-cross-line', gradient: 'from-red-500 to-red-700' },
         ].map((c, i) => (
@@ -733,7 +733,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                       <p className="text-[10px] text-gray-400">Bị khóa</p>
                     </div>
                     <div>
-                      <p className="text-lg font-black text-emerald-600">{data.success}</p>
+                      <p className="text-lg font-black text-forest-600">{data.success}</p>
                       <p className="text-[10px] text-gray-400">Thành công</p>
                     </div>
                     <div className="ml-1 flex flex-col gap-1.5 items-end">
@@ -876,7 +876,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                   <td className="px-4 py-2.5 text-gray-400 max-w-[200px] truncate">{h.userAgent?.split(' ').slice(0, 3).join(' ') || '—'}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
-                      h.status === 'SUCCESS' ? 'bg-emerald-100 text-emerald-700' :
+                      h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
                       h.status === 'FAILED' ? 'bg-red-100 text-red-600' :
                       'bg-orange-100 text-orange-700'
                     }`}>
@@ -1075,7 +1075,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                         title={u.isActive ? 'Khóa tài khoản' : 'Mở khóa'}
                         className={`p-1.5 rounded-lg transition-all disabled:opacity-50 ${
                           !u.isActive
-                            ? 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
+                            ? 'text-forest-600 bg-forest-50 hover:bg-forest-100'
                             : 'text-red-500 hover:text-red-700 hover:bg-red-50'
                         }`}>
                         {processing === u.id
@@ -1136,8 +1136,8 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <i className="ri-lock-unlock-line text-emerald-600 text-lg"></i>
+                  <div className="w-10 h-10 bg-forest-100 rounded-xl flex items-center justify-center">
+                    <i className="ri-lock-unlock-line text-forest-600 text-lg"></i>
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900">Mở khóa tài khoản</h3>
@@ -1145,7 +1145,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={confirmBan} className="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition-all">
+                  <button onClick={confirmBan} className="flex-1 py-2.5 bg-forest-600 text-white rounded-xl font-semibold hover:bg-forest-700 transition-all">
                     Mở khóa
                   </button>
                   <button onClick={() => setBanModal(null)} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
@@ -1182,11 +1182,11 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
               <div className="max-h-80 overflow-y-auto space-y-2">
                 {historyModal.logs.map((h: any, i: number) => (
                   <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${
-                    h.status === 'SUCCESS' ? 'bg-emerald-50' :
+                    h.status === 'SUCCESS' ? 'bg-forest-50' :
                     h.status === 'FAILED' ? 'bg-red-50' : 'bg-orange-50'
                   }`}>
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      h.status === 'SUCCESS' ? 'bg-emerald-500' :
+                      h.status === 'SUCCESS' ? 'bg-forest-500' :
                       h.status === 'FAILED' ? 'bg-red-500' : 'bg-orange-500'
                     }`}></div>
                     <div className="flex-1 min-w-0">
@@ -1195,7 +1195,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                     </div>
                     <div className="text-right flex-shrink-0">
                       <span className={`text-[10px] font-bold ${
-                        h.status === 'SUCCESS' ? 'text-emerald-700' :
+                        h.status === 'SUCCESS' ? 'text-forest-700' :
                         h.status === 'FAILED' ? 'text-red-600' : 'text-orange-600'
                       }`}>{h.status}</span>
                       <p className="text-[10px] text-gray-400">{fmtTime(h.createdAt)}</p>
@@ -1293,7 +1293,7 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
           <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 px-4 py-2 rounded-xl">
             <span className="text-xs font-bold text-orange-700">Đã chọn {selected.size}</span>
             <button onClick={bulkApprove} disabled={processing === 'bulk'}
-              className="text-xs px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50">
+              className="text-xs px-3 py-1.5 bg-forest-600 text-white rounded-lg hover:bg-forest-700 disabled:opacity-50">
               ✓ Duyệt tất cả
             </button>
             <button onClick={bulkDelete} disabled={processing === 'bulk'}
@@ -1306,8 +1306,8 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
 
       {items.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
-          <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <i className="ri-checkbox-circle-line text-3xl text-emerald-400"></i>
+          <div className="w-16 h-16 bg-forest-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <i className="ri-checkbox-circle-line text-3xl text-forest-400"></i>
           </div>
           <p className="text-gray-500 font-semibold">Không có bài nào chờ duyệt</p>
           <p className="text-sm text-gray-400 mt-1">Tất cả bài đã được xử lý ✓</p>
@@ -1359,7 +1359,7 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
               {rejectModal?.id !== post.id && (
                 <div className="flex gap-2 mt-3 pt-3 border-t border-gray-50">
                   <button onClick={() => approve(post.id)} disabled={processing === post.id}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white text-xs rounded-xl hover:opacity-90 disabled:opacity-50 font-semibold shadow-sm">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-forest-600 to-brand-600 text-white text-xs rounded-xl hover:opacity-90 disabled:opacity-50 font-semibold shadow-sm">
                     <i className="ri-check-line"></i> Duyệt
                   </button>
                   <button onClick={() => setRejectModal({ id: post.id, text: '' })}
@@ -1558,17 +1558,17 @@ function WalletTab({ txList }: { txList: any[] }) {
             <label className="block text-xs font-semibold text-gray-500 mb-1">User ID</label>
             <input value={creditUserId} onChange={e => setCreditUserId(e.target.value)}
               placeholder="Dán userId từ DB..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-green-400 focus:border-transparent font-mono" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent font-mono" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Số tiền</label>
             <input type="number" value={creditAmount} onChange={e => setCreditAmount(e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent" />
             <div className="flex gap-1 mt-1.5 flex-wrap">
               {PRESET_AMOUNTS.map(a => (
                 <button key={a} onClick={() => setCreditAmount(String(a))}
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${creditAmount === String(a) ? 'bg-green-600 text-white border-green-600' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'}`}>
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${creditAmount === String(a) ? 'bg-brand-500 text-white border-green-600' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'}`}>
                   {a / 1000}k
                 </button>
               ))}
@@ -1578,12 +1578,12 @@ function WalletTab({ txList }: { txList: any[] }) {
             <label className="block text-xs font-semibold text-gray-500 mb-1">Ghi chú (tùy chọn)</label>
             <input value={creditNote} onChange={e => setCreditNote(e.target.value)}
               placeholder="Lý do..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent" />
           </div>
         </div>
         <div className="flex items-center gap-3 mt-3">
           <button onClick={handleCredit} disabled={crediting}
-            className="px-5 py-2 bg-green-600 text-white rounded-xl text-xs font-bold hover:bg-green-700 disabled:opacity-50 transition">
+            className="px-5 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold hover:bg-brand-600 disabled:opacity-50 transition">
             {crediting ? 'Đang xử lý...' : `+ Cộng ${creditAmount ? new Intl.NumberFormat('vi-VN').format(parseInt(creditAmount) || 0) + 'đ' : 'tiền'}`}
           </button>
           {creditResult && (
@@ -1615,7 +1615,7 @@ function WalletTab({ txList }: { txList: any[] }) {
 
       <div className="grid grid-cols-4 gap-3 mb-5">
         {[
-          { label: 'Tổng nạp thành công', value: fmtMoney(revenue), gradient: 'from-emerald-500 to-green-600', icon: 'ri-money-dollar-circle-line' },
+          { label: 'Tổng nạp thành công', value: fmtMoney(revenue), gradient: 'from-forest-500 to-brand-600', icon: 'ri-money-dollar-circle-line' },
           { label: 'Đang chờ xác nhận', value: fmtMoney(pending), gradient: 'from-orange-500 to-amber-600', icon: 'ri-time-line' },
           { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend), gradient: 'from-violet-500 to-purple-600', icon: 'ri-vip-crown-line' },
           { label: 'Tổng giao dịch', value: txList.length, gradient: 'from-blue-500 to-blue-600', icon: 'ri-exchange-line' },
@@ -1663,7 +1663,7 @@ function WalletTab({ txList }: { txList: any[] }) {
                 </td>
                 <td className="px-4 py-3 text-center">
                   <span className={`px-2 py-0.5 rounded-full font-semibold ${
-                    tx.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                    tx.status === 'completed' ? 'bg-forest-100 text-forest-700' :
                     tx.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-600'
                   }`}>
                     {tx.status === 'completed' ? 'Hoàn thành' : tx.status === 'pending' ? 'Đang xử lý' : 'Thất bại'}
@@ -1743,7 +1743,7 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
                   <td className="px-4 py-2.5 font-mono text-gray-500">{h.ipAddress || '—'}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
-                      h.status === 'SUCCESS' ? 'bg-emerald-100 text-emerald-700' :
+                      h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
                       h.status === 'FAILED' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-700'
                     }`}>{h.status}</span>
                   </td>
