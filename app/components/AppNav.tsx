@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const NAV = [
-  { href: '/',                label: 'Trang chủ',    icon: 'ri-home-5' },
+  { href: '/',                label: 'Trang nhất',   icon: 'ri-home-5' },
   { href: '/products',        label: 'Nông sản',     icon: 'ri-seedling' },
   { href: '/real-estate',     label: 'Bất động sản', icon: 'ri-home-4' },
   { href: '/jobs',            label: 'Việc làm',     icon: 'ri-briefcase-4' },
@@ -17,7 +17,6 @@ const NAV = [
   { href: '/canh-bao',        label: 'Cảnh báo',     icon: 'ri-alarm-warning' },
 ];
 
-// Primary items shown in the mobile bottom bar (rest live behind "Thêm").
 const MOBILE = ['/', '/products', '/real-estate', '/jobs', '/forum'];
 
 function isActive(pathname: string, href: string) {
@@ -37,43 +36,55 @@ export default function AppNav() {
 
   return (
     <>
-      {/* ── Desktop sidebar ─────────────────────────────────────────── */}
+      {/* ── Desktop sidebar — a newspaper index ("mục lục") ───────────── */}
       <aside
         className={`sticky top-0 z-40 hidden h-screen shrink-0 flex-col border-r border-line bg-surface md:flex
-                    transition-[width] duration-200 ${collapsed ? 'w-[76px]' : 'w-[236px]'}`}
+                    transition-[width] duration-200 ${collapsed ? 'w-[76px]' : 'w-[248px]'}`}
       >
-        {/* Brand */}
-        <div className="flex h-16 items-center gap-2.5 px-4">
-          <Link href="/" className="flex items-center gap-2.5 min-w-0">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500 text-white shadow-brand">
-              <i className="ri-store-2-fill text-lg" />
-            </span>
-            {!collapsed && <span className="truncate font-display text-[19px] font-semibold text-ink">Chợ Nhân Cơ</span>}
+        {/* Masthead nameplate */}
+        <div className={`border-b-2 border-ink ${collapsed ? 'px-0 py-4 text-center' : 'px-5 py-4'}`}>
+          <Link href="/" className="block">
+            {collapsed ? (
+              <span className="font-display text-xl font-bold text-brand-600">C</span>
+            ) : (
+              <>
+                <p className="font-display text-[21px] font-semibold leading-none text-ink">Chợ Nhân Cơ</p>
+                <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-faint">Báo chợ · Đắk Nông</p>
+              </>
+            )}
           </Link>
         </div>
 
-        {/* Nav */}
-        <nav aria-label="Danh mục chính" className="flex-1 overflow-y-auto px-3 py-2">
-          {NAV.map(item => {
+        {/* Index */}
+        <nav aria-label="Mục lục" className="flex-1 overflow-y-auto px-3 py-3">
+          {!collapsed && <p className="mb-1 px-2 font-display text-sm italic text-ink-faint">Mục lục</p>}
+          {NAV.map((item, i) => {
             const active = isActive(pathname, item.href);
+            const num = i === 0 ? '' : String(i).padStart(2, '0');
             return (
               <Link key={item.href} href={item.href} title={item.label}
-                className={`group mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-semibold transition-colors
-                  ${active ? 'bg-brand-50 text-brand-600' : 'text-ink-soft hover:bg-paper hover:text-ink'}
-                  ${collapsed ? 'justify-center' : ''}`}>
-                <i className={`${item.icon}-${active ? 'fill' : 'line'} text-xl shrink-0`} />
-                {!collapsed && <span className="truncate">{item.label}</span>}
-                {active && !collapsed && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />}
+                className={`group flex items-center border-b border-line/70 transition-colors last:border-0
+                  ${collapsed ? 'justify-center py-3' : 'gap-3 px-2 py-2.5'}
+                  ${active ? 'text-brand-600' : 'text-ink hover:text-brand-600'}`}>
+                {collapsed ? (
+                  <i className={`${item.icon}-${active ? 'fill' : 'line'} text-xl`} />
+                ) : (
+                  <>
+                    <span className={`w-5 shrink-0 font-sans text-[11px] font-bold tabular-nums ${active ? 'text-brand-500' : 'text-ink-faint'}`}>{num || '·'}</span>
+                    <span className={`font-display text-[16px] leading-tight ${active ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
+                    {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />}
+                  </>
+                )}
               </Link>
             );
           })}
         </nav>
 
         {/* Post CTA + collapse */}
-        <div className="border-t border-line p-3">
+        <div className="border-t-2 border-ink p-3">
           <Link href="/dashboard"
             className={`flex items-center justify-center gap-2 rounded-pill bg-brand-500 py-2.5 font-bold text-white shadow-brand hover:bg-brand-600 ${collapsed ? 'px-0' : 'px-4'}`}>
-            <i className="ri-add-line text-base" />{!collapsed && 'Đăng tin'}
+            <i className="ri-quill-pen-line text-base" />{!collapsed && 'Đăng tin'}
           </Link>
           <button onClick={toggle} aria-label={collapsed ? 'Mở rộng thanh điều hướng' : 'Thu gọn thanh điều hướng'} aria-pressed={collapsed}
             className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold text-ink-faint hover:bg-paper">
@@ -84,7 +95,7 @@ export default function AppNav() {
       </aside>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────── */}
-      <nav aria-label="Điều hướng nhanh" className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-surface/95 backdrop-blur md:hidden">
+      <nav aria-label="Điều hướng nhanh" className="fixed inset-x-0 bottom-0 z-40 flex border-t-2 border-ink bg-surface/95 backdrop-blur md:hidden">
         {NAV.filter(n => MOBILE.includes(n.href)).map(item => {
           const active = isActive(pathname, item.href);
           return (

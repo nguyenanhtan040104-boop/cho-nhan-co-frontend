@@ -387,7 +387,7 @@ export default function Header() {
           {/* ❤️ Tin đã lưu dropdown */}
           <div className="relative hidden sm:block" ref={savedRef}>
             <button onClick={openSavedDropdown} title="Tin đã lưu" aria-label="Tin đã lưu"
-              className="flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+              className="flex w-9 h-9 items-center justify-center rounded-full text-ink-soft hover:bg-paper hover:text-ink transition">
               <i className="ri-heart-line text-lg"></i>
             </button>
             {showSavedDropdown && (
@@ -428,7 +428,7 @@ export default function Header() {
           {/* 🔔 Thông báo dropdown */}
           <div className="relative hidden sm:block" ref={notifRef}>
             <button onClick={openNotifDropdown} title="Thông báo" aria-label="Thông báo"
-              className="flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
+              className="flex w-9 h-9 items-center justify-center rounded-full text-ink-soft hover:bg-paper hover:text-ink transition">
               <i className="ri-notification-3-line text-lg"></i>
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
@@ -518,7 +518,7 @@ export default function Header() {
 
           {/* Liên hệ → trang nhắn tin */}
           <Link href="/messages"
-            className="hidden lg:flex items-center gap-1.5 border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition relative">
+            className="hidden lg:flex items-center gap-1.5 text-ink-soft text-sm font-medium px-2.5 py-1.5 rounded-lg hover:text-ink transition relative">
             <i className="ri-chat-1-line text-sm"></i>
             <span>Liên hệ</span>
             {unreadMessages > 0 && (
@@ -530,7 +530,7 @@ export default function Header() {
 
           {/* Quản lý tin → dashboard tab products */}
           <button onClick={() => navDashboard('products')}
-            className="hidden md:flex items-center border border-gray-200 text-gray-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-gray-50 transition">
+            className="hidden md:flex items-center text-ink-soft text-sm font-medium px-2.5 py-1.5 rounded-lg hover:text-ink transition">
             Quản lý tin
           </button>
 
