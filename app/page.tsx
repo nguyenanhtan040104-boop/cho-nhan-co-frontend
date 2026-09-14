@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import HomepageClient from './HomepageClient';
 import LikeButton from './components/LikeButton';
 import MarketPriceWidget from './components/MarketPriceWidget';
 import AdSponsoredCarousel from './components/AdSponsoredCarousel';
@@ -47,20 +46,6 @@ async function getHomeData() {
   };
 }
 
-// Categories as branded tiles — grounded in the highland market, no generic stock photos.
-const categories = [
-  { title: 'Nông sản',     href: '/products?category=NONG_SAN', icon: 'ri-seedling-fill',           tint: 'bg-brand-500 text-white' },
-  { title: 'Bất động sản', href: '/real-estate',                icon: 'ri-home-4-fill',             tint: 'bg-forest-500 text-white' },
-  { title: 'Việc làm',     href: '/jobs',                       icon: 'ri-briefcase-4-fill',        tint: 'bg-ink text-white' },
-  { title: 'Vật nuôi',     href: '/vat-nuoi',                   icon: 'ri-bear-smile-fill',         tint: 'bg-gold-500 text-ink' },
-  { title: 'Dịch vụ',      href: '/dich-vu',                    icon: 'ri-tools-fill',              tint: 'bg-brand-100 text-brand-700' },
-  { title: 'Diễn đàn',     href: '/forum',                      icon: 'ri-chat-3-fill',             tint: 'bg-forest-100 text-forest-700' },
-  { title: 'Quảng cáo',    href: '/advertisements',             icon: 'ri-megaphone-fill',          tint: 'bg-ink/5 text-ink' },
-  { title: 'Cảnh báo',     href: '/canh-bao',                   icon: 'ri-alarm-warning-fill',      tint: 'bg-brand-50 text-brand-600' },
-  { title: 'Bảng giá',     href: '/market-prices',              icon: 'ri-line-chart-fill',         tint: 'bg-forest-50 text-forest-600' },
-  { title: 'Sản phẩm',     href: '/products',                   icon: 'ri-shopping-bag-3-fill',     tint: 'bg-gold-400/20 text-gold-600' },
-];
-
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
@@ -92,6 +77,14 @@ export default async function HomePage() {
     ...realEstate.filter((p: any) => p.isVip).map((p: any) => ({ ...p, _type: 'real-estate' })),
   ];
 
+  // Lead with a real listing — the most characteristic thing in this market's world.
+  const featured = vipListings[0]
+    || (products[0] ? { ...products[0], _type: 'product' } : null)
+    || (realEstate[0] ? { ...realEstate[0], _type: 'real-estate' } : null);
+  const featuredImg = featured && (featured.images?.[0]?.url
+    || (typeof featured.images?.[0] === 'string' ? featured.images[0] : null) || featured.imageUrl);
+  const featuredHref = featured && (featured._type === 'real-estate' ? `/real-estate/${featured.id}` : `/products/${featured.id}`);
+
   return (
     <main className="min-h-screen bg-paper">
       <div className="mx-auto max-w-content px-4 py-6 sm:px-6">
@@ -113,24 +106,34 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ===== DANH MỤC — branded tiles ===== */}
-        <section className="mt-6">
-          <h2 className="mb-3 text-lg font-extrabold text-ink">Bạn đang tìm gì?</h2>
-          <div className="grid grid-cols-5 gap-2.5 sm:gap-3">
-            {categories.map(cat => (
-              <Link key={cat.href} href={cat.href} className="group flex flex-col items-center gap-2">
-                <span className={`flex aspect-square w-full items-center justify-center rounded-card ${cat.tint}
-                                  shadow-card transition-transform duration-150 group-hover:-translate-y-0.5`}>
-                  <i className={`${cat.icon} text-2xl sm:text-3xl`} />
-                </span>
-                <span className="text-center text-[11px] font-bold leading-tight text-ink-soft sm:text-xs">{cat.title}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {/* ===== TIN DẪN ĐẦU — lead with a real listing, not navigation chrome ===== */}
+        {featured && (
+          <section className="mt-5">
+            <Link href={featuredHref!}
+              className="group grid overflow-hidden rounded-card border border-line bg-surface sm:grid-cols-2">
+              <div className="relative aspect-[16/10] overflow-hidden bg-paper sm:aspect-auto sm:min-h-[260px]">
+                {featuredImg
+                  ? <img src={featuredImg} alt={featured.title} className="h-full w-full object-cover" />
+                  : <div className="h-full w-full" />}
+                <span className="absolute left-3 top-3 rounded-pill bg-gold-500 px-2.5 py-1 text-[11px] font-black text-ink">Tin nổi bật</span>
+              </div>
+              <div className="flex flex-col justify-center gap-2.5 p-6 sm:p-8">
+                <span className="kicker">Hôm nay ở chợ</span>
+                <h2 className="text-xl font-black leading-tight text-ink sm:text-2xl">{featured.title}</h2>
+                <p className="text-2xl font-black text-brand-600 sm:text-3xl">{fmtPrice(featured, featured._type)}</p>
+                {(featured.location || featured.address) && (
+                  <p className="flex items-center gap-1.5 text-sm text-ink-faint">
+                    <i className="ri-map-pin-line" />{featured.location || featured.address}
+                  </p>
+                )}
+                <span className="btn-primary mt-2 w-fit">Xem chi tiết</span>
+              </div>
+            </Link>
+          </section>
+        )}
 
-        <div className="mt-6"><AdSponsoredCarousel /></div>
         <div className="mt-6"><MarketPriceWidget /></div>
+        <div className="mt-6"><AdSponsoredCarousel /></div>
 
         {/* ===== NỔI BẬT (VIP) — restrained gold accent, not a loud gradient ===== */}
         {vipListings.length > 0 && (
@@ -190,25 +193,11 @@ export default async function HomePage() {
               </div>}
         </section>
 
-        {/* ===== CAM KẾT ===== */}
-        <section className="mt-8 overflow-hidden rounded-card border border-line bg-surface">
-          <div className="grid grid-cols-2 divide-x divide-y divide-line sm:grid-cols-4 sm:divide-y-0">
-            {[
-              { icon: 'ri-price-tag-3-line',  title: 'Miễn phí đăng tin', sub: 'Không mất phí cơ bản' },
-              { icon: 'ri-shield-check-line',  title: 'Người thật, tin thật', sub: 'Tài khoản xác minh' },
-              { icon: 'ri-map-pin-2-line',     title: 'Giao dịch tại chỗ', sub: 'Trong xã Nhân Cơ' },
-              { icon: 'ri-customer-service-2-line', title: 'Hỗ trợ nhanh', sub: '0888.317.289' },
-            ].map(t => (
-              <div key={t.title} className="flex items-start gap-3 px-4 py-4">
-                <i className={`${t.icon} mt-0.5 text-xl text-brand-500`} />
-                <div>
-                  <p className="text-[13px] font-bold leading-tight text-ink">{t.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-tight text-ink-faint">{t.sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* ===== CAM KẾT — a plain sentence, not an icon-tile row ===== */}
+        <p className="mt-8 border-t border-line pt-5 text-[15px] leading-relaxed text-ink-soft">
+          Miễn phí đăng tin · người thật tin thật · giao dịch tại chỗ trong xã Nhân Cơ.
+          Cần hỗ trợ, gọi <a href="tel:0888317289" className="font-bold text-brand-600 hover:underline">0888.317.289</a>.
+        </p>
 
         {/* Slim footer */}
         <footer className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-line py-6 text-xs text-ink-faint sm:flex-row">
