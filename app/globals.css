@@ -8,6 +8,7 @@
    ───────────────────────────────────────────────────────────────────────── */
 :root {
   --font-sans: 'Be Vietnam Pro', system-ui, sans-serif;
+  --font-display: 'Lora', Georgia, serif;
   --brand: #D23B27;
   --brand-600: #B32E1D;
   --forest: #1F6B4A;
@@ -31,9 +32,11 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* Bold, tight display headings — type as a design element */
+  /* Editorial serif headings — the "báo chợ / almanac" voice */
   h1, h2, h3 {
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
   /* Visible keyboard focus everywhere */

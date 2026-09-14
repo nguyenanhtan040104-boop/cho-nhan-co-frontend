@@ -48,7 +48,7 @@ export default function AppNav() {
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-500 text-white shadow-brand">
               <i className="ri-store-2-fill text-lg" />
             </span>
-            {!collapsed && <span className="truncate text-[15px] font-black text-ink">Chợ Nhân Cơ</span>}
+            {!collapsed && <span className="truncate font-display text-[19px] font-semibold text-ink">Chợ Nhân Cơ</span>}
           </Link>
         </div>
 

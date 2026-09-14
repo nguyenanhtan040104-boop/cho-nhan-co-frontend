@@ -1,4 +1,4 @@
-import { Be_Vietnam_Pro } from 'next/font/google';
+import { Be_Vietnam_Pro, Lora } from 'next/font/google';
 import './globals.css';
 import Header from './components/Header';
 import AppNav from './components/AppNav';
@@ -9,6 +9,15 @@ const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
   weight: ['400', '500', '600', '700', '800', '900'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+// Editorial display serif — the "almanac / báo chợ" voice for headlines.
+const lora = Lora({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -59,7 +68,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={beVietnam.variable}>
+    <html lang="vi" className={`${beVietnam.variable} ${lora.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
