@@ -50,11 +50,11 @@ export default function MarketPricesPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #241C15 0%, #ca8a04 100%)' }} className="py-8">
+      <div className="border-y-2 border-ink bg-paper py-6">
         <div className="max-w-5xl mx-auto px-4">
-          <p className="text-yellow-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ</p>
-          <h1 className="text-2xl font-bold text-white">Giá thị trường</h1>
-          <p className="text-yellow-200 text-sm mt-1">
+          <p className="text-brand-600 text-xs font-bold mb-1">Chợ Nhân Cơ</p>
+          <h1 className="text-2xl font-semibold text-ink">Giá thị trường</h1>
+          <p className="text-ink-soft text-sm mt-1">
             {agriDateLabel || new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
           </p>
         </div>

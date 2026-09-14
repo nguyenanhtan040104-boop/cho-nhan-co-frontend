@@ -104,22 +104,22 @@ function ForumContent() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #14532d 0%, #241C15 50%, #15803d 100%)' }} className="py-8">
+      <div className="border-y-2 border-ink bg-paper py-6">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <p className="text-green-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ</p>
-              <h1 className="text-2xl font-bold text-white">Diễn đàn cộng đồng</h1>
-              <p className="text-green-200 text-sm mt-1">{total} bài viết · Chia sẻ kinh nghiệm nông nghiệp</p>
+              <p className="text-brand-600 text-xs font-bold mb-1">Chợ Nhân Cơ</p>
+              <h1 className="text-2xl font-semibold text-ink">Diễn đàn cộng đồng</h1>
+              <p className="text-ink-soft text-sm mt-1">{total} bài viết · Chia sẻ kinh nghiệm nông nghiệp</p>
             </div>
             <div className="flex gap-2">
               <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2">
                 <input type="text" placeholder="Tìm bài viết..." value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-green-200 focus:outline-none focus:bg-white/20 w-52" />
-                <button type="submit" className="bg-white text-green-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-50">Tìm</button>
+                  className="px-4 py-2 rounded-xl text-sm bg-white border border-line text-ink placeholder-ink-faint focus:outline-none focus:border-brand-300 w-52" />
+                <button type="submit" className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-black">Tìm</button>
               </form>
-              <Link href="/forum/create" className="bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-400 whitespace-nowrap">
+              <Link href="/forum/create" className="bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-600 whitespace-nowrap">
                 + Viết bài
               </Link>
             </div>
@@ -128,14 +128,14 @@ function ForumContent() {
           <div className="flex gap-2 mt-4 flex-wrap">
             {categoryOptions.map(o => (
               <button key={o.value} onClick={() => setCategory(o.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-white text-green-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-ink/40'}`}>
                 {o.label}
               </button>
             ))}
             <div className="ml-auto flex gap-2">
               {sortOptions.map(o => (
                 <button key={o.value} onClick={() => setSortBy(o.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.value ? 'bg-white text-green-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-ink/40'}`}>
                   {o.label}
                 </button>
               ))}

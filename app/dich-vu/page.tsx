@@ -152,20 +152,20 @@ function DichVuInner() {
     <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
 
       {/* Header */}
-      <header className="border-b border-stone-200" style={{ backgroundColor: '#241C15' }}>
+      <header className="border-y-2 border-ink bg-paper">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
           <div className="flex items-end justify-between gap-3 mb-4">
             <div>
-              <nav className="text-[11px] text-forest-200/80 mb-1 flex items-center gap-1">
-                <Link href="/" className="hover:text-white">Trang chủ</Link>
+              <nav className="text-[11px] text-ink-faint mb-1 flex items-center gap-1">
+                <Link href="/" className="hover:text-ink">Trang chủ</Link>
                 <i className="ri-arrow-right-s-line"></i>
-                <span className="text-forest-200">Dịch vụ</span>
+                <span className="text-ink-soft">Dịch vụ</span>
               </nav>
-              <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
+              <h1 className="text-xl sm:text-2xl font-bold text-ink leading-tight">
                 {search ? `Kết quả "${search}"` : 'Dịch vụ tại Nhân Cơ'}
               </h1>
-              <p className="text-[12px] text-forest-200/90 mt-0.5">
-                <b className="text-white">{fmt(total)}</b> dịch vụ đang rao · Đắk Nông
+              <p className="text-[12px] text-ink-faint mt-0.5">
+                <b className="text-ink">{fmt(total)}</b> dịch vụ đang rao · Đắk Nông
               </p>
             </div>
             <Link href="/products/create?category=DICH_VU"
@@ -183,10 +183,10 @@ function DichVuInner() {
                 placeholder="Tìm dịch vụ sửa chữa, vận chuyển..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white border border-line"
               />
             </div>
-            <button type="submit" className="bg-white hover:bg-stone-100 text-gray-900 px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap">
+            <button type="submit" className="bg-ink hover:bg-black text-white px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap">
               Tìm
             </button>
           </form>
@@ -198,7 +198,7 @@ function DichVuInner() {
                 className={`flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   subCat === cat.value
                     ? 'bg-white text-forest-900'
-                    : 'bg-white/10 text-white hover:bg-white/20'
+                    : 'bg-surface border border-line text-ink-soft hover:border-ink/40'
                 }`}>
                 {cat.name}
               </button>
