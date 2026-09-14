@@ -373,7 +373,7 @@ export default function Header() {
         >
           <div className="flex items-center gap-2 h-10 rounded-pill border border-line bg-paper px-4 transition-colors focus-within:border-brand-300 focus-within:bg-white">
             <i className="ri-search-line text-ink-faint"></i>
-            <input name="q" type="text" placeholder="Tìm nông sản, nhà đất, việc làm..."
+            <input name="q" type="text" aria-label="Tìm kiếm trên Chợ Nhân Cơ" placeholder="Tìm nông sản, nhà đất, việc làm..."
               className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder-ink-faint focus:outline-none" />
           </div>
         </form>
@@ -386,7 +386,7 @@ export default function Header() {
 
           {/* ❤️ Tin đã lưu dropdown */}
           <div className="relative hidden sm:block" ref={savedRef}>
-            <button onClick={openSavedDropdown} title="Tin đã lưu"
+            <button onClick={openSavedDropdown} title="Tin đã lưu" aria-label="Tin đã lưu"
               className="flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
               <i className="ri-heart-line text-lg"></i>
             </button>
@@ -427,7 +427,7 @@ export default function Header() {
 
           {/* 🔔 Thông báo dropdown */}
           <div className="relative hidden sm:block" ref={notifRef}>
-            <button onClick={openNotifDropdown} title="Thông báo"
+            <button onClick={openNotifDropdown} title="Thông báo" aria-label="Thông báo"
               className="flex w-9 h-9 items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 text-gray-500 transition">
               <i className="ri-notification-3-line text-lg"></i>
               {unreadCount > 0 && (
@@ -536,7 +536,7 @@ export default function Header() {
 
           {/* Đăng tin */}
           <div className="relative" ref={postMenuRef}>
-            <button onClick={handlePostClick}
+            <button onClick={handlePostClick} aria-label="Đăng tin"
               className="flex items-center gap-1 bg-brand-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-pill shadow-brand hover:bg-brand-600 transition shrink-0">
               <i className="ri-add-line text-base"></i><span className="hidden sm:inline">Đăng tin</span>
             </button>
@@ -559,7 +559,7 @@ export default function Header() {
           </div>
 
           {/* Avatar */}
-          <Link href="/dashboard"
+          <Link href="/dashboard" aria-label="Tài khoản của tôi"
             className="w-8 h-8 rounded-full bg-ink flex items-center justify-center flex-shrink-0 hover:bg-black transition">
             <i className="ri-user-line text-white text-sm"></i>
           </Link>

@@ -53,7 +53,7 @@ export default function AppNav() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto px-3 py-2">
+        <nav aria-label="Danh mục chính" className="flex-1 overflow-y-auto px-3 py-2">
           {NAV.map(item => {
             const active = isActive(pathname, item.href);
             return (
@@ -75,7 +75,7 @@ export default function AppNav() {
             className={`flex items-center justify-center gap-2 rounded-pill bg-brand-500 py-2.5 font-bold text-white shadow-brand hover:bg-brand-600 ${collapsed ? 'px-0' : 'px-4'}`}>
             <i className="ri-add-line text-base" />{!collapsed && 'Đăng tin'}
           </Link>
-          <button onClick={toggle}
+          <button onClick={toggle} aria-label={collapsed ? 'Mở rộng thanh điều hướng' : 'Thu gọn thanh điều hướng'} aria-pressed={collapsed}
             className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold text-ink-faint hover:bg-paper">
             <i className={`ri-contract-left-line text-base transition-transform ${collapsed ? 'rotate-180' : ''}`} />
             {!collapsed && 'Thu gọn'}
@@ -84,7 +84,7 @@ export default function AppNav() {
       </aside>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────── */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-surface/95 backdrop-blur md:hidden">
+      <nav aria-label="Điều hướng nhanh" className="fixed inset-x-0 bottom-0 z-40 flex border-t border-line bg-surface/95 backdrop-blur md:hidden">
         {NAV.filter(n => MOBILE.includes(n.href)).map(item => {
           const active = isActive(pathname, item.href);
           return (
