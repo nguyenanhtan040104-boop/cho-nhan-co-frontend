@@ -353,110 +353,33 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur-md" suppressHydrationWarning>
-      <div className="w-full px-3 flex items-center gap-2 h-14" suppressHydrationWarning>
+      <div className="w-full px-4 flex items-center gap-3 h-16" suppressHydrationWarning>
 
-        {/* Hamburger → Danh mục */}
-        <div className="relative flex-shrink-0" ref={hamburgerRef}>
-          <button onClick={() => setShowHamburger(v => !v)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600">
-            <i className="ri-menu-line text-xl"></i>
-          </button>
-          {showHamburger && (
-            <div className="absolute left-0 top-11 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 flex overflow-hidden" style={{ minWidth: 520 }}>
-              {/* Cột trái — danh mục chính */}
-              <div className="w-56 bg-white py-2 border-r border-gray-100">
-                <p className="text-sm font-bold text-gray-900 px-4 py-2">Danh mục</p>
-                {mainCategories.map((cat, idx) => (
-                  <button key={idx} onMouseEnter={() => setHoveredCat(idx)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${hoveredCat === idx ? 'bg-brand-50 text-ink' : 'hover:bg-gray-50 text-gray-700'}`}>
-                    <i className={`${cat.icon} text-lg w-5 flex-shrink-0 ${hoveredCat === idx ? 'text-brand-500' : 'text-gray-400'}`}></i>
-                    <span className="text-sm font-medium flex-1">{cat.label}</span>
-                    <i className="ri-arrow-right-s-line text-gray-300 text-base"></i>
-                  </button>
-                ))}
-              </div>
-              {/* Cột phải — danh mục con */}
-              <div className="flex-1 py-4 px-3 bg-gray-50">
-                <p className="text-xs font-bold text-gray-400 uppercase px-2 mb-2">{mainCategories[hoveredCat]?.label}</p>
-                <div className="space-y-0.5">
-                  {mainCategories[hoveredCat]?.sub.map((sub, i) => (
-                    <Link key={i} href={sub.href} onClick={() => setShowHamburger(false)}
-                      className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white hover:shadow-sm transition-all text-sm text-gray-700 hover:text-gray-900 font-medium">
-                      <i className="ri-arrow-right-s-line text-brand-400"></i>
-                      {sub.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Logo */}
-        <Link href="/" className="flex-shrink-0">
-          <div className="flex items-center gap-1.5 bg-brand-500 px-3 py-1.5 rounded-pill shadow-brand">
-            <i className="ri-store-2-fill text-white text-sm"></i>
-            <span className="font-black text-white text-sm leading-none">chợ<span className="uppercase">NC</span></span>
-          </div>
+        {/* Brand — only on mobile (desktop brand lives in the sidebar) */}
+        <Link href="/" className="flex items-center gap-2 md:hidden flex-shrink-0">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-white shadow-brand">
+            <i className="ri-store-2-fill text-lg"></i>
+          </span>
         </Link>
 
-        {/* Dành cho người bán — bên trái như Chợ Tốt */}
-        <div className="relative hidden md:block flex-shrink-0" ref={sellerMenuRef}>
-          <button onClick={() => setShowSellerMenu(v => !v)}
-            className="flex items-center gap-1 text-sm text-gray-600 font-medium hover:text-gray-900 whitespace-nowrap">
-            Dành cho người bán <i className="ri-arrow-down-s-line"></i>
-          </button>
-          {showSellerMenu && (
-            <div className="absolute left-0 top-9 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
-              <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <i className="ri-file-list-3-line text-gray-600 text-sm"></i>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Quản lý tin</p>
-                  <p className="text-xs text-gray-400">Tin đã đăng, đã xóa</p>
-                </div>
-              </Link>
-              <Link href="/pricing" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-gold-400/20 rounded-lg flex items-center justify-center">
-                  <i className="ri-vip-crown-line text-gold-600 text-sm"></i>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Gói VIP</p>
-                  <p className="text-xs text-gray-400">Bảng giá, nâng cấp tin</p>
-                </div>
-              </Link>
-              <Link href="/advertisements/create" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors" onClick={() => setShowSellerMenu(false)}>
-                <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center">
-                  <i className="ri-megaphone-line text-brand-600 text-sm"></i>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Đăng quảng cáo</p>
-                  <p className="text-xs text-gray-400">Khai trương, khuyến mãi</p>
-                </div>
-              </Link>
-            </div>
-          )}
-        </div>
+        {/* Central search — app-style */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const v = ((new FormData(e.currentTarget).get('q') as string) || '').trim();
+            if (v) router.push(smartSearch(v));
+          }}
+          className="min-w-0 flex-1 max-w-xl"
+        >
+          <div className="flex items-center gap-2 h-10 rounded-pill border border-line bg-paper px-4 transition-colors focus-within:border-brand-300 focus-within:bg-white">
+            <i className="ri-search-line text-ink-faint"></i>
+            <input name="q" type="text" placeholder="Tìm nông sản, nhà đất, việc làm..."
+              className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder-ink-faint focus:outline-none" />
+          </div>
+        </form>
 
-        {/* Spacer trái */}
-        <div className="flex-1" />
-
-        {/* Nav links ở GIỮA */}
-        <nav className="hidden lg:flex items-center gap-1 flex-shrink-0">
-          {navLinks.map(link => (
-            <Link key={link.href} href={link.href}
-              className={`text-sm font-semibold px-3 py-1.5 rounded-pill transition whitespace-nowrap ${
-                link.href === '/' ? (pathname === '/' ? 'text-brand-600 font-bold' : 'text-ink-soft hover:text-ink')
-                : pathname.startsWith(link.href) ? 'text-brand-600 font-bold' : 'text-ink-soft hover:text-ink'
-              }`}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Spacer phải */}
-        <div className="flex-1" />
+        {/* Spacer */}
+        <div className="hidden flex-1 sm:block" />
 
         {/* Right actions */}
         <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
@@ -614,8 +537,8 @@ export default function Header() {
           {/* Đăng tin */}
           <div className="relative" ref={postMenuRef}>
             <button onClick={handlePostClick}
-              className="flex items-center gap-1 bg-brand-500 text-white text-sm font-bold px-4 py-2 rounded-pill shadow-brand hover:bg-brand-600 transition">
-              <i className="ri-add-line text-base"></i>Đăng tin
+              className="flex items-center gap-1 bg-brand-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-pill shadow-brand hover:bg-brand-600 transition shrink-0">
+              <i className="ri-add-line text-base"></i><span className="hidden sm:inline">Đăng tin</span>
             </button>
             {showPostMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">

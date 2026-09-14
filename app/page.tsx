@@ -94,38 +94,24 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-content px-4 py-6 sm:px-6">
 
-      {/* ===== HERO — one bold espresso panel; the boldness budget lives here ===== */}
-      <section className="relative overflow-hidden bg-ink text-white">
-        {/* warm basalt glow, not a decorative gradient wash */}
-        <div className="pointer-events-none absolute -top-24 -right-16 h-80 w-80 rounded-full bg-brand-500/25 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-10 h-72 w-72 rounded-full bg-forest-500/20 blur-3xl" />
-
-        <div className="relative mx-auto max-w-content px-5 pt-12 pb-9 sm:pt-16 sm:pb-12 animate-rise">
-          <span className="kicker text-brand-300 before:bg-brand-400">Chợ của người Nhân Cơ</span>
-          <h1 className="mt-3 font-black leading-[1.03] tracking-tight"
-              style={{ fontSize: 'clamp(2rem, 6vw, 3.4rem)' }}>
-            Mua bán nông sản,<br className="hidden sm:block" /> nhà đất và việc làm<br className="hidden sm:block" />
-            <span className="text-brand-400">ngay tại quê mình.</span>
-          </h1>
-          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
-            Từ cà phê, tiêu, bơ tới đất rẫy và việc mùa vụ — đăng tin và tìm người mua ngay trong xã Nhân Cơ, Đắk Nông.
-          </p>
-
-          <div className="mt-6 max-w-2xl">
-            <HomepageClient />
+        {/* ===== WELCOME BANNER — dashboard header card ===== */}
+        <section className="relative overflow-hidden rounded-card bg-ink px-5 py-6 text-white sm:px-7 sm:py-7 animate-rise">
+          <div className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-brand-500/25 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 left-10 h-48 w-48 rounded-full bg-forest-500/20 blur-3xl" />
+          <div className="relative">
+            <span className="kicker text-brand-300 before:bg-brand-400">Chợ của người Nhân Cơ</span>
+            <h1 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">Chào bà con Nhân Cơ 👋</h1>
+            <p className="mt-1.5 max-w-lg text-sm leading-relaxed text-white/70">
+              Cà phê, tiêu, bơ, đất rẫy hay việc mùa vụ — đăng tin và tìm người mua ngay trong xã Nhân Cơ, Đắk Nông.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2.5">
+              <Link href="/dashboard" className="btn-primary"><i className="ri-add-line text-base" /> Đăng tin miễn phí</Link>
+              <Link href="/products" className="btn-ghost bg-white/10 border-white/20 text-white hover:border-white/50">Khám phá tin đăng</Link>
+            </div>
           </div>
-
-          <div className="mt-5 flex flex-wrap items-center gap-2.5">
-            <Link href="/products" className="btn-primary">Xem tất cả tin đăng</Link>
-            <Link href="/dashboard" className="btn-ghost bg-white/10 border-white/20 text-white hover:border-white/50">
-              <i className="ri-add-line text-base" /> Đăng tin miễn phí
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-content px-4 pb-10 sm:px-5">
+        </section>
 
         {/* ===== DANH MỤC — branded tiles ===== */}
         <section className="mt-6">
@@ -223,9 +209,16 @@ export default async function HomePage() {
             ))}
           </div>
         </section>
-      </div>
 
-      <SiteFooter />
+        {/* Slim footer */}
+        <footer className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-line py-6 text-xs text-ink-faint sm:flex-row">
+          <p>© 2025 Chợ Nhân Cơ · Xã Nhân Cơ, Đắk Nông</p>
+          <div className="flex items-center gap-4">
+            <a href="tel:0888317289" className="hover:text-brand-600">0888.317.289</a>
+            <a href="https://www.facebook.com/share/g/1Gwg2sziS1/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-600">Nhóm Facebook</a>
+          </div>
+        </footer>
+      </div>
     </main>
   );
 }

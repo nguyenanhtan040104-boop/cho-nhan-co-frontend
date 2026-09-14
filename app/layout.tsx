@@ -1,6 +1,7 @@
 import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import Header from './components/Header';
+import AppNav from './components/AppNav';
 import PushNotificationSetup from './components/PushNotificationSetup';
 import AdPopup from './components/AdPopup';
 
@@ -86,9 +87,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="font-sans" suppressHydrationWarning>
-        <Header />
+        <div className="flex min-h-screen">
+          <AppNav />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Header />
+            <div className="flex-1 pb-16 md:pb-0">{children}</div>
+          </div>
+        </div>
         <PushNotificationSetup />
-        {children}
         <AdPopup />
       </body>
     </html>
