@@ -32,17 +32,17 @@ export default function PostCard({ post }: PostCardProps) {
     const colors = {
       'Nông nghiệp': 'bg-green-100 text-green-700',
       'Chăn nuôi': 'bg-blue-100 text-blue-700',
-      'Đời sống': 'bg-purple-100 text-purple-700',
+      'Đời sống': 'bg-forest-100 text-forest-700',
       'Tìm người giúp đỡ': 'bg-orange-100 text-orange-700',
       'Tin khẩn': 'bg-red-100 text-red-700',
-      'Hỏi đáp': 'bg-indigo-100 text-indigo-700'
+      'Hỏi đáp': 'bg-forest-100 text-forest-700'
     };
     return colors[category] || 'bg-gray-100 text-gray-700';
   };
 
   const getLevelBadge = (level: string) => {
     const badges = {
-      'Chuyên gia': 'bg-purple-100 text-purple-700',
+      'Chuyên gia': 'bg-forest-100 text-forest-700',
       'Thành viên VIP': 'bg-yellow-100 text-yellow-700',
       'Thành viên tích cực': 'bg-green-100 text-green-700',
       'Thành viên': 'bg-blue-100 text-blue-700',

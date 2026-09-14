@@ -110,7 +110,7 @@ export default function CreatePostPage() {
             <p className="text-gray-500 text-sm">Chia sẻ kiến thức, kinh nghiệm với cộng đồng</p>
           </div>
           <div className="ml-auto">
-            <Link href="/forum/drafts" className="text-sm text-purple-600 hover:underline flex items-center gap-1">
+            <Link href="/forum/drafts" className="text-sm text-forest-600 hover:underline flex items-center gap-1">
               <i className="ri-draft-line"></i> Bản nháp của tôi
             </Link>
           </div>
@@ -134,13 +134,13 @@ export default function CreatePostPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
               placeholder="Tiêu đề bài viết của bạn..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Chủ đề *</label>
             <select name="category" value={form.category} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500">
               {categoryOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -149,7 +149,7 @@ export default function CreatePostPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung *</label>
             <textarea name="content" required rows={10} value={form.content} onChange={handleChange}
               placeholder="Nội dung bài viết của bạn..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
               maxLength={5000} />
             <p className="text-xs text-gray-400 mt-1">{form.content.length}/5000</p>
           </div>
@@ -168,7 +168,7 @@ export default function CreatePostPage() {
                 </div>
               ))}
               {imagePreviews.length < 8 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-forest-400 hover:bg-forest-50 transition-colors">
                   <i className="ri-image-add-line text-2xl text-gray-400"></i>
                   <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
                   <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -181,7 +181,7 @@ export default function CreatePostPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tags (phân cách bằng dấu phẩy)</label>
             <input type="text" name="tags" value={form.tags} onChange={handleChange}
               placeholder="Ví dụ: lúa, phân bón, sâu bệnh"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div>
@@ -191,7 +191,7 @@ export default function CreatePostPage() {
             </label>
             <input type="datetime-local" name="scheduledAt" value={form.scheduledAt} onChange={handleChange}
               min={new Date().toISOString().slice(0, 16)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             <p className="text-xs text-gray-400 mt-1">Để trống nếu muốn đăng ngay. Nếu chọn thời gian, bài sẽ lưu nháp cho đến lúc đó.</p>
           </div>
 
@@ -209,13 +209,13 @@ export default function CreatePostPage() {
               type="button"
               onClick={(e) => handleSubmit(e as any, 'DRAFT')}
               disabled={draftLoading || !form.title}
-              className="px-5 py-3 border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 disabled:opacity-50 text-sm flex items-center gap-2"
+              className="px-5 py-3 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 disabled:opacity-50 text-sm flex items-center gap-2"
             >
               <i className="ri-save-line"></i>
               {draftLoading ? 'Đang lưu...' : 'Lưu nháp'}
             </button>
             <button type="submit" disabled={loading}
-              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm">
+              className="flex-1 bg-forest-600 text-white px-6 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50 text-sm">
               {loading ? 'Đang đăng...' : form.scheduledAt ? 'Lên lịch đăng' : 'Đăng bài'}
             </button>
           </div>
@@ -254,8 +254,8 @@ export default function CreatePostPage() {
       {savedAsDraft && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-draft-line text-purple-600 text-2xl"></i>
+            <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-draft-line text-forest-600 text-2xl"></i>
             </div>
             <h3 className="text-lg font-semibold mb-2">Đã lưu nháp!</h3>
             <p className="text-gray-500 text-sm">Đang chuyển đến trang quản lý nháp...</p>

@@ -6,7 +6,7 @@ import { auth, messages as messagesApi } from '../../lib/api';
 
 type FilterTab = 'all' | 'unread';
 
-const COLORS = ['bg-yellow-400', 'bg-blue-400', 'bg-green-400', 'bg-pink-400', 'bg-purple-400'];
+const COLORS = ['bg-yellow-400', 'bg-blue-400', 'bg-green-400', 'bg-pink-400', 'bg-forest-400'];
 
 function getInitials(name: string) {
   const parts = (name || 'U').trim().split(' ');
@@ -154,7 +154,7 @@ export default function MessagesPage() {
                     <div className="flex items-center justify-between mt-0.5">
                       <span className={`text-xs truncate ${conv.unreadCount ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>{lastText}</span>
                       {conv.unreadCount > 0 && (
-                        <span className="ml-1 flex-shrink-0 w-5 h-5 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full flex items-center justify-center">{conv.unreadCount}</span>
+                        <span className="ml-1 flex-shrink-0 w-5 h-5 bg-brand-500 text-white text-xs font-bold rounded-full flex items-center justify-center">{conv.unreadCount}</span>
                       )}
                     </div>
                   </div>

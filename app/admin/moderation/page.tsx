@@ -191,7 +191,7 @@ export default function ModerationPage() {
                       ) : (
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Hiển thị</span>
                       )}
-                      <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-forest-50 text-forest-600 px-2 py-0.5 rounded">
                         {categoryLabel[post.category] || post.category}
                       </span>
                     </div>
@@ -204,7 +204,7 @@ export default function ModerationPage() {
                       <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount}</span>
                       <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
                       <Link href={`/forum/${post.id}`} target="_blank"
-                        className="text-purple-500 hover:underline ml-auto flex items-center gap-1">
+                        className="text-forest-500 hover:underline ml-auto flex items-center gap-1">
                         <i className="ri-external-link-line"></i> Xem
                       </Link>
                     </div>

@@ -204,7 +204,7 @@ export default function RealEstateCard({ item, isSaved, onSave }: Props) {
           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
             {getTypeLabel(item.type)}
           </span>
-          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
+          <span className="bg-forest-100 text-forest-800 px-2 py-1 rounded text-xs font-medium">
             {getTransactionLabel(item.transactionType)}
           </span>
         </div>

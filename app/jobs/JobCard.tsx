@@ -71,10 +71,10 @@ export default function JobCard({ job }: JobCardProps) {
     const colors = {
       'agriculture': 'text-green-600',
       'construction': 'text-orange-600',
-      'repair': 'text-purple-600',
+      'repair': 'text-forest-600',
       'cleaning': 'text-blue-600',
       'petcare': 'text-pink-600',
-      'childcare': 'text-indigo-600'
+      'childcare': 'text-forest-600'
     };
     return colors[category] || 'text-gray-600';
   };
@@ -145,7 +145,7 @@ export default function JobCard({ job }: JobCardProps) {
             <button 
               onClick={() => setIsSaved(!isSaved)}
               className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                isSaved ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
+                isSaved ? 'bg-forest-100 text-forest-600' : 'bg-gray-100 text-gray-600 hover:bg-forest-50 hover:text-forest-600'
               }`}
             >
               <i className={`${isSaved ? 'ri-bookmark-fill' : 'ri-bookmark-line'}`}></i>
@@ -157,7 +157,7 @@ export default function JobCard({ job }: JobCardProps) {
         </div>
 
         <Link href={`/jobs/${job.id}`} className="cursor-pointer">
-          <h2 className="text-xl font-semibold text-gray-900 mb-3 hover:text-indigo-600 transition-colors line-clamp-2">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3 hover:text-forest-600 transition-colors line-clamp-2">
             {job.title}
           </h2>
         </Link>
@@ -183,7 +183,7 @@ export default function JobCard({ job }: JobCardProps) {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                  <i className="ri-map-pin-line text-indigo-500"></i>
+                  <i className="ri-map-pin-line text-forest-500"></i>
                   <span className="font-medium">Địa điểm:</span>
                 </div>
                 <p className="text-gray-900">{job.location}</p>
@@ -191,7 +191,7 @@ export default function JobCard({ job }: JobCardProps) {
               
               <div>
                 <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                  <i className="ri-time-line text-indigo-500"></i>
+                  <i className="ri-time-line text-forest-500"></i>
                   <span className="font-medium">Thời gian:</span>
                 </div>
                 <p className="text-gray-900">{job.workTime}</p>
@@ -199,10 +199,10 @@ export default function JobCard({ job }: JobCardProps) {
               
               <div>
                 <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                  <i className="ri-money-dollar-circle-line text-indigo-500"></i>
+                  <i className="ri-money-dollar-circle-line text-forest-500"></i>
                   <span className="font-medium">Lương:</span>
                 </div>
-                <p className="text-indigo-600 font-semibold">{job.salary}</p>
+                <p className="text-forest-600 font-semibold">{job.salary}</p>
               </div>
               
               <div>
@@ -220,14 +220,14 @@ export default function JobCard({ job }: JobCardProps) {
             {(job.skills || job.requirements) && (
               <div className="mt-4">
                 <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                  <i className="ri-star-line text-indigo-500"></i>
+                  <i className="ri-star-line text-forest-500"></i>
                   <span className="font-medium">
                     {job.type === 'seeking' ? 'Kỹ năng:' : 'Yêu cầu:'}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {(job.skills || job.requirements)?.slice(0, 3).map((item, index) => (
-                    <span key={index} className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs">
+                    <span key={index} className="bg-forest-50 text-forest-700 px-2 py-1 rounded-md text-xs">
                       {item}
                     </span>
                   ))}
@@ -242,7 +242,7 @@ export default function JobCard({ job }: JobCardProps) {
             {job.experience && (
               <div className="mt-3">
                 <div className="flex items-center space-x-2 text-gray-600 mb-1">
-                  <i className="ri-award-line text-indigo-500"></i>
+                  <i className="ri-award-line text-forest-500"></i>
                   <span className="font-medium">Kinh nghiệm:</span>
                 </div>
                 <p className="text-gray-900 text-sm">{job.experience}</p>
@@ -265,7 +265,7 @@ export default function JobCard({ job }: JobCardProps) {
               <div>
                 <button
                   onClick={handleContactProfile}
-                  className="font-medium text-gray-900 hover:text-indigo-600 transition-colors cursor-pointer"
+                  className="font-medium text-gray-900 hover:text-forest-600 transition-colors cursor-pointer"
                 >
                   {job.contact.name}
                 </button>
@@ -289,7 +289,7 @@ export default function JobCard({ job }: JobCardProps) {
                 className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium cursor-pointer ${
                   hasApplied 
                     ? 'bg-gray-400 text-white cursor-not-allowed' 
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-forest-600 text-white hover:bg-forest-700'
                 }`}
               >
                 {hasApplied ? 'Đã ứng tuyển' : (job.type === 'hiring' ? 'Ứng tuyển' : 'Liên hệ')}
@@ -334,7 +334,7 @@ export default function JobCard({ job }: JobCardProps) {
             
             <Link 
               href={`/jobs/${job.id}`}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium cursor-pointer"
+              className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors text-sm font-medium cursor-pointer"
             >
               Xem chi tiết
             </Link>

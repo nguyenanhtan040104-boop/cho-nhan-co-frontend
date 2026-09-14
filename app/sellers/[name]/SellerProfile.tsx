@@ -248,9 +248,9 @@ export default function SellerProfile({ sellerName }: SellerProfileProps) {
                       <div className="text-xl font-bold text-green-600">{seller.totalSold}</div>
                       <div className="text-green-600">Đã bán</div>
                     </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="text-xl font-bold text-purple-600">{seller.responseTime}</div>
-                      <div className="text-purple-600">Phản hồi</div>
+                    <div className="text-center p-3 bg-forest-50 rounded-lg">
+                      <div className="text-xl font-bold text-forest-600">{seller.responseTime}</div>
+                      <div className="text-forest-600">Phản hồi</div>
                     </div>
                     <div className="text-center p-3 bg-orange-50 rounded-lg">
                       <div className="text-xl font-bold text-orange-600">{seller.joinDate}</div>

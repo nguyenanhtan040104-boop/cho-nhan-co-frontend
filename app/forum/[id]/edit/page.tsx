@@ -73,7 +73,7 @@ export default function EditPostPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
@@ -104,13 +104,13 @@ export default function EditPostPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Chuyên mục</label>
             <select name="category" value={form.category} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500">
               {categoryOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -118,7 +118,7 @@ export default function EditPostPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung *</label>
             <textarea name="content" required rows={10} value={form.content} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
               maxLength={5000} />
             <p className="text-xs text-gray-400 mt-1">{form.content.length}/5000</p>
           </div>
@@ -127,7 +127,7 @@ export default function EditPostPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tags (phân cách bằng dấu phẩy)</label>
             <input type="text" name="tags" value={form.tags} onChange={handleChange}
               placeholder="cà phê, thu hoạch, kinh nghiệm..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
@@ -142,7 +142,7 @@ export default function EditPostPage() {
               Hủy
             </Link>
             <button type="submit" disabled={saving}
-              className="flex-1 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 font-medium">
+              className="flex-1 bg-forest-600 text-white px-6 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50 font-medium">
               {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
             </button>
           </div>

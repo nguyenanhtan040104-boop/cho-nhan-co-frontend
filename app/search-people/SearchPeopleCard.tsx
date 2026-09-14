@@ -55,7 +55,7 @@ export default function SearchPeopleCard({ post }: SearchPeopleCardProps) {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      'new': 'bg-purple-100 text-purple-700',
+      'new': 'bg-forest-100 text-forest-700',
       'searching': 'bg-red-100 text-red-700',
       'found': 'bg-green-100 text-green-700'
     };

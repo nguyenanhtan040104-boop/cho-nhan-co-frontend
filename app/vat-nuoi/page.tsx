@@ -384,7 +384,7 @@ function LowDataFill({ createHref, accentColor }: { createHref: string; accentCo
 function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id: string) => void; accentColor: string }) {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
   const imgUrl = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
-  const accent = accentColor === 'amber' ? 'amber-800' : 'indigo-700';
+  const accent = accentColor === 'amber' ? 'amber-800' : 'forest-700';
 
   return (
     <div className="relative group">
@@ -461,7 +461,7 @@ function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id:
 function ItemListRow({ item, onDeleted, accentColor }: { item: any; onDeleted: (id: string) => void; accentColor: string }) {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
   const imgUrl = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
-  const accent = accentColor === 'amber' ? 'amber-800' : 'indigo-700';
+  const accent = accentColor === 'amber' ? 'amber-800' : 'forest-700';
 
   return (
     <div className="relative group">

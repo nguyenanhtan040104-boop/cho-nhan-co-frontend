@@ -35,7 +35,7 @@ export default function ForumSidebar({
       label: 'Bình luận hôm nay',
       value: '456',
       icon: 'ri-chat-3-line',
-      color: 'text-purple-600',
+      color: 'text-forest-600',
     },
     {
       label: 'Lượt xem tuần này',

@@ -68,11 +68,11 @@ export default function SeekJobPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Banner */}
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-          <i className="ri-user-search-line text-indigo-600 text-xl mt-0.5"></i>
+        <div className="bg-forest-50 border border-forest-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+          <i className="ri-user-search-line text-forest-600 text-xl mt-0.5"></i>
           <div>
-            <p className="text-indigo-800 font-medium text-sm">Tin tìm việc</p>
-            <p className="text-indigo-600 text-xs mt-0.5">Nhà tuyển dụng sẽ thấy tin của bạn và liên hệ trực tiếp qua số điện thoại trong hồ sơ</p>
+            <p className="text-forest-800 font-medium text-sm">Tin tìm việc</p>
+            <p className="text-forest-600 text-xs mt-0.5">Nhà tuyển dụng sẽ thấy tin của bạn và liên hệ trực tiếp qua số điện thoại trong hồ sơ</p>
           </div>
         </div>
 
@@ -83,13 +83,13 @@ export default function SeekJobPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
               placeholder="Ví dụ: Tìm việc thu hoạch cà phê, có kinh nghiệm 3 năm..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Ngành nghề *</label>
             <select name="category" required value={form.category} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500">
               <option value="">Chọn ngành nghề</option>
               {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -100,13 +100,13 @@ export default function SeekJobPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Mức lương mong muốn</label>
               <input type="text" name="salary" value={form.salary} onChange={handleChange}
                 placeholder="Ví dụ: 300.000đ/ngày, thỏa thuận..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Khu vực làm việc *</label>
               <input type="text" name="location" required value={form.location} onChange={handleChange}
                 placeholder="Xã/Huyện/Tỉnh mong muốn"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
           </div>
 
@@ -114,14 +114,14 @@ export default function SeekJobPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Kinh nghiệm</label>
             <input type="text" name="experience" value={form.experience} onChange={handleChange}
               placeholder="Ví dụ: 3 năm thu hoạch cà phê, biết lái xe máy..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Giới thiệu bản thân *</label>
             <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
               placeholder="Mô tả về kỹ năng, kinh nghiệm, thời gian có thể làm việc..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
               maxLength={2000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
           </div>
@@ -130,7 +130,7 @@ export default function SeekJobPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Yêu cầu của bạn</label>
             <textarea name="benefits" rows={2} value={form.benefits} onChange={handleChange}
               placeholder="Ví dụ: Có chỗ ở, xe đưa đón, ăn trưa..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none" />
           </div>
 
           <div className="flex gap-4 pt-4 border-t">
@@ -139,7 +139,7 @@ export default function SeekJobPage() {
               Hủy
             </Link>
             <button type="submit" disabled={loading}
-              className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium">
+              className="flex-1 bg-forest-600 text-white px-6 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50 font-medium">
               {loading ? 'Đang đăng...' : 'Đăng tin tìm việc'}
             </button>
           </div>

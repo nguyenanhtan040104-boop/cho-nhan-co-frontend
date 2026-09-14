@@ -105,7 +105,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
               )}
 
               {(ad.startDate || ad.endDate) && (
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4 bg-orange-50 rounded-lg px-4 py-2">
+                <div className="flex items-center gap-2 text-sm text-ink mb-4 bg-gold-400/15 rounded-lg px-4 py-2">
                   <i className="ri-calendar-event-line text-orange-500"></i>
                   <span>
                     {ad.startDate && new Date(ad.startDate).toLocaleDateString('vi-VN')}

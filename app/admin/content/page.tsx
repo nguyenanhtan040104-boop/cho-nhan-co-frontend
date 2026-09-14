@@ -11,7 +11,7 @@ const TABS: { id: TabType; label: string; icon: string; color: string }[] = [
   { id: 'products',     label: 'San pham',     icon: 'ri-store-line',       color: 'text-green-600'  },
   { id: 'real-estate',  label: 'Bat dong san', icon: 'ri-building-line',    color: 'text-orange-600' },
   { id: 'jobs',         label: 'Viec lam',     icon: 'ri-briefcase-line',   color: 'text-blue-600'   },
-  { id: 'forum',        label: 'Dien dan',     icon: 'ri-discuss-line',     color: 'text-purple-600' },
+  { id: 'forum',        label: 'Dien dan',     icon: 'ri-discuss-line',     color: 'text-forest-600' },
 ];
 
 // Forum uses approvePost / rejectPost; others use adminApprove / adminReject

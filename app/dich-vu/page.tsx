@@ -156,15 +156,15 @@ function DichVuInner() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
           <div className="flex items-end justify-between gap-3 mb-4">
             <div>
-              <nav className="text-[11px] text-indigo-200/80 mb-1 flex items-center gap-1">
+              <nav className="text-[11px] text-forest-200/80 mb-1 flex items-center gap-1">
                 <Link href="/" className="hover:text-white">Trang chủ</Link>
                 <i className="ri-arrow-right-s-line"></i>
-                <span className="text-indigo-200">Dịch vụ</span>
+                <span className="text-forest-200">Dịch vụ</span>
               </nav>
               <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
                 {search ? `Kết quả "${search}"` : 'Dịch vụ tại Nhân Cơ'}
               </h1>
-              <p className="text-[12px] text-indigo-200/90 mt-0.5">
+              <p className="text-[12px] text-forest-200/90 mt-0.5">
                 <b className="text-white">{fmt(total)}</b> dịch vụ đang rao · Đắk Nông
               </p>
             </div>
@@ -197,7 +197,7 @@ function DichVuInner() {
                 onClick={() => { setSubCat(cat.value); setPage(1); }}
                 className={`flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   subCat === cat.value
-                    ? 'bg-white text-indigo-900'
+                    ? 'bg-white text-forest-900'
                     : 'bg-white/10 text-white hover:bg-white/20'
                 }`}>
                 {cat.name}
@@ -218,7 +218,7 @@ function DichVuInner() {
             {QUICK_FILTERS.map(f => (
               <button key={f.value} onClick={() => setQuickFilter(f.value)}
                 className={`px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
-                  quickFilter === f.value ? 'bg-indigo-700 text-white' : 'text-gray-600 hover:bg-stone-200'
+                  quickFilter === f.value ? 'bg-forest-700 text-white' : 'text-gray-600 hover:bg-stone-200'
                 }`}>
                 {f.label}
               </button>
@@ -230,14 +230,14 @@ function DichVuInner() {
               disabled={locating}
               title={userLoc ? `Vị trí: ${userLoc.latitude.toFixed(3)}, ${userLoc.longitude.toFixed(3)}` : 'Chia sẻ GPS để xem khoảng cách'}
               className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
-                userLoc ? 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200' : 'text-gray-600 hover:bg-stone-200'
+                userLoc ? 'bg-forest-100 text-forest-800 hover:bg-forest-200' : 'text-gray-600 hover:bg-stone-200'
               } disabled:opacity-50`}>
               <i className={`${locating ? 'ri-loader-4-line animate-spin' : userLoc ? 'ri-map-pin-2-fill' : 'ri-map-pin-line'}`}></i>
               {locating ? 'Đang lấy...' : userLoc ? 'Đã có GPS' : 'Vị trí của tôi'}
             </button>
             <span className="text-[12px] text-gray-500">Sắp xếp:</span>
             <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
-              className="text-[12px] border border-stone-300 rounded px-2 py-1 focus:outline-none focus:border-indigo-700 bg-white font-medium text-gray-700">
+              className="text-[12px] border border-stone-300 rounded px-2 py-1 focus:outline-none focus:border-forest-700 bg-white font-medium text-gray-700">
               <option value="newest">Mới nhất</option>
               <option value="price_asc">Giá thấp</option>
               <option value="price_desc">Giá cao</option>
@@ -288,7 +288,7 @@ function DichVuInner() {
                 </button>
                 {[...Array(totalPages)].map((_, i) => (
                   <button key={i} onClick={() => setPage(i + 1)}
-                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-indigo-700 text-white' : 'bg-white border border-stone-300 text-gray-700 hover:bg-stone-50'}`}>
+                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-forest-700 text-white' : 'bg-white border border-stone-300 text-gray-700 hover:bg-stone-50'}`}>
                     {i + 1}
                   </button>
                 )).slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))}
@@ -355,16 +355,16 @@ function LowDataFill({ createHref, accentColor }: { createHref: string; accentCo
   const isIndigo = accentColor === 'indigo';
   return (
     <div className="mt-8 space-y-5">
-      <section className={`${isIndigo ? 'bg-indigo-50/60 border-indigo-200/60' : 'bg-amber-50/60 border-amber-200/60'} border rounded-lg p-5 flex items-center gap-4 flex-wrap`}>
+      <section className={`${isIndigo ? 'bg-forest-50/60 border-forest-200/60' : 'bg-amber-50/60 border-amber-200/60'} border rounded-lg p-5 flex items-center gap-4 flex-wrap`}>
         <div className="flex-1 min-w-[200px]">
-          <p className={`text-[10px] font-semibold tracking-wider ${isIndigo ? 'text-indigo-700' : 'text-amber-700'} uppercase`}>Cộng đồng Nhân Cơ</p>
+          <p className={`text-[10px] font-semibold tracking-wider ${isIndigo ? 'text-forest-700' : 'text-amber-700'} uppercase`}>Cộng đồng Nhân Cơ</p>
           <h3 className="text-[15px] font-bold text-gray-900 mt-0.5 mb-1">Đăng dịch vụ của bạn</h3>
           <p className="text-[12.5px] text-gray-600 leading-relaxed">
             Bà con tại Nhân Cơ, Đắk Nông đang cần nhiều loại dịch vụ. Đăng ngay để tiếp cận khách hàng gần nhà.
           </p>
         </div>
         <Link href={createHref}
-          className={`${isIndigo ? 'bg-indigo-700 hover:bg-indigo-800' : 'bg-amber-800 hover:bg-amber-900'} text-white text-[13px] font-semibold px-4 py-2 rounded transition-colors`}>
+          className={`${isIndigo ? 'bg-forest-700 hover:bg-forest-800' : 'bg-amber-800 hover:bg-amber-900'} text-white text-[13px] font-semibold px-4 py-2 rounded transition-colors`}>
           + Đăng ngay
         </Link>
       </section>
@@ -385,8 +385,8 @@ function LowDataFill({ createHref, accentColor }: { createHref: string; accentCo
 function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id: string) => void; accentColor: string }) {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
   const imgUrl = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
-  const hoverColor = accentColor === 'indigo' ? 'group-hover:text-indigo-700' : 'group-hover:text-amber-800';
-  const distColor = accentColor === 'indigo' ? 'text-indigo-700' : 'text-amber-800';
+  const hoverColor = accentColor === 'indigo' ? 'group-hover:text-forest-700' : 'group-hover:text-amber-800';
+  const distColor = accentColor === 'indigo' ? 'text-forest-700' : 'text-amber-800';
 
   return (
     <div className="relative group">
@@ -406,7 +406,7 @@ function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id:
               <i className="ri-vip-crown-fill"></i>VIP
             </span>
           ) : isNew && (
-            <span className={`absolute top-2 left-2 bg-white/95 ${accentColor === 'indigo' ? 'text-indigo-700 border-indigo-200' : 'text-amber-700 border-amber-200'} text-[10px] font-bold px-1.5 py-0.5 rounded border`}>
+            <span className={`absolute top-2 left-2 bg-white/95 ${accentColor === 'indigo' ? 'text-forest-700 border-forest-200' : 'text-amber-700 border-amber-200'} text-[10px] font-bold px-1.5 py-0.5 rounded border`}>
               MỚI
             </span>
           )}
@@ -463,7 +463,7 @@ function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id:
 function ItemListRow({ item, onDeleted, accentColor }: { item: any; onDeleted: (id: string) => void; accentColor: string }) {
   const isNew = item.createdAt && (Date.now() - new Date(item.createdAt).getTime()) < 86400000;
   const imgUrl = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
-  const hoverColor = accentColor === 'indigo' ? 'group-hover:text-indigo-700' : 'group-hover:text-amber-800';
+  const hoverColor = accentColor === 'indigo' ? 'group-hover:text-forest-700' : 'group-hover:text-amber-800';
 
   return (
     <div className="relative group">
@@ -480,7 +480,7 @@ function ItemListRow({ item, onDeleted, accentColor }: { item: any; onDeleted: (
           {item.isVip ? (
             <span className="absolute top-1.5 left-1.5 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">VIP</span>
           ) : isNew && (
-            <span className={`absolute top-1.5 left-1.5 bg-white/95 ${accentColor === 'indigo' ? 'text-indigo-700 border-indigo-200' : 'text-amber-700 border-amber-200'} text-[10px] font-bold px-1.5 py-0.5 rounded border`}>MỚI</span>
+            <span className={`absolute top-1.5 left-1.5 bg-white/95 ${accentColor === 'indigo' ? 'text-forest-700 border-forest-200' : 'text-amber-700 border-amber-200'} text-[10px] font-bold px-1.5 py-0.5 rounded border`}>MỚI</span>
           )}
         </div>
         <div className="flex-1 min-w-0 py-2.5 pr-10">

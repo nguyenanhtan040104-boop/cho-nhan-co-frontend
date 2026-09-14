@@ -115,7 +115,7 @@ export default function CreateJobPage() {
           {typeOptions.map(o => (
             <button key={o.value} type="button"
               onClick={() => setForm(prev => ({ ...prev, type: o.value }))}
-              className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all ${form.type === o.value ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-300'}`}>
+              className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all ${form.type === o.value ? 'border-forest-500 bg-forest-50 text-forest-700' : 'border-gray-200 bg-white text-gray-500 hover:border-forest-300'}`}>
               <i className={`text-3xl ${o.value === 'EMPLOYER' ? 'ri-building-2-line' : 'ri-user-search-line'}`}></i>
               <span className="font-semibold text-base">{o.label}</span>
               <span className="text-xs text-center">{o.value === 'EMPLOYER' ? 'Bạn cần tuyển người' : 'Bạn đang tìm việc'}</span>
@@ -139,14 +139,14 @@ export default function CreateJobPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
               placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: Tuyển công nhân hái cà phê mùa vụ...' : 'Ví dụ: Tìm việc làm nông nghiệp tại Đắk Lắk...'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Ngành nghề *</label>
               <select name="category" required value={form.category} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500">
                 <option value="">Chọn ngành nghề</option>
                 {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
@@ -155,7 +155,7 @@ export default function CreateJobPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Địa điểm *</label>
               <input type="text" name="location" required value={form.location} onChange={handleChange}
                 placeholder="Xã/Huyện/Tỉnh"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
           </div>
 
@@ -180,7 +180,7 @@ export default function CreateJobPage() {
               </label>
               <input type="text" name="salary" value={form.salary} onChange={handleChange}
                 placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: 300.000đ/ngày, thỏa thuận...' : 'Ví dụ: 5-7 triệu/tháng, thỏa thuận...'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,7 +188,7 @@ export default function CreateJobPage() {
               </label>
               <input type="text" name="experience" value={form.experience} onChange={handleChange}
                 placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: Không yêu cầu, 1-2 năm...' : 'Ví dụ: 2 năm làm nông, chưa có kinh nghiệm...'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
           </div>
 
@@ -197,7 +197,7 @@ export default function CreateJobPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Hạn nộp hồ sơ</label>
               <input type="date" name="deadline" value={form.deadline} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
           )}
 
@@ -207,7 +207,7 @@ export default function CreateJobPage() {
             </label>
             <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
               placeholder={form.type === 'EMPLOYER' ? 'Mô tả chi tiết về công việc, yêu cầu, giờ làm...' : 'Giới thiệu về bản thân, kỹ năng, mong muốn công việc...'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
               maxLength={2000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
           </div>
@@ -218,7 +218,7 @@ export default function CreateJobPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Quyền lợi</label>
               <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange}
                 placeholder="Ăn ở, xe đưa đón, bảo hiểm..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none" />
             </div>
           )}
 
@@ -236,7 +236,7 @@ export default function CreateJobPage() {
                 </div>
               ))}
               {imagePreviews.length < 6 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition-colors">
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-forest-400 hover:bg-forest-50 transition-colors">
                   <i className="ri-image-add-line text-2xl text-gray-400"></i>
                   <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
                   <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -256,7 +256,7 @@ export default function CreateJobPage() {
           <div className="flex gap-4 pt-4 border-t">
             <Link href="/jobs" className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-center">Hủy</Link>
             <button type="submit" disabled={loading}
-              className="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+              className="flex-1 bg-forest-600 text-white px-6 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50">
               {loading ? 'Đang đăng...' : 'Đăng tin'}
             </button>
           </div>

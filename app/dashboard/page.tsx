@@ -306,8 +306,8 @@ function DashboardContent() {
 
                   <Link href="/messages" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-message-3-line text-purple-600 text-lg"></i>
+                      <div className="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center">
+                        <i className="ri-message-3-line text-forest-600 text-lg"></i>
                       </div>
                       <span className="text-gray-500 text-sm">Tin nhắn mới</span>
                     </div>
@@ -352,8 +352,8 @@ function DashboardContent() {
                     {[
                       { label: 'Sản phẩm', value: stats.breakdown?.products, color: 'text-green-600', icon: 'ri-plant-line' },
                       { label: 'Bất động sản', value: stats.breakdown?.realEstates, color: 'text-blue-600', icon: 'ri-home-4-line' },
-                      { label: 'Tuyển dụng', value: stats.breakdown?.jobs, color: 'text-indigo-600', icon: 'ri-briefcase-line' },
-                      { label: 'Diễn đàn', value: stats.breakdown?.forumPosts, color: 'text-purple-600', icon: 'ri-chat-3-line' },
+                      { label: 'Tuyển dụng', value: stats.breakdown?.jobs, color: 'text-forest-600', icon: 'ri-briefcase-line' },
+                      { label: 'Diễn đàn', value: stats.breakdown?.forumPosts, color: 'text-forest-600', icon: 'ri-chat-3-line' },
                     ].map((item, i) => (
                       <button key={i} onClick={() => setActiveTab(['products','real-estate','jobs','forum'][i])}
                         className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer">
@@ -407,8 +407,8 @@ function DashboardContent() {
                     {[
                       { href: '/products/create', label: 'Đăng sản phẩm', icon: 'ri-plant-line', color: 'bg-brand-500' },
                       { href: '/real-estate/create', label: 'Đăng BĐS', icon: 'ri-home-4-line', color: 'bg-blue-600' },
-                      { href: '/jobs/create', label: 'Đăng tuyển dụng', icon: 'ri-briefcase-line', color: 'bg-indigo-600' },
-                      { href: '/forum/create', label: 'Viết bài', icon: 'ri-chat-3-line', color: 'bg-purple-600' },
+                      { href: '/jobs/create', label: 'Đăng tuyển dụng', icon: 'ri-briefcase-line', color: 'bg-forest-600' },
+                      { href: '/forum/create', label: 'Viết bài', icon: 'ri-chat-3-line', color: 'bg-forest-600' },
                     ].map((item, i) => (
                       <Link
                         key={i}
@@ -539,7 +539,7 @@ function DashboardContent() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Tuyển dụng của tôi ({myJobs.length})</h2>
-                  <Link href="/jobs/create" className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">
+                  <Link href="/jobs/create" className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors text-sm">
                     + Đăng tuyển dụng
                   </Link>
                 </div>
@@ -548,7 +548,7 @@ function DashboardContent() {
                   <div className="bg-white rounded-xl p-12 text-center shadow-sm">
                     <i className="ri-briefcase-line text-5xl text-gray-300 block mb-3"></i>
                     <p className="text-gray-500 mb-4">Bạn chưa có tin tuyển dụng nào</p>
-                    <Link href="/jobs/create" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">
+                    <Link href="/jobs/create" className="bg-forest-600 text-white px-6 py-2 rounded-lg hover:bg-forest-700">
                       Đăng tin ngay
                     </Link>
                   </div>
@@ -556,8 +556,8 @@ function DashboardContent() {
                   <div className="space-y-3">
                     {myJobs.map(job => (
                       <div key={job.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <i className="ri-briefcase-line text-indigo-600 text-xl"></i>
+                        <div className="w-12 h-12 bg-forest-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <i className="ri-briefcase-line text-forest-600 text-xl"></i>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -576,7 +576,7 @@ function DashboardContent() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Link href={`/jobs/${job.id}`} className="p-2 text-gray-500 hover:text-indigo-600 transition-colors">
+                          <Link href={`/jobs/${job.id}`} className="p-2 text-gray-500 hover:text-forest-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
                           <Link href={`/jobs/${job.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
@@ -661,7 +661,7 @@ function DashboardContent() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Bài diễn đàn của tôi ({myForumPosts.length})</h2>
-                  <Link href="/forum/create" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                  <Link href="/forum/create" className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors text-sm">
                     + Viết bài mới
                   </Link>
                 </div>
@@ -669,7 +669,7 @@ function DashboardContent() {
                   <div className="bg-white rounded-xl p-12 text-center shadow-sm">
                     <i className="ri-chat-3-line text-5xl text-gray-300 block mb-3"></i>
                     <p className="text-gray-500 mb-4">Bạn chưa có bài viết nào</p>
-                    <Link href="/forum/create" className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                    <Link href="/forum/create" className="bg-forest-600 text-white px-6 py-2 rounded-lg hover:bg-forest-700">
                       Viết bài ngay
                     </Link>
                   </div>
@@ -677,12 +677,12 @@ function DashboardContent() {
                   <div className="space-y-3">
                     {myForumPosts.map((post: any) => (
                       <div key={post.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-12 h-12 bg-purple-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-12 h-12 bg-forest-100 rounded-lg overflow-hidden flex-shrink-0">
                           {post.images?.[0] ? (
                             <img src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <i className="ri-article-line text-purple-400 text-xl"></i>
+                              <i className="ri-article-line text-forest-400 text-xl"></i>
                             </div>
                           )}
                         </div>
@@ -698,7 +698,7 @@ function DashboardContent() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Link href={`/forum/${post.id}`} className="p-2 text-gray-500 hover:text-purple-600 transition-colors">
+                          <Link href={`/forum/${post.id}`} className="p-2 text-gray-500 hover:text-forest-600 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
                           <Link href={`/forum/${post.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
@@ -804,8 +804,8 @@ function DashboardContent() {
                       const isMessage = notif.type === 'MESSAGE';
                       const icon = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : isMessage ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-green-500';
                       const content = (
-                        <div className={`bg-white rounded-xl p-4 shadow-sm border-l-4 transition-colors ${
-                          notif.isRead ? 'border-gray-200' : 'border-yellow-400'
+                        <div className={`bg-white rounded-xl p-4 shadow-sm border transition-colors ${
+                          notif.isRead ? 'border-line' : 'border-brand-200 bg-brand-50/40'
                         } ${isClickable ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
                           onClick={async () => {
                             if (!notif.isRead) {
@@ -1666,7 +1666,7 @@ function EngagementTab() {
         {[
           { label: 'Tổng lượt xem', value: totalViews.toLocaleString(), icon: 'ri-eye-line', color: 'bg-blue-100 text-blue-600' },
           { label: 'Lượt thích', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-red-100 text-red-500' },
-          { label: 'Bình luận', value: summary.totalForumComments || 0, icon: 'ri-chat-1-line', color: 'bg-purple-100 text-purple-600' },
+          { label: 'Bình luận', value: summary.totalForumComments || 0, icon: 'ri-chat-1-line', color: 'bg-forest-100 text-forest-600' },
           { label: 'View BĐS', value: (summary.totalRealEstateViews || 0).toLocaleString(), icon: 'ri-home-4-line', color: 'bg-green-100 text-green-600' },
         ].map((item, i) => (
           <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
@@ -1767,7 +1767,7 @@ function EngagementTab() {
       {forumPosts.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i className="ri-chat-3-line text-purple-500"></i>
+            <i className="ri-chat-3-line text-forest-500"></i>
             Bài viết diễn đàn
           </h3>
           <div className="space-y-2">

@@ -90,7 +90,7 @@ export default function EditJobPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
@@ -142,14 +142,14 @@ export default function EditJobPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <i className="ri-file-edit-line text-indigo-600"></i>
+            <i className="ri-file-edit-line text-forest-600"></i>
             Thông tin tin đăng
           </h2>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
             <input type="text" name="title" required value={form.title} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -157,19 +157,19 @@ export default function EditJobPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Mức lương</label>
               <input type="text" name="salary" value={form.salary} onChange={handleChange}
                 placeholder="300.000đ/ngày, thỏa thuận..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Địa điểm *</label>
               <input type="text" name="location" required value={form.location} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả công việc *</label>
             <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
               maxLength={2000} />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
           </div>
@@ -177,7 +177,7 @@ export default function EditJobPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Quyền lợi</label>
             <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none" />
           </div>
 
           <div className="flex justify-end pt-4 border-t gap-4">
@@ -186,7 +186,7 @@ export default function EditJobPage() {
               Xem tin
             </Link>
             <button type="submit" disabled={saving}
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium">
+              className="bg-forest-600 text-white px-8 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50 font-medium">
               {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
             </button>
           </div>

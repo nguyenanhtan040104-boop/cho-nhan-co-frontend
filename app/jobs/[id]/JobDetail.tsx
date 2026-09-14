@@ -101,7 +101,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                     </div>
                   )}
                   {job.location && (
-                    <div className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl text-sm font-medium">
+                    <div className="flex items-center gap-1.5 bg-forest-50 text-forest-700 px-3 py-2 rounded-xl text-sm font-medium">
                       <i className="ri-map-pin-2-line"></i>
                       {job.location}
                     </div>
@@ -193,7 +193,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
             <div>
               <div className="bg-white rounded-2xl shadow-md border border-blue-100 sticky top-4 overflow-hidden">
                 {/* Blue top accent */}
-                <div className="h-1.5 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                <div className="h-1.5 bg-gradient-to-r from-blue-500 to-forest-600"></div>
                 <div className="p-5 space-y-4">
                   {/* CTA Buttons */}
                   <div className="space-y-2">
@@ -238,8 +238,8 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                       </div>
                     )}
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i className="ri-briefcase-line text-indigo-600 text-sm"></i>
+                      <div className="w-7 h-7 bg-forest-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i className="ri-briefcase-line text-forest-600 text-sm"></i>
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-400 uppercase">Loại tin</p>

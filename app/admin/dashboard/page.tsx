@@ -335,10 +335,10 @@ export default function AdminDashboard() {
                         {p.isUrgent && <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full flex-shrink-0">Khẩn</span>}
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.location}</p>
-                      {p.salary && <p className="text-sm font-bold text-indigo-600 mt-0.5">{p.salary}</p>}
+                      {p.salary && <p className="text-sm font-bold text-forest-600 mt-0.5">{p.salary}</p>}
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">{p.type === 'EMPLOYER' ? 'Tuyển dụng' : 'Tìm việc'}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-forest-100 text-forest-700">{p.type === 'EMPLOYER' ? 'Tuyển dụng' : 'Tìm việc'}</span>
                       <p className="text-xs text-gray-400 mt-1">{fmtDate(p.createdAt)}</p>
                     </div>
                   </>
@@ -428,7 +428,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
   const cards = [
     { label: 'Tổng sản phẩm', value: stats.totalProducts, icon: 'ri-leaf-line', gradient: 'from-forest-500 to-brand-600', tab: 'products' },
     { label: 'Bất động sản', value: stats.totalRE, icon: 'ri-home-4-line', gradient: 'from-blue-500 to-blue-600', tab: 'real-estate' },
-    { label: 'Tuyển dụng', value: stats.totalJobs, icon: 'ri-briefcase-line', gradient: 'from-violet-500 to-purple-600', tab: 'jobs' },
+    { label: 'Tuyển dụng', value: stats.totalJobs, icon: 'ri-briefcase-line', gradient: 'from-forest-500 to-forest-600', tab: 'jobs' },
     { label: 'Bài diễn đàn', value: stats.totalPosts, icon: 'ri-chat-3-line', gradient: 'from-cyan-500 to-sky-600', tab: 'forum' },
     { label: 'Người dùng', value: stats.totalUsers, icon: 'ri-group-line', gradient: 'from-pink-500 to-rose-600', tab: 'users' },
     { label: 'Mới hôm nay', value: stats.newUsersToday, icon: 'ri-user-add-line', gradient: 'from-teal-500 to-teal-600', tab: 'users' },
@@ -1326,8 +1326,8 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
               <div className="flex items-start gap-3">
                 <input type="checkbox" checked={selected.has(post.id)} onChange={() => toggleSelect(post.id)}
                   className="rounded w-4 h-4 mt-1 cursor-pointer flex-shrink-0" />
-                <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-                  <i className="ri-article-line text-purple-500"></i>
+                <div className="w-9 h-9 rounded-xl bg-forest-50 flex items-center justify-center flex-shrink-0">
+                  <i className="ri-article-line text-forest-500"></i>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-1">
@@ -1617,7 +1617,7 @@ function WalletTab({ txList }: { txList: any[] }) {
         {[
           { label: 'Tổng nạp thành công', value: fmtMoney(revenue), gradient: 'from-forest-500 to-brand-600', icon: 'ri-money-dollar-circle-line' },
           { label: 'Đang chờ xác nhận', value: fmtMoney(pending), gradient: 'from-orange-500 to-amber-600', icon: 'ri-time-line' },
-          { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend), gradient: 'from-violet-500 to-purple-600', icon: 'ri-vip-crown-line' },
+          { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend), gradient: 'from-forest-500 to-forest-600', icon: 'ri-vip-crown-line' },
           { label: 'Tổng giao dịch', value: txList.length, gradient: 'from-blue-500 to-blue-600', icon: 'ri-exchange-line' },
         ].map((c, i) => (
           <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
@@ -1654,7 +1654,7 @@ function WalletTab({ txList }: { txList: any[] }) {
                   <p className="text-gray-400">{tx.user?.email || tx.user?.phone}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full font-semibold ${tx.type === 'top_up' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                  <span className={`px-2 py-0.5 rounded-full font-semibold ${tx.type === 'top_up' ? 'bg-blue-50 text-blue-600' : 'bg-forest-50 text-forest-600'}`}>
                     {typeLabel[tx.type] || tx.type}
                   </span>
                 </td>

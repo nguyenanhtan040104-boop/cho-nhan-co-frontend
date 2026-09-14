@@ -109,7 +109,7 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           {success && <p className="text-xs text-green-600 mt-1">{success}</p>}
           <button type="submit" disabled={submitting}
-            className="mt-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
+            className="mt-2 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
             {submitting ? 'Đang gửi...' : 'Gửi đánh giá'}
           </button>
         </form>

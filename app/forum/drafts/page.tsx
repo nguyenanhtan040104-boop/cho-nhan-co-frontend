@@ -72,7 +72,7 @@ export default function DraftsPage() {
             <p className="text-gray-500 text-sm">{drafts.length} bản nháp</p>
           </div>
           <div className="ml-auto">
-            <Link href="/forum/create" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-sm">
+            <Link href="/forum/create" className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 text-sm">
               + Viết bài mới
             </Link>
           </div>
@@ -82,13 +82,13 @@ export default function DraftsPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         {loading ? (
           <div className="flex justify-center py-16">
-            <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : drafts.length === 0 ? (
           <div className="bg-white rounded-xl p-16 text-center shadow-sm">
             <i className="ri-draft-line text-6xl text-gray-300 block mb-3"></i>
             <p className="text-gray-500 mb-4">Bạn chưa có bản nháp nào</p>
-            <Link href="/forum/create" className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 text-sm">
+            <Link href="/forum/create" className="bg-forest-600 text-white px-6 py-2 rounded-lg hover:bg-forest-700 text-sm">
               Viết bài mới
             </Link>
           </div>
@@ -106,7 +106,7 @@ export default function DraftsPage() {
                           Lên lịch: {new Date(draft.scheduledAt).toLocaleString('vi-VN')}
                         </span>
                       )}
-                      <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-forest-50 text-forest-600 px-2 py-0.5 rounded">
                         {categoryLabel[draft.category] || draft.category}
                       </span>
                     </div>
@@ -123,7 +123,7 @@ export default function DraftsPage() {
                     <button
                       onClick={() => handlePublish(draft.id)}
                       disabled={publishing === draft.id}
-                      className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-xs"
+                      className="px-3 py-1.5 bg-forest-600 text-white rounded-lg hover:bg-forest-700 disabled:opacity-50 text-xs"
                     >
                       {publishing === draft.id ? '...' : 'Đăng ngay'}
                     </button>

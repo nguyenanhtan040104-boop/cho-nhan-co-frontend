@@ -144,12 +144,12 @@ function CreateProductContent() {
   const colorMap: Record<string, string> = {
     green:  'focus:ring-brand-500 focus:border-brand-500',
     amber:  'focus:ring-amber-500 focus:border-amber-500',
-    indigo: 'focus:ring-indigo-500 focus:border-indigo-500',
+    indigo: 'focus:ring-forest-500 focus:border-forest-500',
   };
   const btnMap: Record<string, string> = {
     green:  'bg-brand-500 hover:bg-brand-600',
     amber:  'bg-amber-600 hover:bg-amber-700',
-    indigo: 'bg-indigo-600 hover:bg-indigo-700',
+    indigo: 'bg-forest-600 hover:bg-forest-700',
   };
   const ringClass = colorMap[cfg.color] || colorMap.green;
   const btnClass  = btnMap[cfg.color] || btnMap.green;

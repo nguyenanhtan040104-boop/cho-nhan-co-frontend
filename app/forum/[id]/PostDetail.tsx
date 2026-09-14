@@ -18,7 +18,7 @@ function Avatar({ user, size = 8 }: { user: any; size?: number }) {
   if (user?.avatarUrl)
     return <img src={user.avatarUrl} alt="" className={`${s} rounded-full object-cover flex-shrink-0`} />;
   return (
-    <div className={`${s} bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-purple-700`}>
+    <div className={`${s} bg-forest-100 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-forest-700`}>
       {user?.fullName?.[0] || user?.username?.[0] || 'U'}
     </div>
   );
@@ -196,14 +196,14 @@ export default function PostDetail({ postId }: { postId: string }) {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
   if (error || !post) return (
     <div className="min-h-screen flex items-center justify-center flex-col gap-4">
       <p className="text-gray-500">{error || 'Không tìm thấy bài viết'}</p>
-      <Link href="/forum" className="text-purple-600 underline">Quay lại diễn đàn</Link>
+      <Link href="/forum" className="text-forest-600 underline">Quay lại diễn đàn</Link>
     </div>
   );
 
@@ -222,13 +222,13 @@ export default function PostDetail({ postId }: { postId: string }) {
             <i className="ri-arrow-left-line"></i>
           </Link>
           <div className="text-sm text-gray-500 flex-1">
-            <Link href="/forum" className="hover:text-purple-600">Diễn đàn</Link>
+            <Link href="/forum" className="hover:text-forest-600">Diễn đàn</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 line-clamp-1">{post.title}</span>
           </div>
           {isPostOwner && (
             <Link href={`/forum/${postId}/edit`}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium">
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-forest-600 text-white rounded-lg hover:bg-forest-700 text-sm font-medium">
               <i className="ri-edit-line"></i> Chỉnh sửa
             </Link>
           )}
@@ -251,7 +251,7 @@ export default function PostDetail({ postId }: { postId: string }) {
               <p className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
             </div>
             {post.category && (
-              <span className="ml-auto bg-purple-50 text-purple-600 text-xs px-2 py-1 rounded">{post.category}</span>
+              <span className="ml-auto bg-forest-50 text-forest-600 text-xs px-2 py-1 rounded">{post.category}</span>
             )}
           </div>
 
@@ -299,9 +299,9 @@ export default function PostDetail({ postId }: { postId: string }) {
             <textarea value={comment} onChange={e => setComment(e.target.value)}
               placeholder="Viết bình luận của bạn..."
               rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 resize-none mb-2" />
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-forest-500 resize-none mb-2" />
             <button type="submit" disabled={submitting || !comment.trim()}
-              className="bg-purple-600 text-white px-5 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm">
+              className="bg-forest-600 text-white px-5 py-2 rounded-lg hover:bg-forest-700 disabled:opacity-50 text-sm">
               {submitting ? 'Đang gửi...' : 'Gửi bình luận'}
             </button>
           </form>
@@ -334,10 +334,10 @@ export default function PostDetail({ postId }: { postId: string }) {
                           <div className="mt-1">
                             <textarea value={editingContent} onChange={e => setEditingContent(e.target.value)}
                               rows={2}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 resize-none" />
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-forest-500 resize-none" />
                             <div className="flex gap-2 mt-1">
                               <button onClick={() => handleUpdateComment(c.id)}
-                                className="text-xs bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700">Lưu</button>
+                                className="text-xs bg-forest-600 text-white px-3 py-1 rounded hover:bg-forest-700">Lưu</button>
                               <button onClick={() => setEditingCommentId(null)}
                                 className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Hủy</button>
                             </div>
@@ -364,13 +364,13 @@ export default function PostDetail({ postId }: { postId: string }) {
                               if (replyingTo?.id === c.id) { setReplyingTo(null); setReplyText(''); }
                               else { setReplyingTo({ id: c.id, name: c.user?.fullName || c.user?.username || 'người dùng' }); setReplyText(''); }
                             }}
-                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-purple-600 transition-colors">
+                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-forest-600 transition-colors">
                             <i className="ri-reply-line"></i> Trả lời
                           </button>
 
                           {isCommentOwner && (
                             <button onClick={() => { setEditingCommentId(c.id); setEditingContent(c.content); }}
-                              className="flex items-center gap-1 text-xs text-gray-400 hover:text-purple-600 transition-colors">
+                              className="flex items-center gap-1 text-xs text-gray-400 hover:text-forest-600 transition-colors">
                               <i className="ri-edit-line"></i> Sửa
                             </button>
                           )}
@@ -400,11 +400,11 @@ export default function PostDetail({ postId }: { postId: string }) {
                               placeholder={`Trả lời ${replyingTo.name}...`}
                               rows={2}
                               autoFocus
-                              className="w-full px-3 py-2 border border-purple-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 resize-none"
+                              className="w-full px-3 py-2 border border-forest-300 rounded-lg text-sm focus:ring-2 focus:ring-forest-500 resize-none"
                             />
                             <div className="flex gap-2 mt-1">
                               <button type="submit" disabled={replySubmitting || !replyText.trim()}
-                                className="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 disabled:opacity-50">
+                                className="text-xs bg-forest-600 text-white px-3 py-1.5 rounded-lg hover:bg-forest-700 disabled:opacity-50">
                                 {replySubmitting ? 'Đang gửi...' : 'Gửi'}
                               </button>
                               <button type="button" onClick={() => { setReplyingTo(null); setReplyText(''); }}
@@ -418,7 +418,7 @@ export default function PostDetail({ postId }: { postId: string }) {
 
                       {/* Replies */}
                       {c.replies?.length > 0 && (
-                        <div className="mt-2 space-y-2 pl-4 border-l-2 border-purple-100">
+                        <div className="mt-2 space-y-2 pl-4 border-l-2 border-forest-100">
                           {c.replies.map((r: any) => {
                             const isReplyOwner = currentUserId && r.user?.id === currentUserId;
                             const isEditingReply = editingCommentId === r.id;
@@ -428,7 +428,7 @@ export default function PostDetail({ postId }: { postId: string }) {
                               <div key={r.id} className="flex gap-2">
                                 <Avatar user={r.user} size={7} />
                                 <div className="flex-1 min-w-0">
-                                  <div className="bg-purple-50 rounded-xl px-3 py-2">
+                                  <div className="bg-forest-50 rounded-xl px-3 py-2">
                                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                                       <span className="text-xs font-semibold text-gray-900">{r.user?.fullName || r.user?.username}</span>
                                       <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
@@ -438,10 +438,10 @@ export default function PostDetail({ postId }: { postId: string }) {
                                       <div>
                                         <textarea value={editingContent} onChange={e => setEditingContent(e.target.value)}
                                           rows={2}
-                                          className="w-full px-2 py-1 border border-gray-300 rounded-lg text-xs focus:ring-1 focus:ring-purple-500 resize-none" />
+                                          className="w-full px-2 py-1 border border-gray-300 rounded-lg text-xs focus:ring-1 focus:ring-forest-500 resize-none" />
                                         <div className="flex gap-2 mt-1">
                                           <button onClick={() => handleUpdateComment(r.id, c.id)}
-                                            className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded hover:bg-purple-700">Lưu</button>
+                                            className="text-xs bg-forest-600 text-white px-2 py-0.5 rounded hover:bg-forest-700">Lưu</button>
                                           <button onClick={() => setEditingCommentId(null)}
                                             className="text-xs border border-gray-300 px-2 py-0.5 rounded">Hủy</button>
                                         </div>
@@ -462,7 +462,7 @@ export default function PostDetail({ postId }: { postId: string }) {
 
                                       {isReplyOwner && (
                                         <button onClick={() => { setEditingCommentId(r.id); setEditingContent(r.content); }}
-                                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-purple-600 transition-colors">
+                                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-forest-600 transition-colors">
                                           <i className="ri-edit-line"></i> Sửa
                                         </button>
                                       )}
