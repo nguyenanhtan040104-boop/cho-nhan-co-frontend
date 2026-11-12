@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
 function urlBase64ToUint8Array(base64String: string) {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
 
-const WS_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api').replace('/api', '');
+const WS_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api').replace('/api', '');
 
 const navLinks = [
   { href: '/', label: 'Chợ NC' },
@@ -167,7 +167,7 @@ function smartSearch(q: string): string {
   return `/products?search=${encodeURIComponent(q)}`;
 }
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
 
 function timeAgoHeader(d: string) {
   const diff = Date.now() - new Date(d).getTime();

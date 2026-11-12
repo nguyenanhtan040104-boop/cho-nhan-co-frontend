@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import JobDetail from './JobDetail';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
 
 async function getJob(id: string) {
   try {

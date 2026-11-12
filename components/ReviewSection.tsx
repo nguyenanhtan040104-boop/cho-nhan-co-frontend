@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import { auth, reviews as reviewsApi } from '../lib/api';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
 
 function timeAgo(d: string) {
   const diff = Date.now() - new Date(d).getTime();

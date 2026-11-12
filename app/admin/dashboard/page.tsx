@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { auth, users, forum, wallet } from '../../../lib/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
 
 function getToken() {
   if (typeof window === 'undefined') return null;

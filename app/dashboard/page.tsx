@@ -1608,7 +1608,7 @@ function EngagementTab() {
       if (ids.length > 0) {
         Promise.all(
           ids.slice(0, 12).map(id =>
-            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.chonhanco.com/api'}/products/${id}`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api'}/products/${id}`)
               .then(r => r.ok ? r.json() : null).catch(() => null)
           )
         ).then(results => setLikedProducts(results.filter(Boolean)));
