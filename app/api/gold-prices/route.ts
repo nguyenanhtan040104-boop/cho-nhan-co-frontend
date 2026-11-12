@@ -82,7 +82,11 @@ async function fetchWebGia() {
       rows.push({ system: system.trim(), buy, sell });
     }
 
-    return rows.length > 0 ? { rows, worldPrice, worldChange, isLive: true } : null;
+    // "Cập nhật lúc 22:00:22 12/11/2026" is the first timestamp on the page (gold table)
+    const um = html.replace(/<[^>]+>/g, ' ').match(/Cập nhật lúc\s+(\d{2}):(\d{2}):\d{2}\s+(\d{2}\/\d{2}\/\d{4})/);
+    const sourceUpdatedAt = um ? `${um[1]}:${um[2]} ${um[3]}` : null;
+
+    return rows.length > 0 ? { rows, worldPrice, worldChange, sourceUpdatedAt, isLive: true } : null;
   } catch {
     return null;
   }
@@ -164,6 +168,7 @@ export async function GET() {
   return NextResponse.json({
     source: data[0]?.source ?? 'unavailable',
     updatedAt: now.toISOString(),
+    sourceUpdatedAt: webGia?.sourceUpdatedAt ?? null,
     worldPrice: webGia?.worldPrice ?? null,
     worldChange: webGia?.worldChange ?? null,
     data,

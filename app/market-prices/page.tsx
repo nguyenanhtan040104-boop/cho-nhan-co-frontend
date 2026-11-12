@@ -192,7 +192,7 @@ export default function MarketPricesPage() {
                 <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
                 <p className="text-xs text-gray-500">
                   {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? 'Dữ liệu thực' : 'Dữ liệu tham khảo'}
-                  {goldUpdatedAt && ` · ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                  {goldData?.sourceUpdatedAt ? ` · Cập nhật ${goldData.sourceUpdatedAt}` : (goldUpdatedAt && ` · ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`)}
                 </p>
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function MarketPricesPage() {
                 <table className="w-full">
                   <thead className="bg-yellow-50 border-b border-yellow-100">
                     <tr>
-                      <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thương hiệu</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Hệ thống bán vàng miếng SJC</th>
                       <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Mua vào</th>
                       <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Bán ra</th>
                       <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
@@ -258,7 +258,7 @@ export default function MarketPricesPage() {
               </div>
             </>
           )}
-          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: webgia.com · sjc.com.vn · 1 lượng = 10 chỉ = 37.5g · Chỉ mang tính tham khảo</p>
+          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: webgia.com · Giá vàng miếng SJC tại TP.HCM, vàng nhẫn và trang sức có giá riêng · 1 lượng = 10 chỉ = 37,5g · Chỉ mang tính tham khảo</p>
         </div>
 
       </div>
