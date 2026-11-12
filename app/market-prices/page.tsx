@@ -13,6 +13,7 @@ export default function MarketPricesPage() {
   const [agriLoading, setAgriLoading] = useState(true);
   const [agriUpdatedAt, setAgriUpdatedAt] = useState('');
   const [agriDateLabel, setAgriDateLabel] = useState('');
+  const [agriPriceDate, setAgriPriceDate] = useState('');
   const [openCat, setOpenCat] = useState<string>('');
   const [openProvince, setOpenProvince] = useState<string>('dakLak');
 
@@ -24,7 +25,7 @@ export default function MarketPricesPage() {
     fetch('/api/agri-prices').then(r => r.json()).then(d => {
       setAgriCategories(d.categories || []);
       setAgriUpdatedAt(d.updatedAt || '');
-      setAgriDateLabel(d.dateLabel || '');
+      setAgriDateLabel(d.dateLabel || ''); setAgriPriceDate(d.priceDate || '');
       if (d.categories?.length > 0) setOpenCat(d.categories[0].category);
     }).catch(() => {}).finally(() => setAgriLoading(false));
   }, []);
@@ -41,7 +42,7 @@ export default function MarketPricesPage() {
     fetch('/api/agri-prices').then(r => r.json()).then(d => {
       setAgriCategories(d.categories || []);
       setAgriUpdatedAt(d.updatedAt || '');
-      setAgriDateLabel(d.dateLabel || '');
+      setAgriDateLabel(d.dateLabel || ''); setAgriPriceDate(d.priceDate || '');
     }).finally(() => setAgriLoading(false));
   }
 
@@ -68,7 +69,7 @@ export default function MarketPricesPage() {
             <div>
               <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Hàng Hóa Hôm Nay</h2>
               <p className="text-xs text-gray-500">
-                {agriDateLabel}
+                {agriDateLabel}{agriPriceDate && ` · Giá ngày ${agriPriceDate}`}
                 {agriUpdatedAt && ` · ${new Date(agriUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
               </p>
             </div>
@@ -95,8 +96,8 @@ export default function MarketPricesPage() {
               {/* Nội dung theo danh mục */}
               {currentCat && (
                 <div>
-                  <div className="px-5 py-2.5 bg-gray-50 border-b flex items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-700">{currentCat.category}</span>
+                  <div className="px-5 py-2.5 bg-gray-50 border-b flex flex-wrap items-center gap-2 text-sm">
+                    <span className="font-medium text-gray-700">{currentCat.category}</span>{currentCat.note && <span className="w-full text-xs text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg">{currentCat.note}</span>}
                     <span className={`text-xs px-2 py-0.5 rounded-full ${currentCat.isLive ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
                       {currentCat.source}
                     </span>
@@ -148,13 +149,13 @@ export default function MarketPricesPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                          {currentCat.items?.map((item: any, i: number) => {
+                          {(!currentCat.items || currentCat.items.length === 0) && (<tr><td colSpan={4} className="px-5 py-6 text-center text-sm text-gray-400">Chưa lấy được giá từ nguồn này, thử làm mới sau ít phút.</td></tr>)}{currentCat.items?.map((item: any, i: number) => {
                             const ch = item.change;
                             return (
                               <tr key={i} className="hover:bg-green-50/30 transition-colors">
                                 <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
                                 <td className="px-5 py-3 text-right">
-                                  <span className="font-bold text-green-600">{item.price.toLocaleString('vi-VN')}đ</span>
+                                  <span className="font-bold text-green-600">{item.price.toLocaleString('vi-VN')}{item.priceMax ? ` – ${item.priceMax.toLocaleString('vi-VN')}` : ''}đ</span>
                                   <span className="text-xs text-gray-400">/{item.unit}</span>
                                 </td>
                                 <td className="px-5 py-3 text-right text-sm font-medium">
@@ -176,7 +177,7 @@ export default function MarketPricesPage() {
           )}
 
           <p className="text-xs text-gray-400 px-5 py-3 border-t text-center">
-            Nguồn: giacafe.vn · banggianongsan.com · Vietcombank · Chỉ mang tính tham khảo
+            Nguồn: giacafe.vn · banggianongsan.com · webgia.com · Chỉ mang tính tham khảo
           </p>
         </div>
 

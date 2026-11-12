@@ -43,7 +43,7 @@ function fmt(n: number) {
 }
 
 export default function MarketPriceWidget() {
-  const [data, setData] = useState<Record<string, { price: number; change: number | null }>>({});
+  const [data, setData] = useState<Record<string, { price: number; change: number | null; unit?: string }>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function MarketPriceWidget() {
       .then(r => r.json())
       .then(d => {
         const cats: any[] = d.categories || [];
-        const map: Record<string, { price: number; change: number | null }> = {};
+        const map: Record<string, { price: number; change: number | null; unit?: string }> = {};
 
         for (const item of ITEMS) {
           const cat = cats.find((c: any) =>
@@ -60,7 +60,7 @@ export default function MarketPriceWidget() {
           if (!cat) continue;
           const row = cat.items?.[item.itemIdx];
           if (row?.price) {
-            map[item.key] = { price: row.price, change: row.change ?? null };
+            map[item.key] = { price: row.price, change: row.change ?? null, unit: row.unit ? `đ/${row.unit}` : undefined };
           }
         }
         setData(map);
@@ -100,7 +100,7 @@ export default function MarketPriceWidget() {
                   <>
                     <p className="font-bold text-gray-900 text-sm leading-tight">
                       {fmt(row.price)}
-                      <span className="text-[11px] font-normal text-gray-400 ml-0.5">{item.unit}</span>
+                      <span className="text-[11px] font-normal text-gray-400 ml-0.5">{row.unit ?? item.unit}</span>
                     </p>
                     {row.change != null && row.change !== 0 && (
                       <p className={`text-[11px] font-semibold ${isUp ? 'text-red-500' : 'text-green-600'}`}>

@@ -43,6 +43,7 @@ async function fetchWebGia() {
 
     type GoldRow = { system: string; buy: number; sell: number };
     const rows: GoldRow[] = [];
+    let worldPrice: number | null = null, worldChange: number | null = null;
 
     const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
     let m;
@@ -50,6 +51,18 @@ async function fetchWebGia() {
       const cells = [...m[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)]
         .map(c => c[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
       if (cells.length < 3) continue;
+
+      // World gold row looks like: "$3,895.27 | -97.5 | -2.44%"
+      const wm = cells[0].match(/^\$\s*([\d,]+(?:\.\d+)?)$/);
+      if (wm && /^[+\-]?\d/.test(cells[1] || '') && worldPrice === null) {
+        const wp = parseFloat(wm[1].replace(/,/g, ''));
+        if (wp > 1000 && wp < 20000) {
+          worldPrice = wp;
+          worldChange = parseFloat((cells[1] || '').replace(/,/g, ''));
+          if (isNaN(worldChange)) worldChange = null;
+        }
+        continue;
+      }
 
       // Tìm row có giá mua/bán hợp lệ
       // Thử các vị trí khác nhau vì có thể có cột khu vực
@@ -67,16 +80,6 @@ async function fetchWebGia() {
       if (!buy || !sell || !system) continue;
       if (rows.find(r => r.system === system)) continue; // bỏ duplicate
       rows.push({ system: system.trim(), buy, sell });
-    }
-
-    // Giá thế giới (USD/oz)
-    const worldMatch = html.match(/\$?\s*([\d,\.]+)\s*(?:USD)?[^%\d]*?([+-][\d,\.]+)\s*([+-][\d,\.]+%)/i)
-      || html.match(/([\d,]{5,}(?:\.\d+)?)\s*([+-][\d\.]+)\s*([+-][\d\.]+%)/);
-    let worldPrice: number | null = null, worldChange: number | null = null;
-    if (worldMatch) {
-      worldPrice = parseFloat(worldMatch[1].replace(/,/g, ''));
-      worldChange = parseFloat(worldMatch[2].replace(/,/g, ''));
-      if (worldPrice < 1000 || worldPrice > 10000) { worldPrice = null; worldChange = null; }
     }
 
     return rows.length > 0 ? { rows, worldPrice, worldChange, isLive: true } : null;
@@ -155,23 +158,11 @@ export async function GET() {
       change: trackChange(item.name + '_sell', item.sell),
       source: 'sjc.com.vn',
     }));
-  } else {
-    // Fallback cứng
-    const fallback = [
-      { name: 'Vàng SJC 1L, 10L, 1KG',           buy: 1195000000, sell: 1215000000 },
-      { name: 'Vàng nhẫn SJC 99,99 (1-2-5 chỉ)', buy: 1185000000, sell: 1195000000 },
-    ];
-    data = fallback.map(item => ({
-      ...item,
-      buyPerChi:  Math.round(item.buy  / 10),
-      sellPerChi: Math.round(item.sell / 10),
-      change: trackChange(item.name + '_sell', item.sell),
-      source: 'fallback',
-    }));
   }
+  // Nếu cả hai nguồn đều lỗi thì trả danh sách rỗng, không bịa giá.
 
   return NextResponse.json({
-    source: data[0]?.source ?? 'fallback',
+    source: data[0]?.source ?? 'unavailable',
     updatedAt: now.toISOString(),
     worldPrice: webGia?.worldPrice ?? null,
     worldChange: webGia?.worldChange ?? null,
