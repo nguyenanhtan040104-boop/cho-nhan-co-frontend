@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { jsonLd } from '../../../lib/jsonld';
 import JobDetail from './JobDetail';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
@@ -41,7 +42,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: jsonLd({
               '@context': 'https://schema.org',
               '@type': 'JobPosting',
               title: job.title,

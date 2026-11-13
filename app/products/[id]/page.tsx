@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { jsonLd } from '../../../lib/jsonld';
 import ProductDetail from './ProductDetail';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
@@ -49,7 +50,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: jsonLd({
               '@context': 'https://schema.org',
               '@type': 'Product',
               name: product.title,

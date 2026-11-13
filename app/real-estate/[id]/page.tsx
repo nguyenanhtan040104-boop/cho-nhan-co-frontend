@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { jsonLd } from '../../../lib/jsonld';
 import RealEstateDetail from './RealEstateDetail';
 import { shortMoney } from '../../../lib/format';
 
@@ -37,7 +38,7 @@ export default async function RealEstateDetailPage({ params }: { params: Promise
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: jsonLd({
               '@context': 'https://schema.org',
               '@type': 'Product',
               name: item.title,

@@ -165,11 +165,13 @@ export default function AdminDashboard() {
       pendingCount: pending.length, revenue, newUsersToday, failedToday,
     });
 
+    // Plain fields, rendered as text. User-supplied titles and names must never be
+    // turned into HTML here (that would let a listing title run script in the admin's browser).
     const activity = [
-      ...products.slice(0, 5).map((p: any) => ({ icon: 'ri-leaf-line', color: '#2d6a4f', text: `<b>${p.user?.fullName || 'Ai đó'}</b> đăng sản phẩm <i>${p.title}</i>`, time: p.createdAt })),
-      ...jobs.slice(0, 3).map((p: any) => ({ icon: 'ri-briefcase-line', color: '#7c3aed', text: `<b>${p.user?.fullName || 'Ai đó'}</b> đăng tuyển dụng <i>${p.title}</i>`, time: p.createdAt })),
-      ...fp.slice(0, 3).map((p: any) => ({ icon: 'ri-chat-3-line', color: '#0891b2', text: `<b>${p.isAnonymous ? 'Ẩn danh' : (p.user?.fullName || 'Ai đó')}</b> đăng diễn đàn <i>${p.title}</i>`, time: p.createdAt })),
-      ...re.slice(0, 3).map((p: any) => ({ icon: 'ri-home-4-line', color: '#1d4ed8', text: `<b>${p.user?.fullName || 'Ai đó'}</b> đăng BĐS <i>${p.title}</i>`, time: p.createdAt })),
+      ...products.slice(0, 5).map((p: any) => ({ who: p.user?.fullName || 'Ai đó', verb: 'đăng sản phẩm', title: p.title, time: p.createdAt })),
+      ...jobs.slice(0, 3).map((p: any) => ({ who: p.user?.fullName || 'Ai đó', verb: 'đăng tuyển dụng', title: p.title, time: p.createdAt })),
+      ...fp.slice(0, 3).map((p: any) => ({ who: p.isAnonymous ? 'Ẩn danh' : (p.user?.fullName || 'Ai đó'), verb: 'đăng diễn đàn', title: p.title, time: p.createdAt })),
+      ...re.slice(0, 3).map((p: any) => ({ who: p.user?.fullName || 'Ai đó', verb: 'đăng nhà đất', title: p.title, time: p.createdAt })),
     ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 15);
     setRecentActivity(activity);
   }
@@ -504,11 +506,8 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
           <div className="divide-y divide-gray-50 max-h-72 overflow-y-auto">
             {recentActivity.slice(0, 8).map((a: any, i: number) => (
               <div key={i} className="flex items-start gap-3 px-5 py-3 hover:bg-gray-50/50">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: a.color + '18' }}>
-                  <i className={`${a.icon} text-xs`} style={{ color: a.color }}></i>
-                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-700 line-clamp-1" dangerouslySetInnerHTML={{ __html: a.text }} />
+                  <p className="text-xs text-gray-700 line-clamp-1"><b>{a.who}</b> {a.verb} <i>{a.title}</i></p>
                   <p className="text-[10px] text-gray-400 mt-0.5">{timeAgo(a.time)}</p>
                 </div>
               </div>
@@ -1705,11 +1704,8 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
             <div className="divide-y divide-gray-50">
               {activity.map((a, i) => (
                 <div key={i} className="flex items-start gap-4 px-5 py-3.5 hover:bg-gray-50/50 transition-colors">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: a.color + '15' }}>
-                    <i className={`${a.icon} text-sm`} style={{ color: a.color }}></i>
-                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-700" dangerouslySetInnerHTML={{ __html: a.text }} />
+                    <p className="text-xs text-gray-700"><b>{a.who}</b> {a.verb} <i>{a.title}</i></p>
                     <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
                       <i className="ri-time-line"></i>{timeAgo(a.time)}
                     </p>
