@@ -6,11 +6,16 @@ import Link from 'next/link';
 import { jobs } from '../../../../lib/api';
 import { Field, FormError, FormShell, Row } from '../../../components/form/Kit';
 
+const categoryOptions = ['Nông nghiệp', 'Chăn nuôi', 'Xây dựng', 'Vận tải', 'Buôn bán', 'Giáo dục', 'Y tế', 'Khác'];
+
 export default function EditJobPage() {
   const { id } = useParams<{ id: string }>();
 
-  // The API only lets an owner change these fields after posting
-  const [form, setForm] = useState({ title: '', description: '', salary: '', location: '', isUrgent: false });
+  const [type, setType] = useState('EMPLOYER');
+  const [form, setForm] = useState({
+    title: '', description: '', category: '', salary: '', location: '',
+    experience: '', benefits: '', deadline: '', isUrgent: false,
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -19,11 +24,16 @@ export default function EditJobPage() {
   useEffect(() => {
     jobs.getOne(id)
       .then((data: any) => {
+        setType(data.type || 'EMPLOYER');
         setForm({
           title: data.title || '',
           description: data.description || '',
+          category: data.category || '',
           salary: data.salary || '',
           location: data.location || '',
+          experience: data.experience || '',
+          benefits: data.benefits || '',
+          deadline: data.deadline ? new Date(data.deadline).toISOString().split('T')[0] : '',
           isUrgent: data.isUrgent || false,
         });
       })
@@ -31,7 +41,9 @@ export default function EditJobPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const isEmployer = type === 'EMPLOYER';
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000); };
@@ -43,8 +55,12 @@ export default function EditJobPage() {
       await jobs.update(id, {
         title: form.title,
         description: form.description,
+        category: form.category || undefined,
         salary: form.salary || undefined,
         location: form.location,
+        experience: form.experience || undefined,
+        benefits: form.benefits || undefined,
+        deadline: form.deadline || undefined,
         isUrgent: form.isUrgent,
       });
       flash('Đã lưu thay đổi');
@@ -78,15 +94,17 @@ export default function EditJobPage() {
         <FormError message={error} />
         {success && <p role="status" className="flex items-center gap-2 rounded-lg border border-forest-200 bg-forest-50 p-3 text-sm text-forest-800"><i className="ri-check-line" aria-hidden="true" />{success}</p>}
 
-        <section className="card flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
-          <div>
-            <h2 className="text-[15px] font-bold text-ink">Tuyển gấp</h2>
-            <p className="text-sm text-ink-soft">{form.isUrgent ? 'Tin đang được đánh dấu gấp và ưu tiên hiển thị.' : 'Tin chưa được đánh dấu gấp.'}</p>
-          </div>
-          {form.isUrgent
-            ? <span className="rounded bg-brand-500 px-2.5 py-1 text-xs font-bold text-white">Gấp</span>
-            : <button type="button" onClick={handleMarkUrgent} disabled={saving} className="btn-ghost disabled:opacity-50">Đánh dấu tuyển gấp</button>}
-        </section>
+        {isEmployer && (
+          <section className="card flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
+            <div>
+              <h2 className="text-[15px] font-bold text-ink">Tuyển gấp</h2>
+              <p className="text-sm text-ink-soft">{form.isUrgent ? 'Tin đang được đánh dấu gấp và ưu tiên hiển thị.' : 'Tin chưa được đánh dấu gấp.'}</p>
+            </div>
+            {form.isUrgent
+              ? <span className="rounded bg-brand-500 px-2.5 py-1 text-xs font-bold text-white">Gấp</span>
+              : <button type="button" onClick={handleMarkUrgent} disabled={saving} className="btn-ghost disabled:opacity-50">Đánh dấu tuyển gấp</button>}
+          </section>
+        )}
 
         <form onSubmit={handleSubmit} className="card space-y-5 p-4 sm:p-6">
           <h2 className="text-lg font-bold text-ink">Thông tin tin đăng</h2>
@@ -94,18 +112,44 @@ export default function EditJobPage() {
           <Field label="Tiêu đề" required>
             <input type="text" name="title" required value={form.title} onChange={handleChange} className="field" />
           </Field>
+
           <Row>
-            <Field label="Mức lương">
-              <input type="text" name="salary" value={form.salary} onChange={handleChange} placeholder="300.000đ/ngày, thỏa thuận" className="field" />
+            <Field label="Ngành nghề">
+              <select name="category" value={form.category} onChange={handleChange} className="field">
+                <option value="">Chọn ngành nghề</option>
+                {[...new Set([...(form.category && !categoryOptions.includes(form.category) ? [form.category] : []), ...categoryOptions])].map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
             </Field>
             <Field label="Địa điểm" required>
               <input type="text" name="location" required value={form.location} onChange={handleChange} className="field" />
             </Field>
           </Row>
-          <Field label="Mô tả" required>
+
+          <Row>
+            <Field label={isEmployer ? 'Mức lương' : 'Mức lương mong muốn'}>
+              <input type="text" name="salary" value={form.salary} onChange={handleChange} placeholder="300.000đ/ngày, thỏa thuận" className="field" />
+            </Field>
+            <Field label={isEmployer ? 'Kinh nghiệm yêu cầu' : 'Kinh nghiệm của bạn'}>
+              <input type="text" name="experience" value={form.experience} onChange={handleChange} className="field" />
+            </Field>
+          </Row>
+
+          {isEmployer && (
+            <Field label="Hạn nộp hồ sơ">
+              <input type="date" name="deadline" value={form.deadline} onChange={handleChange} className="field" />
+            </Field>
+          )}
+
+          <Field label={isEmployer ? 'Mô tả công việc' : 'Giới thiệu bản thân'} required>
             <textarea name="description" required rows={5} maxLength={2000} value={form.description} onChange={handleChange} className="field resize-none" />
             <span className="mt-1 block text-right text-xs text-ink-faint">{form.description.length}/2000</span>
           </Field>
+
+          {isEmployer && (
+            <Field label="Quyền lợi">
+              <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange} placeholder="Ăn ở, xe đưa đón, bảo hiểm..." className="field resize-none" />
+            </Field>
+          )}
 
           <div className="flex justify-end gap-3">
             <Link href={`/jobs/${id}`} className="btn-ghost">Xem tin</Link>
