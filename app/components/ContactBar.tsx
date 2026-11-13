@@ -1,7 +1,7 @@
 'use client';
 
 // One-tap contact for a listing: call, Zalo, or chat. Sits above the phone tab bar.
-function digits(phone: string) {
+export function digits(phone: string) {
   const d = phone.replace(/\D/g, '');
   return d.startsWith('84') ? '0' + d.slice(2) : d;
 }

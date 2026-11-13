@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import ProductDetail from './ProductDetail';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cho-nhan-co-frontend-txj2.vercel.app';
 
 async function getProduct(id: string) {
   try {
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       type: 'article',
     },
     alternates: {
-      canonical: `https://cho-nhan-co-frontend-bxj2-18271g0zq.vercel.app/products/${id}`,
+      canonical: `${SITE_URL}/products/${id}`,
     },
   };
 }
@@ -69,7 +70,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           }}
         />
       )}
-      <ProductDetail productId={id} />
+      <ProductDetail productId={id} initialProduct={product} />
     </>
   );
 }

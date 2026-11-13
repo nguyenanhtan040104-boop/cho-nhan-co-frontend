@@ -3,90 +3,102 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import MessengerModal from '../../../components/MessengerModal';
 import { products as productsApi, messages as messagesApi, auth, wallet as walletApi } from '../../../lib/api';
 import CommentSection from '../../../components/CommentSection';
 import ReviewSection from '../../../components/ReviewSection';
-import ShareButton from '../../../components/ShareButton';
-import ContactBar from '../../components/ContactBar';
+import ContactBar, { digits } from '../../components/ContactBar';
+import ListingCard from '../../components/ListingCard';
+import { timeAgo } from '../../../lib/format';
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
+
+const CATEGORY_META: Record<string, { label: string; icon: string; listHref: string }> = {
+  NONG_SAN: { label: 'Nông sản', icon: 'ri-plant-line', listHref: '/products?category=NONG_SAN' },
+  VAT_NUOI: { label: 'Vật nuôi', icon: 'ri-bear-smile-line', listHref: '/vat-nuoi' },
+  DICH_VU: { label: 'Dịch vụ', icon: 'ri-tools-line', listHref: '/dich-vu' },
+  DO_DUNG_GIA_DINH: { label: 'Đồ dùng gia đình', icon: 'ri-home-gear-line', listHref: '/products?category=DO_DUNG_GIA_DINH' },
+  HANG_TIEU_DUNG: { label: 'Hàng tiêu dùng', icon: 'ri-shopping-bag-line', listHref: '/products?category=HANG_TIEU_DUNG' },
+};
+const DEFAULT_META = { label: 'Sản phẩm', icon: 'ri-leaf-line', listHref: '/products' };
+
+const money = (n: number) => `${Number(n || 0).toLocaleString('vi-VN')}đ`;
+const imgUrl = (i: any): string => (i && (i.url || i)) || '';
 
 interface ProductDetailProps {
   productId: string;
+  initialProduct?: any;
 }
 
-const CATEGORY_THEME: Record<string, { accent: string; bg: string; bgHover: string; border: string; bgLight: string; badge: string; icon: string; label: string; ctaLabel: string; ctaIcon: string }> = {
-  NONG_SAN:   { accent: 'text-forest-600',  bg: 'bg-brand-500',  bgHover: 'hover:bg-brand-600',  border: 'border-forest-200', bgLight: 'bg-forest-50',  badge: 'bg-forest-100 text-forest-700',  icon: 'ri-plant-line',        label: 'Nông sản',  ctaLabel: 'Liên hệ đặt hàng', ctaIcon: 'ri-shopping-basket-line' },
-  VAT_NUOI:   { accent: 'text-gold-600',  bg: 'bg-gold-500',  bgHover: 'hover:bg-gold-600',  border: 'border-gold-200', bgLight: 'bg-gold-50',  badge: 'bg-gold-100 text-gold-700',  icon: 'ri-bear-smile-line',   label: 'Vật nuôi', ctaLabel: 'Liên hệ xem thú',  ctaIcon: 'ri-paw-print-line' },
-  DICH_VU:    { accent: 'text-forest-600', bg: 'bg-forest-600', bgHover: 'hover:bg-forest-700', border: 'border-forest-200', bgLight: 'bg-forest-50', badge: 'bg-forest-100 text-forest-700',icon: 'ri-service-line',      label: 'Dịch vụ',  ctaLabel: 'Yêu cầu dịch vụ', ctaIcon: 'ri-customer-service-2-line' },
-  DO_DUNG_GIA_DINH: { accent: 'text-blue-600', bg: 'bg-blue-600', bgHover: 'hover:bg-blue-700', border: 'border-blue-200', bgLight: 'bg-blue-50', badge: 'bg-blue-100 text-blue-700', icon: 'ri-home-gear-line',    label: 'Đồ dùng',  ctaLabel: 'Liên hệ người bán', ctaIcon: 'ri-message-line' },
-  HANG_TIEU_DUNG: { accent: 'text-teal-600', bg: 'bg-teal-600', bgHover: 'hover:bg-teal-700', border: 'border-teal-200', bgLight: 'bg-teal-50', badge: 'bg-teal-100 text-teal-700',  icon: 'ri-shopping-bag-line', label: 'Hàng tiêu dùng', ctaLabel: 'Liên hệ người bán', ctaIcon: 'ri-message-line' },
-};
-const DEFAULT_THEME = { accent: 'text-forest-600', bg: 'bg-brand-500', bgHover: 'hover:bg-brand-600', border: 'border-forest-200', bgLight: 'bg-forest-50', badge: 'bg-forest-100 text-forest-700', icon: 'ri-leaf-line', label: 'Sản phẩm', ctaLabel: 'Liên hệ mua hàng', ctaIcon: 'ri-message-line' };
-
-export default function ProductDetail({ productId }: ProductDetailProps) {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+export default function ProductDetail({ productId, initialProduct }: ProductDetailProps) {
+  const router = useRouter();
+  const [product, setProduct] = useState<any>(initialProduct || null);
+  const [loading, setLoading] = useState(!initialProduct);
+  const [selected, setSelected] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [quantity, setQuantity] = useState(1);
-  const [showContactModal, setShowContactModal] = useState(false);
-  const [showMessengerModal, setShowMessengerModal] = useState(false);
-  const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(initialProduct?.likeCount || 0);
   const [deleting, setDeleting] = useState(false);
   const [buyingVip, setBuyingVip] = useState(false);
-  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
-  const [likedIds, setLikedIds] = useState<string[]>([]);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
-  const router = useRouter();
+  const [more, setMore] = useState<any[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [toast, setToast] = useState('');
+
+  function notify(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  }
 
   useEffect(() => {
-    async function loadProduct() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
-        const data = await res.json();
-        setProduct(data);
-        setLikeCount(data.likeCount || 0);
-        // Load related products
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}/related`)
-          .then(r => r.json())
-          .then(data => setRelatedProducts(Array.isArray(data) ? data : []))
-          .catch(() => {});
-      } catch (e) {
-        console.error('Lỗi tải sản phẩm:', e);
-      } finally {
-        setLoading(false);
-      }
+    if (initialProduct) {
+      setLikeCount(initialProduct.likeCount || 0);
+    } else {
+      fetch(`${API}/products/${productId}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => { setProduct(data); setLikeCount(data?.likeCount || 0); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
     }
-    loadProduct();
     try {
       const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
       setLiked(ids.includes(productId));
-      setLikedIds(ids);
     } catch {}
-  }, [productId]);
+    try {
+      const id = auth.getCurrentUserId?.() || JSON.parse(localStorage.getItem('user') || 'null')?.id || null;
+      setCurrentUserId(id);
+    } catch {}
+  }, [productId, initialProduct]);
 
+  // "Tin tương tự": the API's related list first, otherwise the same category
   useEffect(() => {
     if (!product) return;
-    const cat = product.category || '';
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/products?limit=10&category=${cat}`;
-    fetch(url).then(r => r.json()).then(data => {
-      const list = (data.data || []).filter((p: any) => String(p.id) !== String(productId));
-      setSimilarProducts(list.slice(0, 8));
-    }).catch(() => {});
+    let cancelled = false;
+    fetch(`${API}/products/${productId}/related`)
+      .then(r => (r.ok ? r.json() : []))
+      .then(async (rel) => {
+        let list = Array.isArray(rel) ? rel : [];
+        if (list.length === 0 && product.category) {
+          const res = await fetch(`${API}/products?limit=9&category=${product.category}`).then(r => r.json()).catch(() => ({}));
+          list = (res.data || []).filter((p: any) => String(p.id) !== String(productId));
+        }
+        if (!cancelled) setMore(list.slice(0, 8));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, [product, productId]);
-
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  if (!mounted) return null;
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F3F7F3' }}>
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-forest-200 border-t-forest-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải sản phẩm...</p>
+      <div className="mx-auto max-w-content px-4 py-6 sm:px-6">
+        <div className="grid animate-pulse gap-6 lg:grid-cols-[1.25fr_1fr]">
+          <div className="aspect-[4/3] rounded-card bg-forest-50" />
+          <div className="space-y-3">
+            <div className="h-6 w-1/3 rounded bg-forest-50" />
+            <div className="h-9 w-4/5 rounded bg-forest-50" />
+            <div className="h-10 w-1/2 rounded bg-forest-50" />
+            <div className="h-32 rounded-card bg-forest-50" />
+          </div>
         </div>
       </div>
     );
@@ -94,480 +106,289 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <i className="ri-alert-line text-6xl text-red-500 mb-4 block"></i>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy sản phẩm</h2>
-          <Link href="/products" className="text-forest-600 hover:text-brand-700">
-            ← Quay lại danh sách sản phẩm
-          </Link>
-        </div>
+      <div className="mx-auto max-w-lg px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold text-ink">Không tìm thấy tin này</h1>
+        <p className="mt-1 text-sm text-ink-soft">Tin có thể đã bị xóa hoặc người đăng đã gỡ xuống.</p>
+        <Link href="/products" className="btn-forest mt-5">Xem các tin khác</Link>
       </div>
     );
   }
 
-  const theme = CATEGORY_THEME[product.category] || DEFAULT_THEME;
-  const isDichVu = product.category === 'DICH_VU';
+  const meta = CATEGORY_META[product.category] || DEFAULT_META;
+  const isOwner = !!currentUserId && currentUserId === product.userId;
   const isVatNuoi = product.category === 'VAT_NUOI';
+  const isDichVu = product.category === 'DICH_VU';
+  const images: any[] = product.images || [];
+  const main = images.length > 0 ? images[selected] : null;
+  const phone = product.contactPhone || product.user?.phone || '';
+  const num = phone ? digits(phone) : '';
+  const stock = product.stock ?? product.quantity;
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-  };
+  const step = (d: number) => setSelected(i => (i + d + images.length) % images.length);
 
-  const currentUser = auth.getCurrentUser?.() || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user') || 'null') : null);
-  const isOwner = currentUser && product && currentUser.id === product.userId;
-
-  const handleContactClick = () => setShowContactModal(true);
-
-  const handleLikeClick = () => {
+  const handleLike = () => {
     try {
       const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
-      const isNowLiked = !ids.includes(productId);
-      const next = isNowLiked ? [...ids, productId] : ids.filter(x => x !== productId);
-      localStorage.setItem('liked_items', JSON.stringify(next));
-      setLiked(isNowLiked);
-      setLikedIds(next);
-      setLikeCount(c => isNowLiked ? c + 1 : c - 1);
+      const now = !ids.includes(productId);
+      localStorage.setItem('liked_items', JSON.stringify(now ? [...ids, productId] : ids.filter(x => x !== productId)));
+      setLiked(now);
+      setLikeCount((c: number) => Math.max(0, now ? c + 1 : c - 1));
     } catch {}
   };
 
-  const toggleSimilarLike = (e: React.MouseEvent, id: string) => {
-    e.preventDefault(); e.stopPropagation();
-    try {
-      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
-      const next = ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id];
-      localStorage.setItem('liked_items', JSON.stringify(next));
-      setLikedIds(next);
-    } catch {}
-  };
-
-  const handleShareClick = async () => {
+  const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
       try { await navigator.share({ title: product.title, url }); } catch {}
     } else {
-      await navigator.clipboard.writeText(url);
-      alert('Đã sao chép liên kết!');
+      try { await navigator.clipboard.writeText(url); notify('Đã sao chép liên kết'); } catch { notify('Không sao chép được liên kết'); }
     }
   };
 
-  const handleDeleteClick = async () => {
-    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+  const handleDelete = async () => {
+    if (!confirm('Bạn có chắc muốn xóa tin này?')) return;
     setDeleting(true);
     try {
       await productsApi.delete(productId);
       router.push('/products');
     } catch {
-      alert('Xóa thất bại');
+      notify('Xóa thất bại, thử lại sau');
       setDeleting(false);
     }
   };
 
   const handleBuyVip = async () => {
-    if (!confirm('Mua VIP cho sản phẩm này với giá 50,000đ?')) return;
+    if (!confirm('Mua VIP cho tin này với giá 50.000đ?')) return;
     setBuyingVip(true);
     try {
       const res = await walletApi.buyVip('product', productId) as any;
-      alert(res.message || 'Mua VIP thành công!');
-      const r = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
-      const d = await r.json();
+      notify(res.message || 'Mua VIP thành công');
+      const d = await fetch(`${API}/products/${productId}`).then(r => r.json());
       setProduct(d);
     } catch (e: any) {
-      alert(e.message || 'Lỗi mua VIP');
+      notify(e.message || 'Không mua được VIP');
     } finally {
       setBuyingVip(false);
     }
   };
 
-  const handleMessageClick = async () => {
-    if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
+  const handleChat = async () => {
+    if (!auth.isLoggedIn()) { router.push('/profile'); return; }
     try {
       const conv = await messagesApi.getOrCreate(product.user?.id) as any;
-      window.location.href = `/messages/${conv.id}`;
-    } catch { alert('Không thể mở chat'); }
+      router.push(`/messages/${conv.id}`);
+    } catch { notify('Không mở được cuộc trò chuyện'); }
   };
 
-  const handleContactProfile = () => {
-    window.location.href = `/profile/${product.user?.id}`;
-  };
-
-  const images = product.images || [];
-  const mainImage = images.length > 0 ? images[selectedImageIndex] : null;
+  const facts: { label: string; value: string }[] = [
+    { label: 'Loại tin', value: meta.label },
+    ...(stock ? [{ label: isVatNuoi ? 'Số con còn' : 'Số lượng còn', value: `${stock}${isVatNuoi ? ' con' : product.unit ? ' ' + product.unit : ''}` }] : []),
+    ...(product.unit && !isVatNuoi ? [{ label: 'Đơn vị', value: product.unit }] : []),
+    ...(product.location ? [{ label: 'Khu vực', value: product.location }] : []),
+    ...(product.createdAt ? [{ label: 'Đăng', value: timeAgo(product.createdAt) }] : []),
+  ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
-      {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-gray-500 hover:text-gray-800">Trang chủ</Link>
-            <i className="ri-arrow-right-s-line text-gray-400"></i>
-            <Link href="/products" className={`text-gray-500 ${theme.accent.replace('text-', 'hover:text-')}`}>Sản phẩm</Link>
-            <i className="ri-arrow-right-s-line text-gray-400"></i>
-            <span className="text-gray-900 truncate max-w-xs">{product.title}</span>
-          </nav>
+    <div className="pb-6">
+      {toast && (
+        <div role="status" className="fixed left-1/2 top-20 z-[70] -translate-x-1/2 rounded-pill bg-ink px-5 py-2.5 text-sm font-semibold text-white shadow-lift">{toast}</div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && main && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90" onClick={() => { setLightbox(false); setZoom(1); }} role="dialog" aria-modal="true" aria-label="Xem ảnh lớn">
+          <div className="absolute right-4 top-4 z-10 flex gap-2">
+            <button onClick={e => { e.stopPropagation(); setZoom(z => Math.min(z + 0.5, 4)); }} aria-label="Phóng to" className="grid h-10 w-10 place-items-center rounded-full bg-white/20 text-white hover:bg-white/35"><i className="ri-zoom-in-line text-lg" /></button>
+            <button onClick={e => { e.stopPropagation(); setZoom(z => Math.max(z - 0.5, 0.5)); }} aria-label="Thu nhỏ" className="grid h-10 w-10 place-items-center rounded-full bg-white/20 text-white hover:bg-white/35"><i className="ri-zoom-out-line text-lg" /></button>
+            <button onClick={() => { setLightbox(false); setZoom(1); }} aria-label="Đóng" className="grid h-10 w-10 place-items-center rounded-full bg-white/20 text-white hover:bg-white/35"><i className="ri-close-line text-xl" /></button>
+          </div>
+          {images.length > 1 && (
+            <>
+              <button onClick={e => { e.stopPropagation(); step(-1); }} aria-label="Ảnh trước" className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white hover:bg-white/35"><i className="ri-arrow-left-s-line text-2xl" /></button>
+              <button onClick={e => { e.stopPropagation(); step(1); }} aria-label="Ảnh sau" className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/20 text-white hover:bg-white/35"><i className="ri-arrow-right-s-line text-2xl" /></button>
+              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-pill bg-black/50 px-3 py-1 text-sm text-white">{selected + 1} / {images.length}</span>
+            </>
+          )}
+          <div className="flex max-h-full max-w-full items-center justify-center overflow-auto" onClick={e => e.stopPropagation()}>
+            <img src={imgUrl(main)} alt={product.title} onClick={() => setZoom(z => (z > 1 ? 1 : 2))}
+              style={{ transform: `scale(${zoom})`, transition: 'transform .2s', maxWidth: '92vw', maxHeight: '86vh', objectFit: 'contain', cursor: zoom > 1 ? 'zoom-out' : 'zoom-in' }} />
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
-          {/* Product Images */}
-          <div className="space-y-3">
-            {/* Lightbox */}
-            {lightbox && mainImage && (
-              <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center" onClick={() => { setLightbox(false); setZoom(1); }}>
-                <div className="absolute top-4 right-4 flex gap-2 z-10">
-                  <button onClick={e => { e.stopPropagation(); setZoom(z => Math.min(z + 0.5, 4)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-zoom-in-line text-lg"></i></button>
-                  <button onClick={e => { e.stopPropagation(); setZoom(z => Math.max(z - 0.5, 0.5)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-zoom-out-line text-lg"></i></button>
-                  <button onClick={e => { e.stopPropagation(); setZoom(1); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-fullscreen-exit-line text-lg"></i></button>
-                  <button onClick={() => { setLightbox(false); setZoom(1); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition"><i className="ri-close-line text-lg"></i></button>
-                </div>
-                {images.length > 1 && (
-                  <>
-                    <button onClick={e => { e.stopPropagation(); setSelectedImageIndex(i => (i - 1 + images.length) % images.length); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition z-10"><i className="ri-arrow-left-s-line text-2xl"></i></button>
-                    <button onClick={e => { e.stopPropagation(); setSelectedImageIndex(i => (i + 1) % images.length); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white transition z-10"><i className="ri-arrow-right-s-line text-2xl"></i></button>
-                    <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">{selectedImageIndex + 1} / {images.length}</span>
-                  </>
-                )}
-                <div className="overflow-auto max-w-full max-h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
-                  <img src={mainImage.url || mainImage} alt={product.title} style={{ transform: `scale(${zoom})`, transition: 'transform 0.2s', maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', cursor: zoom > 1 ? 'zoom-out' : 'zoom-in' }} onClick={() => setZoom(z => z > 1 ? 1 : 2)} />
-                </div>
-              </div>
-            )}
+      <div className="mx-auto max-w-content px-4 sm:px-6">
+        <nav aria-label="Đường dẫn" className="flex items-center gap-1 overflow-x-auto py-3 text-[13px] text-ink-faint no-scrollbar">
+          <Link href="/" className="shrink-0 hover:text-forest-700">Trang chủ</Link>
+          <i className="ri-arrow-right-s-line" aria-hidden="true" />
+          <Link href={meta.listHref} className="shrink-0 hover:text-forest-700">{meta.label}</Link>
+          <i className="ri-arrow-right-s-line" aria-hidden="true" />
+          <span className="truncate text-ink-soft">{product.title}</span>
+        </nav>
 
-            {/* Main image */}
-            <div className="relative w-full rounded-2xl overflow-hidden bg-gray-100 border border-gray-200" style={{ height: 360 }}>
-              {mainImage ? (
-                <img src={mainImage.url || mainImage} alt={product.title} className="w-full h-full object-contain cursor-zoom-in" onClick={() => { setLightbox(true); setZoom(1); }} />
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+          {/* ── Gallery ── */}
+          <div>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-card border border-line bg-forest-50 sm:aspect-[16/11]">
+              {main ? (
+                <button type="button" onClick={() => { setLightbox(true); setZoom(1); }} className="block h-full w-full cursor-zoom-in" aria-label="Xem ảnh lớn">
+                  <img src={imgUrl(main)} alt={product.title} className="h-full w-full object-cover" />
+                </button>
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <i className="ri-image-line text-6xl text-gray-300"></i>
-                </div>
+                <div className="grid h-full w-full place-items-center text-forest-300"><i className={`${meta.icon} text-6xl`} /></div>
               )}
               {product.isVip && (
-                <span className="absolute top-3 left-3 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1 z-10">
-                  <i className="ri-vip-crown-fill"></i> VIP
-                </span>
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-md bg-gold-500 px-2.5 py-1 text-xs font-extrabold text-ink"><i className="ri-vip-crown-fill" aria-hidden="true" /> Nổi bật</span>
               )}
+              <div className="absolute right-3 top-3 flex gap-2">
+                <button onClick={handleLike} aria-label={liked ? 'Bỏ lưu tin' : 'Lưu tin'} aria-pressed={liked} className="grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ink-soft shadow-card backdrop-blur transition hover:scale-105">
+                  <i className={`${liked ? 'ri-heart-fill text-brand-500' : 'ri-heart-line'} text-xl`} />
+                </button>
+                <button onClick={handleShare} aria-label="Chia sẻ" className="grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ink-soft shadow-card backdrop-blur transition hover:scale-105">
+                  <i className="ri-share-forward-line text-xl" />
+                </button>
+              </div>
               {images.length > 1 && (
                 <>
-                  <button onClick={() => setSelectedImageIndex(i => (i - 1 + images.length) % images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white transition z-10">
-                    <i className="ri-arrow-left-s-line text-xl text-gray-700"></i>
-                  </button>
-                  <button onClick={() => setSelectedImageIndex(i => (i + 1) % images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white transition z-10">
-                    <i className="ri-arrow-right-s-line text-xl text-gray-700"></i>
-                  </button>
-                  <span className="absolute bottom-2.5 right-3 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
-                    {selectedImageIndex + 1}/{images.length}
-                  </span>
+                  <button onClick={() => step(-1)} aria-label="Ảnh trước" className="absolute left-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-card"><i className="ri-arrow-left-s-line text-xl text-ink" /></button>
+                  <button onClick={() => step(1)} aria-label="Ảnh sau" className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 shadow-card"><i className="ri-arrow-right-s-line text-xl text-ink" /></button>
+                  <span className="absolute bottom-3 right-3 rounded-pill bg-black/55 px-2.5 py-0.5 text-xs font-semibold text-white">{selected + 1}/{images.length}</span>
                 </>
               )}
             </div>
-
-            {/* Thumbnail strip */}
             {images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {images.map((image: any, index: number) => (
-                  <button key={index} onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index ? 'border-gold-400 shadow-md' : 'border-transparent hover:border-gray-300'}`}>
-                    <img src={image.url || image} alt="" className="w-full h-full object-cover" />
+              <div className="no-scrollbar mt-2.5 flex gap-2 overflow-x-auto pb-1">
+                {images.map((im: any, i: number) => (
+                  <button key={i} onClick={() => setSelected(i)} aria-label={`Ảnh ${i + 1}`} aria-current={selected === i}
+                    className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition ${selected === i ? 'border-forest-600' : 'border-transparent opacity-70 hover:opacity-100'}`}>
+                    <img src={imgUrl(im)} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-5">
-            {/* Category badge + title */}
-            <div>
-              <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full mb-3 ${theme.badge}`}>
-                <i className={theme.icon}></i>
-                {theme.label}
-              </span>
-              {product.isVip && (
-                <div className="inline-flex items-center gap-1 bg-gradient-to-r from-gold-400 to-brand-400 text-white px-3 py-1 rounded-full text-sm font-semibold mb-3 ml-2">
-                  <i className="ri-vip-crown-fill"></i>
-                  Sản phẩm VIP
+          {/* ── Info ── */}
+          <div className="space-y-4">
+            <div className="card p-4 sm:p-5">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-forest-100 px-3 py-1 text-xs font-bold text-forest-700"><i className={meta.icon} aria-hidden="true" />{meta.label}</span>
+              <h1 className="mt-2.5 break-words text-[1.4rem] font-extrabold leading-snug text-ink sm:text-3xl">{product.title}</h1>
+              <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ink-faint">
+                {product.location && <span><i className="ri-map-pin-line" aria-hidden="true" /> {product.location}</span>}
+                {product.createdAt && <span><i className="ri-time-line" aria-hidden="true" /> {timeAgo(product.createdAt)}</span>}
+                {product.viewCount !== undefined && <span><i className="ri-eye-line" aria-hidden="true" /> {product.viewCount} lượt xem</span>}
+                {likeCount > 0 && <span><i className="ri-heart-line" aria-hidden="true" /> {likeCount} lượt lưu</span>}
+              </p>
+
+              <p className="mt-4 text-[2rem] font-extrabold leading-none tabular-nums text-forest-700">
+                {Number(product.price) > 0 ? money(product.price) : 'Thỏa thuận'}
+                {Number(product.price) > 0 && product.unit && <span className="ml-1.5 text-base font-semibold text-ink-faint">/{product.unit}</span>}
+              </p>
+
+              {!isDichVu && !isVatNuoi && Number(product.price) > 0 && (
+                <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-paper px-3.5 py-3">
+                  <span className="text-[13px] font-semibold text-ink-soft">Tạm tính cho</span>
+                  <div className="flex items-center">
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} aria-label="Giảm" className="grid h-9 w-9 place-items-center rounded-l-xl border border-line bg-white hover:bg-forest-50"><i className="ri-subtract-line" /></button>
+                    <input type="number" min={1} value={quantity} aria-label="Số lượng" onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="h-9 w-16 border-y border-line bg-white text-center text-sm font-bold text-ink focus:outline-none" />
+                    <button onClick={() => setQuantity(q => q + 1)} aria-label="Tăng" className="grid h-9 w-9 place-items-center rounded-r-xl border border-line bg-white hover:bg-forest-50"><i className="ri-add-line" /></button>
+                  </div>
+                  <span className="text-[13px] text-ink-faint">{product.unit || 'đơn vị'}</span>
+                  <span className="ml-auto text-lg font-extrabold tabular-nums text-ink">{money(product.price * quantity)}</span>
                 </div>
               )}
-              <h1 className="text-xl md:text-3xl font-bold text-gray-900 break-words">{product.title}</h1>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                {isVatNuoi ? (
-                  product.stock > 0 ? (
-                    <span className="text-gold-600 font-medium">Còn {product.stock} con</span>
-                  ) : null
-                ) : (
-                  <span>Đã bán {product.soldCount || 0}</span>
-                )}
-              </div>
-            </div>
 
-            {/* Price box */}
-            <div className={`${theme.bgLight} border ${theme.border} rounded-xl p-4`}>
-              <div className={`text-2xl md:text-3xl font-bold ${theme.accent}`}>
-                {formatPrice(product.price)}
-                <span className="text-lg text-gray-500 font-normal">/{product.unit}</span>
-              </div>
-              <p className="text-sm text-gray-500 mt-1">Giá có thể thay đổi tùy theo số lượng</p>
-            </div>
-
-            {/* Quantity Selector - hidden for DICH_VU */}
-            {!isDichVu && (
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
-                  Số lượng (tối thiểu 1 {product.unit})
-                </label>
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 border border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-50 transition-colors">
-                    <i className="ri-subtract-line"></i>
-                  </button>
-                  <input type="number" min="1" value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-20 text-center border border-gray-300 rounded-xl py-2 text-sm" />
-                  <button onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 border border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-50 transition-colors">
-                    <i className="ri-add-line"></i>
-                  </button>
-                  <span className="text-sm text-gray-500">Còn {product.stock || 'có sẵn'} {product.unit}</span>
-                </div>
-                <div className="text-xl font-semibold text-gray-900">
-                  Tổng: {formatPrice(product.price * quantity)}
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 md:gap-3 flex-wrap">
-              {isOwner ? (
-                <div className={`flex-1 ${theme.bgLight} border ${theme.border} py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm font-medium ${theme.accent}`}>
-                  <i className="ri-store-2-line"></i>
-                  Đây là sản phẩm của bạn
+              {/* Desktop contact buttons (phones use the bar fixed at the bottom) */}
+              {!isOwner ? (
+                <div className="mt-4 hidden gap-2 md:flex">
+                  {num && <a href={`tel:${num}`} className="btn-forest flex-1 py-3"><i className="ri-phone-fill" aria-hidden="true" /> Gọi {phone}</a>}
+                  {num && <a href={`https://zalo.me/${num}`} target="_blank" rel="noopener noreferrer" className="btn-ghost flex-1 py-3"><i className="ri-chat-smile-3-line" aria-hidden="true" /> Zalo</a>}
+                  <button onClick={handleChat} className={`${num ? 'btn-ghost' : 'btn-forest'} flex-1 py-3`}><i className="ri-message-3-line" aria-hidden="true" /> Nhắn tin</button>
                 </div>
               ) : (
-                <button onClick={handleContactClick}
-                  className={`flex-1 ${theme.bg} ${theme.bgHover} text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 font-semibold text-sm md:text-base shadow-sm`}>
-                  <i className={theme.ctaIcon}></i>
-                  {theme.ctaLabel}
-                </button>
-              )}
-              <button onClick={handleLikeClick}
-                className={`px-4 py-3 border rounded-xl transition-colors flex items-center gap-1.5 ${liked ? 'border-red-400 bg-red-50 text-red-500' : 'border-gray-300 hover:bg-gray-50 text-gray-600'}`}>
-                <i className={liked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
-                {likeCount > 0 && <span className="text-sm">{likeCount}</span>}
-              </button>
-              <button onClick={handleShareClick} className="px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-gray-600">
-                <i className="ri-share-line"></i>
-              </button>
-              {isOwner && !product.isVip && (
-                <button onClick={handleBuyVip} disabled={buyingVip}
-                  className="px-4 py-3 bg-gradient-to-r from-gold-400 to-brand-400 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5 text-sm font-semibold">
-                  <i className="ri-vip-crown-fill"></i>
-                  {buyingVip ? '...' : 'Mua VIP'}
-                </button>
-              )}
-              {isOwner && product.isVip && (
-                <span className="px-4 py-3 bg-gold-50 text-gold-700 rounded-xl text-sm font-semibold flex items-center gap-1.5 border border-gold-200">
-                  <i className="ri-vip-crown-fill"></i> Đang VIP
-                </span>
-              )}
-              {isOwner && (
-                <button onClick={handleDeleteClick} disabled={deleting}
-                  className="px-4 py-3 border border-red-300 text-red-600 rounded-xl hover:bg-red-50 transition-colors disabled:opacity-50">
-                  <i className="ri-delete-bin-line"></i>
-                </button>
+                <div className="mt-4 space-y-2">
+                  <p className="flex items-center gap-2 rounded-xl bg-forest-50 px-4 py-3 text-sm font-semibold text-forest-800"><i className="ri-store-2-line" aria-hidden="true" /> Đây là tin của bạn</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Link href={`/products/${productId}/edit`} className="btn-ghost flex-1"><i className="ri-edit-line" aria-hidden="true" /> Sửa tin</Link>
+                    {!product.isVip ? (
+                      <button onClick={handleBuyVip} disabled={buyingVip} className="btn flex-1 bg-gold-500 text-ink hover:bg-gold-600 disabled:opacity-50"><i className="ri-vip-crown-fill" aria-hidden="true" /> {buyingVip ? 'Đang xử lý...' : 'Đẩy tin nổi bật'}</button>
+                    ) : (
+                      <span className="btn flex-1 border border-gold-200 bg-gold-50 text-gold-700"><i className="ri-vip-crown-fill" aria-hidden="true" /> Đang nổi bật</span>
+                    )}
+                    <button onClick={handleDelete} disabled={deleting} aria-label="Xóa tin" className="btn border border-brand-200 bg-white text-brand-600 hover:bg-brand-50 disabled:opacity-50"><i className="ri-delete-bin-line" aria-hidden="true" /></button>
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Share Button */}
-            <ShareButton title={product?.title || ''} />
-
-            {/* Seller Info */}
+            {/* Seller */}
             {product.user && (
-              <div className={`bg-white border ${theme.border} rounded-2xl p-5`}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-gray-900">Người bán</h3>
-                  <button onClick={handleContactProfile} className={`text-sm font-medium ${theme.accent}`}>
-                    Xem trang
-                  </button>
+              <div className="card flex items-center gap-3 p-4">
+                {product.user.avatar ? (
+                  <img src={product.user.avatar} alt="" className="h-12 w-12 rounded-full border border-line object-cover" />
+                ) : (
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-forest-100 text-lg font-extrabold uppercase text-forest-700" aria-hidden="true">{(product.user.fullName || 'U').charAt(0)}</span>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] text-ink-faint">Người bán</p>
+                  <Link href={`/profile/${product.user.id}`} className="block truncate text-[15px] font-bold text-ink hover:text-forest-700">{product.user.fullName}</Link>
+                  <p className="truncate text-[12px] text-ink-faint"><i className="ri-map-pin-line" aria-hidden="true" /> {product.user.location || 'Nhân Cơ, Đắk Nông'}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  {product.user.avatar ? (
-                    <img src={product.user.avatar} alt={product.user.fullName} className="w-12 h-12 rounded-full object-cover border-2 border-gray-100" />
-                  ) : (
-                    <div className={`w-12 h-12 ${theme.bgLight} rounded-full flex items-center justify-center ${theme.accent} font-bold text-lg`}>
-                      {product.user.fullName?.[0] || 'U'}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <button onClick={handleContactProfile} className="font-semibold text-gray-900 hover:underline text-sm truncate block">
-                      {product.user.fullName}
-                    </button>
-                    <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                      <i className="ri-map-pin-line"></i> {product.user.location || 'Chưa cập nhật'}
-                    </div>
-                  </div>
-                </div>
+                <Link href={`/profile/${product.user.id}`} className="btn-ghost shrink-0 px-4 py-2 text-[13px]">Xem trang</Link>
               </div>
             )}
-          </div>
-        </div>
 
-        {/* Product Description */}
-        {product.description && (
-          <div className="mt-10">
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className={`border-b border-gray-100 px-6 py-4 flex items-center gap-2 ${theme.accent}`}>
-                <i className="ri-file-text-line"></i>
-                <h3 className="font-bold">Mô tả sản phẩm</h3>
-              </div>
-              <div className="p-6">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{product.description}</p>
-              </div>
+            {/* Safety */}
+            <div className="rounded-card border border-gold-200 bg-gold-50 p-4">
+              <p className="flex items-center gap-2 text-[14px] font-bold text-gold-800"><i className="ri-shield-check-fill text-lg" aria-hidden="true" /> Mua bán an toàn</p>
+              <ul className="mt-2 space-y-1 text-[13px] leading-snug text-gold-900/80">
+                <li>Gặp trực tiếp và xem hàng trước khi trả tiền.</li>
+                <li>Không chuyển tiền đặt cọc cho người chưa gặp mặt.</li>
+                <li>Không đọc mã OTP hay gửi ảnh thẻ ngân hàng cho bất kỳ ai.</li>
+              </ul>
+              <Link href="/canh-bao" className="mt-2 inline-block text-[13px] font-bold text-brand-600 hover:underline">Báo cáo tin có dấu hiệu lừa đảo</Link>
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Similar products */}
-      {similarProducts.length > 0 && (
-        <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <h2 className="text-base font-bold text-gray-900 mb-3">Tin đăng tương tự</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-            {similarProducts.map((p: any) => {
-              const isLiked = likedIds.includes(String(p.id));
-              const imgUrl = p.images?.[0]?.url || null;
-              const imgCount = p.images?.length || 0;
-              const diff = Date.now() - new Date(p.createdAt).getTime();
-              const d = Math.floor(diff / 86400000);
-              const h = Math.floor(diff / 3600000);
-              const timeStr = d > 0 ? `${d} ngày trước` : h > 0 ? `${h} giờ trước` : 'Vừa đăng';
-              return (
-                <a key={p.id} href={`/products/${p.id}`}
-                  className="flex-shrink-0 w-44 bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow block">
-                  <div className="relative" style={{ aspectRatio: '4/3' }}>
-                    {imgUrl ? (
-                      <img src={imgUrl} alt={p.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <i className="ri-image-line text-2xl text-gray-300"></i>
-                      </div>
-                    )}
-                    <button onClick={e => toggleSimilarLike(e, String(p.id))}
-                      className="absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
-                      <i className={`${isLiked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400'} text-sm`}></i>
-                    </button>
-                    <span className="absolute bottom-1.5 left-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">{timeStr}</span>
-                    {imgCount > 1 && (
-                      <span className="absolute bottom-1.5 right-1.5 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                        <i className="ri-image-2-line text-[10px]"></i> {imgCount}
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug mb-1">{p.title}</p>
-                    <p className="text-sm font-bold" style={{ color: '#B32E1D' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
-                    {p.location && <p className="text-[10px] text-gray-400 mt-0.5 truncate"><i className="ri-map-pin-line"></i> {p.location}</p>}
-                  </div>
-                </a>
-              );
-            })}
-          </div>
         </div>
-      )}
 
-      {/* Comment Section */}
-      <div className="max-w-screen-xl mx-auto px-4 pb-6">
-        <CommentSection targetType="PRODUCT" targetId={productId} />
-      </div>
-
-      {/* Review Section */}
-      <div className="max-w-screen-xl mx-auto px-4 pb-6">
-        {product && <ReviewSection productId={productId} sellerId={product.user?.id || ''} />}
-      </div>
-
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <div className="max-w-screen-xl mx-auto px-4 pb-6">
-          <div className="bg-white rounded-xl p-5 mt-4">
-            <h3 className="font-bold text-gray-900 text-base mb-4">Có thể bạn cũng thích</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {relatedProducts.map((p: any) => (
-                <a key={p.id} href={`/products/${p.id}`}
-                  className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-md transition group">
-                  <div className="aspect-square overflow-hidden bg-gray-200">
-                    {p.images?.[0]?.url
-                      ? <img src={p.images[0].url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                      : <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-2xl text-gray-300"></i></div>}
-                  </div>
-                  <div className="p-2">
-                    <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug">{p.title}</p>
-                    <p className="text-xs font-bold text-red-500 mt-1">{Number(p.price).toLocaleString('vi-VN')}đ</p>
-                  </div>
-                </a>
+        {/* Details */}
+        <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+          <div className="card p-4 sm:p-6">
+            <h2 className="text-lg font-extrabold text-ink">Mô tả chi tiết</h2>
+            {product.description ? (
+              <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-ink-soft">{product.description}</p>
+            ) : (
+              <p className="mt-3 text-sm text-ink-faint">Người bán chưa viết mô tả.</p>
+            )}
+          </div>
+          <div className="card p-4 sm:p-6">
+            <h2 className="text-lg font-extrabold text-ink">Thông tin nhanh</h2>
+            <dl className="mt-3 divide-y divide-line text-[14px]">
+              {facts.map(f => (
+                <div key={f.label} className="flex justify-between gap-4 py-2.5">
+                  <dt className="text-ink-faint">{f.label}</dt>
+                  <dd className="text-right font-semibold text-ink">{f.value}</dd>
+                </div>
               ))}
-            </div>
+            </dl>
           </div>
-        </div>
-      )}
+        </section>
 
-      {/* One-tap call / Zalo / chat (phones) */}
-      {product.user && !isOwner && (
-        <ContactBar phone={product.contactPhone || product.user.phone} onChat={handleMessageClick} />
-      )}
-
-      {/* Contact Modal */}
-      {showContactModal && product.user && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Liên hệ người bán</h3>
-                <button onClick={() => setShowContactModal(false)} className="text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
-                  <i className="ri-close-line text-xl"></i>
-                </button>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                  {product.user.avatar && (
-                    <img src={product.user.avatar} alt={product.user.fullName} className="w-12 h-12 rounded-full object-cover" />
-                  )}
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{product.user.fullName}</h4>
-                    <p className="text-sm text-gray-500">{product.user.phone}</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <button onClick={handleMessageClick}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-medium">
-                    <i className="ri-message-line"></i>
-                    Nhắn tin riêng
-                  </button>
-                  <button onClick={handleContactProfile}
-                    className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 font-medium">
-                    <i className="ri-user-line"></i>
-                    Xem thông tin cá nhân
-                  </button>
-                </div>
-              </div>
+        {more.length > 0 && (
+          <section className="mt-8" aria-label="Tin tương tự">
+            <h2 className="mb-4 text-xl font-extrabold text-ink">Tin tương tự</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+              {more.map((p: any) => <ListingCard key={p.id} item={p} type="product" />)}
             </div>
-          </div>
-        </div>
-      )}
+          </section>
+        )}
 
-      {/* Messenger Modal */}
-      {product.user && (
-        <MessengerModal
-          isOpen={showMessengerModal}
-          onClose={() => setShowMessengerModal(false)}
-          recipientName={product.user.fullName}
-          recipientAvatar={product.user.avatar}
-          recipientPhone={product.user.phone}
-          productTitle={product.title}
-          productImage={mainImage?.url || mainImage}
-        />
-      )}
+        <div className="mt-8 space-y-5">
+          <CommentSection targetType="PRODUCT" targetId={productId} />
+          <ReviewSection productId={productId} sellerId={product.user?.id || ''} />
+        </div>
+      </div>
+
+      {!isOwner && product.user && <ContactBar phone={phone} onChat={handleChat} />}
     </div>
   );
 }
