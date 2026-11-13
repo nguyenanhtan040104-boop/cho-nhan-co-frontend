@@ -59,8 +59,8 @@ const getTransactionLabel = (type: string) => {
 
 const getStatusLabel = (status: string) => {
   const statuses: { [key: string]: { label: string; color: string } } = {
-    new: { label: 'Mới đăng', color: 'bg-green-100 text-green-800' },
-    trading: { label: 'Đang giao dịch', color: 'bg-yellow-100 text-yellow-800' },
+    new: { label: 'Mới đăng', color: 'bg-forest-100 text-forest-800' },
+    trading: { label: 'Đang giao dịch', color: 'bg-gold-100 text-gold-800' },
     completed: { label: 'Đã hoàn tất', color: 'bg-gray-100 text-gray-800' }
   };
   return statuses[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
@@ -238,7 +238,7 @@ export default function RealEstateCard({ item, isSaved, onSave }: Props) {
                   {item.seller.name}
                 </button>
                 {item.seller.isAgent && (
-                  <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                  <span className="bg-forest-100 text-forest-800 px-2 py-0.5 rounded text-xs">
                     Môi giới
                   </span>
                 )}

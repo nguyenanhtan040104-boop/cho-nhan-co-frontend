@@ -4,113 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
+import Logo from './Logo';
+import { CATEGORIES, POST_ITEMS, isActivePath } from './nav-data';
 
-const WS_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api').replace('/api', '');
-
-const navLinks = [
-  { href: '/', label: 'Chợ NC' },
-  { href: '/products', label: 'Nông sản' },
-  { href: '/vat-nuoi', label: 'Vật nuôi' },
-  { href: '/dich-vu', label: 'Dịch vụ' },
-  { href: '/real-estate', label: 'Bất động sản' },
-  { href: '/jobs', label: 'Việc làm' },
-];
-
-const mainCategories = [
-  {
-    label: 'Bất động sản', icon: 'ri-home-4-line',
-    sub: [
-      { href: '/real-estate?type=NHA_O', label: 'Nhà ở' },
-      { href: '/real-estate?type=DAT_NEN', label: 'Đất nền' },
-      { href: '/real-estate?type=PHONG_TRO', label: 'Phòng trọ' },
-      { href: '/real-estate?type=MAT_BANG', label: 'Mặt bằng KD' },
-    ],
-  },
-  {
-    label: 'Nông sản & Thực phẩm', icon: 'ri-plant-line',
-    sub: [
-      { href: '/products', label: 'Tất cả sản phẩm' },
-      { href: '/products?category=NONG_SAN', label: 'Nông sản' },
-      { href: '/products?category=DO_DUNG_GIA_DINH', label: 'Đồ dùng gia đình' },
-      { href: '/products?category=HANG_TIEU_DUNG', label: 'Hàng tiêu dùng' },
-    ],
-  },
-  {
-    label: 'Vật nuôi', icon: 'ri-bear-smile-line',
-    sub: [
-      { href: '/vat-nuoi', label: 'Tất cả vật nuôi' },
-      { href: '/vat-nuoi?sub=chó', label: 'Chó' },
-      { href: '/vat-nuoi?sub=mèo', label: 'Mèo' },
-      { href: '/vat-nuoi?sub=gia cầm', label: 'Gia cầm' },
-      { href: '/vat-nuoi?sub=gia súc', label: 'Gia súc' },
-    ],
-  },
-  {
-    label: 'Tuyển dụng / Việc làm', icon: 'ri-briefcase-line',
-    sub: [
-      { href: '/jobs', label: 'Tất cả việc làm' },
-      { href: '/jobs?type=EMPLOYER', label: 'Tuyển dụng' },
-      { href: '/jobs?type=JOB_SEEKER', label: 'Tìm việc' },
-    ],
-  },
-  {
-    label: 'Dịch vụ', icon: 'ri-service-line',
-    sub: [
-      { href: '/dich-vu', label: 'Tất cả dịch vụ' },
-      { href: '/dich-vu?sub=sửa chữa', label: 'Sửa chữa, bảo dưỡng' },
-      { href: '/dich-vu?sub=vận chuyển', label: 'Vận chuyển' },
-      { href: '/dich-vu?sub=tư vấn', label: 'Tư vấn' },
-      { href: '/dich-vu?sub=xây dựng', label: 'Xây dựng' },
-    ],
-  },
-  {
-    label: 'Diễn đàn cộng đồng', icon: 'ri-chat-3-line',
-    sub: [
-      { href: '/forum', label: 'Tất cả bài viết' },
-      { href: '/forum?category=KINH_NGHIEM', label: 'Kinh nghiệm' },
-      { href: '/forum?category=HOI_DAP', label: 'Hỏi đáp' },
-      { href: '/forum?category=THI_TRUONG', label: 'Thị trường' },
-      { href: '/forum?category=CHAN_NUOI', label: 'Chăn nuôi' },
-    ],
-  },
-  {
-    label: 'Quảng cáo & Khuyến mãi', icon: 'ri-megaphone-line',
-    sub: [
-      { href: '/advertisements', label: 'Tất cả quảng cáo' },
-      { href: '/advertisements?category=KHUYEN_MAI', label: 'Khuyến mãi' },
-      { href: '/advertisements?category=KHAI_TRUONG', label: 'Khai trương' },
-      { href: '/advertisements?category=SU_KIEN', label: 'Sự kiện' },
-    ],
-  },
-  {
-    label: 'Cảnh báo lừa đảo', icon: 'ri-alert-line',
-    sub: [
-      { href: '/canh-bao', label: 'Tất cả cảnh báo' },
-      { href: '/canh-bao?sub=L%E1%BB%ABa%20%C4%91%E1%BA%A3o%20mua%20b%C3%A1n', label: 'Lừa đảo mua bán' },
-      { href: '/canh-bao?sub=Gi%E1%BA%A3%20m%E1%BA%A1o%20danh%20t%C3%ADnh', label: 'Giả mạo danh tính' },
-      { href: '/canh-bao?sub=L%E1%BB%ABa%20%C4%91%E1%BA%A3o%20%C4%91%E1%BA%B7t%20c%E1%BB%8Dc', label: 'Lừa đảo đặt cọc' },
-      { href: '/canh-bao/create', label: '+ Đăng cảnh báo' },
-    ],
-  },
-  {
-    label: 'Bảng giá thị trường', icon: 'ri-line-chart-line',
-    sub: [
-      { href: '/market-prices', label: 'Giá nông sản' },
-      { href: '/market-prices', label: 'Giá xăng dầu' },
-      { href: '/market-prices', label: 'Giá cao su' },
-    ],
-  },
-];
-
-const postItems = [
-  { href: '/products/create', icon: 'ri-leaf-line', label: 'Đăng nông sản', sub: 'Nông sản, thực phẩm' },
-  { href: '/products/create?category=VAT_NUOI', icon: 'ri-bear-smile-line', label: 'Đăng vật nuôi', sub: 'Chó, mèo, gia súc...' },
-  { href: '/products/create?category=DICH_VU', icon: 'ri-service-line', label: 'Đăng dịch vụ', sub: 'Sửa chữa, vận chuyển...' },
-  { href: '/real-estate/create', icon: 'ri-home-4-line', label: 'Bất động sản', sub: 'Nhà đất, phòng trọ' },
-  { href: '/jobs/create', icon: 'ri-briefcase-line', label: 'Tuyển dụng', sub: 'Tìm việc, thuê nhân công' },
-  { href: '/advertisements/create', icon: 'ri-megaphone-line', label: 'Quảng cáo', sub: 'Khai trương, khuyến mãi' },
-  { href: '/forum/create', icon: 'ri-chat-3-line', label: 'Bài diễn đàn', sub: 'Chia sẻ kinh nghiệm' },
-];
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
+const WS_URL = API.replace('/api', '');
 
 // Quy tắc: cụ thể nhất trước, chung nhất sau (thứ tự quan trọng)
 const SEARCH_ROUTES: { keywords: string[]; route: string }[] = [
@@ -167,8 +65,6 @@ function smartSearch(q: string): string {
   return `/products?search=${encodeURIComponent(q)}`;
 }
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
-
 function timeAgoHeader(d: string) {
   const diff = Date.now() - new Date(d).getTime();
   const m = Math.floor(diff / 60000);
@@ -179,29 +75,27 @@ function timeAgoHeader(d: string) {
   return `${Math.floor(h / 24)} ngày trước`;
 }
 
+const iconBtn = 'relative grid h-10 w-10 place-items-center rounded-full text-ink-soft transition hover:bg-forest-50 hover:text-forest-700';
+const dropdown = 'absolute right-0 top-12 z-50 overflow-hidden rounded-2xl border border-line bg-surface shadow-lift';
+
 export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
-  const [showHamburger, setShowHamburger] = useState(false);
-  const [showSellerMenu, setShowSellerMenu] = useState(false);
-  const [hoveredCat, setHoveredCat] = useState(0);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [showSavedDropdown, setShowSavedDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifs, setNotifs] = useState<any[]>([]);
-  const [notifTab, setNotifTab] = useState<'activity'|'news'>('activity');
+  const [notifTab, setNotifTab] = useState<'activity' | 'news'>('activity');
   const [savedProducts, setSavedProducts] = useState<any[]>([]);
   const [msgToast, setMsgToast] = useState<{ title: string; body: string; conversationId: string } | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
   const postMenuRef = useRef<HTMLDivElement>(null);
-  const sellerMenuRef = useRef<HTMLDivElement>(null);
-  const hamburgerRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const savedRef = useRef<HTMLDivElement>(null);
   const isOnMessagesRef = useRef(false);
-  // Sau khi user vao /messages, an badge cho den khi co tin moi
+  // Sau khi user vào /messages, ẩn badge cho đến khi có tin mới
   const msgSuppressRef = useRef(false);
 
   function navDashboard(tab: string) {
@@ -217,8 +111,6 @@ export default function Header() {
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (postMenuRef.current && !postMenuRef.current.contains(e.target as Node)) setShowPostMenu(false);
-      if (sellerMenuRef.current && !sellerMenuRef.current.contains(e.target as Node)) setShowSellerMenu(false);
-      if (hamburgerRef.current && !hamburgerRef.current.contains(e.target as Node)) setShowHamburger(false);
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifDropdown(false);
       if (savedRef.current && !savedRef.current.contains(e.target as Node)) setShowSavedDropdown(false);
     }
@@ -226,7 +118,7 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Khoi tao suppress tu localStorage khi reload trang
+  // Khởi tạo suppress từ localStorage khi reload trang
   useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem('msgSuppressed') === '1') {
       msgSuppressRef.current = true;
@@ -235,8 +127,6 @@ export default function Header() {
 
   useEffect(() => {
     setShowPostMenu(false);
-    setShowHamburger(false);
-    setShowSellerMenu(false);
     setShowNotifDropdown(false);
     setShowSavedDropdown(false);
     if (pathname === '/dashboard') setUnreadCount(0);
@@ -247,6 +137,11 @@ export default function Header() {
     }
     isOnMessagesRef.current = pathname.startsWith('/messages');
   }, [pathname]);
+
+  // Tell the phone tab bar how many unread messages there are
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('unread-messages', { detail: unreadMessages }));
+  }, [unreadMessages]);
 
   function openNotifDropdown() {
     setShowSavedDropdown(false);
@@ -261,7 +156,7 @@ export default function Header() {
   function openSavedDropdown() {
     setShowNotifDropdown(false);
     setShowSavedDropdown(v => !v);
-    // Load saved products từ localStorage
+    // Tin đã lưu lấy từ localStorage
     try {
       const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
       if (ids.length === 0) { setSavedProducts([]); return; }
@@ -277,15 +172,11 @@ export default function Header() {
     function fetchUnread() {
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
       if (!token) return;
-      fetch(`${API}/notifications/unread-count`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      fetch(`${API}/notifications/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : null)
         .then(data => { if (data?.count !== undefined) setUnreadCount(data.count); })
         .catch(() => {});
-      fetch(`${API}/conversations/unread-count`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      fetch(`${API}/conversations/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : null)
         .then(data => { if (data?.count !== undefined && !isOnMessagesRef.current && !msgSuppressRef.current) setUnreadMessages(data.count); })
         .catch(() => {});
@@ -314,13 +205,11 @@ export default function Header() {
             setUnreadMessages(prev => prev + 1);
           }
           setUnreadCount(prev => prev + 1);
-          // Hiện toast popup
           setMsgToast({
             title: data.title || 'Tin nhắn mới',
             body: data.body || '',
             conversationId: data.data?.conversationId || '',
           });
-          // Tự ẩn sau 5 giây
           setTimeout(() => setMsgToast(null), 5000);
         } else {
           setUnreadCount(prev => prev + 1);
@@ -330,7 +219,7 @@ export default function Header() {
     return () => { if (socket) socket.disconnect(); };
   }, []);
 
-  // Lang nghe khi user click vao 1 cuoc tro chuyen → giam badge
+  // Lắng nghe khi user click vào 1 cuộc trò chuyện → giảm badge
   useEffect(() => {
     function handleConvRead(e: Event) {
       const count = (e as CustomEvent).detail?.unreadCount || 0;
@@ -352,70 +241,67 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur-md" suppressHydrationWarning>
-      <div className="w-full px-4 flex items-center gap-3 h-16" suppressHydrationWarning>
-
-        {/* Brand — only on mobile (desktop brand lives in the sidebar) */}
-        <Link href="/" className="flex items-center gap-2 md:hidden flex-shrink-0">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-white shadow-brand">
-            <i className="ri-store-2-fill text-lg"></i>
-          </span>
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur-md" suppressHydrationWarning>
+      <div className="mx-auto flex h-16 max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Chợ Nhân Cơ, trang chủ">
+          <Logo size={36} />
+          <span className="hidden text-[19px] font-extrabold tracking-tight text-ink sm:block">Chợ Nhân Cơ</span>
         </Link>
 
-        {/* Central search — app-style */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             const v = ((new FormData(e.currentTarget).get('q') as string) || '').trim();
             if (v) router.push(smartSearch(v));
           }}
-          className="min-w-0 flex-1 max-w-xl"
+          className="min-w-0 flex-1 md:mx-4 md:max-w-2xl"
+          role="search"
         >
-          <div className="flex items-center gap-2 h-10 rounded-pill border border-line bg-paper px-4 transition-colors focus-within:border-brand-300 focus-within:bg-white">
-            <i className="ri-search-line text-ink-faint"></i>
-            <input name="q" type="text" aria-label="Tìm kiếm trên Chợ Nhân Cơ" placeholder="Tìm nông sản, nhà đất, việc làm..."
-              className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder-ink-faint focus:outline-none" />
+          <div className="flex h-11 items-center gap-2 rounded-pill border border-line bg-paper pl-4 pr-1.5 transition-colors focus-within:border-forest-500 focus-within:bg-surface">
+            <i className="ri-search-line text-ink-faint" aria-hidden="true" />
+            <input
+              name="q"
+              type="search"
+              aria-label="Tìm kiếm trên Chợ Nhân Cơ"
+              placeholder="Tìm cà phê, tiêu, đất rẫy, việc làm..."
+              className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder-ink-faint focus:outline-none"
+            />
+            <button type="submit" className="hidden h-8 shrink-0 rounded-pill bg-forest-600 px-4 text-[13px] font-bold text-white transition hover:bg-forest-700 sm:block">
+              Tìm
+            </button>
           </div>
         </form>
 
-        {/* Spacer */}
-        <div className="hidden flex-1 sm:block" />
-
-        {/* Right actions */}
-        <div className="flex items-center gap-1 flex-shrink-0" suppressHydrationWarning>
-
-          {/* ❤️ Tin đã lưu dropdown */}
+        <div className="ml-auto flex shrink-0 items-center gap-0.5" suppressHydrationWarning>
+          {/* Tin đã lưu */}
           <div className="relative hidden sm:block" ref={savedRef}>
-            <button onClick={openSavedDropdown} title="Tin đã lưu" aria-label="Tin đã lưu"
-              className="flex w-9 h-9 items-center justify-center rounded-full text-ink-soft hover:bg-paper hover:text-ink transition">
-              <i className="ri-heart-line text-lg"></i>
+            <button onClick={openSavedDropdown} title="Tin đã lưu" aria-label="Tin đã lưu" className={iconBtn}>
+              <i className="ri-heart-line text-xl" />
             </button>
             {showSavedDropdown && (
-              <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <h3 className="font-bold text-gray-900">Tin đăng đã lưu</h3>
-                  <button onClick={() => { setShowSavedDropdown(false); navDashboard('liked'); }}
-                    className="text-xs text-brand-600 font-semibold hover:underline">Xem tất cả</button>
+              <div className={`${dropdown} w-[min(20rem,calc(100vw-2rem))]`}>
+                <div className="flex items-center justify-between border-b border-line px-4 py-3">
+                  <h3 className="text-[15px] font-bold text-ink">Tin đã lưu</h3>
+                  <button onClick={() => { setShowSavedDropdown(false); navDashboard('liked'); }} className="text-xs font-semibold text-forest-700 hover:underline">Xem tất cả</button>
                 </div>
                 {savedProducts.length === 0 ? (
-                  <div className="py-10 text-center text-gray-400">
-                    <i className="ri-heart-line text-3xl block mb-2"></i>
-                    <p className="text-sm font-medium text-gray-700">Bạn chưa lưu tin đăng nào</p>
-                    <p className="text-xs mt-1">Lưu tin yêu thích, tin sẽ hiển thị ở đây để bạn dễ dàng quay lại sau.</p>
+                  <div className="px-6 py-10 text-center text-ink-faint">
+                    <i className="ri-heart-line mb-2 block text-3xl" />
+                    <p className="text-sm font-semibold text-ink">Bạn chưa lưu tin nào</p>
+                    <p className="mt-1 text-xs">Bấm hình trái tim trên tin bạn thích, tin sẽ hiện ở đây.</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-50">
+                  <div className="divide-y divide-line">
                     {savedProducts.map((p: any) => (
-                      <Link key={p.id} href={`/products/${p.id}`} onClick={() => setShowSavedDropdown(false)}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
-                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                      <Link key={p.id} href={`/products/${p.id}`} onClick={() => setShowSavedDropdown(false)} className="flex items-center gap-3 px-4 py-3 transition hover:bg-paper">
+                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-forest-50">
                           {p.images?.[0]?.url
-                            ? <img src={p.images[0].url} alt="" className="w-full h-full object-cover" />
-                            : <i className="ri-image-line text-gray-300 text-xl flex items-center justify-center w-full h-full"></i>}
+                            ? <img src={p.images[0].url} alt="" className="h-full w-full object-cover" />
+                            : <i className="ri-image-line grid h-full w-full place-items-center text-forest-300" />}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 line-clamp-1">{p.title}</p>
-                          <p className="text-sm font-bold text-brand-600">{Number(p.price).toLocaleString('vi-VN')}đ</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="line-clamp-1 text-sm font-medium text-ink">{p.title}</p>
+                          <p className="text-sm font-bold text-forest-700">{Number(p.price).toLocaleString('vi-VN')}đ</p>
                         </div>
                       </Link>
                     ))}
@@ -425,87 +311,84 @@ export default function Header() {
             )}
           </div>
 
-          {/* 🔔 Thông báo dropdown */}
+          {/* Thông báo */}
           <div className="relative hidden sm:block" ref={notifRef}>
-            <button onClick={openNotifDropdown} title="Thông báo" aria-label="Thông báo"
-              className="flex w-9 h-9 items-center justify-center rounded-full text-ink-soft hover:bg-paper hover:text-ink transition">
-              <i className="ri-notification-3-line text-lg"></i>
+            <button onClick={openNotifDropdown} title="Thông báo" aria-label="Thông báo" className={iconBtn}>
+              <i className="ri-notification-3-line text-xl" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold leading-none text-white">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </button>
             {showNotifDropdown && (
-              <div className="absolute right-0 top-12 w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
-                {/* Header */}
-                <div className="px-5 pt-4 pb-0">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-bold text-gray-900">Thông Báo</h3>
-                    <button onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }}
-                      className="text-xs text-brand-600 font-semibold hover:underline">Xem tất cả</button>
+              <div className={`${dropdown} w-[min(25rem,calc(100vw-2rem))]`}>
+                <div className="px-5 pt-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-ink">Thông báo</h3>
+                    <button onClick={() => { setShowNotifDropdown(false); navDashboard('notifications'); }} className="text-xs font-semibold text-forest-700 hover:underline">Xem tất cả</button>
                   </div>
-                  {/* Tabs */}
-                  <div className="flex gap-0 border-b border-gray-100">
-                    {(['activity','news'] as const).map(tab => (
-                      <button key={tab} onClick={() => setNotifTab(tab)}
-                        className={`px-4 py-2.5 text-sm font-semibold transition border-b-2 -mb-px ${notifTab === tab ? 'border-gray-900 text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                        {tab === 'activity' ? 'Hoạt Động' : 'Tin Tức'}
+                  <div className="flex border-b border-line">
+                    {(['activity', 'news'] as const).map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => setNotifTab(tab)}
+                        className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition ${notifTab === tab ? 'border-forest-600 text-forest-700' : 'border-transparent text-ink-faint hover:text-ink-soft'}`}
+                      >
+                        {tab === 'activity' ? 'Hoạt động' : 'Tin tức'}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="max-h-[480px] overflow-y-auto">
+                <div className="max-h-[28rem] overflow-y-auto">
                   {notifTab === 'news' ? (
-                    <div className="py-12 text-center text-gray-400">
-                      <i className="ri-newspaper-line text-4xl block mb-2"></i>
+                    <div className="py-12 text-center text-ink-faint">
+                      <i className="ri-newspaper-line mb-2 block text-4xl" />
                       <p className="text-sm">Chưa có tin tức nào</p>
                     </div>
                   ) : notifs.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400">
-                      <i className="ri-notification-3-line text-4xl block mb-2"></i>
-                      <p className="text-sm font-medium text-gray-600">Chưa có thông báo nào</p>
-                      <p className="text-xs mt-1">Các thông báo tương tác sẽ hiện ở đây</p>
+                    <div className="py-12 text-center text-ink-faint">
+                      <i className="ri-notification-3-line mb-2 block text-4xl" />
+                      <p className="text-sm font-semibold text-ink-soft">Chưa có thông báo nào</p>
+                      <p className="mt-1 text-xs">Thông báo về tin nhắn, lượt thích sẽ hiện ở đây</p>
                     </div>
                   ) : (
                     <div>
-                      {notifs.some((n:any) => !n.isRead) && (
-                        <p className="px-5 pt-3 pb-1 text-xs font-bold text-gray-900">Thông báo mới</p>
-                      )}
                       {notifs.map((n: any) => {
                         const isLike = n.type?.includes('LIKE');
                         const isComment = n.type?.includes('COMMENT');
-                        const iconClass = isLike ? 'ri-heart-fill text-brand-500' : isComment ? 'ri-chat-1-fill text-forest-500' : 'ri-notification-2-fill text-gold-600';
+                        const iconClass = isLike ? 'ri-heart-fill text-brand-500' : isComment ? 'ri-chat-1-fill text-forest-600' : 'ri-notification-2-fill text-gold-600';
                         const iconBg = isLike ? 'bg-brand-50' : isComment ? 'bg-forest-50' : 'bg-gold-400/15';
                         return (
-                          <div key={n.id}
-                            className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition cursor-pointer ${!n.isRead ? 'bg-amber-50/60' : ''}`}
+                          <div
+                            key={n.id}
+                            className={`flex cursor-pointer items-start gap-3 px-5 py-3.5 transition hover:bg-paper ${!n.isRead ? 'bg-forest-50/60' : ''}`}
                             onClick={async () => {
-                          setShowNotifDropdown(false);
-                          if (!n.isRead) {
-                            try {
-                              await fetch(`${API}/notifications/${n.id}/read`, { method: 'PATCH', headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } });
-                              setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, isRead: true } : x));
-                            } catch {}
-                          }
-                          const d = n.data as any;
-                          const url = d?.url
-                            || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
-                            || (n.relatedId ? `/products/${n.relatedId}` : null);
-                          if (url) router.push(url);
-                          else navDashboard('notifications');
-                        }}>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${iconBg}`}>
-                              <i className={`${iconClass} text-base`}></i>
+                              setShowNotifDropdown(false);
+                              if (!n.isRead) {
+                                try {
+                                  await fetch(`${API}/notifications/${n.id}/read`, { method: 'PUT', headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } });
+                                  setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, isRead: true } : x));
+                                } catch {}
+                              }
+                              const d = n.data as any;
+                              const url = d?.url
+                                || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
+                                || (n.relatedId ? `/products/${n.relatedId}` : null);
+                              if (url) router.push(url);
+                              else navDashboard('notifications');
+                            }}
+                          >
+                            <div className={`mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full ${iconBg}`}>
+                              <i className={`${iconClass} text-base`} />
                             </div>
-                            <div className="flex-1 min-w-0">
-                              {n.title && <p className={`text-sm leading-snug ${!n.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-600'}`}>{n.title}</p>}
-                              <p className={`text-sm leading-snug line-clamp-2 mt-0.5 ${!n.isRead ? 'text-gray-700' : 'text-gray-400'}`}>{n.body || n.message}</p>
-                              <p className="text-xs text-gray-400 mt-1">{timeAgoHeader(n.createdAt)}</p>
+                            <div className="min-w-0 flex-1">
+                              {n.title && <p className={`text-sm leading-snug ${!n.isRead ? 'font-bold text-ink' : 'font-medium text-ink-soft'}`}>{n.title}</p>}
+                              <p className={`mt-0.5 line-clamp-2 text-sm leading-snug ${!n.isRead ? 'text-ink-soft' : 'text-ink-faint'}`}>{n.body || n.message}</p>
+                              <p className="mt-1 text-xs text-ink-faint">{timeAgoHeader(n.createdAt)}</p>
                             </div>
-                            {!n.isRead && <div className="w-2.5 h-2.5 bg-red-500 rounded-full flex-shrink-0 mt-2"></div>}
+                            {!n.isRead && <div className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-500" />}
                           </div>
                         );
                       })}
@@ -516,60 +399,65 @@ export default function Header() {
             )}
           </div>
 
-          {/* Liên hệ → trang nhắn tin */}
-          <Link href="/messages"
-            className="hidden lg:flex items-center gap-1.5 text-ink-soft text-sm font-medium px-2.5 py-1.5 rounded-lg hover:text-ink transition relative">
-            <i className="ri-chat-1-line text-sm"></i>
-            <span>Liên hệ</span>
+          {/* Tin nhắn */}
+          <Link href="/messages" aria-label="Tin nhắn" title="Tin nhắn" className={`${iconBtn} hidden md:grid`}>
+            <i className="ri-chat-1-line text-xl" />
             {unreadMessages > 0 && (
-              <span className="min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none ml-0.5">
+              <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold leading-none text-white">
                 {unreadMessages > 99 ? '99+' : unreadMessages}
               </span>
             )}
           </Link>
 
-          {/* Quản lý tin → dashboard tab products */}
-          <button onClick={() => navDashboard('products')}
-            className="hidden md:flex items-center text-ink-soft text-sm font-medium px-2.5 py-1.5 rounded-lg hover:text-ink transition">
+          <button onClick={() => navDashboard('products')} className="hidden rounded-pill px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-forest-50 hover:text-forest-700 lg:block">
             Quản lý tin
           </button>
 
-          {/* Đăng tin */}
-          <div className="relative" ref={postMenuRef}>
-            <button onClick={handlePostClick} aria-label="Đăng tin"
-              className="flex items-center gap-1 bg-brand-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-pill shadow-brand hover:bg-brand-600 transition shrink-0">
-              <i className="ri-add-line text-base"></i><span className="hidden sm:inline">Đăng tin</span>
+          {/* Đăng tin (desktop; on phones the centre tab does this) */}
+          <div className="relative hidden md:block" ref={postMenuRef}>
+            <button onClick={handlePostClick} aria-label="Đăng tin" aria-expanded={showPostMenu} className="btn-primary ml-1">
+              <i className="ri-add-line text-lg" aria-hidden="true" />Đăng tin
             </button>
             {showPostMenu && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider px-4 py-2 border-b border-gray-100">Chọn loại đăng tin</p>
-                {postItems.map(item => (
-                  <Link key={item.href} href={item.href}
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
-                    onClick={() => setShowPostMenu(false)}>
-                    <i className={`${item.icon} text-gray-400 text-base w-5`}></i>
-                    <div>
-                      <div className="text-sm font-semibold text-gray-800">{item.label}</div>
-                      <div className="text-xs text-gray-400">{item.sub}</div>
-                    </div>
+              <div className={`${dropdown} top-12 w-72 py-2`}>
+                <p className="border-b border-line px-4 py-2 text-xs font-bold text-ink-faint">Bạn muốn đăng gì?</p>
+                {POST_ITEMS.map(item => (
+                  <Link key={item.href} href={item.href} onClick={() => setShowPostMenu(false)} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-paper">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest-100 text-forest-700"><i className={`${item.icon} text-lg`} /></span>
+                    <span>
+                      <span className="block text-sm font-semibold text-ink">{item.label}</span>
+                      <span className="block text-xs text-ink-faint">{item.sub}</span>
+                    </span>
                   </Link>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Avatar */}
-          <Link href="/dashboard" aria-label="Tài khoản của tôi"
-            className="w-8 h-8 rounded-full bg-ink flex items-center justify-center flex-shrink-0 hover:bg-black transition">
-            <i className="ri-user-line text-white text-sm"></i>
+          <Link href="/dashboard" aria-label="Tài khoản của tôi" className="ml-1 hidden h-10 w-10 place-items-center rounded-full bg-forest-100 text-forest-700 transition hover:bg-forest-200 md:grid">
+            <i className="ri-user-3-line text-lg" />
           </Link>
         </div>
       </div>
 
-      {/* 💬 Toast thông báo tin nhắn mới */}
+      {/* Danh mục — a scrolling row of chips, same on phone and desktop */}
+      <nav aria-label="Danh mục" className="border-t border-line/70">
+        <div className="no-scrollbar mx-auto flex max-w-content gap-2 overflow-x-auto px-4 py-2 sm:px-6">
+          {CATEGORIES.map((c) => {
+            const active = isActivePath(pathname, c.href);
+            return (
+              <Link key={c.href} href={c.href} aria-current={active ? 'page' : undefined} className={`chip ${active ? 'chip-active' : ''}`}>
+                <i className={`${c.icon} text-base`} aria-hidden="true" />
+                {c.label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
       {msgToast && (
-        <div
-          className="fixed bottom-5 right-5 z-[9999] bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-start gap-3 max-w-xs cursor-pointer animate-slideIn"
+        <button
+          className="fixed bottom-24 right-4 z-[9999] flex max-w-xs items-start gap-3 rounded-2xl border border-line bg-surface p-4 text-left shadow-lift md:bottom-5 md:right-5"
           style={{ animation: 'slideUp 0.3s ease' }}
           onClick={() => {
             if (msgToast.conversationId) router.push(`/messages/${msgToast.conversationId}`);
@@ -577,21 +465,15 @@ export default function Header() {
             setMsgToast(null);
           }}
         >
-          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <i className="ri-chat-1-fill text-green-600 text-lg"></i>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-gray-900 leading-snug">{msgToast.title}</p>
-            {msgToast.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{msgToast.body}</p>}
-            <p className="text-[10px] text-gray-400 mt-1">Nhấn để xem tin nhắn</p>
-          </div>
-          <button
-            className="text-gray-400 hover:text-gray-600 flex-shrink-0"
-            onClick={(e) => { e.stopPropagation(); setMsgToast(null); }}
-          >
-            <i className="ri-close-line text-base"></i>
-          </button>
-        </div>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-forest-100 text-forest-700">
+            <i className="ri-chat-1-fill text-lg" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-bold leading-snug text-ink">{msgToast.title}</span>
+            {msgToast.body && <span className="mt-0.5 line-clamp-2 block text-xs text-ink-soft">{msgToast.body}</span>}
+            <span className="mt-1 block text-[10px] text-ink-faint">Nhấn để xem tin nhắn</span>
+          </span>
+        </button>
       )}
     </header>
   );

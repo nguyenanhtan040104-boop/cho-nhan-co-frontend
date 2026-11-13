@@ -189,7 +189,7 @@ export default function MessageModal({
             <div className="flex space-x-3">
               <a
                 href={`tel:${recipientPhone}`}
-                className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors text-center font-medium cursor-pointer"
+                className="flex-1 bg-forest-600 text-white px-4 py-3 rounded-lg hover:bg-forest-700 transition-colors text-center font-medium cursor-pointer"
               >
                 <i className="ri-phone-line mr-2 w-4 h-4 flex items-center justify-center"></i>
                 Gọi điện
@@ -233,12 +233,12 @@ export default function MessageModal({
 
           {/* Success Message */}
           {showSuccess && (
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="mt-4 p-4 bg-forest-50 border border-forest-200 rounded-lg">
               <div className="flex items-center space-x-2">
-                <i className="ri-check-line text-green-600 w-5 h-5 flex items-center justify-center"></i>
+                <i className="ri-check-line text-forest-600 w-5 h-5 flex items-center justify-center"></i>
                 <div>
-                  <p className="font-medium text-green-800">Gửi tin nhắn thành công!</p>
-                  <p className="text-sm text-green-600">
+                  <p className="font-medium text-forest-800">Gửi tin nhắn thành công!</p>
+                  <p className="text-sm text-forest-600">
                     Tin nhắn đã được gửi đến {recipientName}. Họ sẽ liên hệ lại với bạn sớm nhất.
                   </p>
                 </div>

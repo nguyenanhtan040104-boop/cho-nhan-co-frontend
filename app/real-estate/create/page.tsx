@@ -147,7 +147,7 @@ export default function CreateRealEstatePage() {
                 </div>
               ))}
               {imagePreviews.length < 10 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-green-400">
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-forest-400">
                   <i className="ri-image-add-line text-2xl text-gray-400"></i>
                   <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
                   <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
@@ -246,8 +246,8 @@ export default function CreateRealEstatePage() {
       {success && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-line text-green-600 text-2xl"></i>
+            <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-check-line text-forest-600 text-2xl"></i>
             </div>
             <h3 className="text-lg font-semibold mb-2">Đăng tin thành công!</h3>
             <p className="text-gray-500 text-sm">Đang chuyển trang...</p>

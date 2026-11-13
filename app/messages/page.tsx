@@ -6,7 +6,7 @@ import { auth, messages as messagesApi } from '../../lib/api';
 
 type FilterTab = 'all' | 'unread';
 
-const COLORS = ['bg-yellow-400', 'bg-blue-400', 'bg-green-400', 'bg-pink-400', 'bg-forest-400'];
+const COLORS = ['bg-gold-400', 'bg-blue-400', 'bg-forest-400', 'bg-pink-400', 'bg-forest-400'];
 
 function getInitials(name: string) {
   const parts = (name || 'U').trim().split(' ');
@@ -120,7 +120,7 @@ export default function MessagesPage() {
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
@@ -168,8 +168,8 @@ export default function MessagesPage() {
 
       {/* RIGHT: empty state — desktop only */}
       <div className="hidden sm:flex flex-1 flex-col items-center justify-center gap-4 text-center px-8 bg-gray-50">
-        <div className="w-28 h-28 bg-yellow-50 rounded-full flex items-center justify-center">
-          <i className="ri-message-3-line text-yellow-400 text-5xl"></i>
+        <div className="w-28 h-28 bg-gold-50 rounded-full flex items-center justify-center">
+          <i className="ri-message-3-line text-gold-400 text-5xl"></i>
         </div>
         <div>
           <p className="text-lg font-bold text-gray-800">Tích cực chat, chốc lát chốt đơn!</p>

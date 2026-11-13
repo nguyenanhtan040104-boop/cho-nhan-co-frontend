@@ -17,8 +17,8 @@ const legalOptions = [
 ];
 
 const statusOptions = [
-  { value: 'NEW', label: 'Mới đăng', color: 'bg-green-100 text-green-700 border-green-300' },
-  { value: 'TRADING', label: 'Đang giao dịch', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
+  { value: 'NEW', label: 'Mới đăng', color: 'bg-forest-100 text-forest-700 border-forest-300' },
+  { value: 'TRADING', label: 'Đang giao dịch', color: 'bg-gold-100 text-gold-700 border-gold-300' },
   { value: 'COMPLETED', label: 'Đã hoàn tất', color: 'bg-blue-100 text-blue-700 border-blue-300' },
   { value: 'PAUSED', label: 'Tạm dừng', color: 'bg-gray-100 text-gray-600 border-gray-300' },
 ];
@@ -146,7 +146,7 @@ export default function EditRealEstatePage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
@@ -172,7 +172,7 @@ export default function EditRealEstatePage() {
           <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>
         )}
         {success && (
-          <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-center gap-2">
+          <div className="p-4 bg-forest-50 border border-forest-200 text-forest-700 rounded-lg text-sm flex items-center gap-2">
             <i className="ri-check-circle-line"></i>{success}
           </div>
         )}
@@ -180,7 +180,7 @@ export default function EditRealEstatePage() {
         {/* ===== TRẠNG THÁI ===== */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i className="ri-git-branch-line text-green-600"></i>
+            <i className="ri-git-branch-line text-forest-600"></i>
             Trạng thái tin đăng
           </h2>
           <p className="text-sm text-gray-500 mb-4">
@@ -211,7 +211,7 @@ export default function EditRealEstatePage() {
         {/* ===== THÔNG TIN ===== */}
         <form onSubmit={handleSaveInfo} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <i className="ri-file-edit-line text-green-600"></i>
+            <i className="ri-file-edit-line text-forest-600"></i>
             Thông tin tin đăng
           </h2>
 
@@ -277,7 +277,7 @@ export default function EditRealEstatePage() {
         {/* ===== GALLERY ===== */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i className="ri-image-line text-green-600"></i>
+            <i className="ri-image-line text-forest-600"></i>
             Quản lý hình ảnh
             <span className="text-sm font-normal text-gray-400">({images.length + newImageFiles.length}/10 ảnh)</span>
           </h2>
@@ -307,7 +307,7 @@ export default function EditRealEstatePage() {
             <div className="flex flex-wrap gap-3">
               {newImagePreviews.map((src, i) => (
                 <div key={i} className="relative w-24 h-24">
-                  <img src={src} className="w-full h-full object-cover rounded-lg border-2 border-dashed border-green-400" alt="" />
+                  <img src={src} className="w-full h-full object-cover rounded-lg border-2 border-dashed border-forest-400" alt="" />
                   <button type="button" onClick={() => removeNewImage(i)}
                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">
                     ×
@@ -315,7 +315,7 @@ export default function EditRealEstatePage() {
                 </div>
               ))}
               {images.length + newImageFiles.length < 10 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-green-400">
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-forest-400">
                   <i className="ri-image-add-line text-2xl text-gray-400"></i>
                   <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
                   <input type="file" multiple accept="image/*" className="hidden" onChange={handleNewImages} />

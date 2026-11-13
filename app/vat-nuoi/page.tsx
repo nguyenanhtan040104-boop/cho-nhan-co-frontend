@@ -47,7 +47,7 @@ function timeAgo(dateStr?: string) {
 
 export default function VatNuoiPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }} />}>
       <VatNuoiInner />
     </Suspense>
   );
@@ -148,10 +148,10 @@ function VatNuoiInner() {
   const lowData = !loading && filtered.length < 8;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
 
       {/* Header */}
-      <header className="border-y-2 border-ink bg-paper">
+      <header className="border-b border-line bg-surface">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
           <div className="flex items-end justify-between gap-3 mb-4">
             <div>
@@ -182,10 +182,10 @@ function VatNuoiInner() {
                 placeholder="Tìm chó, mèo, gà, bò..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white border border-line"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white border border-line"
               />
             </div>
-            <button type="submit" className="bg-ink hover:bg-black text-white px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap">
+            <button type="submit" className="bg-forest-600 hover:bg-forest-700 text-white px-4 py-2 rounded-xl text-[13px] font-semibold transition-colors whitespace-nowrap">
               Tìm
             </button>
           </form>
@@ -197,7 +197,7 @@ function VatNuoiInner() {
                 className={`flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   subCat === cat.value
                     ? 'bg-ink text-white'
-                    : 'bg-surface border border-line text-ink-soft hover:border-ink/40'
+                    : 'bg-surface border border-line text-ink-soft hover:border-line/40'
                 }`}>
                 {cat.name}
               </button>
@@ -212,12 +212,12 @@ function VatNuoiInner() {
           <span className="text-[12px] text-gray-500">
             <b className="text-gray-900">{fmt(filtered.length || total)}</b> kết quả
           </span>
-          <div className="w-px h-4 bg-stone-300 mx-1" />
+          <div className="w-px h-4 bg-line mx-1" />
           <div className="flex items-center gap-1 flex-wrap">
             {QUICK_FILTERS.map(f => (
               <button key={f.value} onClick={() => setQuickFilter(f.value)}
                 className={`px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
-                  quickFilter === f.value ? 'bg-amber-800 text-white' : 'text-gray-600 hover:bg-stone-200'
+                  quickFilter === f.value ? 'bg-gold-800 text-white' : 'text-gray-600 hover:bg-forest-50'
                 }`}>
                 {f.label}
               </button>
@@ -229,26 +229,26 @@ function VatNuoiInner() {
               disabled={locating}
               title={userLoc ? `Vị trí: ${userLoc.latitude.toFixed(3)}, ${userLoc.longitude.toFixed(3)}` : 'Chia sẻ GPS để xem khoảng cách'}
               className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
-                userLoc ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'text-gray-600 hover:bg-stone-200'
+                userLoc ? 'bg-gold-100 text-gold-800 hover:bg-gold-200' : 'text-gray-600 hover:bg-forest-50'
               } disabled:opacity-50`}>
               <i className={`${locating ? 'ri-loader-4-line animate-spin' : userLoc ? 'ri-map-pin-2-fill' : 'ri-map-pin-line'}`}></i>
               {locating ? 'Đang lấy...' : userLoc ? 'Đã có GPS' : 'Vị trí của tôi'}
             </button>
             <span className="text-[12px] text-gray-500">Sắp xếp:</span>
             <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
-              className="text-[12px] border border-stone-300 rounded px-2 py-1 focus:outline-none focus:border-amber-700 bg-white font-medium text-gray-700">
+              className="text-[12px] border border-line rounded px-2 py-1 focus:outline-none focus:border-gold-700 bg-white font-medium text-gray-700">
               <option value="newest">Mới nhất</option>
               <option value="price_asc">Giá thấp</option>
               <option value="price_desc">Giá cao</option>
               <option value="popular">Phổ biến</option>
             </select>
-            <div className="flex items-center border border-stone-300 rounded overflow-hidden">
+            <div className="flex items-center border border-line rounded overflow-hidden">
               <button onClick={() => setView('grid')} aria-label="Lưới"
-                className={`w-7 h-7 flex items-center justify-center transition-colors ${view === 'grid' ? 'bg-stone-200 text-gray-900' : 'text-gray-400 hover:bg-stone-100'}`}>
+                className={`w-7 h-7 flex items-center justify-center transition-colors ${view === 'grid' ? 'bg-line text-gray-900' : 'text-gray-400 hover:bg-forest-50'}`}>
                 <i className="ri-grid-fill text-sm"></i>
               </button>
               <button onClick={() => setView('list')} aria-label="Danh sách"
-                className={`w-7 h-7 flex items-center justify-center transition-colors border-l border-stone-300 ${view === 'list' ? 'bg-stone-200 text-gray-900' : 'text-gray-400 hover:bg-stone-100'}`}>
+                className={`w-7 h-7 flex items-center justify-center transition-colors border-l border-line ${view === 'list' ? 'bg-line text-gray-900' : 'text-gray-400 hover:bg-forest-50'}`}>
                 <i className="ri-list-check text-sm"></i>
               </button>
             </div>
@@ -282,17 +282,17 @@ function VatNuoiInner() {
             {totalPages > 1 && !loading && (
               <div className="flex justify-center items-center gap-1 mt-8">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                  className="w-8 h-8 flex items-center justify-center rounded border border-stone-300 bg-white text-gray-600 disabled:opacity-40 hover:bg-stone-50">
+                  className="w-8 h-8 flex items-center justify-center rounded border border-line bg-white text-gray-600 disabled:opacity-40 hover:bg-forest-50">
                   <i className="ri-arrow-left-s-line"></i>
                 </button>
                 {[...Array(totalPages)].map((_, i) => (
                   <button key={i} onClick={() => setPage(i + 1)}
-                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-amber-800 text-white' : 'bg-white border border-stone-300 text-gray-700 hover:bg-stone-50'}`}>
+                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-gold-800 text-white' : 'bg-white border border-line text-gray-700 hover:bg-forest-50'}`}>
                     {i + 1}
                   </button>
                 )).slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))}
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  className="w-8 h-8 flex items-center justify-center rounded border border-stone-300 bg-white text-gray-600 disabled:opacity-40 hover:bg-stone-50">
+                  className="w-8 h-8 flex items-center justify-center rounded border border-line bg-white text-gray-600 disabled:opacity-40 hover:bg-forest-50">
                   <i className="ri-arrow-right-s-line"></i>
                 </button>
               </div>
@@ -322,12 +322,12 @@ function GridSkeleton({ view }: { view: 'grid' | 'list' }) {
     return (
       <div className="space-y-2">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="flex gap-3 bg-white border border-stone-200 rounded-lg overflow-hidden animate-pulse">
-            <div className="w-32 h-28 bg-stone-100 flex-shrink-0" />
+          <div key={i} className="flex gap-3 bg-white border border-line rounded-card overflow-hidden animate-pulse">
+            <div className="w-32 h-28 bg-paper flex-shrink-0" />
             <div className="flex-1 p-3 space-y-2">
-              <div className="h-3 bg-stone-100 rounded w-3/4" />
-              <div className="h-4 bg-stone-100 rounded w-1/3" />
-              <div className="h-2 bg-stone-100 rounded w-1/2" />
+              <div className="h-3 bg-paper rounded w-3/4" />
+              <div className="h-4 bg-paper rounded w-1/3" />
+              <div className="h-2 bg-paper rounded w-1/2" />
             </div>
           </div>
         ))}
@@ -337,12 +337,12 @@ function GridSkeleton({ view }: { view: 'grid' | 'list' }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {[...Array(9)].map((_, i) => (
-        <div key={i} className="bg-white border border-stone-200 rounded-lg overflow-hidden animate-pulse">
-          <div className="bg-stone-100" style={{ aspectRatio: '4/3' }} />
+        <div key={i} className="bg-white border border-line rounded-card overflow-hidden animate-pulse">
+          <div className="bg-paper" style={{ aspectRatio: '4/3' }} />
           <div className="p-3 space-y-2">
-            <div className="h-3 bg-stone-100 rounded w-3/4" />
-            <div className="h-4 bg-stone-100 rounded w-1/2" />
-            <div className="h-2 bg-stone-100 rounded w-2/3" />
+            <div className="h-3 bg-paper rounded w-3/4" />
+            <div className="h-4 bg-paper rounded w-1/2" />
+            <div className="h-2 bg-paper rounded w-2/3" />
           </div>
         </div>
       ))}
@@ -354,7 +354,7 @@ function LowDataFill({ createHref, accentColor }: { createHref: string; accentCo
   const accent = accentColor === 'amber' ? 'amber' : 'indigo';
   return (
     <div className="mt-8 space-y-5">
-      <section className={`bg-${accent}-50/60 border border-${accent}-200/60 rounded-lg p-5 flex items-center gap-4 flex-wrap`}>
+      <section className={`bg-${accent}-50/60 border border-${accent}-200/60 rounded-card p-5 flex items-center gap-4 flex-wrap`}>
         <div className="flex-1 min-w-[200px]">
           <p className={`text-[10px] font-semibold tracking-wider text-${accent}-700 uppercase`}>Cộng đồng Nhân Cơ</p>
           <h3 className="text-[15px] font-bold text-gray-900 mt-0.5 mb-1">Đăng tin đầu tiên trong khu vực của bạn</h3>
@@ -367,8 +367,8 @@ function LowDataFill({ createHref, accentColor }: { createHref: string; accentCo
           + Đăng tin ngay
         </Link>
       </section>
-      <section className="bg-amber-50/60 border border-amber-200/60 rounded-lg p-4 flex gap-3">
-        <i className="ri-shield-check-line text-amber-700 text-xl flex-shrink-0 mt-0.5"></i>
+      <section className="bg-gold-50/60 border border-gold-200/60 rounded-card p-4 flex gap-3">
+        <i className="ri-shield-check-line text-gold-700 text-xl flex-shrink-0 mt-0.5"></i>
         <div>
           <p className="text-[13px] font-bold text-ink mb-1">Mua bán an toàn</p>
           <p className="text-[12px] text-ink/80 leading-relaxed">
@@ -389,22 +389,22 @@ function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id:
   return (
     <div className="relative group">
       <Link href={`/products/${item.id}`}
-        className="block bg-white border border-stone-200 rounded-lg overflow-hidden transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-stone-300">
-        <div className="relative bg-stone-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
+        className="block bg-white border border-line rounded-card overflow-hidden transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-line">
+        <div className="relative bg-paper overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {imgUrl ? (
             <img src={imgUrl} alt={item.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-              <i className="ri-bear-smile-line text-3xl text-stone-300"></i>
-              <span className="text-[10px] text-stone-400">Chưa có ảnh</span>
+              <i className="ri-bear-smile-line text-3xl text-ink-faint"></i>
+              <span className="text-[10px] text-ink-faint">Chưa có ảnh</span>
             </div>
           )}
           {item.isVip ? (
-            <span className="absolute top-2 left-2 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200 flex items-center gap-0.5">
+            <span className="absolute top-2 left-2 bg-white/95 text-gold-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-gold-200 flex items-center gap-0.5">
               <i className="ri-vip-crown-fill"></i>VIP
             </span>
           ) : isNew && (
-            <span className={`absolute top-2 left-2 bg-white/95 text-${accent} text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200`}>
+            <span className={`absolute top-2 left-2 bg-white/95 text-${accent} text-[10px] font-bold px-1.5 py-0.5 rounded border border-gold-200`}>
               MỚI
             </span>
           )}
@@ -414,7 +414,7 @@ function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id:
             {item.title}
           </h4>
           <div className="flex items-baseline gap-1 mb-2">
-            <span className="text-[15px] font-bold text-red-700">{fmt(Number(item.price))}đ</span>
+            <span className="text-[15px] font-bold text-forest-700">{fmt(Number(item.price))}đ</span>
             {item.unit && <span className="text-[11px] text-gray-400">/{item.unit}</span>}
           </div>
           <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-2">
@@ -433,7 +433,7 @@ function ItemCard({ item, onDeleted, accentColor }: { item: any; onDeleted: (id:
               </span>
             )}
           </div>
-          <div className="flex items-center justify-between gap-2 pt-2 border-t border-stone-100 text-[11px] text-gray-500">
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-line text-[11px] text-gray-500">
             {item.user?.fullName ? (
               <span className="flex items-center gap-1 min-w-0 flex-1">
                 <i className="ri-user-line text-gray-400 flex-shrink-0"></i>
@@ -466,26 +466,26 @@ function ItemListRow({ item, onDeleted, accentColor }: { item: any; onDeleted: (
   return (
     <div className="relative group">
       <Link href={`/products/${item.id}`}
-        className="flex gap-3 bg-white border border-stone-200 rounded-lg overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-stone-300 transition-all">
-        <div className="relative w-32 sm:w-40 flex-shrink-0 bg-stone-100" style={{ aspectRatio: '4/3' }}>
+        className="flex gap-3 bg-white border border-line rounded-card overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-line transition-all">
+        <div className="relative w-32 sm:w-40 flex-shrink-0 bg-paper" style={{ aspectRatio: '4/3' }}>
           {imgUrl ? (
             <img src={imgUrl} alt={item.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <i className="ri-bear-smile-line text-3xl text-stone-300"></i>
+              <i className="ri-bear-smile-line text-3xl text-ink-faint"></i>
             </div>
           )}
           {item.isVip ? (
-            <span className="absolute top-1.5 left-1.5 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">VIP</span>
+            <span className="absolute top-1.5 left-1.5 bg-white/95 text-gold-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-gold-200">VIP</span>
           ) : isNew && (
-            <span className={`absolute top-1.5 left-1.5 bg-white/95 text-${accent} text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200`}>MỚI</span>
+            <span className={`absolute top-1.5 left-1.5 bg-white/95 text-${accent} text-[10px] font-bold px-1.5 py-0.5 rounded border border-gold-200`}>MỚI</span>
           )}
         </div>
         <div className="flex-1 min-w-0 py-2.5 pr-10">
           <h4 className={`text-[14px] font-medium text-gray-900 line-clamp-2 leading-snug group-hover:text-${accent} transition-colors`}>
             {item.title}
           </h4>
-          <p className="text-[15px] font-bold text-red-700 mt-1">
+          <p className="text-[15px] font-bold text-forest-700 mt-1">
             {fmt(Number(item.price))}đ
             {item.unit && <span className="text-[11px] font-normal text-gray-400 ml-0.5">/{item.unit}</span>}
           </p>

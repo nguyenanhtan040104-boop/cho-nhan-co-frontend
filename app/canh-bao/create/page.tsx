@@ -197,12 +197,12 @@ export default function CreateReportPage() {
       <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f8f5f0' }}>
         <div className="bg-white rounded-3xl shadow-lg p-8 max-w-md w-full text-center">
           {/* Icon */}
-          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-5">
-            <i className="ri-time-line text-4xl text-amber-500"></i>
+          <div className="w-20 h-20 bg-gold-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <i className="ri-time-line text-4xl text-gold-500"></i>
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Đã gửi thành công!</h2>
           <p className="text-gray-500 text-sm mb-5 leading-relaxed">
-            Bài cảnh báo của bạn đang <span className="font-semibold text-amber-600">chờ admin kiểm duyệt</span>.<br/>
+            Bài cảnh báo của bạn đang <span className="font-semibold text-gold-600">chờ admin kiểm duyệt</span>.<br/>
             Sau khi được duyệt, bài sẽ xuất hiện công khai cho cộng đồng.
           </p>
 
@@ -212,14 +212,14 @@ export default function CreateReportPage() {
               <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center">
                 <i className="ri-check-line text-white text-sm"></i>
               </div>
-              <span className="text-[10px] text-green-600 font-medium">Đã gửi</span>
+              <span className="text-[10px] text-forest-600 font-medium">Đã gửi</span>
             </div>
-            <div className="flex-1 h-0.5 bg-amber-200 max-w-[48px]"></div>
+            <div className="flex-1 h-0.5 bg-gold-200 max-w-[48px]"></div>
             <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center animate-pulse">
+              <div className="w-8 h-8 rounded-full bg-gold-400 flex items-center justify-center animate-pulse">
                 <i className="ri-time-line text-white text-sm"></i>
               </div>
-              <span className="text-[10px] text-amber-600 font-medium">Chờ duyệt</span>
+              <span className="text-[10px] text-gold-600 font-medium">Chờ duyệt</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 max-w-[48px]"></div>
             <div className="flex flex-col items-center gap-1">
@@ -230,10 +230,10 @@ export default function CreateReportPage() {
             </div>
           </div>
 
-          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 text-left">
+          <div className="bg-gold-50 border border-gold-100 rounded-2xl p-4 mb-6 text-left">
             <div className="flex gap-2">
-              <i className="ri-information-line text-amber-500 flex-shrink-0 mt-0.5"></i>
-              <p className="text-xs text-amber-700 leading-relaxed">
+              <i className="ri-information-line text-gold-500 flex-shrink-0 mt-0.5"></i>
+              <p className="text-xs text-gold-700 leading-relaxed">
                 Thông thường bài được duyệt trong vòng <strong>vài giờ</strong>. Bạn sẽ nhận thông báo khi bài được duyệt hoặc nếu có vấn đề.
               </p>
             </div>
@@ -269,10 +269,10 @@ export default function CreateReportPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Lưu ý */}
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
+        <div className="bg-gold-50 border border-gold-200 rounded-2xl p-4 mb-5">
           <div className="flex gap-2">
-            <i className="ri-information-line text-amber-600 text-base flex-shrink-0 mt-0.5"></i>
-            <p className="text-xs text-amber-800">Thông tin đăng lên mang tính cộng đồng cảnh báo. Không vu khống, bịa đặt. Nếu bị thiệt hại tài sản hãy trình báo công an để được hỗ trợ pháp lý.</p>
+            <i className="ri-information-line text-gold-600 text-base flex-shrink-0 mt-0.5"></i>
+            <p className="text-xs text-gold-800">Thông tin đăng lên mang tính cộng đồng cảnh báo. Không vu khống, bịa đặt. Nếu bị thiệt hại tài sản hãy trình báo công an để được hỗ trợ pháp lý.</p>
           </div>
         </div>
 

@@ -66,7 +66,7 @@ export default function PriceTable({ category }: PriceTableProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">Bảng giá {getCategoryTitle(category)}</h2>
           <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-forest-500 rounded-full"></div>
             <span>Cập nhật: 10:30 AM hôm nay</span>
           </div>
         </div>
@@ -95,11 +95,11 @@ export default function PriceTable({ category }: PriceTableProps) {
                   <span className="font-semibold text-blue-600">{item.buyPrice}đ</span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <span className="font-semibold text-green-600">{item.sellPrice}đ</span>
+                  <span className="font-semibold text-forest-600">{item.sellPrice}đ</span>
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className={`flex items-center justify-end space-x-1 ${
-                    item.changeType === 'up' ? 'text-green-600' : 'text-red-600'
+                    item.changeType === 'up' ? 'text-forest-600' : 'text-red-600'
                   }`}>
                     <i className={`${
                       item.changeType === 'up' ? 'ri-arrow-up-line' : 'ri-arrow-down-line'
@@ -125,7 +125,7 @@ export default function PriceTable({ category }: PriceTableProps) {
           <div className="flex items-center space-x-4">
             <span className="text-gray-600">Tổng {priceData.length} sản phẩm</span>
             <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1 text-green-600">
+              <div className="flex items-center space-x-1 text-forest-600">
                 <i className="ri-arrow-up-line"></i>
                 <span>{priceData.filter(item => item.changeType === 'up').length} tăng</span>
               </div>

@@ -20,7 +20,7 @@ export default function ForumHeader() {
               <Link href="/" className="text-gray-700 hover:text-brand-600 font-medium cursor-pointer">
                 Trang chủ
               </Link>
-              <Link href="/forum" className="text-green-600 font-medium cursor-pointer">
+              <Link href="/forum" className="text-forest-600 font-medium cursor-pointer">
                 Diễn đàn
               </Link>
               <Link href="/products" className="text-gray-700 hover:text-brand-600 font-medium cursor-pointer">

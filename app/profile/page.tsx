@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
+import Logo from '../components/Logo';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -247,13 +248,13 @@ export default function ProfilePage() {
   const showTabs = tab === 'login' || tab === 'register';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-forest-50 py-12 px-4">
-      <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-forest-50 to-paper py-12 px-4">
+      <div className="max-w-md mx-auto bg-white rounded-sheet shadow-lift p-8">
 
         {/* Logo */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-brand-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <i className="ri-store-2-line text-white text-2xl"></i>
+          <div className="mx-auto mb-3 flex justify-center">
+            <Logo size={48} />
           </div>
           <h1 className="font-bold text-gray-800 text-lg">Chợ Nhân Cơ</h1>
         </div>
@@ -263,13 +264,13 @@ export default function ProfilePage() {
           <div className="flex gap-4 mb-6 border-b">
             <button
               onClick={() => { setTab('login'); setError(''); setMessage(''); }}
-              className={`pb-3 font-medium transition ${tab === 'login' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}
+              className={`pb-3 font-medium transition ${tab === 'login' ? 'text-forest-600 border-b-2 border-forest-600' : 'text-gray-500'}`}
             >
               Đăng nhập
             </button>
             <button
               onClick={() => { setTab('register'); setError(''); setMessage(''); }}
-              className={`pb-3 font-medium transition ${tab === 'register' ? 'text-green-600 border-b-2 border-green-600' : 'text-gray-500'}`}
+              className={`pb-3 font-medium transition ${tab === 'register' ? 'text-forest-600 border-b-2 border-forest-600' : 'text-gray-500'}`}
             >
               Đăng ký
             </button>
@@ -283,7 +284,7 @@ export default function ProfilePage() {
           </div>
         )}
         {message && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+          <div className="mb-4 p-3 bg-forest-50 border border-forest-200 rounded-lg text-forest-700 text-sm">
             {message}
           </div>
         )}
@@ -329,7 +330,7 @@ export default function ProfilePage() {
               {loading ? 'Đang xử lý...' : 'Đăng nhập'}
             </button>
             <button type="button" onClick={() => { setTab('forgot-password'); setError(''); setMessage(''); setFormData(prev => ({ ...prev, email: '' })); }}
-              className="w-full text-green-600 text-sm hover:text-brand-700 transition">
+              className="w-full text-forest-600 text-sm hover:text-brand-700 transition">
               Quên mật khẩu?
             </button>
           </form>
@@ -374,7 +375,7 @@ export default function ProfilePage() {
             <p className="text-center text-sm text-gray-500 mt-2">
               Đã có tài khoản?{' '}
               <button type="button" onClick={() => { setTab('login'); setError(''); setMessage(''); }}
-                className="text-green-600 hover:text-brand-700 font-medium">
+                className="text-forest-600 hover:text-brand-700 font-medium">
                 Đăng nhập
               </button>
             </p>
@@ -394,7 +395,7 @@ export default function ProfilePage() {
                 className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent font-mono" />
             </div>
             {otpAttempts > 0 && otpAttempts < 5 && (
-              <p className="text-xs text-orange-600 text-center">Còn {5 - otpAttempts} lần thử</p>
+              <p className="text-xs text-brand-600 text-center">Còn {5 - otpAttempts} lần thử</p>
             )}
             <button type="submit" disabled={loading || formData.otp.length !== 6 || otpAttempts >= 5}
               className="w-full bg-brand-500 text-white py-2 rounded-lg hover:bg-brand-600 disabled:opacity-50 transition font-medium">
@@ -488,7 +489,7 @@ export default function ProfilePage() {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t text-center text-sm text-gray-600">
           <p>Cần giúp?{' '}
-            <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-brand-700 font-medium">
+            <a href="https://zalo.me/0888317289" target="_blank" rel="noopener noreferrer" className="text-forest-600 hover:text-brand-700 font-medium">
               Liên hệ hỗ trợ
             </a>
           </p>

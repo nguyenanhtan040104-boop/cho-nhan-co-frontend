@@ -14,51 +14,35 @@ function todayKey() {
 }
 
 /**
- * Entry promotional popup — homepage only, once per day per user (localStorage).
- * Shows the top featured VIP ad; falls back to a generic CTA when none exist.
+ * Entry popup for a real, paid advertisement: homepage only, once a day per visitor.
+ * With no advertisement to show it stays closed (we no longer pitch ads to every visitor).
  */
 export default function AdPopup() {
   const pathname = usePathname();
   const isHome = pathname === '/';
 
   const [ad, setAd] = useState<any>(null);
-  const [isFallback, setIsFallback] = useState(false);
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     if (!isHome || typeof window === 'undefined') return;
-
-    // Only once per day
     if (localStorage.getItem(STORAGE_KEY) === todayKey()) return;
 
     let cancelled = false;
     async function load() {
       try {
-        // 1. Prefer top featured VIP ad
+        // Prefer the top featured (VIP) ad, else the most recent one
         const featured = await advertisements.getFeatured(1).catch(() => ({ data: [] }));
         let top = featured.data?.[0];
-
-        // 2. Fallback to most recent user-submitted ad if no VIP
         if (!top) {
           const recent = await advertisements.getAll({ limit: 1 }).catch(() => ({ data: [] }));
           top = recent.data?.[0];
         }
-
-        if (cancelled) return;
-
-        if (top) {
-          setAd(top);
-          setIsFallback(false);
-        } else {
-          setIsFallback(true);
-        }
+        if (cancelled || !top) return;
+        setAd(top);
         setTimeout(() => { if (!cancelled) setVisible(true); }, DELAY_MS);
-      } catch {
-        if (cancelled) return;
-        setIsFallback(true);
-        setTimeout(() => { if (!cancelled) setVisible(true); }, DELAY_MS);
-      }
+      } catch { /* no popup */ }
     }
     load();
     return () => { cancelled = true; };
@@ -68,104 +52,62 @@ export default function AdPopup() {
     setClosing(true);
     setTimeout(() => {
       setVisible(false);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY, todayKey());
-      }
+      if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, todayKey());
     }, 200); // match fade-out duration
   }
 
-  if (!visible) return null;
+  useEffect(() => {
+    if (!visible) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [visible]);
 
-  // ─── Slide content ──────────────────────────────────────────────────
-  const image = ad?.images?.[0];
-  const title = ad?.title ?? 'Quảng cáo trên Chợ Nhân Cơ';
-  const description = ad?.description ?? 'Đẩy cửa hàng, sản phẩm hoặc khuyến mãi lên đầu trang. Tiếp cận hàng nghìn bà con tại Đắk Nông chỉ từ 50.000đ.';
-  const businessName = ad?.businessName;
-  const href = ad ? `/advertisements/${ad.id}` : '/advertisements/create';
-  const ctaLabel = ad ? 'Xem chi tiết' : 'Đăng quảng cáo ngay';
+  if (!visible || !ad) return null;
+
+  const image = ad.images?.[0];
 
   return (
     <div
       onClick={close}
-      className={`fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${
-        closing ? 'opacity-0' : 'opacity-100'
-      }`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Quảng cáo"
+      className={`fixed inset-0 z-[60] flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className={`ad-popup-card relative bg-white rounded-3xl overflow-hidden max-w-md w-full shadow-2xl transition-all duration-200 ${
-          closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-        }`}
+        className={`relative w-full max-w-md overflow-hidden rounded-sheet bg-surface shadow-lift transition-all duration-200 ${closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}
       >
-        {/* Close button */}
         <button
           onClick={close}
           aria-label="Đóng"
-          className="absolute top-3 right-3 z-10 w-9 h-9 bg-white/95 backdrop-blur rounded-full flex items-center justify-center shadow-md text-gray-600 hover:bg-white hover:text-gray-900 transition-all"
+          className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/95 text-ink-soft shadow-md transition hover:text-ink"
         >
-          <i className="ri-close-line text-xl"></i>
+          <i className="ri-close-line text-xl" />
         </button>
 
-        {/* Banner — real image OR gradient fallback */}
         {image ? (
-          <div className="relative bg-gray-100" style={{ aspectRatio: '16/10' }}>
-            <img src={image} alt={title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-            <div className="absolute top-3 left-3 bg-orange-600 text-white text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full flex items-center gap-1">
-              <i className="ri-megaphone-fill text-sm"></i>
-              Quảng cáo
-            </div>
-            {businessName && (
-              <div className="absolute bottom-3 left-3 right-3">
-                <p className="text-white/90 text-xs font-bold uppercase tracking-wider drop-shadow">{businessName}</p>
-              </div>
-            )}
+          <div className="relative bg-forest-50" style={{ aspectRatio: '16/10' }}>
+            <img src={image} alt={ad.title} className="h-full w-full object-cover" />
+            <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-pill bg-ink/70 px-2.5 py-1 text-[11px] font-bold text-white">
+              <i className="ri-megaphone-fill" aria-hidden="true" /> Quảng cáo
+            </span>
           </div>
         ) : (
-          <div className="relative bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 py-10 px-6 text-center text-white overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
-            <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-white/10 rounded-full" />
-            <div className="relative">
-              <i className="ri-rocket-2-fill text-5xl text-white/95 mb-2 inline-block"></i>
-              <p className="text-[10px] font-black tracking-widest uppercase opacity-90">Mới ra mắt</p>
-            </div>
+          <div className="grid h-28 place-items-center bg-forest-700 text-forest-100">
+            <i className="ri-megaphone-fill text-5xl" aria-hidden="true" />
           </div>
         )}
 
-        {/* Content */}
         <div className="p-5">
-          <h3 className="text-lg font-black text-gray-900 mb-2 leading-tight line-clamp-2">{title}</h3>
-          <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4">
-            {description}
-          </p>
-
-          {isFallback && (
-            <div className="bg-orange-50 rounded-xl px-4 py-3 mb-4 space-y-1.5">
-              <p className="text-xs text-gray-600 flex items-center gap-2">
-                <i className="ri-check-line text-forest-600"></i>
-                Gói 7 ngày — <b className="text-orange-700">50.000đ</b>
-              </p>
-              <p className="text-xs text-gray-600 flex items-center gap-2">
-                <i className="ri-check-line text-forest-600"></i>
-                Gói 30 ngày — <b className="text-orange-700">149.000đ</b>
-              </p>
-            </div>
-          )}
-
+          {ad.businessName && <p className="mb-1 text-xs font-bold text-forest-700">{ad.businessName}</p>}
+          <h3 className="mb-2 line-clamp-2 text-lg font-extrabold leading-tight text-ink">{ad.title}</h3>
+          {ad.description && <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-ink-soft">{ad.description}</p>}
           <div className="flex gap-2">
-            <button
-              onClick={close}
-              className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Để sau
-            </button>
-            <Link
-              href={href}
-              onClick={close}
-              className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-sm font-bold text-center hover:opacity-95 transition-opacity"
-            >
-              {ctaLabel}
-              <i className="ri-arrow-right-line ml-1"></i>
+            <button onClick={close} className="btn-ghost flex-1">Để sau</button>
+            <Link href={`/advertisements/${ad.id}`} onClick={close} className="btn-forest flex-[2]">
+              Xem chi tiết <i className="ri-arrow-right-line" aria-hidden="true" />
             </Link>
           </div>
         </div>

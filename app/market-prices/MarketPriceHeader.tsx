@@ -35,12 +35,12 @@ export default function MarketPriceHeader({ selectedCategory, onCategoryChange }
               onClick={() => onCategoryChange(category.key)}
               className={`flex items-center space-x-2 px-4 py-3 rounded-lg border transition-all whitespace-nowrap ${
                 selectedCategory === category.key
-                  ? 'bg-green-600 text-white border-green-600 shadow-md'
-                  : 'bg-white text-gray-700 border-gray-200 hover:bg-green-50 hover:border-green-300'
+                  ? 'bg-forest-600 text-white border-forest-600 shadow-md'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-forest-50 hover:border-forest-300'
               }`}
             >
               <div className={`w-5 h-5 flex items-center justify-center ${
-                selectedCategory === category.key ? 'text-white' : 'text-green-600'
+                selectedCategory === category.key ? 'text-white' : 'text-forest-600'
               }`}>
                 <i className={category.icon}></i>
               </div>
@@ -48,7 +48,7 @@ export default function MarketPriceHeader({ selectedCategory, onCategoryChange }
               <span className={`px-2 py-1 text-xs rounded-full ${
                 selectedCategory === category.key
                   ? 'bg-white bg-opacity-20 text-white'
-                  : 'bg-green-100 text-green-700'
+                  : 'bg-forest-100 text-forest-700'
               }`}>
                 {category.count}
               </span>
@@ -59,7 +59,7 @@ export default function MarketPriceHeader({ selectedCategory, onCategoryChange }
         {/* Quick Stats */}
         <div className="flex flex-wrap gap-6 mt-6 pt-4 border-t border-gray-100">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-forest-500 rounded-full"></div>
             <span className="text-sm text-gray-600">Cập nhật lúc: 10:30 AM - 20/12/2024</span>
           </div>
           <div className="flex items-center space-x-2">

@@ -143,12 +143,12 @@ function CreateProductContent() {
 
   const colorMap: Record<string, string> = {
     green:  'focus:ring-brand-500 focus:border-brand-500',
-    amber:  'focus:ring-amber-500 focus:border-amber-500',
+    amber:  'focus:ring-gold-500 focus:border-gold-500',
     indigo: 'focus:ring-forest-500 focus:border-forest-500',
   };
   const btnMap: Record<string, string> = {
     green:  'bg-brand-500 hover:bg-brand-600',
-    amber:  'bg-amber-600 hover:bg-amber-700',
+    amber:  'bg-gold-600 hover:bg-gold-700',
     indigo: 'bg-forest-600 hover:bg-forest-700',
   };
   const ringClass = colorMap[cfg.color] || colorMap.green;
@@ -369,8 +369,8 @@ function CreateProductContent() {
       {showSuccess && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center shadow-xl">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-line text-green-600 text-3xl"></i>
+            <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-check-line text-forest-600 text-3xl"></i>
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-1">Đăng thành công!</h3>
             <p className="text-gray-500 text-sm">Đang chuyển hướng...</p>

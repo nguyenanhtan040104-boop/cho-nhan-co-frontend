@@ -266,8 +266,8 @@ export default function CreateJobPage() {
       {success && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-line text-green-600 text-2xl"></i>
+            <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-check-line text-forest-600 text-2xl"></i>
             </div>
             <h3 className="text-lg font-semibold mb-2">Đăng tin thành công!</h3>
             <p className="text-gray-500 text-sm">Đang chuyển trang...</p>

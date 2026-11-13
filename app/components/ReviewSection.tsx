@@ -104,17 +104,17 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
             onChange={e => setComment(e.target.value)}
             placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
             rows={3}
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold-400 resize-none"
           />
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-          {success && <p className="text-xs text-green-600 mt-1">{success}</p>}
+          {success && <p className="text-xs text-forest-600 mt-1">{success}</p>}
           <button type="submit" disabled={submitting}
             className="mt-2 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
             {submitting ? 'Đang gửi...' : 'Gửi đánh giá'}
           </button>
         </form>
       )}
-      {alreadyReviewed && <p className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg mb-4">✓ Bạn đã đánh giá sản phẩm này</p>}
+      {alreadyReviewed && <p className="text-xs text-forest-600 bg-forest-50 px-3 py-2 rounded-lg mb-4">✓ Bạn đã đánh giá sản phẩm này</p>}
       {isSeller && <p className="text-xs text-gray-400 mb-4">Bạn không thể đánh giá sản phẩm của chính mình</p>}
       {!isLoggedIn && <p className="text-xs text-gray-400 mb-4">Đăng nhập để gửi đánh giá</p>}
 
@@ -125,7 +125,7 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
         <div className="space-y-4">
           {reviews.map(r => (
             <div key={r.id} className="flex gap-3">
-              <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0 text-yellow-700 font-bold text-sm">
+              <div className="w-9 h-9 rounded-full bg-gold-100 flex items-center justify-center flex-shrink-0 text-gold-700 font-bold text-sm">
                 {r.author?.avatarUrl
                   ? <img src={r.author.avatarUrl} className="w-full h-full rounded-full object-cover" />
                   : (r.author?.fullName || r.author?.username || 'U')[0].toUpperCase()}

@@ -89,16 +89,16 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
           </div>
           <textarea value={comment} onChange={e => setComment(e.target.value)}
             placeholder="Chia se trai nghiem cua ban..." rows={3}
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none" />
+            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold-400 resize-none" />
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-          {success && <p className="text-xs text-green-600 mt-1">{success}</p>}
+          {success && <p className="text-xs text-forest-600 mt-1">{success}</p>}
           <button type="submit" disabled={submitting}
-            className="mt-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
+            className="mt-2 bg-gold-400 hover:bg-gold-500 text-gray-900 font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
             {submitting ? 'Dang gui...' : 'Gui danh gia'}
           </button>
         </form>
       )}
-      {alreadyReviewed && <p className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg mb-4">Ban da danh gia san pham nay</p>}
+      {alreadyReviewed && <p className="text-xs text-forest-600 bg-forest-50 px-3 py-2 rounded-lg mb-4">Ban da danh gia san pham nay</p>}
       {isSeller && <p className="text-xs text-gray-400 mb-4">Ban khong the danh gia san pham cua chinh minh</p>}
       {!isLoggedIn && <p className="text-xs text-gray-400 mb-4">Dang nhap de gui danh gia</p>}
       {reviews.length === 0 ? (
@@ -107,7 +107,7 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
         <div className="space-y-4">
           {reviews.map(r => (
             <div key={r.id} className="flex gap-3">
-              <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0 text-yellow-700 font-bold text-sm overflow-hidden">
+              <div className="w-9 h-9 rounded-full bg-gold-100 flex items-center justify-center flex-shrink-0 text-gold-700 font-bold text-sm overflow-hidden">
                 {r.author?.avatarUrl ? <img src={r.author.avatarUrl} className="w-full h-full object-cover" alt="" />
                   : (r.author?.fullName || r.author?.username || 'U')[0].toUpperCase()}
               </div>

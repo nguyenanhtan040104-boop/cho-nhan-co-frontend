@@ -162,7 +162,7 @@ function DashboardContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-forest-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải...</p>
         </div>
       </div>
@@ -174,7 +174,7 @@ function DashboardContent() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
-          <Link href="/profile" className="text-green-600 underline">Đăng nhập lại</Link>
+          <Link href="/profile" className="text-forest-600 underline">Đăng nhập lại</Link>
         </div>
       </div>
     );
@@ -205,7 +205,7 @@ function DashboardContent() {
         <div className="flex items-center justify-between mb-4 md:mb-8">
           <div className="flex items-center gap-3">
             {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover flex-shrink-0 border-2 border-green-200" />
+              <img src={user.avatarUrl} alt="" className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover flex-shrink-0 border-2 border-forest-200" />
             ) : (
               <div className="w-10 h-10 md:w-14 md:h-14 bg-brand-500 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
                 {user?.fullName?.[0] || 'U'}
@@ -234,7 +234,7 @@ function DashboardContent() {
                     if (tab.id === 'notifications') notifications.getAll().then((d: any) => setNotifs(d.data || [])).catch(() => {});
                   }}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors relative ${
-                    activeTab === tab.id ? 'bg-green-50 text-green-700' : 'text-gray-600'
+                    activeTab === tab.id ? 'bg-forest-50 text-forest-700' : 'text-gray-600'
                   }`}>
                   <i className={`${tab.icon} text-base`}></i>
                   {tab.label}
@@ -260,7 +260,7 @@ function DashboardContent() {
                     }
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors mb-1 ${
-                    activeTab === tab.id ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50'
+                    activeTab === tab.id ? 'bg-forest-50 text-forest-700 font-medium' : 'text-gray-600 hover:bg-gray-50'
                   }`}>
                   <i className={`${tab.icon} text-lg`}></i>
                   <span className="text-sm">{tab.label}</span>
@@ -286,8 +286,8 @@ function DashboardContent() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                   <Link href="/dashboard?tab=products" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-price-tag-3-line text-green-600 text-lg"></i>
+                      <div className="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center">
+                        <i className="ri-price-tag-3-line text-forest-600 text-lg"></i>
                       </div>
                       <span className="text-gray-500 text-sm">Tin đăng</span>
                     </div>
@@ -316,8 +316,8 @@ function DashboardContent() {
 
                   <Link href="/pricing" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-vip-crown-line text-yellow-600 text-lg"></i>
+                      <div className="w-10 h-10 bg-gold-100 rounded-lg flex items-center justify-center">
+                        <i className="ri-vip-crown-line text-gold-600 text-lg"></i>
                       </div>
                       <span className="text-gray-500 text-sm">Gói VIP</span>
                     </div>
@@ -333,7 +333,7 @@ function DashboardContent() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <i className="ri-wallet-3-line text-white text-lg"></i>
-                        <span className="text-green-100 text-sm">Số dư ví</span>
+                        <span className="text-forest-100 text-sm">Số dư ví</span>
                       </div>
                       <p className="text-2xl font-bold text-white">
                         {walletBalance !== null ? new Intl.NumberFormat('vi-VN').format(walletBalance) + 'đ' : '...'}
@@ -350,7 +350,7 @@ function DashboardContent() {
                   <h3 className="font-semibold text-gray-900 mb-4">Phân loại tin đăng</h3>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                      { label: 'Sản phẩm', value: stats.breakdown?.products, color: 'text-green-600', icon: 'ri-plant-line' },
+                      { label: 'Sản phẩm', value: stats.breakdown?.products, color: 'text-forest-600', icon: 'ri-plant-line' },
                       { label: 'Bất động sản', value: stats.breakdown?.realEstates, color: 'text-blue-600', icon: 'ri-home-4-line' },
                       { label: 'Tuyển dụng', value: stats.breakdown?.jobs, color: 'text-forest-600', icon: 'ri-briefcase-line' },
                       { label: 'Diễn đàn', value: stats.breakdown?.forumPosts, color: 'text-forest-600', icon: 'ri-chat-3-line' },
@@ -372,8 +372,8 @@ function DashboardContent() {
                       <h3 className="font-semibold text-gray-900">📊 Tin đăng của bạn</h3>
                       <div className="flex gap-4 text-sm">
                         <span className="text-gray-500">Tổng lượt xem: <span className="font-bold text-blue-600">{(productStats.totalViews || 0).toLocaleString('vi-VN')}</span></span>
-                        <span className="text-gray-500">Đang duyệt: <span className="font-bold text-orange-500">{productStats.pendingCount || 0}</span></span>
-                        <span className="text-gray-500">Đang đăng: <span className="font-bold text-green-600">{productStats.activeCount || 0}</span></span>
+                        <span className="text-gray-500">Đang duyệt: <span className="font-bold text-brand-500">{productStats.pendingCount || 0}</span></span>
+                        <span className="text-gray-500">Đang đăng: <span className="font-bold text-forest-600">{productStats.activeCount || 0}</span></span>
                       </div>
                     </div>
                     <div className="space-y-3">
@@ -386,7 +386,7 @@ function DashboardContent() {
                           }
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-800 truncate">{p.title}</p>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${['pending','PENDING'].includes(p.status) ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}`}>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${['pending','PENDING'].includes(p.status) ? 'bg-brand-100 text-brand-600' : 'bg-forest-100 text-forest-600'}`}>
                               {['pending','PENDING'].includes(p.status) ? 'Đang duyệt' : 'Đang đăng'}
                             </span>
                           </div>
@@ -439,7 +439,7 @@ function DashboardContent() {
                 createHref="/products/create"
                 createLabel="+ Đăng nông sản"
                 emptyLabel="nông sản"
-                accentColor="green"
+                accentColor="forest"
               />
             )}
 
@@ -452,7 +452,7 @@ function DashboardContent() {
                 createHref="/products/create?category=VAT_NUOI"
                 createLabel="+ Đăng vật nuôi"
                 emptyLabel="vật nuôi"
-                accentColor="amber"
+                accentColor="gold"
               />
             )}
 
@@ -465,7 +465,7 @@ function DashboardContent() {
                 createHref="/products/create?category=DICH_VU"
                 createLabel="+ Đăng dịch vụ"
                 emptyLabel="dịch vụ"
-                accentColor="indigo"
+                accentColor="blue"
               />
             )}
 
@@ -506,8 +506,8 @@ function DashboardContent() {
                             <span className="text-blue-600 font-semibold">{Number(item.price).toLocaleString()}đ</span>
                             <span className="text-sm text-gray-500">{item.area}m²</span>
                             <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              item.status === 'NEW' ? 'bg-green-100 text-green-700' :
-                              item.status === 'TRADING' ? 'bg-yellow-100 text-yellow-700' :
+                              item.status === 'NEW' ? 'bg-forest-100 text-forest-700' :
+                              item.status === 'TRADING' ? 'bg-gold-100 text-gold-700' :
                               'bg-gray-100 text-gray-600'
                             }`}>{item.status === 'NEW' ? 'Mới' : item.status === 'TRADING' ? 'Đang giao dịch' : item.status}</span>
                           </div>
@@ -568,7 +568,7 @@ function DashboardContent() {
                           </div>
                           <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                             <span>{job.type === 'EMPLOYER' ? 'Tuyển dụng' : 'Tìm việc'}</span>
-                            {job.salary && <span className="text-green-600 font-medium">{job.salary}</span>}
+                            {job.salary && <span className="text-forest-600 font-medium">{job.salary}</span>}
                           </div>
                           <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
                             <span><i className="ri-eye-line mr-1"></i>{job.viewCount} lượt xem</span>
@@ -598,7 +598,7 @@ function DashboardContent() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Quảng cáo của tôi ({myAds.length})</h2>
-                  <Link href="/advertisements/create" className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm">
+                  <Link href="/advertisements/create" className="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors text-sm">
                     + Đăng quảng cáo
                   </Link>
                 </div>
@@ -606,7 +606,7 @@ function DashboardContent() {
                   <div className="bg-white rounded-xl p-12 text-center shadow-sm">
                     <i className="ri-megaphone-line text-5xl text-gray-300 block mb-3"></i>
                     <p className="text-gray-500 mb-4">Bạn chưa có quảng cáo nào</p>
-                    <Link href="/advertisements/create" className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600">
+                    <Link href="/advertisements/create" className="bg-brand-500 text-white px-6 py-2 rounded-lg hover:bg-brand-600">
                       Đăng quảng cáo ngay
                     </Link>
                   </div>
@@ -614,12 +614,12 @@ function DashboardContent() {
                   <div className="space-y-3">
                     {myAds.map((ad: any) => (
                       <div key={ad.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-16 h-16 bg-orange-50 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-16 h-16 bg-brand-50 rounded-lg overflow-hidden flex-shrink-0">
                           {ad.images?.[0] ? (
                             <img src={ad.images[0]} alt={ad.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <i className="ri-megaphone-line text-orange-400 text-xl"></i>
+                              <i className="ri-megaphone-line text-brand-400 text-xl"></i>
                             </div>
                           )}
                         </div>
@@ -635,7 +635,7 @@ function DashboardContent() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Link href={`/advertisements/${ad.id}`} className="p-2 text-gray-500 hover:text-orange-500 transition-colors">
+                          <Link href={`/advertisements/${ad.id}`} className="p-2 text-gray-500 hover:text-brand-500 transition-colors">
                             <i className="ri-eye-line text-lg"></i>
                           </Link>
                           <Link href={`/advertisements/${ad.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
@@ -692,7 +692,7 @@ function DashboardContent() {
                             <span><i className="ri-heart-line mr-0.5"></i>{post.likeCount || 0}</span>
                             <span><i className="ri-chat-1-line mr-0.5"></i>{post._count?.comments || 0}</span>
                             <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0}</span>
-                            <span className={`px-2 py-0.5 rounded-full ${post.publishStatus === 'PUBLISHED' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                            <span className={`px-2 py-0.5 rounded-full ${post.publishStatus === 'PUBLISHED' ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
                               {post.publishStatus === 'PUBLISHED' ? 'Đã đăng' : 'Nháp'}
                             </span>
                           </div>
@@ -778,7 +778,7 @@ function DashboardContent() {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900">Thông báo</h2>
                   {notifs.some(n => !n.isRead) && (
-                    <button onClick={handleMarkAllRead} className="text-sm text-green-600 hover:text-brand-700">
+                    <button onClick={handleMarkAllRead} className="text-sm text-forest-600 hover:text-brand-700">
                       Đánh dấu tất cả đã đọc
                     </button>
                   )}
@@ -802,7 +802,7 @@ function DashboardContent() {
                       const isLike = notif.type?.includes('LIKE');
                       const isComment = notif.type?.includes('COMMENT');
                       const isMessage = notif.type === 'MESSAGE';
-                      const icon = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : isMessage ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-green-500';
+                      const icon = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : isMessage ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-forest-500';
                       const content = (
                         <div className={`bg-white rounded-xl p-4 shadow-sm border transition-colors ${
                           notif.isRead ? 'border-line' : 'border-brand-200 bg-brand-50/40'
@@ -880,9 +880,9 @@ function SecurityTab() {
   }, []);
 
   function getStatusStyle(status: string) {
-    if (status === 'SUCCESS') return 'bg-green-100 text-green-700';
+    if (status === 'SUCCESS') return 'bg-forest-100 text-forest-700';
     if (status === 'FAILED') return 'bg-red-100 text-red-700';
-    if (status === 'LOCKED') return 'bg-orange-100 text-orange-700';
+    if (status === 'LOCKED') return 'bg-brand-100 text-brand-700';
     return 'bg-gray-100 text-gray-700';
   }
 
@@ -908,7 +908,7 @@ function SecurityTab() {
 
       <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
         <div className="flex items-center gap-2 mb-2">
-          <i className="ri-lock-password-line text-green-600 text-xl"></i>
+          <i className="ri-lock-password-line text-forest-600 text-xl"></i>
           <h3 className="font-semibold text-gray-900">Khóa tài khoản tự động</h3>
         </div>
         <p className="text-sm text-gray-500">Tài khoản sẽ bị khóa <strong>15 phút</strong> nếu nhập sai mật khẩu <strong>5 lần liên tiếp</strong>.</p>
@@ -925,7 +925,7 @@ function SecurityTab() {
             {history.map((item: any) => (
               <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                 <div className="flex items-center gap-3">
-                  <i className={`text-xl ${item.status === 'SUCCESS' ? 'ri-shield-check-line text-green-500' : 'ri-shield-cross-line text-red-500'}`}></i>
+                  <i className={`text-xl ${item.status === 'SUCCESS' ? 'ri-shield-check-line text-forest-500' : 'ri-shield-cross-line text-red-500'}`}></i>
                   <div>
                     <p className="text-sm font-medium text-gray-800">{formatDevice(item.userAgent)}</p>
                     <p className="text-xs text-gray-400">{item.ipAddress} · {new Date(item.createdAt).toLocaleString('vi-VN')}</p>
@@ -1078,9 +1078,9 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
         <h3 className="font-semibold text-gray-900 mb-4">Ảnh đại diện</h3>
         <div className="flex items-center gap-5">
           {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-green-200" />
+            <img src={user.avatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-forest-200" />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-2xl">
+            <div className="w-20 h-20 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-2xl">
               {user.fullName?.[0] || 'U'}
             </div>
           )}
@@ -1096,13 +1096,13 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                 <button disabled className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-300 cursor-not-allowed">
                   <i className="ri-camera-line"></i> Đổi ảnh đại diện
                 </button>
-                <p className="text-xs text-orange-500 mt-1.5 flex items-center gap-1">
+                <p className="text-xs text-brand-500 mt-1.5 flex items-center gap-1">
                   <i className="ri-information-line"></i> Cần xác thực email để đổi ảnh
                 </p>
               </div>
             )}
             {avatarMsg && (
-              <p className={`text-xs mt-1.5 ${avatarMsg.includes('thành công') ? 'text-green-600' : 'text-red-500'}`}>{avatarMsg}</p>
+              <p className={`text-xs mt-1.5 ${avatarMsg.includes('thành công') ? 'text-forest-600' : 'text-red-500'}`}>{avatarMsg}</p>
             )}
           </div>
         </div>
@@ -1147,14 +1147,14 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
             <div className="flex items-center gap-2">
               <input type="text" value={user.email || 'Chưa có email'} disabled className="flex-1 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" />
               {user.isEmailVerified
-                ? <span className="text-green-600 text-sm font-medium whitespace-nowrap">Đã xác thực</span>
-                : <span className="text-orange-500 text-sm font-medium whitespace-nowrap">Chưa xác thực</span>
+                ? <span className="text-forest-600 text-sm font-medium whitespace-nowrap">Đã xác thực</span>
+                : <span className="text-brand-500 text-sm font-medium whitespace-nowrap">Chưa xác thực</span>
               }
             </div>
           </div>
 
           {msg && (
-            <p className={`mt-3 text-sm ${msg.includes('thành công') ? 'text-green-600' : 'text-red-600'}`}>{msg}</p>
+            <p className={`mt-3 text-sm ${msg.includes('thành công') ? 'text-forest-600' : 'text-red-600'}`}>{msg}</p>
           )}
 
           <button
@@ -1206,12 +1206,12 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           </div>
 
           {pwMsg && (
-            <p className={`mt-3 text-sm ${pwMsg.includes('thành công') ? 'text-green-600' : 'text-red-600'}`}>{pwMsg}</p>
+            <p className={`mt-3 text-sm ${pwMsg.includes('thành công') ? 'text-forest-600' : 'text-red-600'}`}>{pwMsg}</p>
           )}
 
           <button
             type="submit"
-            className="mt-4 bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+            className="mt-4 bg-brand-600 text-white px-6 py-2 rounded-lg hover:bg-brand-700 transition-colors"
           >
             Đổi mật khẩu
           </button>
@@ -1223,11 +1223,11 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
         <div className="bg-white rounded-xl p-6 shadow-sm mt-6">
           <div className="flex items-center gap-2 mb-4">
             <h3 className="font-semibold text-gray-900">Xác thực email</h3>
-            <span className="bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full">Bắt buộc để đăng bài</span>
+            <span className="bg-brand-100 text-brand-600 text-xs px-2 py-0.5 rounded-full">Bắt buộc để đăng bài</span>
           </div>
 
           {emailMsg && (
-            <p className={`mb-3 text-sm ${emailMsg.includes('thành công') ? 'text-green-600' : emailMsg.includes('gửi') ? 'text-green-600' : 'text-red-600'}`}>{emailMsg}</p>
+            <p className={`mb-3 text-sm ${emailMsg.includes('thành công') ? 'text-forest-600' : emailMsg.includes('gửi') ? 'text-forest-600' : 'text-red-600'}`}>{emailMsg}</p>
           )}
 
           {emailStep === 'idle' ? (
@@ -1279,11 +1279,11 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       )}
 
       {user.isEmailVerified && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mt-6 flex items-center gap-3">
-          <i className="ri-checkbox-circle-fill text-green-600 text-xl"></i>
+        <div className="bg-forest-50 border border-forest-200 rounded-xl p-4 mt-6 flex items-center gap-3">
+          <i className="ri-checkbox-circle-fill text-forest-600 text-xl"></i>
           <div>
-            <p className="font-medium text-green-800">Email đã được xác thực</p>
-            <p className="text-sm text-green-600">{user.email}</p>
+            <p className="font-medium text-forest-800">Email đã được xác thực</p>
+            <p className="text-sm text-forest-600">{user.email}</p>
           </div>
         </div>
       )}
@@ -1299,7 +1299,7 @@ function ProductsTab({
   createHref = '/products/create',
   createLabel = '+ Đăng sản phẩm',
   emptyLabel = 'sản phẩm',
-  accentColor = 'green',
+  accentColor = 'forest',
 }: {
   myProducts: any[];
   setMyProducts: any;
@@ -1356,8 +1356,8 @@ function ProductsTab({
 
   const statusLabel: any = { ACTIVE: 'Đang hiển thị', PAUSED: 'Tạm dừng', SOLD_OUT: 'Hết hàng', DRAFT: 'Nháp' };
   const statusColor: any = {
-    ACTIVE: 'bg-green-100 text-green-700',
-    PAUSED: 'bg-yellow-100 text-yellow-700',
+    ACTIVE: 'bg-forest-100 text-forest-700',
+    PAUSED: 'bg-gold-100 text-gold-700',
     SOLD_OUT: 'bg-red-100 text-red-700',
     DRAFT: 'bg-gray-100 text-gray-600',
   };
@@ -1407,7 +1407,7 @@ function ProductsTab({
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
                     <span className={`text-${accentColor}-600 font-semibold text-sm`}>{Number(product.price).toLocaleString()}đ/{product.unit}</span>
                     {product.isVip && (
-                      <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">VIP</span>
+                      <span className="text-xs bg-gold-100 text-gold-700 px-1.5 py-0.5 rounded">VIP</span>
                     )}
                     <span className="text-xs text-gray-400"><i className="ri-eye-line mr-1"></i>{product.viewCount}</span>
                   </div>
@@ -1445,7 +1445,7 @@ function ProductsTab({
 
                 {!product.isDeleted && (
                   <Link href={`/products/${product.id}/edit`}
-                    className="flex items-center gap-1 text-xs text-gray-600 hover:text-brand-600 px-2 py-1 rounded hover:bg-green-50">
+                    className="flex items-center gap-1 text-xs text-gray-600 hover:text-brand-600 px-2 py-1 rounded hover:bg-forest-50">
                     <i className="ri-edit-line"></i> Sửa
                   </Link>
                 )}
@@ -1455,8 +1455,8 @@ function ProductsTab({
                     disabled={actionLoading === product.id + '-status'}
                     className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors disabled:opacity-50 ${
                       product.status === 'ACTIVE'
-                        ? 'text-yellow-600 hover:bg-yellow-50'
-                        : 'text-green-600 hover:bg-green-50'
+                        ? 'text-gold-600 hover:bg-gold-50'
+                        : 'text-forest-600 hover:bg-forest-50'
                     }`}>
                     <i className={product.status === 'ACTIVE' ? 'ri-pause-circle-line' : 'ri-play-circle-line'}></i>
                     {actionLoading === product.id + '-status' ? '...' : product.status === 'ACTIVE' ? 'Tạm dừng' : 'Hiển thị lại'}
@@ -1465,7 +1465,7 @@ function ProductsTab({
 
                 {!product.isDeleted && !product.isVip && (
                   <Link href={`/products/vip?id=${product.id}`}
-                    className="flex items-center gap-1 text-xs text-yellow-600 hover:text-yellow-700 px-2 py-1 rounded hover:bg-yellow-50">
+                    className="flex items-center gap-1 text-xs text-gold-600 hover:text-gold-700 px-2 py-1 rounded hover:bg-gold-50">
                     <i className="ri-vip-crown-line"></i> Nâng VIP
                   </Link>
                 )}
@@ -1509,7 +1509,7 @@ function AnalyticsTab() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div></div>;
+  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div></div>;
 
   const products = data?.products || [];
   const maxViews = Math.max(...products.map((p: any) => p.viewCount), 1);
@@ -1521,7 +1521,7 @@ function AnalyticsTab() {
       {/* Sản phẩm */}
       <div className="bg-white rounded-xl p-6 shadow-sm">
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <i className="ri-plant-line text-green-600"></i>
+          <i className="ri-plant-line text-forest-600"></i>
           Top sản phẩm theo lượt xem
         </h3>
         {products.length === 0 ? (
@@ -1543,8 +1543,8 @@ function AnalyticsTab() {
                     <span className="text-xs text-gray-500 whitespace-nowrap">{p.viewCount} lượt xem</span>
                   </div>
                 </div>
-                {p.isVip && <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-medium">VIP</span>}
-                <span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                {p.isVip && <span className="text-xs bg-gold-100 text-gold-700 px-1.5 py-0.5 rounded font-medium">VIP</span>}
+                <span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'ACTIVE' ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
                   {p.status === 'ACTIVE' ? 'Hoạt động' : 'Ẩn'}
                 </span>
               </div>
@@ -1579,8 +1579,8 @@ function AnalyticsTab() {
                   </div>
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  r.status === 'NEW' ? 'bg-green-100 text-green-700' :
-                  r.status === 'TRADING' ? 'bg-yellow-100 text-yellow-700' :
+                  r.status === 'NEW' ? 'bg-forest-100 text-forest-700' :
+                  r.status === 'TRADING' ? 'bg-gold-100 text-gold-700' :
                   r.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
                 }`}>
                   {r.status === 'NEW' ? 'Mới' : r.status === 'TRADING' ? 'Giao dịch' : r.status === 'COMPLETED' ? 'Hoàn tất' : 'Tạm dừng'}
@@ -1647,11 +1647,11 @@ function EngagementTab() {
     const t = (type || '').toUpperCase();
     if (t.includes('LIKE') || t.includes('REACT')) return { icon: 'ri-heart-fill', color: 'text-red-500 bg-red-100' };
     if (t.includes('COMMENT')) return { icon: 'ri-chat-1-fill', color: 'text-blue-500 bg-blue-100' };
-    if (t.includes('FOLLOW')) return { icon: 'ri-user-follow-fill', color: 'text-green-500 bg-green-100' };
-    return { icon: 'ri-notification-2-fill', color: 'text-yellow-600 bg-yellow-100' };
+    if (t.includes('FOLLOW')) return { icon: 'ri-user-follow-fill', color: 'text-forest-500 bg-forest-100' };
+    return { icon: 'ri-notification-2-fill', color: 'text-gold-600 bg-gold-100' };
   }
 
-  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div></div>;
+  if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-gold-400 border-t-transparent rounded-full animate-spin"></div></div>;
 
   const summary = data?.summary || {};
   const forumPosts = data?.forumPosts || [];
@@ -1667,7 +1667,7 @@ function EngagementTab() {
           { label: 'Tổng lượt xem', value: totalViews.toLocaleString(), icon: 'ri-eye-line', color: 'bg-blue-100 text-blue-600' },
           { label: 'Lượt thích', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-red-100 text-red-500' },
           { label: 'Bình luận', value: summary.totalForumComments || 0, icon: 'ri-chat-1-line', color: 'bg-forest-100 text-forest-600' },
-          { label: 'View BĐS', value: (summary.totalRealEstateViews || 0).toLocaleString(), icon: 'ri-home-4-line', color: 'bg-green-100 text-green-600' },
+          { label: 'View BĐS', value: (summary.totalRealEstateViews || 0).toLocaleString(), icon: 'ri-home-4-line', color: 'bg-forest-100 text-forest-600' },
         ].map((item, i) => (
           <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2 ${item.color}`}>
@@ -1733,7 +1733,7 @@ function EngagementTab() {
               const senderAvatar = n.sender?.avatarUrl || null;
               const initial = senderName[0]?.toUpperCase() || 'A';
               return (
-                <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition ${!n.isRead ? 'bg-yellow-50/40' : ''}`}>
+                <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition ${!n.isRead ? 'bg-gold-50/40' : ''}`}>
                   {/* Avatar + icon badge */}
                   <div className="relative flex-shrink-0">
                     {senderAvatar ? (
@@ -1755,7 +1755,7 @@ function EngagementTab() {
                     </p>
                     <p className="text-xs text-gray-400 mt-0.5">{timeAgoEng(n.createdAt)}</p>
                   </div>
-                  {!n.isRead && <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full flex-shrink-0 mt-1.5"></div>}
+                  {!n.isRead && <div className="w-2.5 h-2.5 bg-gold-400 rounded-full flex-shrink-0 mt-1.5"></div>}
                 </div>
               );
             })}

@@ -51,19 +51,19 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
   }, [propertyId]);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-orange-50">
+    <div className="min-h-screen flex items-center justify-center bg-brand-50">
       <div className="text-center">
-        <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-orange-700 text-sm font-medium">Đang tải tin bất động sản...</p>
+        <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-500 rounded-full animate-spin mx-auto mb-3"></div>
+        <p className="text-brand-700 text-sm font-medium">Đang tải tin bất động sản...</p>
       </div>
     </div>
   );
 
   if (error || !item) return (
-    <div className="min-h-screen flex items-center justify-center flex-col gap-4 bg-orange-50">
-      <i className="ri-home-4-line text-6xl text-orange-300"></i>
+    <div className="min-h-screen flex items-center justify-center flex-col gap-4 bg-brand-50">
+      <i className="ri-home-4-line text-6xl text-brand-300"></i>
       <p className="text-gray-500">{error || 'Không tìm thấy'}</p>
-      <Link href="/real-estate" className="text-orange-600 underline font-medium">← Quay lại danh sách</Link>
+      <Link href="/real-estate" className="text-brand-600 underline font-medium">← Quay lại danh sách</Link>
     </div>
   );
 
@@ -72,17 +72,17 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
 
   return (
     <>
-      <div className="min-h-screen bg-orange-50/40">
+      <div className="min-h-screen bg-brand-50/40">
         {/* Breadcrumb */}
-        <div className="bg-white shadow-sm border-b border-orange-100">
+        <div className="bg-white shadow-sm border-b border-brand-100">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-            <Link href="/real-estate" className="flex items-center justify-center w-9 h-9 rounded-lg border border-orange-200 hover:bg-orange-50 text-orange-600 transition-colors">
+            <Link href="/real-estate" className="flex items-center justify-center w-9 h-9 rounded-lg border border-brand-200 hover:bg-brand-50 text-brand-600 transition-colors">
               <i className="ri-arrow-left-line"></i>
             </Link>
             <div className="text-sm text-gray-500 flex-1 min-w-0 flex items-center gap-1">
-              <Link href="/" className="hover:text-orange-600 flex-shrink-0">Trang chủ</Link>
+              <Link href="/" className="hover:text-brand-600 flex-shrink-0">Trang chủ</Link>
               <i className="ri-arrow-right-s-line text-gray-400"></i>
-              <Link href="/real-estate" className="hover:text-orange-600 flex-shrink-0">Bất động sản</Link>
+              <Link href="/real-estate" className="hover:text-brand-600 flex-shrink-0">Bất động sản</Link>
               <i className="ri-arrow-right-s-line text-gray-400"></i>
               <span className="text-gray-900 truncate">{item.title}</span>
             </div>
@@ -93,7 +93,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* LEFT: Image Gallery */}
             <div className="lg:col-span-2 space-y-4">
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-orange-100">
+              <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-brand-100">
                 {/* Lightbox */}
                 {lightbox && images[selectedImg] && (
                   <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center" onClick={() => { setLightbox(false); setZoom(1); }}>
@@ -122,12 +122,12 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                     <img src={images[selectedImg].url} alt={item.title} className="w-full h-full object-contain cursor-zoom-in" onClick={() => { setLightbox(true); setZoom(1); }} />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-                      <i className="ri-home-4-line text-6xl text-orange-200"></i>
-                      <span className="text-orange-300 text-sm">Chưa có ảnh</span>
+                      <i className="ri-home-4-line text-6xl text-brand-200"></i>
+                      <span className="text-brand-300 text-sm">Chưa có ảnh</span>
                     </div>
                   )}
                   {item.isVip && (
-                    <span className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow z-10 flex items-center gap-1">
+                    <span className="absolute top-3 left-3 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow z-10 flex items-center gap-1">
                       <i className="ri-vip-crown-fill"></i> VIP
                     </span>
                   )}
@@ -151,7 +151,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                   <div className="flex gap-2 p-3 overflow-x-auto bg-white">
                     {images.map((img: any, i: number) => (
                       <button key={i} onClick={() => setSelectedImg(i)}
-                        className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImg === i ? 'border-orange-400 shadow-md' : 'border-transparent hover:border-orange-200'}`}>
+                        className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImg === i ? 'border-brand-400 shadow-md' : 'border-transparent hover:border-brand-200'}`}>
                         <img src={img.url} alt="" className="w-full h-full object-cover" />
                       </button>
                     ))}
@@ -160,9 +160,9 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
               </div>
 
               {/* Description */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-brand-100">
                 <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-base">
-                  <i className="ri-file-text-line text-orange-500"></i>
+                  <i className="ri-file-text-line text-brand-500"></i>
                   Mô tả chi tiết
                 </h2>
                 <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">{item.description}</p>
@@ -170,18 +170,18 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
 
               {/* Price history */}
               {item.priceHistory && item.priceHistory.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-brand-100">
                   <p className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base">
-                    <i className="ri-line-chart-line text-orange-500"></i>
+                    <i className="ri-line-chart-line text-brand-500"></i>
                     Lịch sử thay đổi giá
                   </p>
                   <div className="relative">
-                    <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-orange-100"></div>
+                    <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-brand-100"></div>
                     <div className="space-y-3">
                       <div className="flex items-start gap-4 pl-7 relative">
-                        <div className="absolute left-0 w-4 h-4 rounded-full bg-orange-500 border-2 border-white shadow-sm"></div>
+                        <div className="absolute left-0 w-4 h-4 rounded-full bg-brand-500 border-2 border-white shadow-sm"></div>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-orange-600">{formatPrice(Number(item.price))}</p>
+                          <p className="text-sm font-semibold text-brand-600">{formatPrice(Number(item.price))}</p>
                           <p className="text-xs text-gray-400">Giá hiện tại</p>
                         </div>
                       </div>
@@ -202,13 +202,13 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
 
             {/* RIGHT: Sticky Card */}
             <div className="space-y-4">
-              <div className="bg-white rounded-2xl shadow-md border border-orange-100 sticky top-4 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-md border border-brand-100 sticky top-4 overflow-hidden">
                 {/* Orange top accent */}
-                <div className="h-1.5 bg-gradient-to-r from-orange-400 to-amber-400"></div>
+                <div className="h-1.5 bg-gradient-to-r from-brand-400 to-gold-400"></div>
                 <div className="p-5 space-y-4">
                   {/* VIP badge */}
                   {item.isVip && (
-                    <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                    <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                       <i className="ri-vip-crown-fill"></i> Tin VIP nổi bật
                     </div>
                   )}
@@ -217,14 +217,14 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                   <h1 className="text-xl font-bold text-gray-900 leading-snug">{item.title}</h1>
 
                   {/* Price */}
-                  <div className="bg-orange-50 border border-orange-100 rounded-xl p-3">
-                    <p className="text-2xl font-extrabold text-orange-600">{formatPrice(Number(item.price))}</p>
-                    <p className="text-xs text-orange-400 mt-0.5">Giá thỏa thuận</p>
+                  <div className="bg-brand-50 border border-brand-100 rounded-xl p-3">
+                    <p className="text-2xl font-extrabold text-brand-600">{formatPrice(Number(item.price))}</p>
+                    <p className="text-xs text-brand-400 mt-0.5">Giá thỏa thuận</p>
                   </div>
 
                   {/* Type + Status badges */}
                   <div className="flex flex-wrap gap-2">
-                    <span className="bg-orange-100 text-orange-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    <span className="bg-brand-100 text-brand-700 text-xs font-medium px-2.5 py-1 rounded-full">
                       {typeLabel[item.type] || item.type}
                     </span>
                     <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full">
@@ -234,30 +234,30 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
 
                   {/* Property specs grid */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-orange-50/60 rounded-xl p-3 flex items-start gap-2">
-                      <i className="ri-ruler-2-line text-orange-500 mt-0.5 flex-shrink-0"></i>
+                    <div className="bg-brand-50/60 rounded-xl p-3 flex items-start gap-2">
+                      <i className="ri-ruler-2-line text-brand-500 mt-0.5 flex-shrink-0"></i>
                       <div>
                         <p className="text-[10px] text-gray-500 uppercase tracking-wide">Diện tích</p>
                         <p className="text-sm font-semibold text-gray-900">{item.area} m²</p>
                       </div>
                     </div>
-                    <div className="bg-orange-50/60 rounded-xl p-3 flex items-start gap-2">
-                      <i className="ri-money-dollar-circle-line text-orange-500 mt-0.5 flex-shrink-0"></i>
+                    <div className="bg-brand-50/60 rounded-xl p-3 flex items-start gap-2">
+                      <i className="ri-money-dollar-circle-line text-brand-500 mt-0.5 flex-shrink-0"></i>
                       <div>
                         <p className="text-[10px] text-gray-500 uppercase tracking-wide">Giá/m²</p>
                         <p className="text-sm font-semibold text-gray-900">{item.area ? formatPrice(Math.round(Number(item.price) / item.area)) : '—'}/m²</p>
                       </div>
                     </div>
-                    <div className="bg-orange-50/60 rounded-xl p-3 flex items-start gap-2">
-                      <i className="ri-eye-line text-orange-500 mt-0.5 flex-shrink-0"></i>
+                    <div className="bg-brand-50/60 rounded-xl p-3 flex items-start gap-2">
+                      <i className="ri-eye-line text-brand-500 mt-0.5 flex-shrink-0"></i>
                       <div>
                         <p className="text-[10px] text-gray-500 uppercase tracking-wide">Lượt xem</p>
                         <p className="text-sm font-semibold text-gray-900">{item.viewCount || 0}</p>
                       </div>
                     </div>
                     {item.legalStatus && (
-                      <div className="bg-orange-50/60 rounded-xl p-3 flex items-start gap-2">
-                        <i className="ri-file-shield-2-line text-orange-500 mt-0.5 flex-shrink-0"></i>
+                      <div className="bg-brand-50/60 rounded-xl p-3 flex items-start gap-2">
+                        <i className="ri-file-shield-2-line text-brand-500 mt-0.5 flex-shrink-0"></i>
                         <div>
                           <p className="text-[10px] text-gray-500 uppercase tracking-wide">Pháp lý</p>
                           <p className="text-sm font-semibold text-gray-900">{item.legalStatus}</p>
@@ -268,8 +268,8 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
 
                   {/* Address */}
                   {item.address && (
-                    <div className="flex items-start gap-2 text-sm text-gray-700 bg-orange-50/40 rounded-xl p-3">
-                      <i className="ri-map-pin-2-line text-orange-500 mt-0.5 flex-shrink-0"></i>
+                    <div className="flex items-start gap-2 text-sm text-gray-700 bg-brand-50/40 rounded-xl p-3">
+                      <i className="ri-map-pin-2-line text-brand-500 mt-0.5 flex-shrink-0"></i>
                       <span>{item.address}</span>
                     </div>
                   )}
@@ -285,7 +285,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                           window.location.href = `/messages/${conv.id}`;
                         } catch { alert('Không thể mở chat'); }
                       }}
-                      className="w-full flex items-center justify-center gap-2 border-2 border-orange-500 text-orange-600 hover:bg-orange-50 py-3 rounded-xl font-semibold transition-colors">
+                      className="w-full flex items-center justify-center gap-2 border-2 border-brand-500 text-brand-600 hover:bg-brand-50 py-3 rounded-xl font-semibold transition-colors">
                       <i className="ri-message-3-line"></i>
                       Nhắn tin người đăng
                     </button>
@@ -300,13 +300,13 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                   </div>
 
                   {/* Seller info */}
-                  <div className="border-t border-orange-100 pt-4">
+                  <div className="border-t border-brand-100 pt-4">
                     <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-3">Người đăng tin</p>
                     <div className="flex items-center gap-3">
                       {item.user?.avatarUrl ? (
-                        <img src={item.user.avatarUrl} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-orange-200" />
+                        <img src={item.user.avatarUrl} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-brand-200" />
                       ) : (
-                        <div className="w-11 h-11 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold text-base border-2 border-orange-200">
+                        <div className="w-11 h-11 bg-brand-100 rounded-full flex items-center justify-center text-brand-700 font-bold text-base border-2 border-brand-200">
                           {item.user?.fullName?.[0] || 'U'}
                         </div>
                       )}
@@ -314,7 +314,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                         <p className="font-semibold text-gray-900 text-sm truncate">{item.user?.fullName}</p>
                         <p className="text-xs text-gray-400">@{item.user?.username}</p>
                       </div>
-                      <Link href={`/profile/${item.user?.id}`} className="text-orange-500 hover:text-orange-600 text-xs font-medium flex-shrink-0">
+                      <Link href={`/profile/${item.user?.id}`} className="text-brand-500 hover:text-brand-600 text-xs font-medium flex-shrink-0">
                         Xem →
                       </Link>
                     </div>

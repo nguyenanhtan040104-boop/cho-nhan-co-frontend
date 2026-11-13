@@ -49,7 +49,7 @@ export default function NearbyToggle({ active, onChange, className = '' }: Props
         className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
           userLoc
             ? 'bg-forest-100 text-forest-800 hover:bg-forest-200'
-            : 'bg-stone-100 text-gray-700 hover:bg-stone-200'
+            : 'bg-paper text-gray-700 hover:bg-forest-50'
         } disabled:opacity-50`}
       >
         <i className={`${locating ? 'ri-loader-4-line animate-spin' : userLoc ? 'ri-map-pin-2-fill' : 'ri-map-pin-line'}`}></i>
@@ -65,7 +65,7 @@ export default function NearbyToggle({ active, onChange, className = '' }: Props
         className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
           active
             ? 'bg-forest-700 text-white'
-            : 'bg-stone-100 text-gray-700 hover:bg-stone-200'
+            : 'bg-paper text-gray-700 hover:bg-forest-50'
         } disabled:opacity-40 disabled:cursor-not-allowed`}
       >
         <i className="ri-navigation-line"></i>

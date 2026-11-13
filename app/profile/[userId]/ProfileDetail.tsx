@@ -54,14 +54,14 @@ export default function ProfileDetail({ userId }: { userId: string }) {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-8 h-8 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
   if (!profile) return (
     <div className="min-h-screen flex items-center justify-center flex-col gap-3">
       <p className="text-gray-500">Không tìm thấy người dùng</p>
-      <Link href="/" className="text-green-600 underline">Về trang chủ</Link>
+      <Link href="/" className="text-forest-600 underline">Về trang chủ</Link>
     </div>
   );
 
@@ -146,7 +146,7 @@ export default function ProfileDetail({ userId }: { userId: string }) {
                 {profile.fullName || profile.username}
               </h1>
               {profile.isVerified && (
-                <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-semibold flex items-center gap-1 flex-shrink-0">
+                <span className="bg-forest-100 text-forest-700 text-xs px-2 py-0.5 rounded-full font-semibold flex items-center gap-1 flex-shrink-0">
                   <i className="ri-shield-check-fill text-xs"></i> Xác thực
                 </span>
               )}
@@ -164,18 +164,18 @@ export default function ProfileDetail({ userId }: { userId: string }) {
             <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-gray-500 mb-4">
               {profile.address && (
                 <span className="flex items-center gap-1">
-                  <i className="ri-map-pin-2-line text-green-500"></i>
+                  <i className="ri-map-pin-2-line text-forest-500"></i>
                   {profile.address}
                 </span>
               )}
               {joinedStr && (
                 <span className="flex items-center gap-1">
-                  <i className="ri-calendar-check-line text-green-500"></i>
+                  <i className="ri-calendar-check-line text-forest-500"></i>
                   Đã tham gia: {joinedStr}
                 </span>
               )}
               <span className="flex items-center gap-1">
-                <i className="ri-file-list-3-line text-green-500"></i>
+                <i className="ri-file-list-3-line text-forest-500"></i>
                 {products.length} tin đăng
               </span>
             </div>
@@ -202,13 +202,13 @@ export default function ProfileDetail({ userId }: { userId: string }) {
         <div className="flex border-b border-gray-100 px-4">
           <button onClick={() => setActiveTab('active')}
             className={`py-3.5 px-4 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === 'active' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+              activeTab === 'active' ? 'border-forest-600 text-forest-600' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}>
             Tin đăng ({activeProducts.length || products.length})
           </button>
           <button onClick={() => setActiveTab('info')}
             className={`py-3.5 px-4 text-sm font-semibold border-b-2 transition-colors ${
-              activeTab === 'info' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+              activeTab === 'info' ? 'border-forest-600 text-forest-600' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}>
             Thông tin
           </button>
@@ -228,7 +228,7 @@ export default function ProfileDetail({ userId }: { userId: string }) {
                   const img = p.images?.[0]?.url || null;
                   return (
                     <Link key={p.id} href={`/products/${p.id}`}
-                      className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-green-200 transition-all">
+                      className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-forest-200 transition-all">
                       <div className="relative aspect-square bg-gray-100 overflow-hidden">
                         {img ? (
                           <img src={img} alt={p.title}
@@ -239,7 +239,7 @@ export default function ProfileDetail({ userId }: { userId: string }) {
                           </div>
                         )}
                         {p.isVip && (
-                          <span className="absolute top-1.5 left-1.5 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
+                          <span className="absolute top-1.5 left-1.5 bg-gold-400 text-gold-900 text-[10px] font-bold px-1.5 py-0.5 rounded">VIP</span>
                         )}
                         <span className="absolute bottom-1.5 left-1.5 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded">
                           {timeAgo(p.createdAt)}
@@ -283,8 +283,8 @@ export default function ProfileDetail({ userId }: { userId: string }) {
             )}
             {profile.address && (
               <div className="flex items-center gap-3 py-2 border-b border-gray-50">
-                <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <i className="ri-map-pin-line text-green-500"></i>
+                <div className="w-8 h-8 bg-forest-50 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i className="ri-map-pin-line text-forest-500"></i>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Địa chỉ</p>
@@ -294,8 +294,8 @@ export default function ProfileDetail({ userId }: { userId: string }) {
             )}
             {joinedStr && (
               <div className="flex items-center gap-3 py-2">
-                <div className="w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <i className="ri-calendar-line text-orange-500"></i>
+                <div className="w-8 h-8 bg-brand-50 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i className="ri-calendar-line text-brand-500"></i>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Tham gia</p>

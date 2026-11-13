@@ -47,7 +47,7 @@ export default function JobCard({ job }: JobCardProps) {
 
   const getTypeColor = (type: string) => {
     return type === 'hiring' 
-      ? 'bg-green-100 text-green-700' 
+      ? 'bg-forest-100 text-forest-700' 
       : 'bg-blue-100 text-blue-700';
   };
 
@@ -69,8 +69,8 @@ export default function JobCard({ job }: JobCardProps) {
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'agriculture': 'text-green-600',
-      'construction': 'text-orange-600',
+      'agriculture': 'text-forest-600',
+      'construction': 'text-brand-600',
       'repair': 'text-forest-600',
       'cleaning': 'text-blue-600',
       'petcare': 'text-pink-600',
@@ -116,7 +116,7 @@ export default function JobCard({ job }: JobCardProps) {
 
   return (
     <div className={`bg-white rounded-xl shadow-sm border transition-all hover:shadow-md ${
-      job.isUrgent ? 'ring-2 ring-orange-200 border-orange-300' : 'border-gray-200'
+      job.isUrgent ? 'ring-2 ring-brand-200 border-brand-300' : 'border-gray-200'
     }`}>
       {/* Header */}
       <div className="p-6 pb-4">
@@ -131,7 +131,7 @@ export default function JobCard({ job }: JobCardProps) {
                   {getTypeText(job.type)}
                 </span>
                 {job.isUrgent && (
-                  <span className="flex items-center space-x-1 text-orange-600 text-xs">
+                  <span className="flex items-center space-x-1 text-brand-600 text-xs">
                     <i className="ri-alarm-warning-line"></i>
                     <span>Gấp</span>
                   </span>
@@ -300,7 +300,7 @@ export default function JobCard({ job }: JobCardProps) {
 
           {hasApplied && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center space-x-2 text-green-600">
+              <div className="flex items-center space-x-2 text-forest-600">
                 <i className="ri-check-line"></i>
                 <span className="text-sm">Bạn đã ứng tuyển thành công!</span>
               </div>

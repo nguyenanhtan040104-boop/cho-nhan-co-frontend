@@ -29,7 +29,7 @@ export default function ForumSidebar({
       label: 'Thành viên hoạt động',
       value: '5,678',
       icon: 'ri-user-star-line',
-      color: 'text-green-600',
+      color: 'text-forest-600',
     },
     {
       label: 'Bình luận hôm nay',
@@ -41,7 +41,7 @@ export default function ForumSidebar({
       label: 'Lượt xem tuần này',
       value: '12.5K',
       icon: 'ri-eye-line',
-      color: 'text-orange-600',
+      color: 'text-brand-600',
     },
   ];
 
@@ -101,7 +101,7 @@ export default function ForumSidebar({
               onClick={() => onCategoryChange(category.name)}
               className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer ${
                 selectedCategory === category.name
-                  ? 'bg-green-50 text-green-700 border border-green-200'
+                  ? 'bg-forest-50 text-forest-700 border border-forest-200'
                   : 'hover:bg-gray-50 text-gray-700'
               }`}
             >
@@ -110,7 +110,7 @@ export default function ForumSidebar({
                   <i
                     className={`${category.icon} ${
                       selectedCategory === category.name
-                        ? 'text-green-600'
+                        ? 'text-forest-600'
                         : 'text-gray-500'
                     }`}
                   ></i>
@@ -120,7 +120,7 @@ export default function ForumSidebar({
               <span
                 className={`text-sm px-2 py-1 rounded-full ${
                   selectedCategory === category.name
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-forest-100 text-forest-700'
                     : 'bg-gray-100 text-gray-600'
                 }`}
               >
@@ -148,10 +148,10 @@ export default function ForumSidebar({
                 <div
                   className={`absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                     index === 0
-                      ? 'bg-yellow-500'
+                      ? 'bg-gold-500'
                       : index === 1
                       ? 'bg-gray-400'
-                      : 'bg-orange-500'
+                      : 'bg-brand-500'
                   }`}
                 >
                   {index + 1}
@@ -178,10 +178,10 @@ export default function ForumSidebar({
       {/* Quick Actions */}
       <div className="bg-gradient-to-br from-brand-600 to-brand-700 rounded-xl p-6 text-white">
         <h3 className="text-lg font-semibold mb-3">Bắt đầu thảo luận</h3>
-        <p className="text-green-100 text-sm mb-4">
+        <p className="text-forest-100 text-sm mb-4">
           Chia sẻ kinh nghiệm, đặt câu hỏi hoặc tìm kiếm sự giúp đỡ từ cộng đồng
         </p>
-        <button className="w-full bg-white text-green-700 py-2 px-4 rounded-lg hover:bg-green-50 transition-colors font-medium whitespace-nowrap cursor-pointer">
+        <button className="w-full bg-white text-forest-700 py-2 px-4 rounded-lg hover:bg-forest-50 transition-colors font-medium whitespace-nowrap cursor-pointer">
           <i className="ri-edit-line mr-2"></i>
           Viết bài mới
         </button>

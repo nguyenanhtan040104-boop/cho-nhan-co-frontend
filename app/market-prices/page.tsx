@@ -49,9 +49,9 @@ export default function MarketPricesPage() {
   const currentCat = agriCategories.find(c => c.category === openCat);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
       {/* Banner */}
-      <div className="border-y-2 border-ink bg-paper py-6">
+      <div className="border-b border-line bg-surface py-6">
         <div className="max-w-5xl mx-auto px-4">
           <p className="text-brand-600 text-xs font-bold mb-1">Chợ Nhân Cơ</p>
           <h1 className="text-2xl font-semibold text-ink">Giá thị trường</h1>
@@ -65,7 +65,7 @@ export default function MarketPricesPage() {
 
         {/* ── Bảng Giá Hàng Hóa ── */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-green-50 to-emerald-50">
+          <div className="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-forest-50 to-emerald-50">
             <div>
               <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Hàng Hóa Hôm Nay</h2>
               <p className="text-xs text-gray-500">
@@ -73,7 +73,7 @@ export default function MarketPricesPage() {
                 {agriUpdatedAt && ` · ${new Date(agriUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
               </p>
             </div>
-            <button onClick={refreshAgri} className="text-green-600 hover:text-green-700 p-2 rounded-lg hover:bg-green-100 transition-colors">
+            <button onClick={refreshAgri} className="text-forest-600 hover:text-forest-700 p-2 rounded-lg hover:bg-forest-100 transition-colors">
               <i className={`ri-refresh-line text-lg ${agriLoading ? 'animate-spin' : ''}`}></i>
             </button>
           </div>
@@ -86,9 +86,9 @@ export default function MarketPricesPage() {
               <div className="flex flex-wrap gap-1.5 px-5 py-3 border-b bg-gray-50">
                 {agriCategories.map(cat => (
                   <button key={cat.category} onClick={() => setOpenCat(cat.category)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${openCat === cat.category ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${openCat === cat.category ? 'bg-forest-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
                     {cat.category}
-                    {cat.isLive && <span className={`w-1.5 h-1.5 rounded-full ${openCat === cat.category ? 'bg-green-200' : 'bg-green-500'}`}></span>}
+                    {cat.isLive && <span className={`w-1.5 h-1.5 rounded-full ${openCat === cat.category ? 'bg-forest-200' : 'bg-forest-500'}`}></span>}
                   </button>
                 ))}
               </div>
@@ -97,8 +97,8 @@ export default function MarketPricesPage() {
               {currentCat && (
                 <div>
                   <div className="px-5 py-2.5 bg-gray-50 border-b flex flex-wrap items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-700">{currentCat.category}</span>{currentCat.note && <span className="w-full text-xs text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg">{currentCat.note}</span>}
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${currentCat.isLive ? 'text-green-600 bg-green-50' : 'text-gray-400 bg-gray-100'}`}>
+                    <span className="font-medium text-gray-700">{currentCat.category}</span>{currentCat.note && <span className="w-full text-xs text-gold-700 bg-gold-50 px-3 py-1.5 rounded-lg">{currentCat.note}</span>}
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${currentCat.isLive ? 'text-forest-600 bg-forest-50' : 'text-gray-400 bg-gray-100'}`}>
                       {currentCat.source}
                     </span>
                   </div>
@@ -152,16 +152,16 @@ export default function MarketPricesPage() {
                           {(!currentCat.items || currentCat.items.length === 0) && (<tr><td colSpan={4} className="px-5 py-6 text-center text-sm text-gray-400">Chưa lấy được giá từ nguồn này, thử làm mới sau ít phút.</td></tr>)}{currentCat.items?.map((item: any, i: number) => {
                             const ch = item.change;
                             return (
-                              <tr key={i} className="hover:bg-green-50/30 transition-colors">
+                              <tr key={i} className="hover:bg-forest-50/30 transition-colors">
                                 <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
                                 <td className="px-5 py-3 text-right">
-                                  <span className="font-bold text-green-600">{item.price.toLocaleString('vi-VN')}{item.priceMax ? ` – ${item.priceMax.toLocaleString('vi-VN')}` : ''}đ</span>
+                                  <span className="font-bold text-forest-600">{item.price.toLocaleString('vi-VN')}{item.priceMax ? ` – ${item.priceMax.toLocaleString('vi-VN')}` : ''}đ</span>
                                   <span className="text-xs text-gray-400">/{item.unit}</span>
                                 </td>
                                 <td className="px-5 py-3 text-right text-sm font-medium">
                                   {ch == null || ch === 0 ? <span className="text-gray-300">—</span>
                                     : ch > 0 ? <span className="text-red-500">▲ {Math.abs(ch).toLocaleString('vi-VN')}</span>
-                                    : <span className="text-green-600">▼ {Math.abs(ch).toLocaleString('vi-VN')}</span>}
+                                    : <span className="text-forest-600">▼ {Math.abs(ch).toLocaleString('vi-VN')}</span>}
                                 </td>
                                 <td className="px-5 py-3 text-sm text-gray-500 hidden sm:table-cell">{item.location}</td>
                               </tr>
@@ -182,10 +182,10 @@ export default function MarketPricesPage() {
         </div>
 
         {/* ── Giá Vàng SJC ── */}
-        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-2xl p-5 shadow-sm">
+        <div className="bg-gradient-to-r from-gold-50 to-gold-50 border border-gold-200 rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow">
+              <div className="w-10 h-10 bg-gold-400 rounded-xl flex items-center justify-center shadow">
                 <span className="text-base font-bold text-white">Au</span>
               </div>
               <div>
@@ -196,7 +196,7 @@ export default function MarketPricesPage() {
                 </p>
               </div>
             </div>
-            <button onClick={refreshGold} className="text-yellow-600 hover:text-yellow-700 p-2 rounded-lg hover:bg-yellow-100 transition-colors">
+            <button onClick={refreshGold} className="text-gold-600 hover:text-gold-700 p-2 rounded-lg hover:bg-gold-100 transition-colors">
               <i className={`ri-refresh-line text-lg ${goldLoading ? 'animate-spin' : ''}`}></i>
             </button>
           </div>
@@ -206,21 +206,21 @@ export default function MarketPricesPage() {
           ) : (
             <>
               {goldData?.worldPrice && (
-                <div className="bg-yellow-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
+                <div className="bg-gold-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Vàng thế giới (XAU/USD)</span>
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-gray-900">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</span>
                     {goldData.worldChange != null && (
-                      <span className={`text-sm font-semibold ${goldData.worldChange >= 0 ? 'text-red-500' : 'text-green-600'}`}>
+                      <span className={`text-sm font-semibold ${goldData.worldChange >= 0 ? 'text-red-500' : 'text-forest-600'}`}>
                         {goldData.worldChange >= 0 ? '▲' : '▼'} {Math.abs(goldData.worldChange).toFixed(2)}
                       </span>
                     )}
                   </div>
                 </div>
               )}
-              <div className="overflow-x-auto rounded-xl border border-yellow-100">
+              <div className="overflow-x-auto rounded-xl border border-gold-100">
                 <table className="w-full">
-                  <thead className="bg-yellow-50 border-b border-yellow-100">
+                  <thead className="bg-gold-50 border-b border-gold-100">
                     <tr>
                       <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Hệ thống bán vàng miếng SJC</th>
                       <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Mua vào</th>
@@ -228,11 +228,11 @@ export default function MarketPricesPage() {
                       <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-yellow-50">
+                  <tbody className="divide-y divide-gold-50">
                     {goldPrices.map((item: any, i: number) => {
                       const ch = item.change;
                       return (
-                        <tr key={i} className="hover:bg-yellow-50/40 transition-colors bg-white">
+                        <tr key={i} className="hover:bg-gold-50/40 transition-colors bg-white">
                           <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
                           <td className="px-4 py-3 text-right">
                             <span className="font-bold text-blue-600 text-sm">{item.buy > 0 ? (item.buy / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
@@ -245,7 +245,7 @@ export default function MarketPricesPage() {
                           <td className="px-4 py-3 text-right text-sm font-medium">
                             {ch == null || ch === 0 ? <span className="text-gray-300">—</span>
                               : ch > 0 ? <span className="text-red-500">▲ {(Math.abs(ch) / 1000).toFixed(0)}k</span>
-                              : <span className="text-green-600">▼ {(Math.abs(ch) / 1000).toFixed(0)}k</span>}
+                              : <span className="text-forest-600">▼ {(Math.abs(ch) / 1000).toFixed(0)}k</span>}
                           </td>
                         </tr>
                       );
@@ -314,7 +314,7 @@ function CoffeeHistoryTable({ provinces, openProvince, setOpenProvince }: {
                     <td className="px-5 py-3 text-right text-sm font-semibold">
                       {ch == null || ch === 0 ? <span className="text-gray-300 font-normal">—</span>
                         : ch > 0 ? <span className="text-red-500">+{Math.abs(ch).toLocaleString('vi-VN')}</span>
-                        : <span className="text-green-600">-{Math.abs(ch).toLocaleString('vi-VN')}</span>}
+                        : <span className="text-forest-600">-{Math.abs(ch).toLocaleString('vi-VN')}</span>}
                     </td>
                   </tr>
                 );

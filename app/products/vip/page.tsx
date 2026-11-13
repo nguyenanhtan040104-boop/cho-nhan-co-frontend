@@ -13,7 +13,7 @@ const VIP_PLANS = [
 
 export default function VipProductPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-gold-400 border-t-transparent rounded-full animate-spin"></div></div>}>
       <VipProductContent />
     </Suspense>
   );
@@ -119,7 +119,7 @@ function VipProductContent() {
   const seconds = countdown % 60;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-gold-50 to-brand-50">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/dashboard" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
@@ -158,15 +158,15 @@ function VipProductContent() {
             <div className="space-y-3">
               {VIP_PLANS.map(p => (
                 <button key={p.days} onClick={() => setSelectedPlan(p.days)}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${selectedPlan === p.days ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 bg-white hover:border-yellow-300'}`}>
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${selectedPlan === p.days ? 'border-gold-400 bg-gold-50' : 'border-gray-200 bg-white hover:border-gold-300'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === p.days ? 'border-yellow-500 bg-yellow-500' : 'border-gray-300'}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === p.days ? 'border-gold-500 bg-gold-500' : 'border-gray-300'}`}>
                         {selectedPlan === p.days && <div className="w-2 h-2 bg-white rounded-full"></div>}
                       </div>
                       <div>
                         <span className="font-semibold text-gray-900">{p.label}</span>
-                        {p.popular && <span className="ml-2 text-xs bg-orange-500 text-white px-1.5 py-0.5 rounded">Phổ biến</span>}
+                        {p.popular && <span className="ml-2 text-xs bg-brand-500 text-white px-1.5 py-0.5 rounded">Phổ biến</span>}
                         <p className="text-xs text-gray-500">{p.desc}</p>
                       </div>
                     </div>
@@ -184,7 +184,7 @@ function VipProductContent() {
               {/* Sản phẩm được chọn */}
               {loading ? (
                 <div className="flex justify-center py-4">
-                  <div className="w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-6 h-6 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : product ? (
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-4">
@@ -199,12 +199,12 @@ function VipProductContent() {
                     <p className="font-medium text-gray-900 text-sm truncate">{product.title}</p>
                     <p className="text-xs text-gray-500">{Number(product.price).toLocaleString()}đ/{product.unit}</p>
                     {product.isVip && product.vipExpiresAt && (
-                      <p className="text-xs text-yellow-600">VIP đến: {new Date(product.vipExpiresAt).toLocaleDateString('vi-VN')}</p>
+                      <p className="text-xs text-gold-600">VIP đến: {new Date(product.vipExpiresAt).toLocaleDateString('vi-VN')}</p>
                     )}
                   </div>
                 </div>
               ) : !productId ? (
-                <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg mb-4 text-sm text-orange-700">
+                <div className="p-3 bg-brand-50 border border-brand-200 rounded-lg mb-4 text-sm text-brand-700">
                   Chưa chọn sản phẩm. Vào <Link href="/dashboard" className="underline">Dashboard</Link> → Sản phẩm → Nâng VIP
                 </div>
               ) : null}
@@ -217,7 +217,7 @@ function VipProductContent() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Giá</span>
-                  <span className="font-bold text-yellow-600">{plan.price.toLocaleString()}đ</span>
+                  <span className="font-bold text-gold-600">{plan.price.toLocaleString()}đ</span>
                 </div>
                 <div className="flex justify-between text-sm pt-2 border-t">
                   <span className="font-semibold">Tổng cộng</span>
@@ -229,12 +229,12 @@ function VipProductContent() {
 
               {success ? (
                 <div className="text-center py-4">
-                  <p className="font-semibold text-green-700">Nâng cấp VIP thành công!</p>
+                  <p className="font-semibold text-forest-700">Nâng cấp VIP thành công!</p>
                   <p className="text-sm text-gray-500 mt-1">Đang chuyển về trang quản lý...</p>
                 </div>
               ) : (
                 <button onClick={handlePay} disabled={creating || !productId}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white py-3 rounded-xl font-semibold hover:from-yellow-500 hover:to-orange-500 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
+                  className="w-full bg-gradient-to-r from-gold-400 to-brand-400 text-white py-3 rounded-xl font-semibold hover:from-gold-500 hover:to-brand-500 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
                   {creating ? (
                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang tạo...</>
                   ) : (
@@ -256,7 +256,7 @@ function VipProductContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-yellow-400 to-orange-400 px-6 py-4 text-white text-center">
+            <div className="bg-gradient-to-r from-gold-400 to-brand-400 px-6 py-4 text-white text-center">
               <p className="text-sm font-medium opacity-90">Thanh toán VIP</p>
               <p className="text-2xl font-bold mt-1">{paymentData.amount.toLocaleString()}đ</p>
             </div>
@@ -283,7 +283,7 @@ function VipProductContent() {
 
               {/* Status */}
               <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-5">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></div>
                 Đang chờ thanh toán... tự động xác nhận khi nhận tiền
               </div>
 

@@ -142,11 +142,11 @@ export default function ModerationPage() {
 
         {/* Bulk action bar */}
         {selected.size > 0 && (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4 flex items-center gap-3 flex-wrap">
-            <span className="text-sm font-medium text-orange-700">Đã chọn {selected.size} bài</span>
+          <div className="bg-brand-50 border border-brand-200 rounded-xl p-4 mb-4 flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-medium text-brand-700">Đã chọn {selected.size} bài</span>
             <div className="ml-auto flex gap-2">
               <button onClick={handleBulkHide} disabled={processing === 'bulk'}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 text-sm">
+                className="px-4 py-2 bg-gold-500 text-white rounded-lg hover:bg-gold-600 disabled:opacity-50 text-sm">
                 <i className="ri-eye-off-line mr-1"></i> Ẩn tất cả
               </button>
               <button onClick={handleBulkDelete} disabled={processing === 'bulk'}
@@ -189,7 +189,7 @@ export default function ModerationPage() {
                           <i className="ri-eye-off-line"></i> Đã ẩn
                         </span>
                       ) : (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Hiển thị</span>
+                        <span className="text-xs bg-forest-100 text-forest-700 px-2 py-0.5 rounded">Hiển thị</span>
                       )}
                       <span className="text-xs bg-forest-50 text-forest-600 px-2 py-0.5 rounded">
                         {categoryLabel[post.category] || post.category}
@@ -218,7 +218,7 @@ export default function ModerationPage() {
                       </button>
                     ) : (
                       <button onClick={() => handleHide(post.id)} disabled={processing === post.id}
-                        className="px-3 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 text-xs whitespace-nowrap">
+                        className="px-3 py-1.5 bg-gold-500 text-white rounded-lg hover:bg-gold-600 disabled:opacity-50 text-xs whitespace-nowrap">
                         {processing === post.id ? '...' : 'Ẩn bài'}
                       </button>
                     )}

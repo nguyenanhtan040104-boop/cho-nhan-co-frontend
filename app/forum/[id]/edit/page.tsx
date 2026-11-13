@@ -95,7 +95,7 @@ export default function EditPostPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4">{error}</div>}
         {success && (
-          <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4 flex items-center gap-2">
+          <div className="p-4 bg-forest-50 border border-forest-200 text-forest-700 rounded-lg text-sm mb-4 flex items-center gap-2">
             <i className="ri-check-circle-line"></i>{success}
           </div>
         )}

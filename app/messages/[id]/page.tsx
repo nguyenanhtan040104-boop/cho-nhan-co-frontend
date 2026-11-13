@@ -200,7 +200,7 @@ export default function ChatPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-8 h-8 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
@@ -215,15 +215,15 @@ export default function ChatPage() {
           {otherUser?.avatarUrl ? (
             <img src={otherUser.avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover" />
           ) : (
-            <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">
+            <div className="w-9 h-9 bg-forest-100 rounded-full flex items-center justify-center text-forest-700 font-bold">
               {otherUser?.fullName?.[0] || otherUser?.username?.[0] || 'U'}
             </div>
           )}
           <div className="flex-1">
             <p className="font-semibold text-gray-900 text-sm">{otherUser?.fullName || otherUser?.username || 'Người dùng'}</p>
-            {typing && <p className="text-xs text-green-600 animate-pulse">Đang nhập...</p>}
-            {!socketReady && <p className="text-xs text-amber-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse inline-block"></span>Đang kết nối...</p>}
-            {socketReady && !typing && <p className="text-xs text-green-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block"></span>Đang hoạt động</p>}
+            {typing && <p className="text-xs text-forest-600 animate-pulse">Đang nhập...</p>}
+            {!socketReady && <p className="text-xs text-gold-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-gold-400 rounded-full animate-pulse inline-block"></span>Đang kết nối...</p>}
+            {socketReady && !typing && <p className="text-xs text-forest-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-forest-400 rounded-full inline-block"></span>Đang hoạt động</p>}
           </div>
           <div className="relative">
             <button onClick={() => setShowMenu(!showMenu)}
@@ -259,7 +259,7 @@ export default function ChatPage() {
             return (
               <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} gap-2`}>
                 {!isMe && (
-                  <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center text-green-700 text-xs font-bold flex-shrink-0 mt-1">
+                  <div className="w-7 h-7 bg-forest-100 rounded-full flex items-center justify-center text-forest-700 text-xs font-bold flex-shrink-0 mt-1">
                     {otherUser?.fullName?.[0] || 'U'}
                   </div>
                 )}
@@ -276,7 +276,7 @@ export default function ChatPage() {
                   )}
                   <span className="text-xs text-gray-400 px-1">
                     {new Date(msg.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                    {isMe && msg.isRead && <span className="ml-1 text-green-500">✓✓</span>}
+                    {isMe && msg.isRead && <span className="ml-1 text-forest-500">✓✓</span>}
                   </span>
                 </div>
               </div>
@@ -295,9 +295,9 @@ export default function ChatPage() {
             <form onSubmit={handleSend} className="flex items-center gap-2">
               <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSend} className="hidden" />
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImg}
-                className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-brand-600 hover:bg-green-50 rounded-full transition-colors disabled:opacity-50">
+                className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-brand-600 hover:bg-forest-50 rounded-full transition-colors disabled:opacity-50">
                 {uploadingImg
-                  ? <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                  ? <div className="w-4 h-4 border-2 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
                   : <i className="ri-image-line text-xl"></i>}
               </button>
               <input value={text} onChange={handleTextChange}

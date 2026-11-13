@@ -110,7 +110,7 @@ export default function EditProductPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
@@ -145,14 +145,14 @@ export default function EditProductPage() {
               ))}
               {newPreviews.map((src, i) => (
                 <div key={`new-${i}`} className="relative w-24 h-24">
-                  <img src={src} className="w-full h-full object-cover rounded-lg border border-green-300" alt="" />
+                  <img src={src} className="w-full h-full object-cover rounded-lg border border-forest-300" alt="" />
                   <button type="button" onClick={() => removeNew(i)}
                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
                   <span className="absolute bottom-0 left-0 right-0 bg-brand-500 text-white text-xs text-center py-0.5 rounded-b-lg">Mới</span>
                 </div>
               ))}
               {existingImages.length + newFiles.length < 10 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-green-400">
+                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-forest-400">
                   <i className="ri-image-add-line text-2xl text-gray-400"></i>
                   <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
                   <input type="file" multiple accept="image/*" className="hidden" onChange={handleNewImages} />

@@ -79,7 +79,7 @@ function CanhBaoContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
       <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
@@ -143,12 +143,12 @@ function CanhBaoContent() {
               </div>
             )}
 
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5">
+            <div className="bg-gold-50 border border-gold-200 rounded-2xl p-4 mb-5">
               <div className="flex gap-3">
-                <i className="ri-information-line text-amber-500 text-xl flex-shrink-0 mt-0.5"></i>
+                <i className="ri-information-line text-gold-500 text-xl flex-shrink-0 mt-0.5"></i>
                 <div>
-                  <p className="text-sm font-semibold text-amber-800 mb-1">Lưu ý</p>
-                  <p className="text-xs text-amber-700">Các bài đăng mang tính cộng đồng, chưa được kiểm chứng pháp lý. Nếu bị thiệt hại về tài sản, hãy trình báo cơ quan công an để được hỗ trợ.</p>
+                  <p className="text-sm font-semibold text-gold-800 mb-1">Lưu ý</p>
+                  <p className="text-xs text-gold-700">Các bài đăng mang tính cộng đồng, chưa được kiểm chứng pháp lý. Nếu bị thiệt hại về tài sản, hãy trình báo cơ quan công an để được hỗ trợ.</p>
                 </div>
               </div>
             </div>
@@ -231,13 +231,13 @@ function CanhBaoContent() {
             {/* Tips */}
             <div className="bg-white rounded-2xl p-5 border border-gray-100">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i className="ri-shield-line text-green-600"></i>
+                <i className="ri-shield-line text-forest-600"></i>
                 Cách tự bảo vệ
               </h3>
               <ul className="space-y-2.5">
                 {TIPS.map((tip, i) => (
                   <li key={i} className="flex gap-2 text-xs text-gray-600">
-                    <span className="w-4 h-4 rounded-full bg-green-100 text-green-700 text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">{i + 1}</span>
+                    <span className="w-4 h-4 rounded-full bg-forest-100 text-forest-700 text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">{i + 1}</span>
                     <span>{tip}</span>
                   </li>
                 ))}
@@ -275,7 +275,7 @@ function CanhBaoContent() {
 export default function CanhBaoPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FBF9F5' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F3F7F3' }}>
         <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>

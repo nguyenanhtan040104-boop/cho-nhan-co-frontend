@@ -75,13 +75,13 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                     {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
                   </span>
                   {job.isUrgent && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-orange-100 text-orange-700">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-brand-100 text-brand-700">
                       <i className="ri-alarm-line"></i> Khẩn cấp
                     </span>
                   )}
                   {job.isVip && (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200">
-                      <i className="ri-vip-crown-fill text-yellow-500"></i> VIP
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-gold-100 to-brand-100 text-gold-800 border border-gold-200">
+                      <i className="ri-vip-crown-fill text-gold-500"></i> VIP
                     </span>
                   )}
                   {job.category && (
@@ -113,7 +113,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                     </div>
                   )}
                   {job.deadline && (
-                    <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-2 rounded-xl text-sm font-medium">
+                    <div className="flex items-center gap-1.5 bg-gold-50 text-gold-700 px-3 py-2 rounded-xl text-sm font-medium">
                       <i className="ri-calendar-close-line"></i>
                       Hạn: {new Date(job.deadline).toLocaleDateString('vi-VN')}
                     </div>

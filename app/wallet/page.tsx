@@ -8,7 +8,7 @@ const VIP_PRICE: Record<string, number> = { product: 50000, job: 50000, real_est
 const TYPE_LABEL: Record<string, string> = { product: 'Sản phẩm', job: 'Tuyển dụng', real_estate: 'BĐS' };
 const PRESETS = [50000, 100000, 200000, 500000];
 const fmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
-const statusColor: Record<string, string> = { pending: 'text-yellow-600 bg-yellow-50', completed: 'text-green-600 bg-green-50', rejected: 'text-red-600 bg-red-50' };
+const statusColor: Record<string, string> = { pending: 'text-gold-600 bg-gold-50', completed: 'text-forest-600 bg-forest-50', rejected: 'text-red-600 bg-red-50' };
 const statusLabel: Record<string, string> = { pending: 'Đang xử lý', completed: 'Thành công', rejected: 'Từ chối' };
 
 export default function WalletPage() {
@@ -168,7 +168,7 @@ function WalletContent() {
 
         {/* Balance card */}
         <div className="bg-gradient-to-r from-brand-600 to-forest-500 rounded-2xl p-6 text-white shadow-lg">
-          <p className="text-green-100 text-sm mb-1">Số dư hiện tại</p>
+          <p className="text-forest-100 text-sm mb-1">Số dư hiện tại</p>
           {loading ? (
             <div className="h-10 w-40 bg-white/20 rounded animate-pulse"></div>
           ) : (
@@ -176,7 +176,7 @@ function WalletContent() {
           )}
           <div className="flex gap-3 mt-5">
             <button onClick={() => { setShowTopUp(!showTopUp); setShowBuyVip(false); setError(''); }}
-              className="flex-1 bg-white text-green-700 font-semibold py-2.5 rounded-xl hover:bg-green-50 transition flex items-center justify-center gap-2 text-sm">
+              className="flex-1 bg-white text-forest-700 font-semibold py-2.5 rounded-xl hover:bg-forest-50 transition flex items-center justify-center gap-2 text-sm">
               <i className="ri-add-circle-line text-lg"></i> Nạp tiền
             </button>
             <button onClick={() => { setShowBuyVip(!showBuyVip); setShowTopUp(false); if (myListings.length === 0) loadMyListings(); setVipSuccess(''); }}
@@ -188,9 +188,9 @@ function WalletContent() {
 
         {/* Thông báo */}
         {paymentStatus === 'success' && !paymentData && (
-          <div className="bg-green-50 border border-green-300 text-green-700 px-4 py-4 rounded-xl flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <i className="ri-check-line text-green-600 text-xl"></i>
+          <div className="bg-forest-50 border border-forest-300 text-forest-700 px-4 py-4 rounded-xl flex items-center gap-3">
+            <div className="w-10 h-10 bg-forest-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <i className="ri-check-line text-forest-600 text-xl"></i>
             </div>
             <div>
               <p className="font-semibold">Nạp tiền thành công!</p>
@@ -199,12 +199,12 @@ function WalletContent() {
           </div>
         )}
         {paymentStatus === 'cancel' && (
-          <div className="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl text-sm">
+          <div className="bg-brand-50 border border-brand-200 text-brand-700 px-4 py-3 rounded-xl text-sm">
             Bạn đã hủy giao dịch. Chọn lại số tiền để nạp.
           </div>
         )}
         {vipSuccess && (
-          <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <div className="bg-gold-50 border border-gold-300 text-gold-800 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
             <i className="ri-vip-crown-fill"></i> {vipSuccess}
           </div>
         )}
@@ -220,7 +220,7 @@ function WalletContent() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="font-bold text-gray-900 flex items-center gap-2">
-                  <i className="ri-qr-code-line text-green-600 text-xl"></i> Quét mã thanh toán
+                  <i className="ri-qr-code-line text-forest-600 text-xl"></i> Quét mã thanh toán
                 </h2>
                 <p className="text-sm text-gray-500 mt-0.5">Mở app ngân hàng → Quét QR → Xác nhận</p>
               </div>
@@ -244,14 +244,14 @@ function WalletContent() {
               </div>
 
               {/* Amount */}
-              <div className="bg-green-50 border border-green-200 rounded-xl px-6 py-3 mb-4 text-center">
+              <div className="bg-forest-50 border border-forest-200 rounded-xl px-6 py-3 mb-4 text-center">
                 <p className="text-xs text-gray-500 mb-0.5">Số tiền cần chuyển</p>
-                <p className="text-2xl font-bold text-green-700">{fmt(paymentData.amount)}</p>
+                <p className="text-2xl font-bold text-forest-700">{fmt(paymentData.amount)}</p>
               </div>
 
               {/* Waiting indicator */}
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
-                <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-forest-500 border-t-transparent rounded-full animate-spin"></div>
                 Đang chờ thanh toán... tự động xác nhận khi nhận tiền
               </div>
 
@@ -260,7 +260,7 @@ function WalletContent() {
                   href={paymentData.checkoutUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 bg-green-50 border border-green-300 text-green-700 text-sm font-medium py-2.5 rounded-xl hover:bg-green-100 transition text-center"
+                  className="flex-1 bg-forest-50 border border-forest-300 text-forest-700 text-sm font-medium py-2.5 rounded-xl hover:bg-forest-100 transition text-center"
                 >
                   <i className="ri-external-link-line mr-1"></i>Mở lại trang thanh toán
                 </a>
@@ -297,8 +297,8 @@ function WalletContent() {
                       key={p}
                       onClick={() => setAmount(String(p))}
                       className={`py-3 rounded-xl border-2 text-sm font-semibold transition ${amount === String(p)
-                        ? 'bg-brand-500 border-green-600 text-white'
-                        : 'border-gray-200 hover:border-green-400 text-gray-700 bg-gray-50'}`}
+                        ? 'bg-brand-500 border-forest-600 text-white'
+                        : 'border-gray-200 hover:border-forest-400 text-gray-700 bg-gray-50'}`}
                     >
                       {fmt(p)}
                     </button>
@@ -316,7 +316,7 @@ function WalletContent() {
               </div>
 
               {amount && Number(amount) >= 10000 && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700 flex items-center gap-2">
+                <div className="bg-forest-50 border border-forest-200 rounded-xl p-3 text-sm text-forest-700 flex items-center gap-2">
                   <i className="ri-information-line"></i>
                   Sau khi quét QR và thanh toán <strong>{fmt(Number(amount))}</strong>, số dư sẽ được cộng tự động.
                 </div>
@@ -343,7 +343,7 @@ function WalletContent() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="font-bold text-gray-900 flex items-center gap-2">
-                  <i className="ri-vip-crown-fill text-yellow-500"></i> Mua VIP cho tin đăng
+                  <i className="ri-vip-crown-fill text-gold-500"></i> Mua VIP cho tin đăng
                 </h2>
                 <p className="text-sm text-gray-500 mt-0.5">Chọn tin bạn muốn nâng lên VIP</p>
               </div>
@@ -364,35 +364,35 @@ function WalletContent() {
 
             {loadingListings ? (
               <div className="py-8 text-center text-gray-400">
-                <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                <div className="w-6 h-6 border-2 border-gold-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
                 Đang tải danh sách tin...
               </div>
             ) : myListings.length === 0 ? (
               <div className="py-8 text-center text-gray-400">
                 <i className="ri-inbox-line text-3xl block mb-2"></i>
                 <p className="text-sm">Bạn chưa có tin đăng nào</p>
-                <Link href="/products/create" className="inline-block mt-3 text-green-600 text-sm hover:underline">+ Đăng tin ngay</Link>
+                <Link href="/products/create" className="inline-block mt-3 text-forest-600 text-sm hover:underline">+ Đăng tin ngay</Link>
               </div>
             ) : (
               <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                 {myListings.map(item => (
-                  <div key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border transition ${item.isVip ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200 hover:border-yellow-300'}`}>
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${item.isVip ? 'bg-yellow-100' : 'bg-white border border-gray-200'}`}>
-                      <i className={`text-sm ${item.isVip ? 'ri-vip-crown-fill text-yellow-500' : 'ri-file-list-line text-gray-400'}`}></i>
+                  <div key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border transition ${item.isVip ? 'bg-gold-50 border-gold-200' : 'bg-gray-50 border-gray-200 hover:border-gold-300'}`}>
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${item.isVip ? 'bg-gold-100' : 'bg-white border border-gray-200'}`}>
+                      <i className={`text-sm ${item.isVip ? 'ri-vip-crown-fill text-gold-500' : 'ri-file-list-line text-gray-400'}`}></i>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
                       <p className="text-xs text-gray-400">{TYPE_LABEL[item.type]} · {fmt(VIP_PRICE[item.type])}</p>
                     </div>
                     {item.isVip ? (
-                      <span className="flex-shrink-0 text-xs bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg font-medium flex items-center gap-1">
+                      <span className="flex-shrink-0 text-xs bg-gold-100 text-gold-700 px-3 py-1.5 rounded-lg font-medium flex items-center gap-1">
                         <i className="ri-vip-crown-fill"></i> VIP
                       </span>
                     ) : (
                       <button
                         onClick={() => handleBuyVip(item)}
                         disabled={buyingId === item.id}
-                        className="flex-shrink-0 text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-1.5 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition"
+                        className="flex-shrink-0 text-xs bg-gradient-to-r from-gold-400 to-brand-400 text-white px-4 py-1.5 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition"
                       >
                         {buyingId === item.id ? '...' : '⭐ Mua'}
                       </button>
@@ -426,15 +426,15 @@ function WalletContent() {
             <div className="divide-y">
               {transactions.map(tx => (
                 <div key={tx.id} className="px-5 py-4 flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tx.type === 'top_up' ? 'bg-green-100' : 'bg-orange-100'}`}>
-                    <i className={tx.type === 'top_up' ? 'ri-add-circle-line text-green-600' : 'ri-vip-crown-fill text-orange-500'}></i>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${tx.type === 'top_up' ? 'bg-forest-100' : 'bg-brand-100'}`}>
+                    <i className={tx.type === 'top_up' ? 'ri-add-circle-line text-forest-600' : 'ri-vip-crown-fill text-brand-500'}></i>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{tx.description}</p>
                     <p className="text-xs text-gray-400 mt-0.5">{new Date(tx.createdAt).toLocaleString('vi-VN')}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className={`font-bold text-sm ${Number(tx.amount) > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`font-bold text-sm ${Number(tx.amount) > 0 ? 'text-forest-600' : 'text-red-500'}`}>
                       {Number(tx.amount) > 0 ? '+' : ''}{fmt(Math.abs(Number(tx.amount)))}
                     </p>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[tx.status]}`}>

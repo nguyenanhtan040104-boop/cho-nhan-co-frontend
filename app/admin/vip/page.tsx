@@ -68,7 +68,7 @@ export default function AdminVipPage() {
             </button>
             <div>
               <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <i className="ri-vip-crown-fill text-yellow-500"></i>
+                <i className="ri-vip-crown-fill text-gold-500"></i>
                 Quản lý VIP
               </h1>
               <p className="text-sm text-gray-500">{vipCount} tin đang là VIP</p>
@@ -84,10 +84,10 @@ export default function AdminVipPage() {
             const tabItems = tab === t.key ? items : [];
             return (
               <div key={t.key} onClick={() => setTab(t.key)}
-                className={`bg-white rounded-xl p-4 shadow-sm cursor-pointer border-2 transition-all ${tab === t.key ? 'border-yellow-400' : 'border-transparent hover:border-gray-200'}`}>
+                className={`bg-white rounded-xl p-4 shadow-sm cursor-pointer border-2 transition-all ${tab === t.key ? 'border-gold-400' : 'border-transparent hover:border-gray-200'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${tab === t.key ? 'bg-yellow-100' : 'bg-gray-100'}`}>
-                    <i className={`${t.icon} ${tab === t.key ? 'text-yellow-600' : 'text-gray-500'}`}></i>
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${tab === t.key ? 'bg-gold-100' : 'bg-gray-100'}`}>
+                    <i className={`${t.icon} ${tab === t.key ? 'text-gold-600' : 'text-gray-500'}`}></i>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">{t.label}</p>
@@ -103,7 +103,7 @@ export default function AdminVipPage() {
         <div className="mb-4">
           <input type="text" placeholder="Tìm theo tiêu đề hoặc tên người đăng..." value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" />
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-gold-400 focus:border-gold-400" />
         </div>
 
         {/* Table */}
@@ -120,7 +120,7 @@ export default function AdminVipPage() {
             <tbody className="divide-y">
               {loading ? (
                 <tr><td colSpan={4} className="py-12 text-center text-gray-400">
-                  <div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <div className="w-8 h-8 border-4 border-gold-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
                 </td></tr>
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={4} className="py-12 text-center text-gray-400">Không có dữ liệu</td></tr>
@@ -129,13 +129,13 @@ export default function AdminVipPage() {
                   <td className="px-4 py-3">
                     <div className="font-medium text-gray-900 line-clamp-1">{item.title}</div>
                     {item.isVip && (
-                      <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-medium">VIP</span>
+                      <span className="text-xs bg-gold-100 text-gold-700 px-1.5 py-0.5 rounded font-medium">VIP</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{item.user?.fullName}</td>
                   <td className="px-4 py-3 text-center">
                     {item.isVip ? (
-                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs px-3 py-1 rounded-full font-bold">
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs px-3 py-1 rounded-full font-bold">
                         <i className="ri-vip-crown-fill"></i> VIP
                       </span>
                     ) : (
@@ -147,7 +147,7 @@ export default function AdminVipPage() {
                       className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${
                         item.isVip
                           ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          : 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white hover:opacity-90'
+                          : 'bg-gradient-to-r from-gold-400 to-brand-400 text-white hover:opacity-90'
                       }`}>
                       {toggling === item.id ? '...' : item.isVip ? 'Hủy VIP' : '⭐ Lên VIP'}
                     </button>

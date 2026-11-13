@@ -199,13 +199,13 @@ export default function AdminDashboard() {
     { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-3-line' },
     { id: 'users', label: 'Người dùng', icon: 'ri-group-line', badge: allUsers.length },
     { id: 'security', label: 'Bảo mật / IP', icon: 'ri-shield-keyhole-line', badge: (!visitedTabs.has('security') && suspiciousIPs > 0) ? suspiciousIPs : undefined, badgeColor: 'bg-red-500' },
-    { id: 'moderation', label: 'Kiểm duyệt', icon: 'ri-shield-check-line', badge: pendingPosts.length || undefined, badgeColor: 'bg-orange-500' },
+    { id: 'moderation', label: 'Kiểm duyệt', icon: 'ri-shield-check-line', badge: pendingPosts.length || undefined, badgeColor: 'bg-brand-500' },
     { id: 'products', label: 'Sản phẩm', icon: 'ri-leaf-line', badge: allProducts.length },
     { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line', badge: allRealEstates.length },
     { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line', badge: allJobs.length },
     { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line', badge: allPosts.length },
     { id: 'ads', label: 'Quảng cáo', icon: 'ri-megaphone-line', badge: allAds.length },
-    { id: 'vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', badge: (!visitedTabs.has('vip') && vipItems.length > 0) ? vipItems.length : undefined, badgeColor: 'bg-yellow-500' },
+    { id: 'vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', badge: (!visitedTabs.has('vip') && vipItems.length > 0) ? vipItems.length : undefined, badgeColor: 'bg-gold-500' },
     { id: 'wallet', label: 'Doanh thu', icon: 'ri-wallet-3-line' },
     { id: 'activity', label: 'Nhật ký', icon: 'ri-history-line' },
   ];
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.location} · {p.category}</p>
-                      <p className="text-sm font-bold text-green-600 mt-0.5">{fmtMoney(Number(p.price))}/{p.unit}</p>
+                      <p className="text-sm font-bold text-forest-600 mt-0.5">{fmtMoney(Number(p.price))}/{p.unit}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <StatusBadge status={p.status} isVip={p.isVip} />
@@ -374,10 +374,10 @@ export default function AdminDashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.category}</p>
-                      {p.endDate && <p className="text-xs text-orange-500 mt-0.5">Hết hạn: {fmtDate(p.endDate)}</p>}
+                      {p.endDate && <p className="text-xs text-brand-500 mt-0.5">Hết hạn: {fmtDate(p.endDate)}</p>}
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${new Date(p.endDate) > new Date() ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${new Date(p.endDate) > new Date() ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
                         {new Date(p.endDate) > new Date() ? 'Đang chạy' : 'Hết hạn'}
                       </span>
                       <p className="text-xs text-gray-400 mt-1">{fmtDate(p.createdAt)}</p>
@@ -408,7 +408,7 @@ export default function AdminDashboard() {
 function StatusBadge({ status, isVip }: { status?: string; isVip?: boolean }) {
   return (
     <div className="flex items-center gap-1 justify-end flex-wrap">
-      {isVip && <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-semibold">VIP</span>}
+      {isVip && <span className="text-xs px-1.5 py-0.5 rounded-full bg-gold-100 text-gold-700 font-semibold">VIP</span>}
       {status && (
         <span className={`text-xs px-1.5 py-0.5 rounded-full ${
           status === 'ACTIVE' ? 'bg-forest-100 text-forest-700' :
@@ -432,7 +432,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
     { label: 'Bài diễn đàn', value: stats.totalPosts, icon: 'ri-chat-3-line', gradient: 'from-cyan-500 to-sky-600', tab: 'forum' },
     { label: 'Người dùng', value: stats.totalUsers, icon: 'ri-group-line', gradient: 'from-pink-500 to-rose-600', tab: 'users' },
     { label: 'Mới hôm nay', value: stats.newUsersToday, icon: 'ri-user-add-line', gradient: 'from-teal-500 to-teal-600', tab: 'users' },
-    { label: 'Chờ duyệt', value: stats.pendingCount, icon: 'ri-time-line', gradient: 'from-orange-500 to-amber-600', tab: 'moderation' },
+    { label: 'Chờ duyệt', value: stats.pendingCount, icon: 'ri-time-line', gradient: 'from-brand-500 to-gold-600', tab: 'moderation' },
     { label: 'Login thất bại hôm nay', value: stats.failedToday, icon: 'ri-shield-keyhole-line', gradient: 'from-red-500 to-red-700', tab: 'security' },
   ];
 
@@ -476,7 +476,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
           <div className="space-y-3">
             {[
               { label: 'Đã xác nhận', value: fmtMoney(revenue), color: 'text-forest-600', dot: 'bg-forest-500' },
-              { label: 'Chờ xác nhận', value: `${pendingTx.length} giao dịch`, color: 'text-orange-500', dot: 'bg-orange-400' },
+              { label: 'Chờ xác nhận', value: `${pendingTx.length} giao dịch`, color: 'text-brand-500', dot: 'bg-brand-400' },
               { label: 'Tổng giao dịch', value: walletTx.length, color: 'text-gray-700', dot: 'bg-gray-400' },
             ].map((r, i) => (
               <div key={i} className="flex items-center justify-between">
@@ -570,7 +570,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
                       <span className={`px-2 py-0.5 rounded-full font-semibold ${
                         h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
                         h.status === 'FAILED' ? 'bg-red-100 text-red-600' :
-                        'bg-orange-100 text-orange-700'
+                        'bg-brand-100 text-brand-700'
                       }`}>{h.status === 'SUCCESS' ? 'Thành công' : h.status === 'FAILED' ? 'Thất bại' : 'Bị khóa'}</span>
                     </td>
                     <td className="px-5 py-2.5 text-right text-gray-400">{timeAgo(h.createdAt)}</td>
@@ -684,7 +684,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
         {[
           { label: 'Login hôm nay', value: successToday + failedToday + lockedToday, icon: 'ri-login-box-line', gradient: 'from-blue-500 to-blue-600' },
           { label: 'Thành công', value: successToday, icon: 'ri-checkbox-circle-line', gradient: 'from-forest-500 to-brand-600' },
-          { label: 'Thất bại hôm nay', value: failedToday, icon: 'ri-close-circle-line', gradient: 'from-orange-500 to-amber-600' },
+          { label: 'Thất bại hôm nay', value: failedToday, icon: 'ri-close-circle-line', gradient: 'from-brand-500 to-gold-600' },
           { label: 'IP bị chặn', value: blockedIps.length, icon: 'ri-shield-cross-line', gradient: 'from-red-500 to-red-700' },
         ].map((c, i) => (
           <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
@@ -729,7 +729,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                       <p className="text-[10px] text-gray-400">Thất bại</p>
                     </div>
                     <div>
-                      <p className="text-lg font-black text-orange-500">{data.locked}</p>
+                      <p className="text-lg font-black text-brand-500">{data.locked}</p>
                       <p className="text-[10px] text-gray-400">Bị khóa</p>
                     </div>
                     <div>
@@ -740,7 +740,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                       <span className={`text-xs px-2 py-0.5 rounded-lg font-bold ${
                         data.failed >= 10 ? 'bg-red-600 text-white' :
                         data.failed >= 5 ? 'bg-red-100 text-red-700' :
-                        'bg-orange-100 text-orange-700'
+                        'bg-brand-100 text-brand-700'
                       }`}>
                         {data.failed >= 10 ? '🔴 Nguy hiểm' : data.failed >= 5 ? '🟠 Cao' : '🟡 Trung bình'}
                       </span>
@@ -800,7 +800,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
 
         {blockedIps.length === 0 ? (
           <div className="py-8 text-center text-gray-400 text-sm">
-            <i className="ri-shield-check-line text-2xl mb-2 block text-green-400"></i>
+            <i className="ri-shield-check-line text-2xl mb-2 block text-forest-400"></i>
             Không có IP nào bị chặn
           </div>
         ) : (
@@ -860,7 +860,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                 <tr><td colSpan={5} className="text-center py-10 text-gray-400">Không có dữ liệu</td></tr>
               )}
               {filtered.slice(0, 100).map((h: any, i: number) => (
-                <tr key={i} className={`hover:bg-gray-50/50 ${h.status === 'FAILED' ? 'bg-red-50/30' : h.status === 'LOCKED' ? 'bg-orange-50/30' : ''}`}>
+                <tr key={i} className={`hover:bg-gray-50/50 ${h.status === 'FAILED' ? 'bg-red-50/30' : h.status === 'LOCKED' ? 'bg-brand-50/30' : ''}`}>
                   <td className="px-5 py-2.5">
                     <p className="font-medium text-gray-800">{h.user?.fullName || '—'}</p>
                     <p className="text-gray-400 text-[10px]">{h.user?.email || h.user?.username}</p>
@@ -878,7 +878,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
                       h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
                       h.status === 'FAILED' ? 'bg-red-100 text-red-600' :
-                      'bg-orange-100 text-orange-700'
+                      'bg-brand-100 text-brand-700'
                     }`}>
                       {h.status === 'SUCCESS' ? '✓ Thành công' : h.status === 'FAILED' ? '✗ Thất bại' : '⚠ Bị khóa'}
                     </span>
@@ -1017,7 +1017,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                     <div className="flex items-center gap-2.5">
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 ${
                         u.role === 'admin' ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white' :
-                        u.role === 'vip' ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white' :
+                        u.role === 'vip' ? 'bg-gradient-to-br from-gold-400 to-gold-500 text-white' :
                         'bg-gradient-to-br from-gray-200 to-gray-300 text-gray-600'
                       }`}>
                         {u.fullName?.[0] || '?'}
@@ -1027,7 +1027,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                         {u.username && <p className="text-[10px] text-gray-400">@{u.username}</p>}
                         <div className="flex items-center gap-1 mt-0.5">
                           {!u.isActive && <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded-full">🔒 Bị khóa</span>}
-                          {failedCount >= 3 && <span className="text-[10px] text-orange-600 font-bold bg-orange-50 px-1.5 py-0.5 rounded-full">⚠ {failedCount} thất bại</span>}
+                          {failedCount >= 3 && <span className="text-[10px] text-brand-600 font-bold bg-brand-50 px-1.5 py-0.5 rounded-full">⚠ {failedCount} thất bại</span>}
                         </div>
                       </div>
                     </div>
@@ -1068,7 +1068,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                       </button>
                       <button onClick={() => handleHideAll(u)} disabled={processing === u.id}
                         title="Ẩn tất cả bài đăng"
-                        className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all disabled:opacity-50">
+                        className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all disabled:opacity-50">
                         <i className="ri-eye-off-line text-sm"></i>
                       </button>
                       <button onClick={() => setBanModal({ user: u })} disabled={processing === u.id}
@@ -1183,11 +1183,11 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                 {historyModal.logs.map((h: any, i: number) => (
                   <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${
                     h.status === 'SUCCESS' ? 'bg-forest-50' :
-                    h.status === 'FAILED' ? 'bg-red-50' : 'bg-orange-50'
+                    h.status === 'FAILED' ? 'bg-red-50' : 'bg-brand-50'
                   }`}>
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       h.status === 'SUCCESS' ? 'bg-forest-500' :
-                      h.status === 'FAILED' ? 'bg-red-500' : 'bg-orange-500'
+                      h.status === 'FAILED' ? 'bg-red-500' : 'bg-brand-500'
                     }`}></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-700 font-mono">{h.ipAddress || '—'}</p>
@@ -1196,7 +1196,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                     <div className="text-right flex-shrink-0">
                       <span className={`text-[10px] font-bold ${
                         h.status === 'SUCCESS' ? 'text-forest-700' :
-                        h.status === 'FAILED' ? 'text-red-600' : 'text-orange-600'
+                        h.status === 'FAILED' ? 'text-red-600' : 'text-brand-600'
                       }`}>{h.status}</span>
                       <p className="text-[10px] text-gray-400">{fmtTime(h.createdAt)}</p>
                     </div>
@@ -1290,8 +1290,8 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
           <i className="ri-store-2-line"></i> Duyệt SP/BĐS/Việc làm
         </a>
         {selected.size > 0 && (
-          <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 px-4 py-2 rounded-xl">
-            <span className="text-xs font-bold text-orange-700">Đã chọn {selected.size}</span>
+          <div className="flex items-center gap-2 bg-brand-50 border border-brand-200 px-4 py-2 rounded-xl">
+            <span className="text-xs font-bold text-brand-700">Đã chọn {selected.size}</span>
             <button onClick={bulkApprove} disabled={processing === 'bulk'}
               className="text-xs px-3 py-1.5 bg-forest-600 text-white rounded-lg hover:bg-forest-700 disabled:opacity-50">
               ✓ Duyệt tất cả
@@ -1337,7 +1337,7 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
                         {post.isAnonymous ? '🎭 Ẩn danh' : post.user?.fullName} · {post.category} · {timeAgo(post.createdAt)}
                       </p>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700 font-bold flex-shrink-0">Chờ duyệt</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-brand-100 text-brand-700 font-bold flex-shrink-0">Chờ duyệt</span>
                   </div>
                   {post.content && (
                     <p className="text-xs text-gray-500 mt-2 line-clamp-2 bg-gray-50 rounded-lg px-3 py-2">{post.content}</p>
@@ -1363,7 +1363,7 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
                     <i className="ri-check-line"></i> Duyệt
                   </button>
                   <button onClick={() => setRejectModal({ id: post.id, text: '' })}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-orange-50 text-orange-700 text-xs rounded-xl hover:bg-orange-100 border border-orange-200 font-semibold">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-brand-50 text-brand-700 text-xs rounded-xl hover:bg-brand-100 border border-brand-200 font-semibold">
                     <i className="ri-close-line"></i> Từ chối
                   </button>
                   <Link href={`/forum/${post.id}`} target="_blank"
@@ -1435,7 +1435,7 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref, onTogg
         <div className="space-y-2">
           {filtered.map(item => (
             <div key={item.id} className={`bg-white rounded-xl border shadow-sm px-4 py-3 flex items-center gap-3 hover:shadow-md transition-all ${
-              item.isVip ? 'border-yellow-200 bg-gradient-to-r from-yellow-50/50 to-white' : 'border-gray-100'
+              item.isVip ? 'border-gold-200 bg-gradient-to-r from-gold-50/50 to-white' : 'border-gray-100'
             }`}>
               {item.images?.[0]?.url && (
                 <img src={item.images[0].url} className="w-11 h-11 rounded-xl object-cover flex-shrink-0 border border-gray-100" />
@@ -1446,7 +1446,7 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref, onTogg
               <div className="flex items-center gap-1 flex-shrink-0">
                 {onToggleVip && (
                   <button onClick={() => handleToggleVip(item.id, item.isVip)} disabled={togglingVip === item.id} title={item.isVip ? 'Hủy VIP' : 'Đặt VIP'}
-                    className={`p-2 rounded-xl transition-all disabled:opacity-50 ${item.isVip ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-300 hover:text-yellow-500 hover:bg-yellow-50'}`}>
+                    className={`p-2 rounded-xl transition-all disabled:opacity-50 ${item.isVip ? 'text-gold-500 bg-gold-50 hover:bg-gold-100' : 'text-gray-300 hover:text-gold-500 hover:bg-gold-50'}`}>
                     {togglingVip === item.id ? <i className="ri-loader-4-line text-sm animate-spin"></i> : <i className="ri-vip-crown-fill text-sm"></i>}
                   </button>
                 )}
@@ -1492,15 +1492,15 @@ function VipTab({ vipItems, onRefresh }: { vipItems: any[]; onRefresh: () => voi
       ) : (
         <div className="space-y-2">
           {vipItems.map(item => (
-            <div key={item.id} className="bg-white rounded-xl border border-yellow-200 shadow-sm px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-yellow-50/30 to-white">
+            <div key={item.id} className="bg-white rounded-xl border border-gold-200 shadow-sm px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-gold-50/30 to-white">
               {item.images?.[0]?.url && <img src={item.images[0].url} className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-bold">{item._type}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gold-100 text-gold-700 font-bold">{item._type}</span>
                   <p className="font-semibold text-gray-900 truncate text-sm">{item.title}</p>
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5">{item.user?.fullName}</p>
-                {item.vipExpiresAt && <p className="text-xs text-orange-500 mt-0.5">Hết hạn: {fmtDate(item.vipExpiresAt)}</p>}
+                {item.vipExpiresAt && <p className="text-xs text-brand-500 mt-0.5">Hết hạn: {fmtDate(item.vipExpiresAt)}</p>}
               </div>
               <button onClick={() => removeVip(item)} disabled={processing === item.id}
                 className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 disabled:opacity-50 transition-all flex-shrink-0 font-semibold">
@@ -1568,7 +1568,7 @@ function WalletTab({ txList }: { txList: any[] }) {
             <div className="flex gap-1 mt-1.5 flex-wrap">
               {PRESET_AMOUNTS.map(a => (
                 <button key={a} onClick={() => setCreditAmount(String(a))}
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${creditAmount === String(a) ? 'bg-brand-500 text-white border-green-600' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'}`}>
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${creditAmount === String(a) ? 'bg-brand-500 text-white border-forest-600' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'}`}>
                   {a / 1000}k
                 </button>
               ))}
@@ -1587,7 +1587,7 @@ function WalletTab({ txList }: { txList: any[] }) {
             {crediting ? 'Đang xử lý...' : `+ Cộng ${creditAmount ? new Intl.NumberFormat('vi-VN').format(parseInt(creditAmount) || 0) + 'đ' : 'tiền'}`}
           </button>
           {creditResult && (
-            <p className={`text-xs font-semibold ${creditResult.ok ? 'text-green-600' : 'text-red-500'}`}>
+            <p className={`text-xs font-semibold ${creditResult.ok ? 'text-forest-600' : 'text-red-500'}`}>
               {creditResult.ok ? '✓ ' : '✗ '}{creditResult.msg}
             </p>
           )}
@@ -1616,7 +1616,7 @@ function WalletTab({ txList }: { txList: any[] }) {
       <div className="grid grid-cols-4 gap-3 mb-5">
         {[
           { label: 'Tổng nạp thành công', value: fmtMoney(revenue), gradient: 'from-forest-500 to-brand-600', icon: 'ri-money-dollar-circle-line' },
-          { label: 'Đang chờ xác nhận', value: fmtMoney(pending), gradient: 'from-orange-500 to-amber-600', icon: 'ri-time-line' },
+          { label: 'Đang chờ xác nhận', value: fmtMoney(pending), gradient: 'from-brand-500 to-gold-600', icon: 'ri-time-line' },
           { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend), gradient: 'from-forest-500 to-forest-600', icon: 'ri-vip-crown-line' },
           { label: 'Tổng giao dịch', value: txList.length, gradient: 'from-blue-500 to-blue-600', icon: 'ri-exchange-line' },
         ].map((c, i) => (
@@ -1664,7 +1664,7 @@ function WalletTab({ txList }: { txList: any[] }) {
                 <td className="px-4 py-3 text-center">
                   <span className={`px-2 py-0.5 rounded-full font-semibold ${
                     tx.status === 'completed' ? 'bg-forest-100 text-forest-700' :
-                    tx.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-600'
+                    tx.status === 'pending' ? 'bg-brand-100 text-brand-700' : 'bg-red-100 text-red-600'
                   }`}>
                     {tx.status === 'completed' ? 'Hoàn thành' : tx.status === 'pending' ? 'Đang xử lý' : 'Thất bại'}
                   </span>
@@ -1735,7 +1735,7 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
             <tbody className="divide-y divide-gray-50 max-h-[600px] overflow-y-auto">
               {loginHistory.length === 0 && <tr><td colSpan={4} className="text-center py-12 text-gray-400">Không có dữ liệu</td></tr>}
               {loginHistory.map((h: any, i: number) => (
-                <tr key={i} className={`hover:bg-gray-50/50 ${h.status === 'FAILED' ? 'bg-red-50/20' : h.status === 'LOCKED' ? 'bg-orange-50/20' : ''}`}>
+                <tr key={i} className={`hover:bg-gray-50/50 ${h.status === 'FAILED' ? 'bg-red-50/20' : h.status === 'LOCKED' ? 'bg-brand-50/20' : ''}`}>
                   <td className="px-5 py-2.5">
                     <p className="font-medium text-gray-800">{h.user?.fullName || '—'}</p>
                     <p className="text-[10px] text-gray-400">{h.user?.email}</p>
@@ -1744,7 +1744,7 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
                   <td className="px-4 py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
                       h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
-                      h.status === 'FAILED' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-700'
+                      h.status === 'FAILED' ? 'bg-red-100 text-red-600' : 'bg-brand-100 text-brand-700'
                     }`}>{h.status}</span>
                   </td>
                   <td className="px-5 py-2.5 text-right text-gray-400">{fmtTime(h.createdAt)}</td>

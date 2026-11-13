@@ -8,8 +8,8 @@ import { products, realEstate, jobs, forum, auth, users } from '../../../lib/api
 type TabType = 'products' | 'real-estate' | 'jobs' | 'forum';
 
 const TABS: { id: TabType; label: string; icon: string; color: string }[] = [
-  { id: 'products',     label: 'San pham',     icon: 'ri-store-line',       color: 'text-green-600'  },
-  { id: 'real-estate',  label: 'Bat dong san', icon: 'ri-building-line',    color: 'text-orange-600' },
+  { id: 'products',     label: 'San pham',     icon: 'ri-store-line',       color: 'text-forest-600'  },
+  { id: 'real-estate',  label: 'Bat dong san', icon: 'ri-building-line',    color: 'text-brand-600' },
   { id: 'jobs',         label: 'Viec lam',     icon: 'ri-briefcase-line',   color: 'text-blue-600'   },
   { id: 'forum',        label: 'Dien dan',     icon: 'ri-discuss-line',     color: 'text-forest-600' },
 ];
@@ -170,7 +170,7 @@ export default function AdminContentPage() {
           </div>
         ) : items.length === 0 ? (
           <div className="bg-white rounded-2xl p-16 text-center shadow-sm">
-            <i className="ri-checkbox-circle-line text-6xl text-green-400 block mb-3"></i>
+            <i className="ri-checkbox-circle-line text-6xl text-forest-400 block mb-3"></i>
             <p className="font-semibold text-gray-700 text-lg">Tat ca da duoc duyet!</p>
             <p className="text-gray-400 text-sm mt-1">Khong co bai nao cho duyet trong muc nay.</p>
           </div>
@@ -209,7 +209,7 @@ export default function AdminContentPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug">{item.title}</h3>
-                          <span className="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                          <span className="bg-gold-100 text-gold-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
                             CHO DUYET
                           </span>
                         </div>

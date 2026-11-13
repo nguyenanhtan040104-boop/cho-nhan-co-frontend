@@ -316,14 +316,14 @@ export default function PostDetail({ postId }: { postId: string }) {
               return (
                 <div key={c.id}>
                   {/* Main comment */}
-                  <div className={`flex gap-3 ${c.isPinned ? 'bg-yellow-50 border border-yellow-200 rounded-xl p-3' : ''}`}>
+                  <div className={`flex gap-3 ${c.isPinned ? 'bg-gold-50 border border-gold-200 rounded-xl p-3' : ''}`}>
                     <Avatar user={c.user} size={8} />
                     <div className="flex-1 min-w-0">
                       <div className="bg-gray-50 rounded-xl px-4 py-3">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-sm font-semibold text-gray-900">{c.user?.fullName || c.user?.username}</span>
                           {c.isPinned && (
-                            <span className="flex items-center gap-0.5 text-xs text-yellow-600 font-medium">
+                            <span className="flex items-center gap-0.5 text-xs text-gold-600 font-medium">
                               <i className="ri-pushpin-fill"></i> Đã ghim
                             </span>
                           )}
@@ -382,7 +382,7 @@ export default function PostDetail({ postId }: { postId: string }) {
                           )}
                           {isPostOwner && (
                             <button onClick={() => handlePinComment(c.id)}
-                              className={`flex items-center gap-1 text-xs transition-colors ${c.isPinned ? 'text-yellow-500 hover:text-gray-400' : 'text-gray-400 hover:text-yellow-500'}`}>
+                              className={`flex items-center gap-1 text-xs transition-colors ${c.isPinned ? 'text-gold-500 hover:text-gray-400' : 'text-gray-400 hover:text-gold-500'}`}>
                               <i className={c.isPinned ? 'ri-pushpin-fill' : 'ri-pushpin-line'}></i>
                               {c.isPinned ? 'Bỏ ghim' : 'Ghim'}
                             </button>

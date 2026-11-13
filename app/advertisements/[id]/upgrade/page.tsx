@@ -98,7 +98,7 @@ export default function AdvertisementUpgradePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -107,7 +107,7 @@ export default function AdvertisementUpgradePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col gap-3">
         <p className="text-gray-500">Không tìm thấy quảng cáo</p>
-        <Link href="/advertisements" className="text-orange-600 underline">Quay lại</Link>
+        <Link href="/advertisements" className="text-brand-600 underline">Quay lại</Link>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function AdvertisementUpgradePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col gap-3">
         <p className="text-gray-500">Bạn không phải chủ của quảng cáo này</p>
-        <Link href={`/advertisements/${adId}`} className="text-orange-600 underline">Quay lại</Link>
+        <Link href={`/advertisements/${adId}`} className="text-brand-600 underline">Quay lại</Link>
       </div>
     );
   }
@@ -136,9 +136,9 @@ export default function AdvertisementUpgradePage() {
             <i className="ri-arrow-left-line"></i>
           </Link>
           <div className="text-sm text-gray-500 flex-1 min-w-0">
-            <Link href="/advertisements" className="hover:text-orange-600">Quảng cáo</Link>
+            <Link href="/advertisements" className="hover:text-brand-600">Quảng cáo</Link>
             <span className="mx-1.5 text-gray-300">/</span>
-            <Link href={`/advertisements/${adId}`} className="hover:text-orange-600 truncate">{ad.title}</Link>
+            <Link href={`/advertisements/${adId}`} className="hover:text-brand-600 truncate">{ad.title}</Link>
             <span className="mx-1.5 text-gray-300">/</span>
             <span className="text-gray-900">Nâng VIP</span>
           </div>
@@ -149,8 +149,8 @@ export default function AdvertisementUpgradePage() {
 
         {/* ─── Header ───────────────────────────────────────────────── */}
         <div className="mb-6">
-          <p className="text-[10px] font-bold tracking-widest text-orange-700 uppercase mb-2">
-            <span className="inline-block w-6 h-px bg-orange-700 align-middle mr-2"></span>
+          <p className="text-[10px] font-bold tracking-widest text-brand-700 uppercase mb-2">
+            <span className="inline-block w-6 h-px bg-brand-700 align-middle mr-2"></span>
             Thanh toán quảng cáo
           </p>
           <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
@@ -166,8 +166,8 @@ export default function AdvertisementUpgradePage() {
           {ad.images?.[0] ? (
             <img src={ad.images[0]} alt={ad.title} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
           ) : (
-            <div className="w-16 h-16 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <i className="ri-megaphone-line text-orange-500 text-2xl"></i>
+            <div className="w-16 h-16 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
+              <i className="ri-megaphone-line text-brand-500 text-2xl"></i>
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -185,7 +185,7 @@ export default function AdvertisementUpgradePage() {
         </div>
 
         {/* ─── Wallet balance ───────────────────────────────────────── */}
-        <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between text-white">
+        <div className="bg-gradient-to-r from-brand-500 to-gold-500 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between text-white">
           <div>
             <p className="text-[11px] font-bold tracking-widest uppercase opacity-80">Số dư ví</p>
             <p className="text-2xl font-black">{fmtMoney(balance)}</p>
@@ -223,12 +223,12 @@ export default function AdvertisementUpgradePage() {
               <div
                 key={plan.id}
                 className={`bg-white rounded-2xl overflow-hidden flex flex-col ${
-                  highlight ? 'ring-2 ring-orange-500 shadow-lg' : 'border border-gray-200'
+                  highlight ? 'ring-2 ring-brand-500 shadow-lg' : 'border border-gray-200'
                 }`}
               >
                 {plan.badge ? (
                   <div className={`text-center py-2 text-xs font-bold ${
-                    highlight ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white' : 'bg-gray-900 text-white'
+                    highlight ? 'bg-gradient-to-r from-brand-500 to-gold-500 text-white' : 'bg-gray-900 text-white'
                   }`}>
                     {plan.badge}
                   </div>
@@ -238,7 +238,7 @@ export default function AdvertisementUpgradePage() {
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1">
                   <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">{plan.name}</p>
                   <div className="mb-5">
-                    <span className={`text-3xl font-black ${highlight ? 'text-orange-600' : 'text-gray-900'}`}>
+                    <span className={`text-3xl font-black ${highlight ? 'text-brand-600' : 'text-gray-900'}`}>
                       {fmtMoney(plan.price)}
                     </span>
                     <span className="text-sm text-gray-400 ml-1">/ {plan.id} ngày</span>
@@ -247,7 +247,7 @@ export default function AdvertisementUpgradePage() {
                   <ul className="space-y-2.5 mb-6 flex-1">
                     {plan.benefits.map((b, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                        <i className={`ri-check-line mt-0.5 flex-shrink-0 ${highlight ? 'text-orange-500' : 'text-gray-700'}`}></i>
+                        <i className={`ri-check-line mt-0.5 flex-shrink-0 ${highlight ? 'text-brand-500' : 'text-gray-700'}`}></i>
                         <span>{b}</span>
                       </li>
                     ))}
@@ -260,7 +260,7 @@ export default function AdvertisementUpgradePage() {
                       !enough
                         ? 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                         : highlight
-                          ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:opacity-95'
+                          ? 'bg-gradient-to-r from-brand-500 to-gold-500 text-white hover:opacity-95'
                           : 'bg-gray-900 text-white hover:bg-gray-700'
                     } disabled:opacity-60 disabled:cursor-not-allowed`}
                   >
@@ -284,7 +284,7 @@ export default function AdvertisementUpgradePage() {
         {/* ─── Info ─────────────────────────────────────────────────── */}
         <div className="mt-6 text-xs text-gray-400 text-center">
           <p>Tiền sẽ được trừ trực tiếp từ ví. Nếu quảng cáo đang VIP, thời gian sẽ được cộng dồn.</p>
-          <p className="mt-1">Bạn có thắc mắc? <Link href="/wallet" className="text-orange-600 underline">Xem lịch sử ví</Link></p>
+          <p className="mt-1">Bạn có thắc mắc? <Link href="/wallet" className="text-brand-600 underline">Xem lịch sử ví</Link></p>
         </div>
       </div>
     </div>

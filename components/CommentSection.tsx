@@ -93,7 +93,7 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
 
     return (
       <div className="flex gap-3">
-        <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 mt-0.5">
+        <div className="w-8 h-8 rounded-full bg-gold-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 mt-0.5">
           {c.user?.avatarUrl ? <img src={c.user.avatarUrl} className="w-full h-full rounded-full object-cover" alt="" /> : initial}
         </div>
         <div className="flex-1 min-w-0">
@@ -171,7 +171,7 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
               }}
             />
             <button type="submit" disabled={submitting || !content.trim()}
-              className="text-yellow-500 hover:text-yellow-600 disabled:opacity-30 transition flex-shrink-0 pb-0.5">
+              className="text-gold-500 hover:text-gold-600 disabled:opacity-30 transition flex-shrink-0 pb-0.5">
               <i className="ri-send-plane-fill text-lg"></i>
             </button>
           </div>
@@ -180,7 +180,7 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
 
       {/* Comments list */}
       {loading ? (
-        <div className="flex justify-center py-6"><div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div></div>
+        <div className="flex justify-center py-6"><div className="w-6 h-6 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div></div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           <i className="ri-chat-3-line text-3xl block mb-1"></i>

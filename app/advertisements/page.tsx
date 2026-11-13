@@ -60,9 +60,9 @@ export default function AdvertisementsPage() {
   useEffect(() => { loadData(1); }, [loadData]);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
       {/* Banner */}
-      <div className="border-y-2 border-ink bg-paper py-6">
+      <div className="border-b border-line bg-surface py-6">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>
@@ -85,7 +85,7 @@ export default function AdvertisementsPage() {
           <div className="flex gap-2 flex-wrap justify-center mt-5">
             {CATEGORIES.map(o => (
               <button key={o.value} onClick={() => setCategory(o.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-ink/40'}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-line/40'}`}>
                 {o.label}
               </button>
             ))}
@@ -125,7 +125,7 @@ export default function AdvertisementsPage() {
               <div className="flex justify-center gap-2 mt-10">
                 {[...Array(totalPages)].map((_, i) => (
                   <button key={i} onClick={() => loadData(i + 1)}
-                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-orange-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-brand-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
                     {i + 1}
                   </button>
                 ))}
@@ -155,25 +155,25 @@ function AdCard({ item, currentUserId, onDeleted }: { item: any; currentUserId: 
           </div>
         )}
         <div className="absolute top-2 right-2 flex gap-1">
-          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${active ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
             {active ? 'Đang chạy' : 'Hết hạn'}
           </span>
         </div>
         {item.category && (
-          <span className="absolute bottom-2 left-2 bg-orange-500/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+          <span className="absolute bottom-2 left-2 bg-brand-500/90 text-white text-xs px-2 py-0.5 rounded-full font-medium">
             {getCategoryLabel(item.category)}
           </span>
         )}
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1 group-hover:text-orange-700 transition-colors">{item.title}</h3>
+        <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1 group-hover:text-brand-700 transition-colors">{item.title}</h3>
         {item.description && <p className="text-xs text-gray-400 line-clamp-2 mb-2">{item.description}</p>}
         {item.endDate && (
           <p className="text-xs text-gray-400">Hết hạn: {formatDate(item.endDate)}</p>
         )}
         {item.user?.fullName && (
           <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-            <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-xs text-orange-700 font-bold flex-shrink-0">
+            <div className="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center text-xs text-brand-700 font-bold flex-shrink-0">
               {item.user.fullName[0]}
             </div>
             <span className="text-xs text-gray-400 truncate">{item.user.fullName}</span>

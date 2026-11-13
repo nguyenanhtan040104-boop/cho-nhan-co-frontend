@@ -30,10 +30,10 @@ interface PostCardProps {
 export default function PostCard({ post }: PostCardProps) {
   const getCategoryColor = (category: string) => {
     const colors = {
-      'Nông nghiệp': 'bg-green-100 text-green-700',
+      'Nông nghiệp': 'bg-forest-100 text-forest-700',
       'Chăn nuôi': 'bg-blue-100 text-blue-700',
       'Đời sống': 'bg-forest-100 text-forest-700',
-      'Tìm người giúp đỡ': 'bg-orange-100 text-orange-700',
+      'Tìm người giúp đỡ': 'bg-brand-100 text-brand-700',
       'Tin khẩn': 'bg-red-100 text-red-700',
       'Hỏi đáp': 'bg-forest-100 text-forest-700'
     };
@@ -43,8 +43,8 @@ export default function PostCard({ post }: PostCardProps) {
   const getLevelBadge = (level: string) => {
     const badges = {
       'Chuyên gia': 'bg-forest-100 text-forest-700',
-      'Thành viên VIP': 'bg-yellow-100 text-yellow-700',
-      'Thành viên tích cực': 'bg-green-100 text-green-700',
+      'Thành viên VIP': 'bg-gold-100 text-gold-700',
+      'Thành viên tích cực': 'bg-forest-100 text-forest-700',
       'Thành viên': 'bg-blue-100 text-blue-700',
       'Thành viên mới': 'bg-gray-100 text-gray-700'
     };
@@ -54,7 +54,7 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <div className={`bg-white rounded-xl shadow-sm border transition-all hover:shadow-md ${
       post.isVip ? 'border-gold-400 ring-1 ring-gold-400/40' : 'border-gray-200'
-    } ${post.isPinned ? 'ring-2 ring-green-200' : ''}`}>
+    } ${post.isPinned ? 'ring-2 ring-forest-200' : ''}`}>
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex items-start space-x-4">
@@ -81,13 +81,13 @@ export default function PostCard({ post }: PostCardProps) {
                     {post.category}
                   </span>
                   {post.isPinned && (
-                    <span className="flex items-center space-x-1 text-green-600">
+                    <span className="flex items-center space-x-1 text-forest-600">
                       <i className="ri-pushpin-line"></i>
                       <span className="text-xs">Ghim</span>
                     </span>
                   )}
                   {post.isVip && (
-                    <span className="flex items-center space-x-1 text-yellow-600">
+                    <span className="flex items-center space-x-1 text-gold-600">
                       <i className="ri-vip-crown-line"></i>
                       <span className="text-xs">VIP</span>
                     </span>

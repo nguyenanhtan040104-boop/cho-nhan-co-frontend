@@ -66,7 +66,7 @@ export default function PriceNotifications() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-green-600"
+                  className="rounded border-gray-300 text-forest-600"
                   defaultChecked
                 />
                 <span className="ml-2 text-sm text-gray-600">
@@ -76,7 +76,7 @@ export default function PriceNotifications() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-green-600"
+                  className="rounded border-gray-300 text-forest-600"
                   defaultChecked
                 />
                 <span className="ml-2 text-sm text-gray-600">
@@ -86,7 +86,7 @@ export default function PriceNotifications() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-green-600"
+                  className="rounded border-gray-300 text-forest-600"
                 />
                 <span className="ml-2 text-sm text-gray-600">
                   Cập nhật hàng ngày
@@ -102,14 +102,14 @@ export default function PriceNotifications() {
           <div
             key={notification.id}
             className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-              !notification.isRead ? 'bg-green-50' : ''
+              !notification.isRead ? 'bg-forest-50' : ''
             }`}
             onClick={() => markAsRead(notification.id)}
           >
             <div className="flex items-start space-x-3">
               <div
                 className={`w-2 h-2 rounded-full mt-2 ${
-                  !notification.isRead ? 'bg-green-500' : 'bg-gray-300'
+                  !notification.isRead ? 'bg-forest-500' : 'bg-gray-300'
                 }`}
               ></div>
 
@@ -127,7 +127,7 @@ export default function PriceNotifications() {
                   <span
                     className={`inline-flex items-center px-2 py-1 text-xs rounded-full ${
                       notification.type === 'increase'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-forest-100 text-forest-700'
                         : 'bg-red-100 text-red-700'
                     }`}
                   >
@@ -151,7 +151,7 @@ export default function PriceNotifications() {
       </div>
 
       <div className="p-4 border-t border-gray-200">
-        <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 text-green-600 border border-green-200 rounded-lg hover:bg-green-50 transition-colors whitespace-nowrap">
+        <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 text-forest-600 border border-forest-200 rounded-lg hover:bg-forest-50 transition-colors whitespace-nowrap">
           <i className="ri-notification-3-line"></i>
           <span>Đăng ký nhận thông báo</span>
         </button>

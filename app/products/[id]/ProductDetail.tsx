@@ -8,19 +8,20 @@ import { products as productsApi, messages as messagesApi, auth, wallet as walle
 import CommentSection from '../../../components/CommentSection';
 import ReviewSection from '../../../components/ReviewSection';
 import ShareButton from '../../../components/ShareButton';
+import ContactBar from '../../components/ContactBar';
 
 interface ProductDetailProps {
   productId: string;
 }
 
 const CATEGORY_THEME: Record<string, { accent: string; bg: string; bgHover: string; border: string; bgLight: string; badge: string; icon: string; label: string; ctaLabel: string; ctaIcon: string }> = {
-  NONG_SAN:   { accent: 'text-green-600',  bg: 'bg-brand-500',  bgHover: 'hover:bg-brand-600',  border: 'border-green-200', bgLight: 'bg-green-50',  badge: 'bg-green-100 text-green-700',  icon: 'ri-plant-line',        label: 'Nông sản',  ctaLabel: 'Liên hệ đặt hàng', ctaIcon: 'ri-shopping-basket-line' },
-  VAT_NUOI:   { accent: 'text-amber-600',  bg: 'bg-amber-500',  bgHover: 'hover:bg-amber-600',  border: 'border-amber-200', bgLight: 'bg-amber-50',  badge: 'bg-amber-100 text-amber-700',  icon: 'ri-bear-smile-line',   label: 'Vật nuôi', ctaLabel: 'Liên hệ xem thú',  ctaIcon: 'ri-paw-print-line' },
+  NONG_SAN:   { accent: 'text-forest-600',  bg: 'bg-brand-500',  bgHover: 'hover:bg-brand-600',  border: 'border-forest-200', bgLight: 'bg-forest-50',  badge: 'bg-forest-100 text-forest-700',  icon: 'ri-plant-line',        label: 'Nông sản',  ctaLabel: 'Liên hệ đặt hàng', ctaIcon: 'ri-shopping-basket-line' },
+  VAT_NUOI:   { accent: 'text-gold-600',  bg: 'bg-gold-500',  bgHover: 'hover:bg-gold-600',  border: 'border-gold-200', bgLight: 'bg-gold-50',  badge: 'bg-gold-100 text-gold-700',  icon: 'ri-bear-smile-line',   label: 'Vật nuôi', ctaLabel: 'Liên hệ xem thú',  ctaIcon: 'ri-paw-print-line' },
   DICH_VU:    { accent: 'text-forest-600', bg: 'bg-forest-600', bgHover: 'hover:bg-forest-700', border: 'border-forest-200', bgLight: 'bg-forest-50', badge: 'bg-forest-100 text-forest-700',icon: 'ri-service-line',      label: 'Dịch vụ',  ctaLabel: 'Yêu cầu dịch vụ', ctaIcon: 'ri-customer-service-2-line' },
   DO_DUNG_GIA_DINH: { accent: 'text-blue-600', bg: 'bg-blue-600', bgHover: 'hover:bg-blue-700', border: 'border-blue-200', bgLight: 'bg-blue-50', badge: 'bg-blue-100 text-blue-700', icon: 'ri-home-gear-line',    label: 'Đồ dùng',  ctaLabel: 'Liên hệ người bán', ctaIcon: 'ri-message-line' },
   HANG_TIEU_DUNG: { accent: 'text-teal-600', bg: 'bg-teal-600', bgHover: 'hover:bg-teal-700', border: 'border-teal-200', bgLight: 'bg-teal-50', badge: 'bg-teal-100 text-teal-700',  icon: 'ri-shopping-bag-line', label: 'Hàng tiêu dùng', ctaLabel: 'Liên hệ người bán', ctaIcon: 'ri-message-line' },
 };
-const DEFAULT_THEME = { accent: 'text-green-600', bg: 'bg-brand-500', bgHover: 'hover:bg-brand-600', border: 'border-green-200', bgLight: 'bg-green-50', badge: 'bg-green-100 text-green-700', icon: 'ri-leaf-line', label: 'Sản phẩm', ctaLabel: 'Liên hệ mua hàng', ctaIcon: 'ri-message-line' };
+const DEFAULT_THEME = { accent: 'text-forest-600', bg: 'bg-brand-500', bgHover: 'hover:bg-brand-600', border: 'border-forest-200', bgLight: 'bg-forest-50', badge: 'bg-forest-100 text-forest-700', icon: 'ri-leaf-line', label: 'Sản phẩm', ctaLabel: 'Liên hệ mua hàng', ctaIcon: 'ri-message-line' };
 
 export default function ProductDetail({ productId }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -82,9 +83,9 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FBF9F5' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F3F7F3' }}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-forest-200 border-t-forest-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải sản phẩm...</p>
         </div>
       </div>
@@ -97,7 +98,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         <div className="text-center">
           <i className="ri-alert-line text-6xl text-red-500 mb-4 block"></i>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Không tìm thấy sản phẩm</h2>
-          <Link href="/products" className="text-green-600 hover:text-brand-700">
+          <Link href="/products" className="text-forest-600 hover:text-brand-700">
             ← Quay lại danh sách sản phẩm
           </Link>
         </div>
@@ -194,7 +195,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const mainImage = images.length > 0 ? images[selectedImageIndex] : null;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
       {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -244,7 +245,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                 </div>
               )}
               {product.isVip && (
-                <span className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1 z-10">
+                <span className="absolute top-3 left-3 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1 z-10">
                   <i className="ri-vip-crown-fill"></i> VIP
                 </span>
               )}
@@ -268,7 +269,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {images.map((image: any, index: number) => (
                   <button key={index} onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index ? 'border-yellow-400 shadow-md' : 'border-transparent hover:border-gray-300'}`}>
+                    className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index ? 'border-gold-400 shadow-md' : 'border-transparent hover:border-gray-300'}`}>
                     <img src={image.url || image} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
@@ -285,7 +286,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
                 {theme.label}
               </span>
               {product.isVip && (
-                <div className="inline-flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-sm font-semibold mb-3 ml-2">
+                <div className="inline-flex items-center gap-1 bg-gradient-to-r from-gold-400 to-brand-400 text-white px-3 py-1 rounded-full text-sm font-semibold mb-3 ml-2">
                   <i className="ri-vip-crown-fill"></i>
                   Sản phẩm VIP
                 </div>
@@ -294,7 +295,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                 {isVatNuoi ? (
                   product.stock > 0 ? (
-                    <span className="text-amber-600 font-medium">Còn {product.stock} con</span>
+                    <span className="text-gold-600 font-medium">Còn {product.stock} con</span>
                   ) : null
                 ) : (
                   <span>Đã bán {product.soldCount || 0}</span>
@@ -361,13 +362,13 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
               </button>
               {isOwner && !product.isVip && (
                 <button onClick={handleBuyVip} disabled={buyingVip}
-                  className="px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5 text-sm font-semibold">
+                  className="px-4 py-3 bg-gradient-to-r from-gold-400 to-brand-400 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5 text-sm font-semibold">
                   <i className="ri-vip-crown-fill"></i>
                   {buyingVip ? '...' : 'Mua VIP'}
                 </button>
               )}
               {isOwner && product.isVip && (
-                <span className="px-4 py-3 bg-yellow-50 text-yellow-700 rounded-xl text-sm font-semibold flex items-center gap-1.5 border border-yellow-200">
+                <span className="px-4 py-3 bg-gold-50 text-gold-700 rounded-xl text-sm font-semibold flex items-center gap-1.5 border border-gold-200">
                   <i className="ri-vip-crown-fill"></i> Đang VIP
                 </span>
               )}
@@ -509,6 +510,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* One-tap call / Zalo / chat (phones) */}
+      {product.user && !isOwner && (
+        <ContactBar phone={product.contactPhone || product.user.phone} onChat={handleMessageClick} />
       )}
 
       {/* Contact Modal */}

@@ -26,14 +26,14 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
   if (error || !ad) return (
     <div className="min-h-screen flex items-center justify-center flex-col gap-4">
       <p className="text-gray-500">{error || 'Không tìm thấy'}</p>
-      <Link href="/advertisements" className="text-orange-500 underline">Quay lại</Link>
+      <Link href="/advertisements" className="text-brand-500 underline">Quay lại</Link>
     </div>
   );
 
@@ -47,7 +47,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
             <i className="ri-arrow-left-line"></i>
           </Link>
           <div className="text-sm text-gray-500 flex-1 min-w-0">
-            <Link href="/advertisements" className="hover:text-orange-500 flex-shrink-0">Quảng cáo</Link>
+            <Link href="/advertisements" className="hover:text-brand-500 flex-shrink-0">Quảng cáo</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 truncate">{ad.title}</span>
           </div>
@@ -67,7 +67,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                   <div className="flex gap-2 p-3 overflow-x-auto">
                     {images.map((img: string, i: number) => (
                       <button key={i} onClick={() => setSelectedImg(i)}
-                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${selectedImg === i ? 'border-orange-500' : 'border-transparent'}`}>
+                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${selectedImg === i ? 'border-brand-500' : 'border-transparent'}`}>
                         <img src={img} alt="" className="w-full h-full object-cover" />
                       </button>
                     ))}
@@ -79,11 +79,11 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
             {/* Content */}
             <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
               <div className="flex flex-wrap gap-2 mb-3 items-center">
-                <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded font-medium">
+                <span className="bg-brand-100 text-brand-700 text-xs px-2 py-1 rounded font-medium">
                   {CATEGORIES[ad.category] || ad.category}
                 </span>
                 {ad.isVip && (
-                  <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs px-2 py-1 rounded font-bold flex items-center gap-1">
+                  <span className="bg-gradient-to-r from-gold-400 to-gold-500 text-white text-xs px-2 py-1 rounded font-bold flex items-center gap-1">
                     <i className="ri-vip-crown-fill"></i>VIP
                   </span>
                 )}
@@ -91,7 +91,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 {currentUserId && (ad.userId === currentUserId || ad.user?.id === currentUserId) && (
                   <Link
                     href={`/advertisements/${ad.id}/upgrade`}
-                    className="ml-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
+                    className="ml-auto bg-gradient-to-r from-brand-500 to-gold-500 hover:opacity-95 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
                   >
                     <i className="ri-rocket-2-line"></i>
                     {ad.isVip ? 'Gia hạn VIP' : 'Đẩy lên VIP'}
@@ -101,12 +101,12 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
               <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{ad.title}</h1>
               {ad.businessName && (
-                <p className="text-orange-600 font-semibold text-lg mb-4">{ad.businessName}</p>
+                <p className="text-brand-600 font-semibold text-lg mb-4">{ad.businessName}</p>
               )}
 
               {(ad.startDate || ad.endDate) && (
                 <div className="flex items-center gap-2 text-sm text-ink mb-4 bg-gold-400/15 rounded-lg px-4 py-2">
-                  <i className="ri-calendar-event-line text-orange-500"></i>
+                  <i className="ri-calendar-event-line text-brand-500"></i>
                   <span>
                     {ad.startDate && new Date(ad.startDate).toLocaleDateString('vi-VN')}
                     {ad.startDate && ad.endDate && ' – '}
@@ -119,7 +119,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
               {ad.location && (
                 <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
-                  <i className="ri-map-pin-line text-orange-500"></i>
+                  <i className="ri-map-pin-line text-brand-500"></i>
                   {ad.location}
                 </div>
               )}
@@ -137,8 +137,8 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
               {ad.contactName && (
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i className="ri-user-line text-orange-600"></i>
+                  <div className="w-10 h-10 bg-brand-100 rounded-full flex items-center justify-center">
+                    <i className="ri-user-line text-brand-600"></i>
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{ad.contactName}</p>
@@ -149,7 +149,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
               {ad.contactPhone && (
                 <a href={`tel:${ad.contactPhone}`}
-                  className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 mb-2">
+                  className="w-full flex items-center justify-center gap-2 bg-brand-500 text-white py-3 rounded-lg hover:bg-brand-600 mb-2">
                   <i className="ri-phone-line"></i> {ad.contactPhone}
                 </a>
               )}

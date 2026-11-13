@@ -1,25 +1,23 @@
-import { Be_Vietnam_Pro, Lora } from 'next/font/google';
+import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import Header from './components/Header';
-import AppNav from './components/AppNav';
+import BottomNav from './components/BottomNav';
+import SiteFooter from './components/SiteFooter';
 import PushNotificationSetup from './components/PushNotificationSetup';
 import AdPopup from './components/AdPopup';
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-sans',
   display: 'swap',
 });
 
-// Editorial display serif — the "almanac / báo chợ" voice for headlines.
-const lora = Lora({
-  subsets: ['latin', 'vietnamese'],
-  weight: ['500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-display',
-  display: 'swap',
-});
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#0D7A41',
+};
 
 const siteUrl = 'https://chonhanco.com';
 const siteName = 'Chợ Nhân Cơ';
@@ -68,10 +66,9 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${beVietnam.variable} ${lora.variable}`}>
+    <html lang="vi" className={beVietnam.variable}>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/icon.svg" />
@@ -96,13 +93,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="font-sans" suppressHydrationWarning>
-        <div className="flex min-h-screen">
-          <AppNav />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <Header />
-            <div className="flex-1 pb-16 md:pb-0">{children}</div>
-          </div>
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
         </div>
+        <BottomNav />
         <PushNotificationSetup />
         <AdPopup />
       </body>

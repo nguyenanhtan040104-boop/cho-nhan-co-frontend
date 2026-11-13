@@ -115,7 +115,7 @@ export default function GPSLocationPicker({
           type="button"
           onClick={capture}
           disabled={status === 'loading'}
-          className="w-full flex items-center justify-center gap-2 border border-stone-300 hover:border-forest-700 text-gray-700 hover:text-forest-800 rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 border border-line hover:border-forest-700 text-gray-700 hover:text-forest-800 rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50"
         >
           <i className={`${status === 'loading' ? 'ri-loader-4-line animate-spin' : 'ri-map-pin-add-line'} text-lg`}></i>
           {status === 'loading' ? 'Đang lấy vị trí...' : label}
@@ -124,16 +124,16 @@ export default function GPSLocationPicker({
 
       {/* Reverse-geocoded address suggestion */}
       {hasGPS && detectedAddress && onAddressDetected && (
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-          <i className="ri-magic-line text-amber-700 mt-0.5"></i>
+        <div className="flex items-start gap-2 bg-gold-50 border border-gold-200 rounded-md px-3 py-2">
+          <i className="ri-magic-line text-gold-700 mt-0.5"></i>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold text-amber-700 mb-0.5">Gợi ý địa chỉ từ GPS</p>
-            <p className="text-[12.5px] text-amber-900 line-clamp-2">{detectedAddress}</p>
+            <p className="text-[11px] font-semibold text-gold-700 mb-0.5">Gợi ý địa chỉ từ GPS</p>
+            <p className="text-[12.5px] text-gold-900 line-clamp-2">{detectedAddress}</p>
           </div>
           <button
             type="button"
             onClick={applyDetectedAddress}
-            className="text-[12px] font-bold text-amber-800 hover:underline whitespace-nowrap"
+            className="text-[12px] font-bold text-gold-800 hover:underline whitespace-nowrap"
           >
             Dùng
           </button>

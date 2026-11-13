@@ -37,7 +37,7 @@ export default function ShareButton({ title, url }: { title: string; url?: strin
             <p className="text-xs font-bold text-gray-400 px-4 py-1 uppercase tracking-wide">Chia sẻ qua</p>
             <button onClick={copyLink}
               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-left">
-              <i className={`${copied ? 'ri-check-line text-green-500' : 'ri-link text-gray-500'} text-base w-5`}></i>
+              <i className={`${copied ? 'ri-check-line text-forest-500' : 'ri-link text-gray-500'} text-base w-5`}></i>
               <span className="text-sm text-gray-700">{copied ? 'Đã sao chép!' : 'Sao chép link'}</span>
             </button>
             <button onClick={shareFacebook}

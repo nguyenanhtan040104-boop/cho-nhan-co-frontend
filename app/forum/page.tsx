@@ -32,8 +32,8 @@ function timeAgo(dateStr: string) {
 }
 
 const catColors: any = {
-  NONG_NGHIEP: { bg: '#FBF9F5', color: '#241C15', label: 'Nông nghiệp' },
-  CHAN_NUOI: { bg: '#FBF9F5', color: '#9a3412', label: 'Chăn nuôi' },
+  NONG_NGHIEP: { bg: '#F3F7F3', color: '#13271D', label: 'Nông nghiệp' },
+  CHAN_NUOI: { bg: '#F3F7F3', color: '#9a3412', label: 'Chăn nuôi' },
   THI_TRUONG: { bg: '#eff6ff', color: '#1e40af', label: 'Thị trường' },
   KY_THUAT: { bg: '#fdf4ff', color: '#6b21a8', label: 'Kỹ thuật' },
   KINH_NGHIEM: { bg: '#fefce8', color: '#854d0e', label: 'Kinh nghiệm' },
@@ -102,9 +102,9 @@ function ForumContent() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
       {/* Banner */}
-      <div className="border-y-2 border-ink bg-paper py-6">
+      <div className="border-b border-line bg-surface py-6">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
@@ -128,14 +128,14 @@ function ForumContent() {
           <div className="flex gap-2 mt-4 flex-wrap">
             {categoryOptions.map(o => (
               <button key={o.value} onClick={() => setCategory(o.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-ink/40'}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-line/40'}`}>
                 {o.label}
               </button>
             ))}
             <div className="ml-auto flex gap-2">
               {sortOptions.map(o => (
                 <button key={o.value} onClick={() => setSortBy(o.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-ink/40'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-line/40'}`}>
                   {o.label}
                 </button>
               ))}
@@ -214,13 +214,13 @@ function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: an
     <div className="relative group">
       {bulkMode && (
         <button onClick={onToggle}
-          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-brand-500 border-green-600' : 'bg-white border-gray-300'}`}>
+          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-brand-500 border-forest-600' : 'bg-white border-gray-300'}`}>
           {selected && <i className="ri-check-line text-white text-xs"></i>}
         </button>
       )}
       <Link href={bulkMode ? '#' : `/forum/${post.id}`}
         onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 ${selected ? 'ring-2 ring-green-500' : ''}`}>
+        className={`block bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 ${selected ? 'ring-2 ring-forest-500' : ''}`}>
         {/* Thumbnail */}
         <div className="relative w-full bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {thumb ? (
@@ -233,14 +233,14 @@ function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: an
           {post.category && (
             <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: cat.color, color: '#fff' }}>{cat.label}</span>
           )}
-          {post.isPinned && <span className="absolute top-2 right-2 text-[10px] bg-yellow-400 text-yellow-900 font-bold px-1.5 py-0.5 rounded">Ghim</span>}
+          {post.isPinned && <span className="absolute top-2 right-2 text-[10px] bg-gold-400 text-gold-900 font-bold px-1.5 py-0.5 rounded">Ghim</span>}
         </div>
         {/* Info */}
         <div className="p-3">
           <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2">{post.title}</h3>
           {/* Author */}
           <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-[10px] flex-shrink-0">
+            <div className="w-5 h-5 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-[10px] flex-shrink-0">
               {authorInitial}
             </div>
             <span className="text-[11px] text-gray-500 truncate max-w-[80px]">{authorName}</span>

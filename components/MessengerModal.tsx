@@ -160,7 +160,7 @@ export default function MessengerModal({
                 className="w-10 h-10 rounded-full object-cover border-2 border-white"
               />
               {isOnline && (
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-forest-400 border-2 border-white rounded-full"></div>
               )}
             </div>
             <div>

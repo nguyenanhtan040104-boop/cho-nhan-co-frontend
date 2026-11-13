@@ -16,7 +16,7 @@ export default function StarRating({ rating, max = 5, size = 'md', interactive =
           <button key={i} type="button"
             disabled={!interactive}
             onClick={() => interactive && onRate?.(i + 1)}
-            className={`${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'} ${filled ? 'text-yellow-400' : 'text-gray-200'}`}>
+            className={`${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'} ${filled ? 'text-gold-400' : 'text-gray-200'}`}>
             <i className="ri-star-fill"></i>
           </button>
         );

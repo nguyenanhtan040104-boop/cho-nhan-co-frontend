@@ -55,10 +55,10 @@ const CATEGORIES = [
 // Tailwind needs full class strings to scan — explicit color map
 const COLOR_MAP: Record<string, { bg: string; bgSoft: string; text: string; textDark: string; border: string; ring: string }> = {
   emerald: { bg: 'bg-forest-500', bgSoft: 'bg-forest-50',  text: 'text-forest-600', textDark: 'text-forest-800', border: 'border-forest-200', ring: 'ring-forest-400' },
-  orange:  { bg: 'bg-orange-500',  bgSoft: 'bg-orange-50',   text: 'text-orange-600',  textDark: 'text-orange-800',  border: 'border-orange-200',  ring: 'ring-orange-400' },
+  orange:  { bg: 'bg-brand-500',  bgSoft: 'bg-brand-50',   text: 'text-brand-600',  textDark: 'text-brand-800',  border: 'border-brand-200',  ring: 'ring-brand-400' },
   lime:    { bg: 'bg-lime-500',    bgSoft: 'bg-lime-50',     text: 'text-lime-600',    textDark: 'text-lime-800',    border: 'border-lime-200',    ring: 'ring-lime-400' },
   slate:   { bg: 'bg-slate-600',   bgSoft: 'bg-slate-50',    text: 'text-slate-600',   textDark: 'text-slate-800',   border: 'border-slate-200',   ring: 'ring-slate-400' },
-  amber:   { bg: 'bg-amber-500',   bgSoft: 'bg-amber-50',    text: 'text-amber-600',   textDark: 'text-amber-800',   border: 'border-amber-200',   ring: 'ring-amber-400' },
+  amber:   { bg: 'bg-gold-500',   bgSoft: 'bg-gold-50',    text: 'text-gold-600',   textDark: 'text-gold-800',   border: 'border-gold-200',   ring: 'ring-gold-400' },
   blue:    { bg: 'bg-blue-500',    bgSoft: 'bg-blue-50',     text: 'text-blue-600',    textDark: 'text-blue-800',    border: 'border-blue-200',    ring: 'ring-blue-400' },
   purple:  { bg: 'bg-forest-500',  bgSoft: 'bg-forest-50',   text: 'text-forest-600',  textDark: 'text-forest-800',  border: 'border-forest-200',  ring: 'ring-forest-400' },
   teal:    { bg: 'bg-teal-500',    bgSoft: 'bg-teal-50',     text: 'text-teal-600',    textDark: 'text-teal-800',    border: 'border-teal-200',    ring: 'ring-teal-400' },

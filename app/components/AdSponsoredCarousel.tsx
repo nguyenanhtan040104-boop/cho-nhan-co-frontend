@@ -157,7 +157,7 @@ export default function AdSponsoredCarousel() {
   if (slides.length === 0) {
     return (
       <div
-        className="mt-3 w-full rounded-3xl bg-gradient-to-br from-orange-100 via-amber-50 to-orange-50 animate-pulse"
+        className="mt-3 w-full rounded-3xl bg-gradient-to-br from-brand-100 via-gold-50 to-brand-50 animate-pulse"
         style={{ height: 'clamp(220px, 30vw, 380px)' }}
       />
     );

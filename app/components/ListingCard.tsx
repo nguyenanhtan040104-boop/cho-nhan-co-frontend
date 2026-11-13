@@ -1,0 +1,60 @@
+import Link from 'next/link';
+import LikeButton from './LikeButton';
+import { listingHref, listingImage, listingPrice, timeAgo, type ListingType } from '../../lib/format';
+
+const PLACEHOLDER_ICON: Record<ListingType, string> = {
+  product: 'ri-plant-line',
+  'real-estate': 'ri-home-4-line',
+  job: 'ri-briefcase-4-line',
+  ad: 'ri-megaphone-line',
+  forum: 'ri-chat-3-line',
+};
+
+// One card for every kind of listing: photo first, price second, place and age last.
+export default function ListingCard({ item, type, distanceLabel }: { item: any; type: ListingType; distanceLabel?: string }) {
+  const img = listingImage(item);
+  const price = listingPrice(item, type);
+  const place = item.location || item.address || '';
+  const age = timeAgo(item.createdAt);
+
+  return (
+    <Link
+      href={listingHref(item, type)}
+      className="group block overflow-hidden rounded-card border border-line bg-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lift"
+    >
+      <div className="relative aspect-[4/3] bg-forest-50">
+        {img ? (
+          <img
+            src={img}
+            alt={item.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="grid h-full w-full place-items-center text-forest-300">
+            <i className={`${PLACEHOLDER_ICON[type]} text-4xl`} />
+          </div>
+        )}
+        {item.isVip && (
+          <span className="absolute left-2 top-2 rounded-md bg-gold-500 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-ink">
+            Nổi bật
+          </span>
+        )}
+        <LikeButton itemId={String(item.id)} targetType={type === 'real-estate' ? 'REAL_ESTATE' : type === 'job' ? 'JOB' : 'PRODUCT'} className="!right-2 !top-2" />
+      </div>
+      <div className="p-3">
+        <p className="line-clamp-2 min-h-[2.5rem] text-[14px] font-medium leading-snug text-ink">{item.title}</p>
+        {price && <p className="mt-1.5 text-[17px] font-extrabold tabular-nums text-forest-700">{price}</p>}
+        {(place || age) && (
+          <p className="mt-1.5 flex items-center gap-1 text-[12px] text-ink-faint">
+            {place && <i className="ri-map-pin-line" aria-hidden="true" />}
+            <span className="truncate">{place}</span>
+            {distanceLabel && <span className="shrink-0 font-semibold text-forest-700">· {distanceLabel}</span>}
+            {place && age && <span aria-hidden="true">·</span>}
+            <span className="shrink-0">{age}</span>
+          </p>
+        )}
+      </div>
+    </Link>
+  );
+}

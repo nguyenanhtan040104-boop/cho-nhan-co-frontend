@@ -46,7 +46,7 @@ function timeAgo(dateStr?: string) {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#FBF9F5' }} />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }} />}>
       <ProductsInner />
     </Suspense>
   );
@@ -155,7 +155,7 @@ function ProductsInner() {
     <div className="min-h-screen bg-paper">
 
       {/* ── Compact category header ──────────────────────────────── */}
-      <header className="border-y-2 border-ink bg-paper">
+      <header className="border-b border-line bg-surface">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
           {/* Title row */}
           <div className="flex items-end justify-between gap-3 mb-4">
@@ -188,10 +188,10 @@ function ProductsInner() {
                 placeholder="Tìm cà phê, hồ tiêu, sầu riêng..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-md text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white border border-line"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white border border-line"
               />
             </div>
-            <button type="submit" className="bg-ink hover:bg-black text-white px-4 py-2 rounded-md text-[13px] font-semibold transition-colors whitespace-nowrap">
+            <button type="submit" className="bg-forest-600 hover:bg-forest-700 text-white px-4 py-2 rounded-xl text-[13px] font-semibold transition-colors whitespace-nowrap">
               Tìm
             </button>
           </form>
@@ -205,7 +205,7 @@ function ProductsInner() {
                 className={`flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
                   category === cat.value
                     ? 'bg-ink text-white'
-                    : 'bg-surface border border-line text-ink-soft hover:border-ink/40'
+                    : 'bg-surface border border-line text-ink-soft hover:border-line/40'
                 }`}
               >
                 {cat.name}
@@ -224,7 +224,7 @@ function ProductsInner() {
             <b className="text-gray-900">{fmt(filtered.length || total)}</b> kết quả
           </span>
 
-          <div className="w-px h-4 bg-stone-300 mx-1" />
+          <div className="w-px h-4 bg-line mx-1" />
 
           {/* Quick filters */}
           <div className="flex items-center gap-1 flex-wrap">
@@ -234,7 +234,7 @@ function ProductsInner() {
                 className={`px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
                   quickFilter === f.value
                     ? 'bg-forest-700 text-white'
-                    : 'text-gray-600 hover:bg-stone-200'
+                    : 'text-gray-600 hover:bg-forest-50'
                 }`}>
                 {f.label}
               </button>
@@ -249,7 +249,7 @@ function ProductsInner() {
               disabled={locating}
               title={userLoc ? `Vị trí của bạn: ${userLoc.latitude.toFixed(3)}, ${userLoc.longitude.toFixed(3)}` : 'Chia sẻ GPS để xem khoảng cách'}
               className={`flex items-center gap-1 px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${
-                userLoc ? 'bg-forest-100 text-forest-800 hover:bg-forest-200' : 'text-gray-600 hover:bg-stone-200'
+                userLoc ? 'bg-forest-100 text-forest-800 hover:bg-forest-200' : 'text-gray-600 hover:bg-forest-50'
               } disabled:opacity-50`}
             >
               <i className={`${locating ? 'ri-loader-4-line animate-spin' : userLoc ? 'ri-map-pin-2-fill' : 'ri-map-pin-line'}`}></i>
@@ -259,7 +259,7 @@ function ProductsInner() {
             <select
               value={sortBy}
               onChange={e => { setSortBy(e.target.value); setPage(1); }}
-              className="text-[12px] border border-stone-300 rounded px-2 py-1 focus:outline-none focus:border-forest-700 bg-white font-medium text-gray-700"
+              className="text-[12px] border border-line rounded px-2 py-1 focus:outline-none focus:border-forest-700 bg-white font-medium text-gray-700"
             >
               <option value="newest">Mới nhất</option>
               <option value="price_asc">Giá thấp</option>
@@ -267,15 +267,15 @@ function ProductsInner() {
               <option value="popular">Phổ biến</option>
             </select>
             {/* Grid / List toggle */}
-            <div className="flex items-center border border-stone-300 rounded overflow-hidden">
+            <div className="flex items-center border border-line rounded overflow-hidden">
               <button onClick={() => setView('grid')}
                 aria-label="Lưới"
-                className={`w-7 h-7 flex items-center justify-center transition-colors ${view === 'grid' ? 'bg-stone-200 text-gray-900' : 'text-gray-400 hover:bg-stone-100'}`}>
+                className={`w-7 h-7 flex items-center justify-center transition-colors ${view === 'grid' ? 'bg-line text-gray-900' : 'text-gray-400 hover:bg-forest-50'}`}>
                 <i className="ri-grid-fill text-sm"></i>
               </button>
               <button onClick={() => setView('list')}
                 aria-label="Danh sách"
-                className={`w-7 h-7 flex items-center justify-center transition-colors border-l border-stone-300 ${view === 'list' ? 'bg-stone-200 text-gray-900' : 'text-gray-400 hover:bg-stone-100'}`}>
+                className={`w-7 h-7 flex items-center justify-center transition-colors border-l border-line ${view === 'list' ? 'bg-line text-gray-900' : 'text-gray-400 hover:bg-forest-50'}`}>
                 <i className="ri-list-check text-sm"></i>
               </button>
             </div>
@@ -313,17 +313,17 @@ function ProductsInner() {
             {totalPages > 1 && !loading && (
               <div className="flex justify-center items-center gap-1 mt-8">
                 <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                  className="w-8 h-8 flex items-center justify-center rounded border border-stone-300 bg-white text-gray-600 disabled:opacity-40 hover:bg-stone-50">
+                  className="w-8 h-8 flex items-center justify-center rounded border border-line bg-white text-gray-600 disabled:opacity-40 hover:bg-forest-50">
                   <i className="ri-arrow-left-s-line"></i>
                 </button>
                 {[...Array(totalPages)].map((_, i) => (
                   <button key={i} onClick={() => setPage(i + 1)}
-                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-forest-700 text-white' : 'bg-white border border-stone-300 text-gray-700 hover:bg-stone-50'}`}>
+                    className={`w-8 h-8 flex items-center justify-center rounded text-[13px] font-semibold transition-colors ${page === i + 1 ? 'bg-forest-700 text-white' : 'bg-white border border-line text-gray-700 hover:bg-forest-50'}`}>
                     {i + 1}
                   </button>
                 )).slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))}
                 <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  className="w-8 h-8 flex items-center justify-center rounded border border-stone-300 bg-white text-gray-600 disabled:opacity-40 hover:bg-stone-50">
+                  className="w-8 h-8 flex items-center justify-center rounded border border-line bg-white text-gray-600 disabled:opacity-40 hover:bg-forest-50">
                   <i className="ri-arrow-right-s-line"></i>
                 </button>
               </div>
@@ -355,12 +355,12 @@ function GridSkeleton({ view }: { view: 'grid' | 'list' }) {
     return (
       <div className="space-y-2">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="flex gap-3 bg-white border border-stone-200 rounded-lg overflow-hidden animate-pulse">
-            <div className="w-32 h-28 bg-stone-100 flex-shrink-0" />
+          <div key={i} className="flex gap-3 bg-white border border-line rounded-card overflow-hidden animate-pulse">
+            <div className="w-32 h-28 bg-paper flex-shrink-0" />
             <div className="flex-1 p-3 space-y-2">
-              <div className="h-3 bg-stone-100 rounded w-3/4" />
-              <div className="h-4 bg-stone-100 rounded w-1/3" />
-              <div className="h-2 bg-stone-100 rounded w-1/2" />
+              <div className="h-3 bg-paper rounded w-3/4" />
+              <div className="h-4 bg-paper rounded w-1/3" />
+              <div className="h-2 bg-paper rounded w-1/2" />
             </div>
           </div>
         ))}
@@ -370,12 +370,12 @@ function GridSkeleton({ view }: { view: 'grid' | 'list' }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {[...Array(9)].map((_, i) => (
-        <div key={i} className="bg-white border border-stone-200 rounded-lg overflow-hidden animate-pulse">
-          <div className="bg-stone-100" style={{ aspectRatio: '4/3' }} />
+        <div key={i} className="bg-white border border-line rounded-card overflow-hidden animate-pulse">
+          <div className="bg-paper" style={{ aspectRatio: '4/3' }} />
           <div className="p-3 space-y-2">
-            <div className="h-3 bg-stone-100 rounded w-3/4" />
-            <div className="h-4 bg-stone-100 rounded w-1/2" />
-            <div className="h-2 bg-stone-100 rounded w-2/3" />
+            <div className="h-3 bg-paper rounded w-3/4" />
+            <div className="h-4 bg-paper rounded w-1/2" />
+            <div className="h-2 bg-paper rounded w-2/3" />
           </div>
         </div>
       ))}
@@ -390,7 +390,7 @@ function LowDataFill({ currentCategory }: { currentCategory: string }) {
   return (
     <div className="mt-8 space-y-5">
       {/* Có thể bạn quan tâm */}
-      <section className="bg-white border border-stone-200 rounded-lg p-4">
+      <section className="bg-white border border-line rounded-card p-4">
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">Có thể bạn quan tâm</p>
@@ -400,7 +400,7 @@ function LowDataFill({ currentCategory }: { currentCategory: string }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {otherCats.map(c => (
             <Link key={c.value} href={`/products?category=${c.value}`}
-              className="flex items-center justify-between px-3 py-2 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded text-[13px] font-medium text-gray-700 transition-colors">
+              className="flex items-center justify-between px-3 py-2 bg-paper hover:bg-forest-50 border border-line rounded text-[13px] font-medium text-gray-700 transition-colors">
               <span>{c.name}</span>
               <i className="ri-arrow-right-s-line text-gray-400"></i>
             </Link>
@@ -409,7 +409,7 @@ function LowDataFill({ currentCategory }: { currentCategory: string }) {
       </section>
 
       {/* Đăng tin đầu tiên trong khu vực */}
-      <section className="bg-white border border-stone-200 rounded-lg p-5 flex items-center gap-4 flex-wrap">
+      <section className="bg-white border border-line rounded-card p-5 flex items-center gap-4 flex-wrap">
         <div className="flex-1 min-w-[200px]">
           <p className="text-[10px] font-semibold tracking-wider text-forest-700 uppercase">Cộng đồng Nhân Cơ</p>
           <h3 className="text-[15px] font-bold text-gray-900 mt-0.5 mb-1">Đăng tin đầu tiên trong khu vực của bạn</h3>
@@ -424,13 +424,13 @@ function LowDataFill({ currentCategory }: { currentCategory: string }) {
       </section>
 
       {/* Safety reminder */}
-      <section className="bg-amber-50/60 border border-amber-200/60 rounded-lg p-4 flex gap-3">
-        <i className="ri-shield-check-line text-amber-700 text-xl flex-shrink-0 mt-0.5"></i>
+      <section className="bg-gold-50/60 border border-gold-200/60 rounded-card p-4 flex gap-3">
+        <i className="ri-shield-check-line text-gold-700 text-xl flex-shrink-0 mt-0.5"></i>
         <div className="min-w-0">
-          <p className="text-[13px] font-bold text-amber-900 mb-1">Mua bán an toàn</p>
-          <p className="text-[12px] text-amber-900/80 leading-relaxed">
+          <p className="text-[13px] font-bold text-gold-900 mb-1">Mua bán an toàn</p>
+          <p className="text-[12px] text-gold-900/80 leading-relaxed">
             Gặp trực tiếp ở nơi đông người · Kiểm tra hàng trước khi trả tiền · Không chuyển khoản trước · Không chia sẻ OTP.
-            <Link href="/canh-bao" className="text-amber-900 font-bold hover:underline ml-1">Xem cảnh báo</Link>
+            <Link href="/canh-bao" className="text-gold-900 font-bold hover:underline ml-1">Xem cảnh báo</Link>
           </p>
         </div>
       </section>
@@ -447,22 +447,22 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
     <div className="relative group">
       <Link
         href={`/products/${product.id}`}
-        className="block bg-white border border-stone-200 rounded-lg overflow-hidden transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-stone-300"
+        className="block bg-white border border-line rounded-card overflow-hidden transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-line"
       >
-        <div className="relative bg-stone-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
+        <div className="relative bg-paper overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {imgUrl ? (
             <img src={imgUrl} alt={product.title}
               className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-              <i className="ri-image-line text-3xl text-stone-300"></i>
-              <span className="text-[10px] text-stone-400">Chưa có ảnh</span>
+              <i className="ri-image-line text-3xl text-ink-faint"></i>
+              <span className="text-[10px] text-ink-faint">Chưa có ảnh</span>
             </div>
           )}
 
           {/* Single corner badge — VIP takes priority, else MỚI */}
           {product.isVip ? (
-            <span className="absolute top-2 left-2 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200 flex items-center gap-0.5">
+            <span className="absolute top-2 left-2 bg-white/95 text-gold-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-gold-200 flex items-center gap-0.5">
               <i className="ri-vip-crown-fill"></i>VIP
             </span>
           ) : isNew && (
@@ -477,7 +477,7 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
             {product.title}
           </h4>
           <div className="flex items-baseline gap-1 mb-2">
-            <span className="text-[15px] font-bold text-red-700">{fmt(Number(product.price))}đ</span>
+            <span className="text-[15px] font-bold text-forest-700">{fmt(Number(product.price))}đ</span>
             {product.unit && <span className="text-[11px] text-gray-400">/{product.unit}</span>}
           </div>
 
@@ -500,7 +500,7 @@ function ProductCard({ product, onDeleted }: { product: any; onDeleted: (id: str
           </div>
 
           {/* Bottom row — seller (left) + time + like (right) */}
-          <div className="flex items-center justify-between gap-2 pt-2 border-t border-stone-100 text-[11px] text-gray-500">
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-line text-[11px] text-gray-500">
             {product.user?.fullName ? (
               <span className="flex items-center gap-1 min-w-0 flex-1">
                 <i className="ri-user-line text-gray-400 flex-shrink-0"></i>
@@ -534,18 +534,18 @@ function ProductListRow({ product, onDeleted }: { product: any; onDeleted: (id: 
     <div className="relative group">
       <Link
         href={`/products/${product.id}`}
-        className="flex gap-3 bg-white border border-stone-200 rounded-lg overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-stone-300 transition-all"
+        className="flex gap-3 bg-white border border-line rounded-card overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:border-line transition-all"
       >
-        <div className="relative w-32 sm:w-40 flex-shrink-0 bg-stone-100" style={{ aspectRatio: '4/3' }}>
+        <div className="relative w-32 sm:w-40 flex-shrink-0 bg-paper" style={{ aspectRatio: '4/3' }}>
           {imgUrl ? (
             <img src={imgUrl} alt={product.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <i className="ri-image-line text-3xl text-stone-300"></i>
+              <i className="ri-image-line text-3xl text-ink-faint"></i>
             </div>
           )}
           {product.isVip ? (
-            <span className="absolute top-1.5 left-1.5 bg-white/95 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-200">VIP</span>
+            <span className="absolute top-1.5 left-1.5 bg-white/95 text-gold-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-gold-200">VIP</span>
           ) : isNew && (
             <span className="absolute top-1.5 left-1.5 bg-white/95 text-forest-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-forest-200">MỚI</span>
           )}
@@ -554,7 +554,7 @@ function ProductListRow({ product, onDeleted }: { product: any; onDeleted: (id: 
           <h4 className="text-[14px] font-medium text-gray-900 line-clamp-2 leading-snug group-hover:text-forest-800 transition-colors">
             {product.title}
           </h4>
-          <p className="text-[15px] font-bold text-red-700 mt-1">
+          <p className="text-[15px] font-bold text-forest-700 mt-1">
             {fmt(Number(product.price))}đ
             {product.unit && <span className="text-[11px] font-normal text-gray-400 ml-0.5">/{product.unit}</span>}
           </p>
