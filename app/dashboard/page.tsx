@@ -1,11 +1,12 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { auth, users, analytics, products, realEstate, jobs, notifications, wallet as walletApi, forum, advertisements, sellerStats } from '../../lib/api';
+import { shortMoney, timeAgo } from '../../lib/format';
 
-// Tab mapping từ URL param → tab id trong dashboard
+// ?tab=... from the URL (and header shortcuts) -> tab id on this page
 const TAB_MAP: Record<string, string> = {
   saved: 'engagement',
   liked: 'engagement',
@@ -27,9 +28,43 @@ const TAB_MAP: Record<string, string> = {
   settings: 'settings',
 };
 
+const NAV: { label: string; items: { id: string; label: string; icon: string }[] }[] = [
+  {
+    label: 'Tổng quan',
+    items: [
+      { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-line' },
+      { id: 'analytics', label: 'Hiệu suất', icon: 'ri-bar-chart-line' },
+      { id: 'engagement', label: 'Đã lưu và tương tác', icon: 'ri-heart-line' },
+      { id: 'notifications', label: 'Thông báo', icon: 'ri-notification-line' },
+    ],
+  },
+  {
+    label: 'Tin của tôi',
+    items: [
+      { id: 'products', label: 'Nông sản', icon: 'ri-plant-line' },
+      { id: 'vat-nuoi', label: 'Vật nuôi', icon: 'ri-bear-smile-line' },
+      { id: 'dich-vu', label: 'Dịch vụ', icon: 'ri-tools-line' },
+      { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
+      { id: 'jobs', label: 'Việc làm', icon: 'ri-briefcase-line' },
+      { id: 'advertisements', label: 'Quảng cáo', icon: 'ri-megaphone-line' },
+      { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line' },
+      { id: 'canh-bao', label: 'Cảnh báo', icon: 'ri-alert-line' },
+    ],
+  },
+  {
+    label: 'Tài khoản',
+    items: [
+      { id: 'security', label: 'Bảo mật', icon: 'ri-shield-check-line' },
+      { id: 'settings', label: 'Cài đặt', icon: 'ri-settings-line' },
+    ],
+  },
+];
+
+const money = (n: number) => `${Number(n || 0).toLocaleString('vi-VN')}đ`;
+
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">Đang tải...</div>}>
+    <Suspense fallback={<div className="grid min-h-[60vh] place-items-center text-ink-faint">Đang tải...</div>}>
       <DashboardContent />
     </Suspense>
   );
@@ -58,23 +93,18 @@ function DashboardContent() {
       router.push('/profile');
       return;
     }
-    // Đọc tab từ URL query param
     const tabParam = searchParams.get('tab');
-    if (tabParam && TAB_MAP[tabParam]) {
-      setActiveTab(TAB_MAP[tabParam]);
-    }
+    if (tabParam && TAB_MAP[tabParam]) setActiveTab(TAB_MAP[tabParam]);
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Lắng nghe searchParams thay đổi (khi navigate giữa các ?tab=)
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && TAB_MAP[tabParam]) {
-      setActiveTab(TAB_MAP[tabParam]);
-    }
+    if (tabParam && TAB_MAP[tabParam]) setActiveTab(TAB_MAP[tabParam]);
   }, [searchParams]);
 
-  // Lắng nghe custom event từ header (khi đang ở dashboard, click lại tim/chuông)
+  // The header's heart/bell fire this while the dashboard is already open
   useEffect(() => {
     function onSwitchTab(e: Event) {
       const tab = (e as CustomEvent).detail;
@@ -84,86 +114,62 @@ function DashboardContent() {
     return () => window.removeEventListener('dashboard-switch-tab', onSwitchTab);
   }, []);
 
+  useEffect(() => {
+    if (activeTab === 'wallet') router.push('/wallet');
+  }, [activeTab, router]);
+
   async function loadData() {
-  try {
-    const userData = await users.getMe();
-    setUser(userData);
-
-    // Load các phần khác độc lập, lỗi không làm crash trang
-    const results = await Promise.allSettled([
-      analytics.getOverview(),
-      products.getMine(),
-      realEstate.getMine(),
-      jobs.getMine(),
-      notifications.getAll(),
-      advertisements.getMine(),
-      forum.getMyPosts({ limit: 50 }),
-      forum.getMyPosts({ category: 'CANH_BAO', limit: 50 }),
-    ]);
-
-    if (results[0].status === 'fulfilled') setStats(results[0].value);
-    if (results[1].status === 'fulfilled') setMyProducts(results[1].value.data || []);
-    if (results[2].status === 'fulfilled') setMyRealEstates(results[2].value.data || []);
-    if (results[3].status === 'fulfilled') setMyJobs(results[3].value.data || []);
-    if (results[4].status === 'fulfilled') setNotifs(results[4].value.data || []);
-    if (results[5].status === 'fulfilled') setMyAds((results[5].value as any).data || []);
-    if (results[6].status === 'fulfilled') setMyForumPosts((results[6].value as any).data || []);
-    if (results[7].status === 'fulfilled') setMyCanhBao((results[7].value as any).data || []);
-    walletApi.get().then((w: any) => setWalletBalance(Number(w.balance))).catch(() => {});
-    sellerStats.getMyStats().then((s: any) => setProductStats(s)).catch(() => {});
-  } catch (e: any) {
-    setError(e.message || 'Lỗi tải dữ liệu');
-  } finally {
-    setLoading(false);
-  }
-}
-
-  async function handleDeleteProduct(id: string) {
-    if (!confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) return;
     try {
-      await products.delete(id);
-      setMyProducts(prev => prev.filter(p => p.id !== id));
-    } catch {
-      alert('Xóa thất bại');
+      const userData = await users.getMe();
+      setUser(userData);
+      // Each part loads on its own so one failure does not blank the page
+      const r = await Promise.allSettled([
+        analytics.getOverview(),
+        products.getMine(),
+        realEstate.getMine(),
+        jobs.getMine(),
+        notifications.getAll(),
+        advertisements.getMine(),
+        forum.getMyPosts({ limit: 50 }),
+        forum.getMyPosts({ category: 'CANH_BAO', limit: 50 }),
+      ]);
+      if (r[0].status === 'fulfilled') setStats(r[0].value);
+      if (r[1].status === 'fulfilled') setMyProducts(r[1].value.data || []);
+      if (r[2].status === 'fulfilled') setMyRealEstates(r[2].value.data || []);
+      if (r[3].status === 'fulfilled') setMyJobs(r[3].value.data || []);
+      if (r[4].status === 'fulfilled') setNotifs(r[4].value.data || []);
+      if (r[5].status === 'fulfilled') setMyAds((r[5].value as any).data || []);
+      if (r[6].status === 'fulfilled') setMyForumPosts((r[6].value as any).data || []);
+      if (r[7].status === 'fulfilled') setMyCanhBao((r[7].value as any).data || []);
+      walletApi.get().then((w: any) => setWalletBalance(Number(w.balance))).catch(() => {});
+      sellerStats.getMyStats().then((s: any) => setProductStats(s)).catch(() => {});
+    } catch (e: any) {
+      setError(e.message || 'Lỗi tải dữ liệu');
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function handleDeleteRealEstate(id: string) {
-    if (!confirm('Bạn chắc chắn muốn xóa tin này?')) return;
-    try {
-      await realEstate.delete(id);
-      setMyRealEstates(prev => prev.filter(p => p.id !== id));
-    } catch {
-      alert('Xóa thất bại');
-    }
+  const unread = notifs.filter(n => !n.isRead).length;
+
+  function goTab(id: string) {
+    setActiveTab(id);
+    if (id === 'notifications') notifications.getAll().then((d: any) => setNotifs(d.data || [])).catch(() => {});
+    window.scrollTo({ top: 0 });
   }
 
-  async function handleDeleteJob(id: string) {
-    if (!confirm('Bạn chắc chắn muốn xóa tin này?')) return;
-    try {
-      await jobs.delete(id);
-      setMyJobs(prev => prev.filter(p => p.id !== id));
-    } catch {
-      alert('Xóa thất bại');
-    }
-  }
-
-  async function handleMarkAllRead() {
-    await notifications.markAllRead();
-    setNotifs(prev => prev.map(n => ({ ...n, isRead: true })));
-  }
-
-  function handleLogout() {
-    auth.logout();
-    router.push('/');
+  async function removeFrom<T extends { id: string }>(api: { delete: (id: string) => Promise<any> }, id: string, set: (f: (p: T[]) => T[]) => void, what: string) {
+    if (!confirm(`Xóa ${what} này?`)) return;
+    try { await api.delete(id); set(prev => prev.filter(x => x.id !== id)); }
+    catch { alert('Xóa thất bại'); }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="grid min-h-[60vh] place-items-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-forest-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải...</p>
+          <div className="mx-auto mb-3 h-9 w-9 animate-spin rounded-full border-[3px] border-forest-600 border-t-transparent" />
+          <p className="text-sm text-ink-soft">Đang tải...</p>
         </div>
       </div>
     );
@@ -171,690 +177,365 @@ function DashboardContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Link href="/profile" className="text-forest-600 underline">Đăng nhập lại</Link>
+      <div className="grid min-h-[60vh] place-items-center px-4 text-center">
+        <div>
+          <p className="mb-3 text-brand-600">{error}</p>
+          <Link href="/profile" className="btn-primary">Đăng nhập lại</Link>
         </div>
       </div>
     );
   }
 
-  const tabs = [
-    { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-line' },
-    { id: 'analytics', label: 'Hiệu suất', icon: 'ri-bar-chart-line' },
-    { id: 'engagement', label: 'Tương tác', icon: 'ri-heart-line' },
-    { id: 'products', label: 'Nông sản', icon: 'ri-plant-line' },
-    { id: 'vat-nuoi', label: 'Vật nuôi', icon: 'ri-bear-smile-line' },
-    { id: 'dich-vu', label: 'Dịch vụ', icon: 'ri-service-line' },
-    { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line' },
-    { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line' },
-    { id: 'advertisements', label: 'Quảng cáo', icon: 'ri-megaphone-line' },
-    { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line' },
-    { id: 'canh-bao', label: 'Cảnh báo', icon: 'ri-alert-line' },
-    { id: 'notifications', label: 'Thông báo', icon: 'ri-notification-line' },
-    { id: 'security', label: 'Bảo mật', icon: 'ri-shield-check-line' },
-    { id: 'settings', label: 'Cài đặt', icon: 'ri-settings-line' },
-  ];
+  const flatNav = NAV.flatMap(g => g.items);
+  const current = flatNav.find(i => i.id === activeTab);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4 md:mb-8">
-          <div className="flex items-center gap-3">
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover flex-shrink-0 border-2 border-forest-200" />
-            ) : (
-              <div className="w-10 h-10 md:w-14 md:h-14 bg-brand-500 rounded-full flex items-center justify-center text-white text-lg md:text-xl font-bold flex-shrink-0">
-                {user?.fullName?.[0] || 'U'}
-              </div>
-            )}
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">{user?.fullName}</h1>
-              {user?.username && <p className="text-sm text-gray-500 truncate">@{user.username}</p>}
-            </div>
+    <div className="min-h-screen bg-paper pb-8">
+      <div className="mx-auto max-w-content px-4 py-4 sm:px-6 md:py-6">
+        {/* Account header */}
+        <div className="card flex flex-wrap items-center gap-3 p-4">
+          {user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" className="h-12 w-12 shrink-0 rounded-full object-cover" />
+          ) : (
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-forest-600 text-lg font-bold text-white">{user?.fullName?.[0] || 'U'}</div>
+          )}
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-lg font-bold text-ink sm:text-xl">{user?.fullName}</h1>
+            {user?.username && <p className="truncate text-[13px] text-ink-faint">@{user.username}</p>}
           </div>
-          <button onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 text-sm flex-shrink-0">
-            <i className="ri-logout-box-line"></i>
+          <Link href="/wallet" className="rounded-lg border border-line px-3 py-1.5 text-left hover:border-forest-500">
+            <span className="block text-[11px] text-ink-faint">Số dư ví</span>
+            <span className="block text-sm font-bold tabular-nums text-ink">{walletBalance !== null ? money(walletBalance) : '...'}</span>
+          </Link>
+          <button onClick={() => { auth.logout(); router.push('/'); }} className="btn-ghost shrink-0 !text-brand-600">
+            <i className="ri-logout-box-line" aria-hidden="true" />
             <span className="hidden sm:inline">Đăng xuất</span>
           </button>
         </div>
 
-        {/* Mobile: horizontal scroll tabs */}
-        <div className="md:hidden mb-4">
-          <div className="bg-white rounded-xl shadow-sm p-1.5 overflow-x-auto">
-            <div className="flex gap-1 min-w-max">
-              {tabs.map(tab => (
-                <button key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    if (tab.id === 'notifications') notifications.getAll().then((d: any) => setNotifs(d.data || [])).catch(() => {});
-                  }}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors relative ${
-                    activeTab === tab.id ? 'bg-forest-50 text-forest-700' : 'text-gray-600'
-                  }`}>
-                  <i className={`${tab.icon} text-base`}></i>
-                  {tab.label}
-                  {tab.id === 'notifications' && notifs.filter(n => !n.isRead).length > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-1 rounded-full leading-4">{notifs.filter(n => !n.isRead).length}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Mobile tabs */}
+        <div className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 md:hidden">
+          {flatNav.map(t => (
+            <button key={t.id} onClick={() => goTab(t.id)} className={`chip shrink-0 ${activeTab === t.id ? 'chip-active' : ''}`}>
+              {t.label}
+              {t.id === 'notifications' && unread > 0 && <span className="ml-1.5 rounded-full bg-brand-500 px-1.5 text-[11px] text-white">{unread}</span>}
+            </button>
+          ))}
         </div>
 
-        <div className="flex gap-6">
-          {/* Sidebar - desktop only */}
-          <div className="hidden md:block w-56 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm p-2">
-              {tabs.map(tab => (
-                <button key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    if (tab.id === 'notifications') {
-                      notifications.getAll().then((d: any) => setNotifs(d.data || [])).catch(() => {});
-                    }
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors mb-1 ${
-                    activeTab === tab.id ? 'bg-forest-50 text-forest-700 font-medium' : 'text-gray-600 hover:bg-gray-50'
-                  }`}>
-                  <i className={`${tab.icon} text-lg`}></i>
-                  <span className="text-sm">{tab.label}</span>
-                  {tab.id === 'notifications' && notifs.filter(n => !n.isRead).length > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                      {notifs.filter(n => !n.isRead).length}
-                    </span>
-                  )}
-                </button>
+        <div className="mt-4 flex gap-6">
+          {/* Desktop nav */}
+          <nav className="hidden w-56 shrink-0 md:block" aria-label="Menu tài khoản">
+            <div className="card sticky top-36 p-2">
+              {NAV.map((g, gi) => (
+                <div key={g.label} className={gi > 0 ? 'mt-2 border-t border-line pt-2' : ''}>
+                  <p className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{g.label}</p>
+                  {g.items.map(t => (
+                    <button key={t.id} onClick={() => goTab(t.id)} aria-current={activeTab === t.id ? 'page' : undefined}
+                      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${activeTab === t.id ? 'bg-forest-50 font-semibold text-forest-800' : 'text-ink-soft hover:bg-paper'}`}>
+                      <i className={`${t.icon} text-base`} aria-hidden="true" />
+                      <span>{t.label}</span>
+                      {t.id === 'notifications' && unread > 0 && <span className="ml-auto rounded-full bg-brand-500 px-1.5 text-[11px] text-white">{unread}</span>}
+                    </button>
+                  ))}
+                </div>
               ))}
             </div>
-          </div>
+          </nav>
 
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
-
-            {/* OVERVIEW TAB */}
-            {activeTab === 'overview' && stats && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Tổng quan</h2>
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <Link href="/dashboard?tab=products" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-price-tag-3-line text-forest-600 text-lg"></i>
-                      </div>
-                      <span className="text-gray-500 text-sm">Tin đăng</span>
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{stats.totalListings}</p>
-                  </Link>
-
-                  <Link href="/dashboard?tab=performance" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-eye-line text-blue-600 text-lg"></i>
-                      </div>
-                      <span className="text-gray-500 text-sm">Lượt xem</span>
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{stats.totalViews}</p>
-                  </Link>
-
-                  <Link href="/messages" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-message-3-line text-forest-600 text-lg"></i>
-                      </div>
-                      <span className="text-gray-500 text-sm">Tin nhắn mới</span>
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{stats.unreadMessages}</p>
-                  </Link>
-
-                  <Link href="/pricing" className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-gold-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-vip-crown-line text-gold-600 text-lg"></i>
-                      </div>
-                      <span className="text-gray-500 text-sm">Gói VIP</span>
-                    </div>
-                    <p className="text-xl font-bold text-gray-900">
-                      {stats.vip ? `${stats.vip.plan} (${stats.vip.daysLeft}d)` : 'Chưa có'}
-                    </p>
-                  </Link>
-                </div>
-
-                {/* Wallet Balance Card */}
-                <Link href="/wallet" className="bg-brand-600 rounded-xl p-5 shadow-sm block hover:opacity-90 transition mb-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <i className="ri-wallet-3-line text-white text-lg"></i>
-                        <span className="text-forest-100 text-sm">Số dư ví</span>
-                      </div>
-                      <p className="text-2xl font-bold text-white">
-                        {walletBalance !== null ? new Intl.NumberFormat('vi-VN').format(walletBalance) + 'đ' : '...'}
-                      </p>
-                    </div>
-                    <div className="text-white/70 text-sm flex items-center gap-1">
-                      Nạp tiền <i className="ri-arrow-right-line"></i>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Breakdown */}
-                <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">Phân loại tin đăng</h3>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                      { label: 'Sản phẩm', value: stats.breakdown?.products, color: 'text-forest-600', icon: 'ri-plant-line' },
-                      { label: 'Bất động sản', value: stats.breakdown?.realEstates, color: 'text-blue-600', icon: 'ri-home-4-line' },
-                      { label: 'Tuyển dụng', value: stats.breakdown?.jobs, color: 'text-forest-600', icon: 'ri-briefcase-line' },
-                      { label: 'Diễn đàn', value: stats.breakdown?.forumPosts, color: 'text-forest-600', icon: 'ri-chat-3-line' },
-                    ].map((item, i) => (
-                      <button key={i} onClick={() => setActiveTab(['products','real-estate','jobs','forum'][i])}
-                        className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer">
-                        <i className={`${item.icon} text-2xl ${item.color} mb-1 block`}></i>
-                        <p className="text-2xl font-bold text-gray-900">{item.value || 0}</p>
-                        <p className="text-sm text-gray-500">{item.label}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Seller Stats - Top sản phẩm theo lượt xem */}
-                {productStats && productStats.topProducts?.length > 0 && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-gray-900">📊 Tin đăng của bạn</h3>
-                      <div className="flex gap-4 text-sm">
-                        <span className="text-gray-500">Tổng lượt xem: <span className="font-bold text-blue-600">{(productStats.totalViews || 0).toLocaleString('vi-VN')}</span></span>
-                        <span className="text-gray-500">Đang duyệt: <span className="font-bold text-brand-500">{productStats.pendingCount || 0}</span></span>
-                        <span className="text-gray-500">Đang đăng: <span className="font-bold text-forest-600">{productStats.activeCount || 0}</span></span>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      {productStats.topProducts.map((p: any, i: number) => (
-                        <div key={p.id} className="flex items-center gap-3">
-                          <span className="text-sm font-bold text-gray-400 w-5 text-center">{i + 1}</span>
-                          {p.images?.[0]?.url
-                            ? <img src={p.images[0].url} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                            : <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0"><i className="ri-image-line text-gray-300"></i></div>
-                          }
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 truncate">{p.title}</p>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${['pending','PENDING'].includes(p.status) ? 'bg-brand-100 text-brand-600' : 'bg-forest-100 text-forest-600'}`}>
-                              {['pending','PENDING'].includes(p.status) ? 'Đang duyệt' : 'Đang đăng'}
-                            </span>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <p className="text-sm font-bold text-blue-600">{(p.viewCount || 0).toLocaleString('vi-VN')}</p>
-                            <p className="text-xs text-gray-400">lượt xem</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Quick Actions */}
-                <div className="bg-white rounded-xl p-6 shadow-sm">
-                  <h3 className="font-semibold text-gray-900 mb-4">Đăng tin mới</h3>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    {[
-                      { href: '/products/create', label: 'Đăng sản phẩm', icon: 'ri-plant-line', color: 'bg-brand-500' },
-                      { href: '/real-estate/create', label: 'Đăng BĐS', icon: 'ri-home-4-line', color: 'bg-blue-600' },
-                      { href: '/jobs/create', label: 'Đăng tuyển dụng', icon: 'ri-briefcase-line', color: 'bg-forest-600' },
-                      { href: '/forum/create', label: 'Viết bài', icon: 'ri-chat-3-line', color: 'bg-forest-600' },
-                    ].map((item, i) => (
-                      <Link
-                        key={i}
-                        href={item.href}
-                        className={`${item.color} text-white p-4 rounded-xl text-center hover:opacity-90 transition-opacity`}
-                      >
-                        <i className={`${item.icon} text-2xl block mb-1`}></i>
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
+          <main className="min-w-0 flex-1">
+            {activeTab === 'overview' && (
+              <Overview stats={stats} productStats={productStats} go={goTab} />
             )}
-
-            {/* ANALYTICS TAB - 3.2 Theo dõi hiệu suất */}
             {activeTab === 'analytics' && <AnalyticsTab />}
-
-            {/* ENGAGEMENT TAB - 3.4 User Engagement */}
             {activeTab === 'engagement' && <EngagementTab />}
 
-            {/* PRODUCTS TAB */}
             {activeTab === 'products' && (
               <ProductsTab
                 myProducts={myProducts.filter((p: any) => p.category !== 'VAT_NUOI' && p.category !== 'DICH_VU')}
                 setMyProducts={setMyProducts}
-                title="Nông sản của tôi"
-                createHref="/products/create"
-                createLabel="+ Đăng nông sản"
-                emptyLabel="nông sản"
-                accentColor="forest"
+                title="Nông sản của tôi" createHref="/products/create" createLabel="Đăng nông sản" emptyLabel="nông sản" accentColor="forest"
               />
             )}
-
-            {/* VAT NUOI TAB */}
             {activeTab === 'vat-nuoi' && (
               <ProductsTab
                 myProducts={myProducts.filter((p: any) => p.category === 'VAT_NUOI')}
                 setMyProducts={setMyProducts}
-                title="Vật nuôi của tôi"
-                createHref="/products/create?category=VAT_NUOI"
-                createLabel="+ Đăng vật nuôi"
-                emptyLabel="vật nuôi"
-                accentColor="gold"
+                title="Vật nuôi của tôi" createHref="/products/create?category=VAT_NUOI" createLabel="Đăng vật nuôi" emptyLabel="vật nuôi" accentColor="forest"
               />
             )}
-
-            {/* DICH VU TAB */}
             {activeTab === 'dich-vu' && (
               <ProductsTab
                 myProducts={myProducts.filter((p: any) => p.category === 'DICH_VU')}
                 setMyProducts={setMyProducts}
-                title="Dịch vụ của tôi"
-                createHref="/products/create?category=DICH_VU"
-                createLabel="+ Đăng dịch vụ"
-                emptyLabel="dịch vụ"
-                accentColor="blue"
+                title="Dịch vụ của tôi" createHref="/products/create?category=DICH_VU" createLabel="Đăng dịch vụ" emptyLabel="dịch vụ" accentColor="forest"
               />
             )}
 
-            {/* REAL ESTATE TAB */}
             {activeTab === 'real-estate' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Bất động sản của tôi ({myRealEstates.length})</h2>
-                  <Link href="/real-estate/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                    + Đăng BĐS
-                  </Link>
-                </div>
-
-                {myRealEstates.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-home-4-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500 mb-4">Bạn chưa có tin bất động sản nào</p>
-                    <Link href="/real-estate/create" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                      Đăng tin ngay
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myRealEstates.map(item => (
-                      <div key={item.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {item.images?.[0] ? (
-                            <img src={item.images[0].url} alt={item.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <i className="ri-home-4-line text-gray-400 text-xl"></i>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{item.title}</h4>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="text-blue-600 font-semibold">{Number(item.price).toLocaleString()}đ</span>
-                            <span className="text-sm text-gray-500">{item.area}m²</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              item.status === 'NEW' ? 'bg-forest-100 text-forest-700' :
-                              item.status === 'TRADING' ? 'bg-gold-100 text-gold-700' :
-                              'bg-gray-100 text-gray-600'
-                            }`}>{item.status === 'NEW' ? 'Mới' : item.status === 'TRADING' ? 'Đang giao dịch' : item.status}</span>
-                          </div>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                            <span><i className="ri-eye-line mr-1"></i>{item.viewCount} lượt xem</span>
-                            <span><i className="ri-map-pin-line mr-1"></i>{item.address}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/real-estate/${item.id}`} className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
-                            <i className="ri-eye-line text-lg"></i>
-                          </Link>
-                          <Link href={`/real-estate/${item.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
-                            <i className="ri-edit-line text-lg"></i>
-                          </Link>
-                          <button onClick={() => handleDeleteRealEstate(item.id)} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
-                            <i className="ri-delete-bin-line text-lg"></i>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <MyList
+                title="Bất động sản của tôi" icon="ri-home-4-line" createHref="/real-estate/create" createLabel="Đăng tin nhà đất" empty="Bạn chưa có tin nhà đất nào"
+                items={myRealEstates} viewHref={i => `/real-estate/${i.id}`} editHref={i => `/real-estate/${i.id}/edit`}
+                onDelete={id => removeFrom(realEstate, id, setMyRealEstates, 'tin')}
+                image={i => i.images?.[0]?.url}
+                price={i => shortMoney(Number(i.price))}
+                status={i => i.status === 'NEW' ? { text: 'Mới', tone: 'ok' } : i.status === 'TRADING' ? { text: 'Đang giao dịch', tone: 'warn' } : { text: i.status, tone: 'off' }}
+                meta={i => [i.area ? `${i.area} m²` : '', i.address, `${i.viewCount ?? 0} lượt xem`]}
+              />
             )}
 
-            {/* JOBS TAB */}
             {activeTab === 'jobs' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Tuyển dụng của tôi ({myJobs.length})</h2>
-                  <Link href="/jobs/create" className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors text-sm">
-                    + Đăng tuyển dụng
-                  </Link>
-                </div>
-
-                {myJobs.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-briefcase-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500 mb-4">Bạn chưa có tin tuyển dụng nào</p>
-                    <Link href="/jobs/create" className="bg-forest-600 text-white px-6 py-2 rounded-lg hover:bg-forest-700">
-                      Đăng tin ngay
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myJobs.map(job => (
-                      <div key={job.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-12 h-12 bg-forest-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <i className="ri-briefcase-line text-forest-600 text-xl"></i>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium text-gray-900">{job.title}</h4>
-                            {job.isUrgent && (
-                              <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Khẩn cấp</span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-                            <span>{job.type === 'EMPLOYER' ? 'Tuyển dụng' : 'Tìm việc'}</span>
-                            {job.salary && <span className="text-forest-600 font-medium">{job.salary}</span>}
-                          </div>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                            <span><i className="ri-eye-line mr-1"></i>{job.viewCount} lượt xem</span>
-                            <span><i className="ri-map-pin-line mr-1"></i>{job.location}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/jobs/${job.id}`} className="p-2 text-gray-500 hover:text-forest-600 transition-colors">
-                            <i className="ri-eye-line text-lg"></i>
-                          </Link>
-                          <Link href={`/jobs/${job.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
-                            <i className="ri-edit-line text-lg"></i>
-                          </Link>
-                          <button onClick={() => handleDeleteJob(job.id)} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
-                            <i className="ri-delete-bin-line text-lg"></i>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <MyList
+                title="Việc làm của tôi" icon="ri-briefcase-line" createHref="/jobs/create" createLabel="Đăng tin tuyển dụng" empty="Bạn chưa có tin tuyển dụng nào"
+                items={myJobs} viewHref={i => `/jobs/${i.id}`} editHref={i => `/jobs/${i.id}/edit`}
+                onDelete={id => removeFrom(jobs, id, setMyJobs, 'tin')}
+                price={i => i.salary || ''}
+                status={i => i.isUrgent ? { text: 'Gấp', tone: 'bad' } : null}
+                meta={i => [i.type === 'EMPLOYER' ? 'Tuyển dụng' : 'Tìm việc', i.location, `${i.viewCount ?? 0} lượt xem`]}
+              />
             )}
 
-            {/* ADVERTISEMENTS TAB */}
             {activeTab === 'advertisements' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Quảng cáo của tôi ({myAds.length})</h2>
-                  <Link href="/advertisements/create" className="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors text-sm">
-                    + Đăng quảng cáo
-                  </Link>
-                </div>
-                {myAds.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-megaphone-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500 mb-4">Bạn chưa có quảng cáo nào</p>
-                    <Link href="/advertisements/create" className="bg-brand-500 text-white px-6 py-2 rounded-lg hover:bg-brand-600">
-                      Đăng quảng cáo ngay
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myAds.map((ad: any) => (
-                      <div key={ad.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-16 h-16 bg-brand-50 rounded-lg overflow-hidden flex-shrink-0">
-                          {ad.images?.[0] ? (
-                            <img src={ad.images[0]} alt={ad.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <i className="ri-megaphone-line text-brand-400 text-xl"></i>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{ad.title}</h4>
-                          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                            <span>{ad.businessName || 'Không có tên cửa hàng'}</span>
-                            {ad.location && <span>· <i className="ri-map-pin-line mr-0.5"></i>{ad.location}</span>}
-                          </div>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
-                            {ad.startDate && <span>Từ {new Date(ad.startDate).toLocaleDateString('vi-VN')}</span>}
-                            {ad.endDate && <span>đến {new Date(ad.endDate).toLocaleDateString('vi-VN')}</span>}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/advertisements/${ad.id}`} className="p-2 text-gray-500 hover:text-brand-500 transition-colors">
-                            <i className="ri-eye-line text-lg"></i>
-                          </Link>
-                          <Link href={`/advertisements/${ad.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
-                            <i className="ri-edit-line text-lg"></i>
-                          </Link>
-                          <button onClick={async () => {
-                            if (!confirm('Xóa quảng cáo này?')) return;
-                            try { await advertisements.delete(ad.id); setMyAds(prev => prev.filter((a: any) => a.id !== ad.id)); }
-                            catch { alert('Xóa thất bại'); }
-                          }} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
-                            <i className="ri-delete-bin-line text-lg"></i>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <MyList
+                title="Quảng cáo của tôi" icon="ri-megaphone-line" createHref="/advertisements/create" createLabel="Đăng quảng cáo" empty="Bạn chưa có quảng cáo nào"
+                items={myAds} viewHref={i => `/advertisements/${i.id}`} editHref={i => `/advertisements/${i.id}/edit`}
+                onDelete={id => removeFrom(advertisements, id, setMyAds, 'quảng cáo')}
+                image={i => (typeof i.images?.[0] === 'string' ? i.images[0] : i.images?.[0]?.url)}
+                meta={i => [i.businessName, i.location, i.startDate && i.endDate ? `${new Date(i.startDate).toLocaleDateString('vi-VN')} - ${new Date(i.endDate).toLocaleDateString('vi-VN')}` : '']}
+              />
             )}
 
-            {/* FORUM TAB */}
             {activeTab === 'forum' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Bài diễn đàn của tôi ({myForumPosts.length})</h2>
-                  <Link href="/forum/create" className="bg-forest-600 text-white px-4 py-2 rounded-lg hover:bg-forest-700 transition-colors text-sm">
-                    + Viết bài mới
-                  </Link>
-                </div>
-                {myForumPosts.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-chat-3-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500 mb-4">Bạn chưa có bài viết nào</p>
-                    <Link href="/forum/create" className="bg-forest-600 text-white px-6 py-2 rounded-lg hover:bg-forest-700">
-                      Viết bài ngay
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myForumPosts.map((post: any) => (
-                      <div key={post.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-12 h-12 bg-forest-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {post.images?.[0] ? (
-                            <img src={typeof post.images[0] === 'string' ? post.images[0] : post.images[0].url} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <i className="ri-article-line text-forest-400 text-xl"></i>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                            <span><i className="ri-heart-line mr-0.5"></i>{post.likeCount || 0}</span>
-                            <span><i className="ri-chat-1-line mr-0.5"></i>{post._count?.comments || 0}</span>
-                            <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0}</span>
-                            <span className={`px-2 py-0.5 rounded-full ${post.publishStatus === 'PUBLISHED' ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
-                              {post.publishStatus === 'PUBLISHED' ? 'Đã đăng' : 'Nháp'}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/forum/${post.id}`} className="p-2 text-gray-500 hover:text-forest-600 transition-colors">
-                            <i className="ri-eye-line text-lg"></i>
-                          </Link>
-                          <Link href={`/forum/${post.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
-                            <i className="ri-edit-line text-lg"></i>
-                          </Link>
-                          <button onClick={async () => {
-                            if (!confirm('Xóa bài viết này?')) return;
-                            try { await forum.delete(post.id); setMyForumPosts(prev => prev.filter((p: any) => p.id !== post.id)); }
-                            catch { alert('Xóa thất bại'); }
-                          }} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
-                            <i className="ri-delete-bin-line text-lg"></i>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <MyList
+                title="Bài diễn đàn của tôi" icon="ri-article-line" createHref="/forum/create" createLabel="Viết bài mới" empty="Bạn chưa có bài viết nào"
+                items={myForumPosts} viewHref={i => `/forum/${i.id}`} editHref={i => `/forum/${i.id}/edit`}
+                onDelete={id => removeFrom(forum, id, setMyForumPosts, 'bài viết')}
+                image={i => (typeof i.images?.[0] === 'string' ? i.images[0] : i.images?.[0]?.url)}
+                status={i => i.publishStatus === 'PUBLISHED' ? { text: 'Đã đăng', tone: 'ok' } : { text: 'Nháp', tone: 'off' }}
+                meta={i => [`${i.likeCount || 0} thích`, `${i._count?.comments || 0} bình luận`, `${i.viewCount || 0} lượt xem`]}
+              />
             )}
 
-            {/* CANH BAO TAB */}
             {activeTab === 'canh-bao' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Cảnh báo của tôi ({myCanhBao.length})</h2>
-                  <Link href="/canh-bao/create" className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
-                    + Đăng cảnh báo
-                  </Link>
-                </div>
-                {myCanhBao.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-alert-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500 mb-4">Bạn chưa đăng cảnh báo nào</p>
-                    <Link href="/canh-bao/create" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
-                      Đăng cảnh báo ngay
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myCanhBao.map((post: any) => (
-                      <div key={post.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <i className="ri-alert-line text-red-500 text-xl"></i>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">{post.title}</h4>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                            <span><i className="ri-eye-line mr-0.5"></i>{post.viewCount || 0} lượt xem</span>
-                            <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/canh-bao/${post.id}`} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
-                            <i className="ri-eye-line text-lg"></i>
-                          </Link>
-                          <Link href={`/canh-bao/${post.id}/edit`} className="p-2 text-gray-500 hover:text-brand-600 transition-colors">
-                            <i className="ri-edit-line text-lg"></i>
-                          </Link>
-                          <button onClick={async () => {
-                            if (!confirm('Xóa cảnh báo này?')) return;
-                            try { await forum.delete(post.id); setMyCanhBao(prev => prev.filter((p: any) => p.id !== post.id)); }
-                            catch { alert('Xóa thất bại'); }
-                          }} className="p-2 text-gray-500 hover:text-red-600 transition-colors">
-                            <i className="ri-delete-bin-line text-lg"></i>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <MyList
+                title="Cảnh báo của tôi" icon="ri-alert-line" createHref="/canh-bao/create" createLabel="Đăng cảnh báo" empty="Bạn chưa đăng cảnh báo nào"
+                items={myCanhBao} viewHref={i => `/canh-bao/${i.id}`} editHref={i => `/canh-bao/${i.id}/edit`}
+                onDelete={id => removeFrom(forum, id, setMyCanhBao, 'cảnh báo')}
+                meta={i => [`${i.viewCount || 0} lượt xem`, i.createdAt ? new Date(i.createdAt).toLocaleDateString('vi-VN') : '']}
+              />
             )}
 
-            {/* NOTIFICATIONS TAB */}
             {activeTab === 'notifications' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Thông báo</h2>
-                  {notifs.some(n => !n.isRead) && (
-                    <button onClick={handleMarkAllRead} className="text-sm text-forest-600 hover:text-brand-700">
-                      Đánh dấu tất cả đã đọc
-                    </button>
-                  )}
-                </div>
-
-                {notifs.length === 0 ? (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm">
-                    <i className="ri-notification-line text-5xl text-gray-300 block mb-3"></i>
-                    <p className="text-gray-500">Chưa có thông báo nào</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {notifs.map(notif => {
-                      const convId = notif.data?.conversationId;
-                      const d = notif.data as any;
-                      const notifUrl = d?.url
-                        || (convId ? `/messages/${convId}` : null)
-                        || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
-                        || (notif.relatedId ? `/products/${notif.relatedId}` : null);
-                      const isClickable = !!notifUrl;
-                      const isLike = notif.type?.includes('LIKE');
-                      const isComment = notif.type?.includes('COMMENT');
-                      const isMessage = notif.type === 'MESSAGE';
-                      const icon = isLike ? 'ri-heart-fill text-red-500' : isComment ? 'ri-chat-1-fill text-blue-500' : isMessage ? 'ri-message-3-line text-blue-500' : 'ri-notification-3-line text-forest-500';
-                      const content = (
-                        <div className={`bg-white rounded-xl p-4 shadow-sm border transition-colors ${
-                          notif.isRead ? 'border-line' : 'border-brand-200 bg-brand-50/40'
-                        } ${isClickable ? 'hover:bg-gray-50 cursor-pointer' : ''}`}
-                          onClick={async () => {
-                            if (!notif.isRead) {
-                              await notifications.markRead(notif.id).catch(() => {});
-                              setNotifs(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
-                            }
-                            if (notifUrl) router.push(notifUrl);
-                          }}>
-                          <div className="flex items-start gap-3">
-                            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${isLike ? 'bg-red-50' : isComment ? 'bg-blue-50' : 'bg-gray-100'}`}>
-                              <i className={`${icon} text-base`}></i>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2">
-                                <p className={`text-sm ${notif.isRead ? 'font-medium text-gray-600' : 'font-bold text-gray-900'}`}>{notif.title}</p>
-                                {!notif.isRead && <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1"></span>}
-                              </div>
-                              {notif.body && <p className={`text-sm mt-0.5 ${notif.isRead ? 'text-gray-400' : 'text-gray-700'}`}>{notif.body}</p>}
-                              <p className="text-xs text-gray-400 mt-1">
-                                {new Date(notif.createdAt).toLocaleString('vi-VN', {
-                                  day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-                                })}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                      return <div key={notif.id}>{content}</div>;
-                    })}
-                  </div>
-                )}
-              </div>
+              <NotificationsTab
+                notifs={notifs}
+                onOpen={async (n, url) => {
+                  if (!n.isRead) {
+                    await notifications.markRead(n.id).catch(() => {});
+                    setNotifs(prev => prev.map(x => (x.id === n.id ? { ...x, isRead: true } : x)));
+                  }
+                  if (url) router.push(url);
+                }}
+                onReadAll={async () => { await notifications.markAllRead(); setNotifs(prev => prev.map(n => ({ ...n, isRead: true }))); }}
+              />
             )}
 
-            {/* SETTINGS TAB */}
-            {activeTab === 'security' && (
-              <SecurityTab />
-            )}
+            {activeTab === 'security' && <SecurityTab />}
+            {activeTab === 'settings' && user && <SettingsTab user={user} onUpdate={setUser} />}
+          </main>
+        </div>
+      </div>
+      {current && <span className="sr-only" aria-live="polite">{current.label}</span>}
+    </div>
+  );
+}
 
-            {activeTab === 'settings' && user && (
-              <SettingsTab user={user} onUpdate={setUser} />
-            )}
+// =================== OVERVIEW ===================
+function Overview({ stats, productStats, go }: { stats: any; productStats: any; go: (id: string) => void }) {
+  const s = stats || {};
+  const tiles = [
+    { label: 'Tin đang đăng', value: s.totalListings ?? 0, onClick: () => go('products') },
+    { label: 'Lượt xem', value: Number(s.totalViews || 0).toLocaleString('vi-VN'), onClick: () => go('analytics') },
+    { label: 'Tin nhắn mới', value: s.unreadMessages ?? 0, href: '/messages' },
+    { label: 'Gói VIP', value: s.vip ? `${s.vip.plan} · còn ${s.vip.daysLeft} ngày` : 'Chưa có', href: '/pricing', small: true },
+  ];
+  const breakdown = [
+    { label: 'Sản phẩm', value: s.breakdown?.products, tab: 'products' },
+    { label: 'Bất động sản', value: s.breakdown?.realEstates, tab: 'real-estate' },
+    { label: 'Việc làm', value: s.breakdown?.jobs, tab: 'jobs' },
+    { label: 'Diễn đàn', value: s.breakdown?.forumPosts, tab: 'forum' },
+  ];
+  const tileCls = 'card block p-4 text-left transition-colors hover:border-forest-500';
 
+  return (
+    <div className="space-y-5">
+      <h2 className="text-xl font-bold text-ink">Tổng quan</h2>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {tiles.map(t => {
+          const inner = (
+            <>
+              <p className="text-[13px] text-ink-faint">{t.label}</p>
+              <p className={`mt-1 font-bold tabular-nums text-ink ${t.small ? 'text-base' : 'text-3xl'}`}>{t.value}</p>
+            </>
+          );
+          return t.href
+            ? <Link key={t.label} href={t.href} className={tileCls}>{inner}</Link>
+            : <button key={t.label} onClick={t.onClick} className={tileCls}>{inner}</button>;
+        })}
+      </div>
+
+      <div className="card divide-y divide-line">
+        <h3 className="px-4 py-3 text-[15px] font-bold text-ink">Tin theo loại</h3>
+        {breakdown.map(b => (
+          <button key={b.tab} onClick={() => go(b.tab)} className="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-paper">
+            <span className="text-ink-soft">{b.label}</span>
+            <span className="flex items-center gap-2 font-bold tabular-nums text-ink">{b.value || 0}<i className="ri-arrow-right-s-line text-ink-faint" aria-hidden="true" /></span>
+          </button>
+        ))}
+      </div>
+
+      {productStats?.topProducts?.length > 0 && (
+        <div className="card p-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h3 className="text-[15px] font-bold text-ink">Tin được xem nhiều nhất</h3>
+            <p className="text-[13px] text-ink-faint">
+              Đang đăng <b className="text-ink">{productStats.activeCount || 0}</b> · Chờ duyệt <b className="text-ink">{productStats.pendingCount || 0}</b>
+            </p>
           </div>
+          <ol className="mt-3 divide-y divide-line">
+            {productStats.topProducts.map((p: any, i: number) => (
+              <li key={p.id} className="flex items-center gap-3 py-2.5">
+                <span className="w-5 text-center text-sm font-bold text-ink-faint">{i + 1}</span>
+                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-paper">
+                  {p.images?.[0]?.url ? <img src={p.images[0].url} alt="" className="h-full w-full object-cover" /> : <i className="ri-image-line grid h-full place-items-center text-ink-faint" />}
+                </div>
+                <Link href={`/products/${p.id}`} className="min-w-0 flex-1 truncate text-sm font-medium text-ink hover:text-forest-700">{p.title}</Link>
+                <span className="shrink-0 text-right text-sm font-bold tabular-nums text-ink">{(p.viewCount || 0).toLocaleString('vi-VN')}<span className="block text-[11px] font-normal text-ink-faint">lượt xem</span></span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      <div className="card p-4">
+        <h3 className="text-[15px] font-bold text-ink">Đăng tin mới</h3>
+        <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {[
+            { href: '/products/create', label: 'Sản phẩm' },
+            { href: '/real-estate/create', label: 'Nhà đất' },
+            { href: '/jobs/create', label: 'Việc làm' },
+            { href: '/forum/create', label: 'Bài diễn đàn' },
+          ].map(a => <Link key={a.href} href={a.href} className="btn-ghost justify-center"><i className="ri-add-line" aria-hidden="true" />{a.label}</Link>)}
         </div>
       </div>
     </div>
   );
 }
+
+// =================== GENERIC "MY LISTINGS" LIST ===================
+type Tone = 'ok' | 'warn' | 'bad' | 'off';
+const TONE: Record<Tone, string> = {
+  ok: 'bg-forest-50 text-forest-800',
+  warn: 'bg-gold-100 text-gold-700',
+  bad: 'bg-brand-50 text-brand-600',
+  off: 'bg-paper text-ink-soft',
+};
+
+function MyList({ title, icon, createHref, createLabel, empty, items, viewHref, editHref, onDelete, image, price, status, meta }: {
+  title: string; icon: string; createHref: string; createLabel: string; empty: string;
+  items: any[]; viewHref: (i: any) => string; editHref: (i: any) => string; onDelete: (id: string) => void;
+  image?: (i: any) => string | undefined; price?: (i: any) => string;
+  status?: (i: any) => { text: string; tone: Tone } | null; meta?: (i: any) => (string | undefined)[];
+}) {
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-ink">{title} <span className="font-medium text-ink-faint">({items.length})</span></h2>
+        <Link href={createHref} className="btn-primary shrink-0"><i className="ri-add-line" aria-hidden="true" />{createLabel}</Link>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="card px-6 py-12 text-center">
+          <i className={`${icon} text-4xl text-ink-faint`} aria-hidden="true" />
+          <p className="mb-4 mt-2 text-ink-soft">{empty}</p>
+          <Link href={createHref} className="btn-primary">{createLabel}</Link>
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {items.map(item => {
+            const img = image?.(item);
+            const st = status?.(item);
+            const p = price?.(item);
+            const m = (meta?.(item) || []).filter(Boolean);
+            return (
+              <li key={item.id} className="card flex items-center gap-3 p-3">
+                <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-lg bg-paper text-ink-faint">
+                  {img ? <img src={img} alt="" className="h-full w-full object-cover" /> : <i className={`${icon} text-xl`} aria-hidden="true" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start gap-2">
+                    <Link href={viewHref(item)} className="line-clamp-2 flex-1 text-[15px] font-medium leading-snug text-ink hover:text-forest-700">{item.title}</Link>
+                    {st && <span className={`shrink-0 rounded px-1.5 py-0.5 text-[11px] font-semibold ${TONE[st.tone]}`}>{st.text}</span>}
+                  </div>
+                  {p && <p className="mt-0.5 text-sm font-bold text-forest-700">{p}</p>}
+                  {m.length > 0 && <p className="mt-0.5 truncate text-[12px] text-ink-faint">{m.join(' · ')}</p>}
+                </div>
+                <div className="flex shrink-0 items-center">
+                  <Link href={editHref(item)} aria-label="Sửa" className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-paper hover:text-forest-700"><i className="ri-edit-line text-lg" /></Link>
+                  <button onClick={() => onDelete(item.id)} aria-label="Xóa" className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-brand-50 hover:text-brand-600"><i className="ri-delete-bin-line text-lg" /></button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// =================== NOTIFICATIONS ===================
+function NotificationsTab({ notifs, onOpen, onReadAll }: { notifs: any[]; onOpen: (n: any, url: string | null) => void; onReadAll: () => void }) {
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-ink">Thông báo</h2>
+        {notifs.some(n => !n.isRead) && <button onClick={onReadAll} className="text-sm font-semibold text-forest-700 hover:underline">Đánh dấu tất cả đã đọc</button>}
+      </div>
+      {notifs.length === 0 ? (
+        <div className="card px-6 py-12 text-center">
+          <i className="ri-notification-line text-4xl text-ink-faint" aria-hidden="true" />
+          <p className="mt-2 text-ink-soft">Chưa có thông báo nào</p>
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {notifs.map(n => {
+            const d = n.data as any;
+            const url = d?.url
+              || (d?.conversationId ? `/messages/${d.conversationId}` : null)
+              || (d?.targetType && d?.targetId ? (d.targetType === 'REAL_ESTATE' ? `/real-estate/${d.targetId}` : d.targetType === 'JOB' ? `/jobs/${d.targetId}` : `/products/${d.targetId}`) : null)
+              || (n.relatedId ? `/products/${n.relatedId}` : null);
+            const icon = n.type?.includes('LIKE') ? 'ri-heart-line' : n.type?.includes('COMMENT') ? 'ri-chat-1-line' : n.type === 'MESSAGE' ? 'ri-message-3-line' : 'ri-notification-3-line';
+            return (
+              <li key={n.id}>
+                <button onClick={() => onOpen(n, url)}
+                  className={`card flex w-full items-start gap-3 p-3 text-left transition-colors hover:border-forest-500 ${n.isRead ? '' : '!border-forest-300 !bg-forest-50/50'}`}>
+                  <i className={`${icon} mt-0.5 text-lg ${n.isRead ? 'text-ink-faint' : 'text-forest-700'}`} aria-hidden="true" />
+                  <span className="min-w-0 flex-1">
+                    <span className={`block text-sm ${n.isRead ? 'text-ink-soft' : 'font-bold text-ink'}`}>{n.title}</span>
+                    {n.body && <span className="mt-0.5 block text-sm text-ink-soft">{n.body}</span>}
+                    <span className="mt-1 block text-[12px] text-ink-faint">{timeAgo(n.createdAt)}</span>
+                  </span>
+                  {!n.isRead && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-500" aria-label="Chưa đọc" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 
 function SecurityTab() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -906,7 +587,7 @@ function SecurityTab() {
     <div>
       <h2 className="text-xl font-bold text-gray-900 mb-6">Bảo mật tài khoản</h2>
 
-      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+      <div className="bg-white rounded-xl p-6  mb-6">
         <div className="flex items-center gap-2 mb-2">
           <i className="ri-lock-password-line text-forest-600 text-xl"></i>
           <h3 className="font-semibold text-gray-900">Khóa tài khoản tự động</h3>
@@ -914,7 +595,7 @@ function SecurityTab() {
         <p className="text-sm text-gray-500">Tài khoản sẽ bị khóa <strong>15 phút</strong> nếu nhập sai mật khẩu <strong>5 lần liên tiếp</strong>.</p>
       </div>
 
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className="bg-white rounded-xl p-6 ">
         <h3 className="font-semibold text-gray-900 mb-4">Lịch sử đăng nhập gần đây</h3>
         {loading ? (
           <p className="text-gray-400 text-sm">Đang tải...</p>
@@ -1019,7 +700,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
     setSaving(true);
     try {
       const updated = await users.updateProfile(form);
-      onUpdate({ ...user, ...updated });
+      onUpdate({ ...user, ...(updated as any) });
       setMsg('Lưu thành công!');
       setTimeout(() => setMsg(''), 3000);
     } catch (e: any) {
@@ -1042,7 +723,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       const { uploads } = await import('../../lib/api');
       const { url } = await uploads.uploadImage(file);
       const updated = await users.updateProfile({ avatarUrl: url });
-      onUpdate({ ...user, ...updated, avatarUrl: url });
+      onUpdate({ ...user, ...(updated as any), avatarUrl: url });
       setAvatarMsg('Cập nhật ảnh đại diện thành công!');
       setTimeout(() => setAvatarMsg(''), 3000);
     } catch (err: any) {
@@ -1074,7 +755,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       <h2 className="text-xl font-bold text-gray-900 mb-6">Cài đặt tài khoản</h2>
 
       {/* Avatar */}
-      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+      <div className="bg-white rounded-xl p-6  mb-6">
         <h3 className="font-semibold text-gray-900 mb-4">Ảnh đại diện</h3>
         <div className="flex items-center gap-5">
           {user.avatarUrl ? (
@@ -1109,7 +790,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       </div>
 
       {/* Profile Info */}
-      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+      <div className="bg-white rounded-xl p-6  mb-6">
         <h3 className="font-semibold text-gray-900 mb-4">Thông tin cá nhân</h3>
         <form onSubmit={handleSaveProfile}>
           <div className="grid grid-cols-1 gap-4">
@@ -1168,7 +849,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       </div>
 
       {/* Change Password */}
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className="bg-white rounded-xl p-6 ">
         <h3 className="font-semibold text-gray-900 mb-4">Đổi mật khẩu</h3>
         <form onSubmit={handleChangePassword}>
           <div className="grid grid-cols-1 gap-4">
@@ -1220,7 +901,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
 
       {/* Email Verification */}
       {!user.isEmailVerified && (
-        <div className="bg-white rounded-xl p-6 shadow-sm mt-6">
+        <div className="bg-white rounded-xl p-6  mt-6">
           <div className="flex items-center gap-2 mb-4">
             <h3 className="font-semibold text-gray-900">Xác thực email</h3>
             <span className="bg-brand-100 text-brand-600 text-xs px-2 py-0.5 rounded-full">Bắt buộc để đăng bài</span>
@@ -1372,7 +1053,7 @@ function ProductsTab({
       </div>
 
       {myProducts.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+        <div className="bg-white rounded-xl p-12 text-center ">
           <i className="ri-plant-line text-5xl text-gray-300 block mb-3"></i>
           <p className="text-gray-500 mb-4">Bạn chưa có {emptyLabel} nào</p>
           <Link href={createHref} className={`bg-${accentColor}-600 text-white px-6 py-2 rounded-lg hover:bg-${accentColor}-700`}>
@@ -1382,7 +1063,7 @@ function ProductsTab({
       ) : (
         <div className="space-y-3">
           {myProducts.map(product => (
-            <div key={product.id} className={`bg-white rounded-xl p-4 shadow-sm ${product.isDeleted ? 'opacity-60' : ''}`}>
+            <div key={product.id} className={`bg-white rounded-xl p-4  ${product.isDeleted ? 'opacity-60' : ''}`}>
               <div className="flex items-start gap-4">
                 {/* Ảnh */}
                 <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -1519,7 +1200,7 @@ function AnalyticsTab() {
       <h2 className="text-xl font-bold text-gray-900">Hiệu suất tin đăng</h2>
 
       {/* Sản phẩm */}
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className="bg-white rounded-xl p-6 ">
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <i className="ri-plant-line text-forest-600"></i>
           Top sản phẩm theo lượt xem
@@ -1557,7 +1238,7 @@ function AnalyticsTab() {
       </div>
 
       {/* Bất động sản */}
-      <div className="bg-white rounded-xl p-6 shadow-sm">
+      <div className="bg-white rounded-xl p-6 ">
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <i className="ri-home-4-line text-blue-600"></i>
           Bất động sản theo lượt xem
