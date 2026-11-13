@@ -10,7 +10,7 @@ type TabType = 'products' | 'real-estate' | 'jobs' | 'forum';
 const TABS: { id: TabType; label: string; icon: string; color: string }[] = [
   { id: 'products',     label: 'San pham',     icon: 'ri-store-line',       color: 'text-forest-600'  },
   { id: 'real-estate',  label: 'Bat dong san', icon: 'ri-building-line',    color: 'text-brand-600' },
-  { id: 'jobs',         label: 'Viec lam',     icon: 'ri-briefcase-line',   color: 'text-blue-600'   },
+  { id: 'jobs',         label: 'Viec lam',     icon: 'ri-briefcase-line',   color: 'text-ink-soft'   },
   { id: 'forum',        label: 'Dien dan',     icon: 'ri-discuss-line',     color: 'text-forest-600' },
 ];
 
@@ -126,35 +126,35 @@ export default function AdminContentPage() {
   const totalPending = Object.values(counts).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="bg-surface border-b sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link href="/admin/dashboard"
-            className="w-9 h-9 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line text-gray-600"></i>
+            className="w-9 h-9 border border-line rounded-lg flex items-center justify-center hover:bg-paper">
+            <i className="ri-arrow-left-line text-ink-soft"></i>
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Duyet noi dung</h1>
-            <p className="text-xs text-gray-400">
+            <h1 className="text-lg font-bold text-ink">Duyet noi dung</h1>
+            <p className="text-xs text-ink-faint">
               {totalPending > 0 ? `${totalPending} bai cho duyet tren tat ca danh muc` : 'Tat ca da duoc duyet'}
             </p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="max-w-5xl mx-auto px-4 flex border-t border-gray-100 overflow-x-auto">
+        <div className="max-w-5xl mx-auto px-4 flex border-t border-line overflow-x-auto">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`relative flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 tab === t.id
-                  ? 'border-gray-900 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-line text-ink'
+                  : 'border-transparent text-ink-soft hover:text-ink'
               }`}>
               <i className={`${t.icon} ${t.color}`}></i>
               {t.label}
               {counts[t.id] > 0 && (
-                <span className="absolute -top-0.5 right-0.5 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1">
+                <span className="absolute -top-0.5 right-0.5 bg-brand-500 text-white text-[11px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1">
                   {counts[t.id] > 99 ? '99+' : counts[t.id]}
                 </span>
               )}
@@ -166,17 +166,17 @@ export default function AdminContentPage() {
       <div className="max-w-5xl mx-auto px-4 py-5">
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-line border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center shadow-sm">
+          <div className="bg-surface rounded-card p-16 text-center">
             <i className="ri-checkbox-circle-line text-6xl text-forest-400 block mb-3"></i>
-            <p className="font-semibold text-gray-700 text-lg">Tat ca da duoc duyet!</p>
-            <p className="text-gray-400 text-sm mt-1">Khong co bai nao cho duyet trong muc nay.</p>
+            <p className="font-semibold text-ink text-lg">Tat ca da duoc duyet!</p>
+            <p className="text-ink-faint text-sm mt-1">Khong co bai nao cho duyet trong muc nay.</p>
           </div>
         ) : (
           <>
-            <p className="text-xs text-gray-400 mb-3 font-medium">{total} bai cho duyet</p>
+            <p className="text-xs text-ink-faint mb-3 font-medium">{total} bai cho duyet</p>
             <div className="space-y-3">
               {items.map(item => {
                 const img = getImage(item);
@@ -186,16 +186,16 @@ export default function AdminContentPage() {
                 const isProcessing = processing === item.id;
 
                 return (
-                  <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div key={item.id} className="bg-surface rounded-card border border-line overflow-hidden">
                     <div className="flex gap-4 p-4">
                       {/* Thumbnail — hide for forum if no image */}
                       {(img || tab !== 'forum') && (
-                        <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-paper flex-shrink-0">
                           {img ? (
                             <img src={img} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <i className={`text-2xl text-gray-300 ${
+                              <i className={`text-2xl text-ink-faint ${
                                 tab === 'products' ? 'ri-store-line' :
                                 tab === 'real-estate' ? 'ri-building-line' :
                                 tab === 'jobs' ? 'ri-briefcase-line' : 'ri-discuss-line'
@@ -208,20 +208,20 @@ export default function AdminContentPage() {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug">{item.title}</h3>
-                          <span className="bg-gold-100 text-gold-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                          <h3 className="font-semibold text-ink text-sm line-clamp-2 leading-snug">{item.title}</h3>
+                          <span className="bg-gold-100 text-gold-700 text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
                             CHO DUYET
                           </span>
                         </div>
 
                         {body && (
-                          <p className="text-xs text-gray-500 line-clamp-2 mb-1.5">{body}</p>
+                          <p className="text-xs text-ink-soft line-clamp-2 mb-1.5">{body}</p>
                         )}
 
                         <div className="flex items-center gap-3 flex-wrap mb-2">
-                          {price && <span className="text-sm font-bold text-red-500">{price}</span>}
+                          {price && <span className="text-sm font-bold text-brand-600">{price}</span>}
                           {sub && (
-                            <span className="text-xs text-gray-400 flex items-center gap-0.5">
+                            <span className="text-xs text-ink-faint flex items-center gap-0.5">
                               <i className="ri-map-pin-line"></i> {sub}
                             </span>
                           )}
@@ -232,15 +232,15 @@ export default function AdminContentPage() {
                           {item.user?.avatarUrl ? (
                             <img src={item.user.avatarUrl} alt="" className="w-5 h-5 rounded-full object-cover" />
                           ) : (
-                            <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
-                              <i className="ri-user-line text-[10px] text-gray-400"></i>
+                            <div className="w-5 h-5 rounded-full bg-line flex items-center justify-center">
+                              <i className="ri-user-line text-[11px] text-ink-faint"></i>
                             </div>
                           )}
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-ink-soft">
                             {item.isAnonymous ? 'An danh' : (item.user?.fullName || item.user?.username || 'N/A')}
                           </span>
-                          <span className="text-xs text-gray-300">•</span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-ink-faint">•</span>
+                          <span className="text-xs text-ink-faint">
                             {new Date(item.createdAt).toLocaleDateString('vi-VN')}
                           </span>
                         </div>
@@ -248,19 +248,19 @@ export default function AdminContentPage() {
                     </div>
 
                     {/* Action bar */}
-                    <div className="border-t border-gray-50 px-4 py-3 flex items-center gap-2 bg-gray-50/50">
+                    <div className="border-t border-line px-4 py-3 flex items-center gap-2 bg-paper">
                       <Link href={DETAIL_LINK[tab](item.id)} target="_blank"
-                        className="flex items-center gap-1 text-xs text-blue-500 hover:underline mr-auto">
+                        className="flex items-center gap-1 text-xs text-ink-soft hover:underline mr-auto">
                         <i className="ri-external-link-line"></i> Xem chi tiet
                       </Link>
 
                       <button onClick={() => handleReject(item.id)} disabled={isProcessing}
-                        className="px-4 py-2 border border-red-200 text-red-500 rounded-xl text-xs font-semibold hover:bg-red-50 disabled:opacity-50 transition">
+                        className="px-4 py-2 border border-brand-200 text-brand-600 rounded-lg text-xs font-semibold hover:bg-brand-50 disabled:opacity-50 transition">
                         {isProcessing ? '...' : 'Tu choi'}
                       </button>
 
                       <button onClick={() => handleApprove(item.id)} disabled={isProcessing}
-                        className="px-4 py-2 bg-brand-500 text-white rounded-xl text-xs font-semibold hover:bg-brand-600 disabled:opacity-50 transition">
+                        className="px-4 py-2 bg-brand-500 text-white rounded-lg text-xs font-semibold hover:bg-brand-600 disabled:opacity-50 transition">
                         {isProcessing ? '...' : 'Duyet dang'}
                       </button>
                     </div>
@@ -276,8 +276,8 @@ export default function AdminContentPage() {
           <div className="flex justify-center gap-2 mt-6">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
               <button key={p} onClick={() => load(p)}
-                className={`w-10 h-10 rounded-xl text-sm font-medium transition ${
-                  p === page ? 'bg-gray-900 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                className={`w-10 h-10 rounded-lg text-sm font-medium transition ${
+                  p === page ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:bg-paper'
                 }`}>
                 {p}
               </button>

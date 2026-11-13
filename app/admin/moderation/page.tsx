@@ -112,37 +112,37 @@ export default function ModerationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-paper">
+      <div className="bg-surface border-b">
         <div className="max-w-6xl mx-auto px-4 py-5 flex items-center gap-4">
-          <Link href="/admin/dashboard" className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
+          <Link href="/admin/dashboard" className="w-10 h-10 border border-line rounded-lg flex items-center justify-center hover:bg-paper">
             <i className="ri-arrow-left-line text-lg"></i>
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Kiểm duyệt nội dung</h1>
-            <p className="text-gray-500 text-sm">{total} bài viết</p>
+            <h1 className="text-xl font-bold text-ink">Kiểm duyệt nội dung</h1>
+            <p className="text-ink-soft text-sm">{total} bài viết</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-4 flex flex-wrap gap-3 items-center">
+        <div className="bg-surface rounded-lg p-4 mb-4 flex flex-wrap gap-3 items-center">
           <form onSubmit={e => { e.preventDefault(); loadPosts(1); }} className="flex gap-2 flex-1 min-w-[200px]">
             <input type="text" placeholder="Tìm tiêu đề, nội dung..." value={search}
               onChange={e => setSearch(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500" />
-            <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">Tìm</button>
+              className="flex-1 px-3 py-2 border border-line rounded-lg text-sm focus:ring-2 focus:ring-forest-400" />
+            <button type="submit" className="bg-brand-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-600">Tìm</button>
           </form>
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            className="border border-line rounded-lg px-3 py-2 text-sm">
             {STATUS_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
 
         {/* Bulk action bar */}
         {selected.size > 0 && (
-          <div className="bg-brand-50 border border-brand-200 rounded-xl p-4 mb-4 flex items-center gap-3 flex-wrap">
+          <div className="bg-brand-50 border border-brand-200 rounded-lg p-4 mb-4 flex items-center gap-3 flex-wrap">
             <span className="text-sm font-medium text-brand-700">Đã chọn {selected.size} bài</span>
             <div className="ml-auto flex gap-2">
               <button onClick={handleBulkHide} disabled={processing === 'bulk'}
@@ -150,7 +150,7 @@ export default function ModerationPage() {
                 <i className="ri-eye-off-line mr-1"></i> Ẩn tất cả
               </button>
               <button onClick={handleBulkDelete} disabled={processing === 'bulk'}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 text-sm">
+                className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50 text-sm">
                 <i className="ri-delete-bin-line mr-1"></i> Xóa tất cả
               </button>
             </div>
@@ -159,25 +159,25 @@ export default function ModerationPage() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-brand-200 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : posts.length === 0 ? (
-          <div className="bg-white rounded-xl p-16 text-center shadow-sm">
-            <i className="ri-file-list-3-line text-6xl text-gray-300 block mb-3"></i>
-            <p className="text-gray-500">Không có bài viết nào</p>
+          <div className="bg-surface rounded-lg p-16 text-center">
+            <i className="ri-file-list-3-line text-6xl text-ink-faint block mb-3"></i>
+            <p className="text-ink-soft">Không có bài viết nào</p>
           </div>
         ) : (
           <>
             {/* Select all row */}
-            <div className="bg-white rounded-xl shadow-sm mb-2 px-5 py-3 flex items-center gap-3">
+            <div className="bg-surface rounded-lg mb-2 px-5 py-3 flex items-center gap-3">
               <input type="checkbox" checked={selected.size === posts.length}
                 onChange={toggleAll} className="rounded w-4 h-4 cursor-pointer" />
-              <span className="text-sm text-gray-500">Chọn tất cả ({posts.length})</span>
+              <span className="text-sm text-ink-soft">Chọn tất cả ({posts.length})</span>
             </div>
 
             <div className="space-y-2">
               {posts.map(post => (
-                <div key={post.id} className={`bg-white rounded-xl shadow-sm p-4 flex gap-3 ${post.status === 'hidden' ? 'opacity-60' : ''}`}>
+                <div key={post.id} className={`bg-surface rounded-lg p-4 flex gap-3 ${post.status === 'hidden' ? 'opacity-60' : ''}`}>
                   <input type="checkbox" checked={selected.has(post.id)}
                     onChange={() => toggleSelect(post.id)}
                     className="rounded w-4 h-4 mt-1 cursor-pointer flex-shrink-0" />
@@ -185,7 +185,7 @@ export default function ModerationPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       {post.status === 'hidden' ? (
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded flex items-center gap-1">
+                        <span className="text-xs bg-paper text-ink-soft px-2 py-0.5 rounded flex items-center gap-1">
                           <i className="ri-eye-off-line"></i> Đã ẩn
                         </span>
                       ) : (
@@ -195,9 +195,9 @@ export default function ModerationPage() {
                         {categoryLabel[post.category] || post.category}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm mb-0.5">{post.title}</h3>
-                    <p className="text-xs text-gray-500 line-clamp-1">{post.content?.replace(/<[^>]+>/g, '')}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
+                    <h3 className="font-semibold text-ink text-sm mb-0.5">{post.title}</h3>
+                    <p className="text-xs text-ink-soft line-clamp-1">{post.content?.replace(/<[^>]+>/g, '')}</p>
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-ink-faint">
                       <span>{post.isAnonymous ? 'Ẩn danh' : (post.user?.fullName || post.user?.username)}</span>
                       <span><i className="ri-heart-line mr-0.5"></i>{post.likeCount}</span>
                       <span><i className="ri-chat-1-line mr-0.5"></i>{post._count?.comments || 0}</span>
@@ -223,7 +223,7 @@ export default function ModerationPage() {
                       </button>
                     )}
                     <button onClick={() => handleDelete(post.id)} disabled={processing === post.id}
-                      className="px-3 py-1.5 border border-red-300 text-red-500 rounded-lg hover:bg-red-50 disabled:opacity-50 text-xs whitespace-nowrap">
+                      className="px-3 py-1.5 border border-brand-200 text-brand-600 rounded-lg hover:bg-brand-50 disabled:opacity-50 text-xs whitespace-nowrap">
                       Xóa
                     </button>
                   </div>
@@ -235,7 +235,7 @@ export default function ModerationPage() {
               <div className="flex justify-center gap-2 mt-6">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                   <button key={p} onClick={() => loadPosts(p)}
-                    className={`w-10 h-10 rounded-lg text-sm ${p === page ? 'bg-red-600 text-white' : 'border border-gray-300 text-gray-600 hover:bg-gray-50'}`}>
+                    className={`w-10 h-10 rounded-lg text-sm ${p === page ? 'bg-brand-500 text-white' : 'border border-line text-ink-soft hover:bg-paper'}`}>
                     {p}
                   </button>
                 ))}

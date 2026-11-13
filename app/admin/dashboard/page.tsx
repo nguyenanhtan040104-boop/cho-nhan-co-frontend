@@ -61,7 +61,7 @@ function MiniBar({ data, color }: { data: { label: string; value: number }[]; co
       {data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
           <div className="w-full rounded-t transition-all" style={{ height: `${(d.value / max) * 72}px`, backgroundColor: color }} />
-          <span className="text-[9px] text-gray-400 truncate w-full text-center">{d.label}</span>
+          <span className="text-[11px] text-ink-faint truncate w-full text-center">{d.label}</span>
         </div>
       ))}
     </div>
@@ -177,10 +177,10 @@ export default function AdminDashboard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-slate-400 text-sm">Đang tải...</p>
+    <div className="grid min-h-screen place-items-center bg-paper">
+      <div className="text-center">
+        <div className="mx-auto mb-3 h-9 w-9 animate-spin rounded-full border-[3px] border-forest-600 border-t-transparent" />
+        <p className="text-sm text-ink-soft">Đang tải trang quản trị...</p>
       </div>
     </div>
   );
@@ -197,77 +197,76 @@ export default function AdminDashboard() {
   });
   const suspiciousIPs = Object.entries(ipMap).filter(([, v]) => v.failed >= 3).length;
 
-  const sidebarTabs = [
-    { id: 'overview', label: 'Tổng quan', icon: 'ri-dashboard-3-line' },
-    { id: 'users', label: 'Người dùng', icon: 'ri-group-line', badge: allUsers.length },
-    { id: 'security', label: 'Bảo mật / IP', icon: 'ri-shield-keyhole-line', badge: (!visitedTabs.has('security') && suspiciousIPs > 0) ? suspiciousIPs : undefined, badgeColor: 'bg-red-500' },
-    { id: 'moderation', label: 'Kiểm duyệt', icon: 'ri-shield-check-line', badge: pendingPosts.length || undefined, badgeColor: 'bg-brand-500' },
-    { id: 'products', label: 'Sản phẩm', icon: 'ri-leaf-line', badge: allProducts.length },
-    { id: 'real-estate', label: 'Bất động sản', icon: 'ri-home-4-line', badge: allRealEstates.length },
-    { id: 'jobs', label: 'Tuyển dụng', icon: 'ri-briefcase-line', badge: allJobs.length },
-    { id: 'forum', label: 'Diễn đàn', icon: 'ri-chat-3-line', badge: allPosts.length },
-    { id: 'ads', label: 'Quảng cáo', icon: 'ri-megaphone-line', badge: allAds.length },
-    { id: 'vip', label: 'Quản lý VIP', icon: 'ri-vip-crown-fill', badge: (!visitedTabs.has('vip') && vipItems.length > 0) ? vipItems.length : undefined, badgeColor: 'bg-gold-500' },
-    { id: 'wallet', label: 'Doanh thu', icon: 'ri-wallet-3-line' },
-    { id: 'activity', label: 'Nhật ký', icon: 'ri-history-line' },
+  // `alert` badges need attention (filled red); the rest are plain counts
+  const navGroups: { label: string; items: { id: string; label: string; count?: number; alert?: boolean }[] }[] = [
+    { label: 'Theo dõi', items: [
+      { id: 'overview', label: 'Tổng quan' },
+      { id: 'moderation', label: 'Kiểm duyệt', count: pendingPosts.length || undefined, alert: true },
+      { id: 'security', label: 'Bảo mật và IP', count: (!visitedTabs.has('security') && suspiciousIPs > 0) ? suspiciousIPs : undefined, alert: true },
+      { id: 'activity', label: 'Nhật ký' },
+    ] },
+    { label: 'Nội dung', items: [
+      { id: 'products', label: 'Sản phẩm', count: allProducts.length },
+      { id: 'real-estate', label: 'Bất động sản', count: allRealEstates.length },
+      { id: 'jobs', label: 'Tuyển dụng', count: allJobs.length },
+      { id: 'forum', label: 'Diễn đàn', count: allPosts.length },
+      { id: 'ads', label: 'Quảng cáo', count: allAds.length },
+    ] },
+    { label: 'Tiền và người dùng', items: [
+      { id: 'users', label: 'Người dùng', count: allUsers.length },
+      { id: 'vip', label: 'Quản lý VIP', count: (!visitedTabs.has('vip') && vipItems.length > 0) ? vipItems.length : undefined, alert: true },
+      { id: 'wallet', label: 'Doanh thu' },
+    ] },
   ];
+  const sidebarTabs = navGroups.flatMap(g => g.items);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-screen-2xl mx-auto px-4 py-5">
+    <div className="min-h-screen bg-paper">
+      <div className="mx-auto max-w-screen-2xl px-4 py-4 sm:px-6">
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-red-500 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-red-200">
-              A
-            </div>
-            <div>
-              <h1 className="text-xl font-black text-gray-900 tracking-tight">Admin Dashboard</h1>
-              <p className="text-xs text-gray-400">Xin chào, <b className="text-gray-600">{me?.fullName}</b> · {fmtDate(new Date().toISOString())}</p>
-            </div>
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+          <div>
+            <h1 className="text-xl font-bold text-ink">Quản trị Chợ Nhân Cơ</h1>
+            <p className="text-[13px] text-ink-faint">Xin chào <b className="text-ink-soft">{me?.fullName}</b> · {fmtDate(new Date().toISOString())}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {suspiciousIPs > 0 && (
-              <button onClick={() => handleTabChange('security')}
-                className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold animate-pulse hover:animate-none hover:bg-red-100 transition-all">
-                <i className="ri-alarm-warning-line"></i> {suspiciousIPs} IP đáng ngờ
+              <button onClick={() => handleTabChange('security')} className="btn-ghost !border-brand-200 !px-3 !py-1.5 text-[13px] !text-brand-600">
+                {suspiciousIPs} IP đáng ngờ
               </button>
             )}
-            <Link href="/" className="px-3 py-2 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 rounded-xl hover:bg-white transition-all">
-              <i className="ri-home-line mr-1"></i>Trang chủ
-            </Link>
-            <Link href="/dashboard" className="px-3 py-2 text-xs text-gray-500 border border-gray-200 rounded-xl hover:bg-white transition-all">
-              Dashboard cá nhân
-            </Link>
-            <button onClick={() => { auth.logout(); router.push('/'); }}
-              className="px-3 py-2 text-xs text-red-500 border border-red-200 rounded-xl hover:bg-red-50 transition-all">
-              <i className="ri-logout-box-line mr-1"></i>Đăng xuất
-            </button>
+            <Link href="/" className="btn-ghost !px-3 !py-1.5 text-[13px]">Trang chủ</Link>
+            <Link href="/dashboard" className="btn-ghost !px-3 !py-1.5 text-[13px]">Tài khoản của tôi</Link>
+            <button onClick={() => { auth.logout(); router.push('/'); }} className="btn-ghost !px-3 !py-1.5 text-[13px]">Đăng xuất</button>
           </div>
+        </header>
+
+        {/* Phones and small tablets: one scrolling row */}
+        <div className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 md:hidden">
+          {sidebarTabs.map(tab => (
+            <button key={tab.id} onClick={() => handleTabChange(tab.id)} className={`chip shrink-0 ${activeTab === tab.id ? 'chip-active' : ''}`}>
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && <span className={`ml-1.5 text-[11px] ${tab.alert ? 'rounded-full bg-brand-500 px-1.5 text-white' : 'opacity-70'}`}>{tab.count}</span>}
+            </button>
+          ))}
         </div>
 
-        <div className="flex gap-5">
-          {/* Sidebar */}
-          <aside className="w-52 flex-shrink-0">
-            <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 sticky top-4">
-              {sidebarTabs.map(tab => (
-                <button key={tab.id} onClick={() => handleTabChange(tab.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all mb-0.5 ${
-                    activeTab === tab.id
-                      ? 'bg-red-600 text-white shadow-md shadow-red-200'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}>
-                  <i className={`${tab.icon} text-base flex-shrink-0`}></i>
-                  <span className="text-sm flex-1 font-medium">{tab.label}</span>
-                  {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
-                      activeTab === tab.id ? 'bg-white/25 text-white' : (tab.badgeColor || 'bg-gray-100 text-gray-500') + ' text-white'
-                    }`}>
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
+        <div className="mt-4 flex gap-6">
+          <aside className="hidden w-56 shrink-0 md:block">
+            <nav className="card sticky top-4 p-2" aria-label="Menu quản trị">
+              {navGroups.map((g, gi) => (
+                <div key={g.label} className={gi > 0 ? 'mt-2 border-t border-line pt-2' : ''}>
+                  <p className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{g.label}</p>
+                  {g.items.map(tab => (
+                    <button key={tab.id} onClick={() => handleTabChange(tab.id)} aria-current={activeTab === tab.id ? 'page' : undefined}
+                      className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${activeTab === tab.id ? 'bg-forest-50 font-semibold text-forest-800' : 'text-ink-soft hover:bg-paper'}`}>
+                      <span>{tab.label}</span>
+                      {tab.count !== undefined && tab.count > 0 && (
+                        <span className={`text-[11px] font-semibold tabular-nums ${tab.alert ? 'rounded-full bg-brand-500 px-1.5 text-white' : 'text-ink-faint'}`}>{tab.count}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               ))}
             </nav>
           </aside>
@@ -291,13 +290,13 @@ export default function AdminDashboard() {
                 renderRow={p => (
                   <>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.location} · {p.category}</p>
+                      <p className="font-semibold text-ink truncate text-sm">{p.title}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">{p.user?.fullName} · {p.location} · {p.category}</p>
                       <p className="text-sm font-bold text-forest-600 mt-0.5">{fmtMoney(Number(p.price))}/{p.unit}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <StatusBadge status={p.status} isVip={p.isVip} />
-                      <p className="text-xs text-gray-400 mt-1"><i className="ri-eye-line"></i> {p.viewCount || 0} · {fmtDate(p.createdAt)}</p>
+                      <p className="text-xs text-ink-faint mt-1"><i className="ri-eye-line"></i> {p.viewCount || 0} · {fmtDate(p.createdAt)}</p>
                     </div>
                   </>
                 )}
@@ -311,14 +310,14 @@ export default function AdminDashboard() {
                 renderRow={p => (
                   <>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.address}</p>
-                      <p className="text-sm font-bold text-blue-600 mt-0.5">{fmtMoney(Number(p.price))} · {p.area}m²</p>
+                      <p className="font-semibold text-ink truncate text-sm">{p.title}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">{p.user?.fullName} · {p.address}</p>
+                      <p className="text-sm font-bold text-ink-soft mt-0.5">{fmtMoney(Number(p.price))} · {p.area}m²</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{p.type}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-paper text-ink-soft">{p.type}</span>
                       <StatusBadge isVip={p.isVip} />
-                      <p className="text-xs text-gray-400 mt-1">{fmtDate(p.createdAt)}</p>
+                      <p className="text-xs text-ink-faint mt-1">{fmtDate(p.createdAt)}</p>
                     </div>
                   </>
                 )}
@@ -333,15 +332,15 @@ export default function AdminDashboard() {
                   <>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
-                        {p.isUrgent && <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full flex-shrink-0">Khẩn</span>}
+                        <p className="font-semibold text-ink truncate text-sm">{p.title}</p>
+                        {p.isUrgent && <span className="text-xs bg-brand-50 text-brand-600 px-1.5 py-0.5 rounded-full flex-shrink-0">Khẩn</span>}
                       </div>
-                      <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.location}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">{p.user?.fullName} · {p.location}</p>
                       {p.salary && <p className="text-sm font-bold text-forest-600 mt-0.5">{p.salary}</p>}
                     </div>
                     <div className="text-right flex-shrink-0">
                       <span className="text-xs px-2 py-0.5 rounded-full bg-forest-100 text-forest-700">{p.type === 'EMPLOYER' ? 'Tuyển dụng' : 'Tìm việc'}</span>
-                      <p className="text-xs text-gray-400 mt-1">{fmtDate(p.createdAt)}</p>
+                      <p className="text-xs text-ink-faint mt-1">{fmtDate(p.createdAt)}</p>
                     </div>
                   </>
                 )}
@@ -355,13 +354,13 @@ export default function AdminDashboard() {
                 renderRow={p => (
                   <>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{p.isAnonymous ? 'Ẩn danh' : p.user?.fullName} · {p.category}</p>
+                      <p className="font-semibold text-ink truncate text-sm">{p.title}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">{p.isAnonymous ? 'Ẩn danh' : p.user?.fullName} · {p.category}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs text-gray-500">❤️ {p.likeCount} · 👁️ {p.viewCount}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{p._count?.comments || 0} bình luận</p>
-                      <p className="text-xs text-gray-400">{fmtDate(p.createdAt)}</p>
+                      <p className="text-xs text-ink-soft">{p.likeCount} thích · {p.viewCount} xem</p>
+                      <p className="text-xs text-ink-faint mt-0.5">{p._count?.comments || 0} bình luận</p>
+                      <p className="text-xs text-ink-faint">{fmtDate(p.createdAt)}</p>
                     </div>
                   </>
                 )}
@@ -374,15 +373,15 @@ export default function AdminDashboard() {
                 renderRow={p => (
                   <>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate text-sm">{p.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{p.user?.fullName} · {p.category}</p>
+                      <p className="font-semibold text-ink truncate text-sm">{p.title}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">{p.user?.fullName} · {p.category}</p>
                       {p.endDate && <p className="text-xs text-brand-500 mt-0.5">Hết hạn: {fmtDate(p.endDate)}</p>}
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${new Date(p.endDate) > new Date() ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${new Date(p.endDate) > new Date() ? 'bg-forest-100 text-forest-700' : 'bg-paper text-ink-soft'}`}>
                         {new Date(p.endDate) > new Date() ? 'Đang chạy' : 'Hết hạn'}
                       </span>
-                      <p className="text-xs text-gray-400 mt-1">{fmtDate(p.createdAt)}</p>
+                      <p className="text-xs text-ink-faint mt-1">{fmtDate(p.createdAt)}</p>
                     </div>
                   </>
                 )}
@@ -414,7 +413,7 @@ function StatusBadge({ status, isVip }: { status?: string; isVip?: boolean }) {
       {status && (
         <span className={`text-xs px-1.5 py-0.5 rounded-full ${
           status === 'ACTIVE' ? 'bg-forest-100 text-forest-700' :
-          status === 'HIDDEN' ? 'bg-gray-100 text-gray-500' : 'bg-red-100 text-red-600'
+          status === 'HIDDEN' ? 'bg-paper text-ink-soft' : 'bg-brand-50 text-brand-600'
         }`}>{status === 'ACTIVE' ? 'Hiển thị' : status === 'HIDDEN' ? 'Đã ẩn' : status}</span>
       )}
     </div>
@@ -428,14 +427,14 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
   const pendingTx = walletTx.filter((t: any) => t.status === 'pending');
 
   const cards = [
-    { label: 'Tổng sản phẩm', value: stats.totalProducts, icon: 'ri-leaf-line', gradient: 'from-forest-500 to-brand-600', tab: 'products' },
-    { label: 'Bất động sản', value: stats.totalRE, icon: 'ri-home-4-line', gradient: 'from-blue-500 to-blue-600', tab: 'real-estate' },
-    { label: 'Tuyển dụng', value: stats.totalJobs, icon: 'ri-briefcase-line', gradient: 'from-forest-500 to-forest-600', tab: 'jobs' },
-    { label: 'Bài diễn đàn', value: stats.totalPosts, icon: 'ri-chat-3-line', gradient: 'from-cyan-500 to-sky-600', tab: 'forum' },
-    { label: 'Người dùng', value: stats.totalUsers, icon: 'ri-group-line', gradient: 'from-pink-500 to-rose-600', tab: 'users' },
-    { label: 'Mới hôm nay', value: stats.newUsersToday, icon: 'ri-user-add-line', gradient: 'from-teal-500 to-teal-600', tab: 'users' },
-    { label: 'Chờ duyệt', value: stats.pendingCount, icon: 'ri-time-line', gradient: 'from-brand-500 to-gold-600', tab: 'moderation' },
-    { label: 'Login thất bại hôm nay', value: stats.failedToday, icon: 'ri-shield-keyhole-line', gradient: 'from-red-500 to-red-700', tab: 'security' },
+    { label: 'Tổng sản phẩm', value: stats.totalProducts, tab: 'products' },
+    { label: 'Bất động sản', value: stats.totalRE, tab: 'real-estate' },
+    { label: 'Tuyển dụng', value: stats.totalJobs, tab: 'jobs' },
+    { label: 'Bài diễn đàn', value: stats.totalPosts, tab: 'forum' },
+    { label: 'Người dùng', value: stats.totalUsers, tab: 'users' },
+    { label: 'Mới hôm nay', value: stats.newUsersToday, tab: 'users' },
+    { label: 'Chờ duyệt', value: stats.pendingCount, tab: 'moderation' },
+    { label: 'Login thất bại hôm nay', value: stats.failedToday, tab: 'security' },
   ];
 
   const days7 = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d; });
@@ -447,8 +446,8 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-black text-gray-900">Tổng quan hệ thống</h2>
-        <span className="text-xs text-gray-400 bg-white border border-gray-100 px-3 py-1.5 rounded-full shadow-sm">
+        <h2 className="text-lg font-bold text-ink">Tổng quan hệ thống</h2>
+        <span className="text-xs text-ink-faint bg-surface border border-line px-3 py-1.5 rounded-full">
           <i className="ri-refresh-line mr-1"></i>Cập nhật: {fmtTime(new Date().toISOString())}
         </span>
       </div>
@@ -457,34 +456,31 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {cards.map((c, i) => (
           <button key={i} onClick={() => c.tab && onTabChange(c.tab)}
-            className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all text-left group">
-            <div className={`w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform`}>
-              <i className={`${c.icon} text-white text-base`}></i>
-            </div>
-            <p className="text-2xl font-black text-gray-900">{c.value}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{c.label}</p>
+            className="bg-surface rounded-card p-4 border border-line transition-all text-left group">
+            <p className="text-2xl font-bold text-ink">{c.value}</p>
+            <p className="text-xs text-ink-faint mt-0.5">{c.label}</p>
           </button>
         ))}
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-          <p className="text-sm font-bold text-gray-800 mb-3">Sản phẩm đăng mới (7 ngày)</p>
+        <div className="bg-surface rounded-card p-5 border border-line">
+          <p className="text-sm font-bold text-ink mb-3">Sản phẩm đăng mới (7 ngày)</p>
           <MiniBar data={chartData} color="#059669" />
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-          <p className="text-sm font-bold text-gray-800 mb-4">Giao dịch nạp tiền</p>
+        <div className="bg-surface rounded-card p-5 border border-line">
+          <p className="text-sm font-bold text-ink mb-4">Giao dịch nạp tiền</p>
           <div className="space-y-3">
             {[
               { label: 'Đã xác nhận', value: fmtMoney(revenue), color: 'text-forest-600', dot: 'bg-forest-500' },
               { label: 'Chờ xác nhận', value: `${pendingTx.length} giao dịch`, color: 'text-brand-500', dot: 'bg-brand-400' },
-              { label: 'Tổng giao dịch', value: walletTx.length, color: 'text-gray-700', dot: 'bg-gray-400' },
+              { label: 'Tổng giao dịch', value: walletTx.length, color: 'text-ink', dot: 'bg-ink' },
             ].map((r, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${r.dot}`}></div>
-                  <span className="text-sm text-gray-500">{r.label}</span>
+                  <span className="text-sm text-ink-soft">{r.label}</span>
                 </div>
                 <span className={`font-bold text-sm ${r.color}`}>{r.value}</span>
               </div>
@@ -495,45 +491,45 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
 
       {/* Activity + Products */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+        <div className="bg-surface rounded-card border border-line overflow-hidden">
+          <div className="px-5 py-4 border-b border-line flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="ri-history-line text-gray-400"></i>
-              <h3 className="font-bold text-gray-800 text-sm">Hoạt động gần đây</h3>
+              <i className="ri-history-line text-ink-faint"></i>
+              <h3 className="font-bold text-ink text-sm">Hoạt động gần đây</h3>
             </div>
-            <button onClick={() => onTabChange('activity')} className="text-xs text-red-500 hover:underline">Xem tất cả</button>
+            <button onClick={() => onTabChange('activity')} className="text-xs text-brand-600 hover:underline">Xem tất cả</button>
           </div>
-          <div className="divide-y divide-gray-50 max-h-72 overflow-y-auto">
+          <div className="divide-y divide-line max-h-72 overflow-y-auto">
             {recentActivity.slice(0, 8).map((a: any, i: number) => (
-              <div key={i} className="flex items-start gap-3 px-5 py-3 hover:bg-gray-50/50">
+              <div key={i} className="flex items-start gap-3 px-5 py-3 hover:bg-paper">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-700 line-clamp-1"><b>{a.who}</b> {a.verb} <i>{a.title}</i></p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{timeAgo(a.time)}</p>
+                  <p className="text-xs text-ink line-clamp-1"><b>{a.who}</b> {a.verb} <i>{a.title}</i></p>
+                  <p className="text-[11px] text-ink-faint mt-0.5">{timeAgo(a.time)}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+        <div className="bg-surface rounded-card border border-line overflow-hidden">
+          <div className="px-5 py-4 border-b border-line flex items-center justify-between">
             <div className="flex items-center gap-2">
               <i className="ri-leaf-line text-forest-500"></i>
-              <h3 className="font-bold text-gray-800 text-sm">Sản phẩm mới nhất</h3>
+              <h3 className="font-bold text-ink text-sm">Sản phẩm mới nhất</h3>
             </div>
-            <button onClick={() => onTabChange('products')} className="text-xs text-red-500 hover:underline">Quản lý</button>
+            <button onClick={() => onTabChange('products')} className="text-xs text-brand-600 hover:underline">Quản lý</button>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-line">
             {products.slice(0, 6).map((p: any) => (
-              <div key={p.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/50">
-                <div className="w-9 h-9 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+              <div key={p.id} className="flex items-center gap-3 px-5 py-3 hover:bg-paper">
+                <div className="w-9 h-9 rounded-lg bg-paper overflow-hidden flex-shrink-0">
                   {p.images?.[0]?.url
                     ? <img src={p.images[0].url} className="w-full h-full object-cover" />
-                    : <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-gray-300 text-sm"></i></div>}
+                    : <div className="w-full h-full flex items-center justify-center"><i className="ri-image-line text-ink-faint text-sm"></i></div>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 truncate">{p.title}</p>
-                  <p className="text-[10px] text-gray-400">{p.user?.fullName} · {timeAgo(p.createdAt)}</p>
+                  <p className="text-xs font-semibold text-ink truncate">{p.title}</p>
+                  <p className="text-[11px] text-ink-faint">{p.user?.fullName} · {timeAgo(p.createdAt)}</p>
                 </div>
                 <span className="text-xs font-bold text-forest-600 flex-shrink-0">{fmtMoney(Number(p.price))}</span>
               </div>
@@ -544,35 +540,35 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
 
       {/* Login security preview */}
       {loginHistory.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+        <div className="bg-surface rounded-card border border-line overflow-hidden">
+          <div className="px-5 py-4 border-b border-line flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <i className="ri-shield-keyhole-line text-red-500"></i>
-              <h3 className="font-bold text-gray-800 text-sm">Đăng nhập gần đây</h3>
+              <i className="ri-shield-keyhole-line text-brand-600"></i>
+              <h3 className="font-bold text-ink text-sm">Đăng nhập gần đây</h3>
             </div>
-            <button onClick={() => onTabChange('security')} className="text-xs text-red-500 hover:underline">Xem bảo mật</button>
+            <button onClick={() => onTabChange('security')} className="text-xs text-brand-600 hover:underline">Xem bảo mật</button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead><tr className="border-b border-gray-50 bg-gray-50/50">
-                <th className="text-left px-5 py-2.5 font-medium text-gray-400">Người dùng</th>
-                <th className="text-left px-4 py-2.5 font-medium text-gray-400">IP</th>
-                <th className="text-center px-4 py-2.5 font-medium text-gray-400">Trạng thái</th>
-                <th className="text-right px-5 py-2.5 font-medium text-gray-400">Thời gian</th>
+              <thead><tr className="border-b border-line bg-paper">
+                <th className="text-left px-5 py-2.5 font-medium text-ink-faint">Người dùng</th>
+                <th className="text-left px-4 py-2.5 font-medium text-ink-faint">IP</th>
+                <th className="text-center px-4 py-2.5 font-medium text-ink-faint">Trạng thái</th>
+                <th className="text-right px-5 py-2.5 font-medium text-ink-faint">Thời gian</th>
               </tr></thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-line">
                 {loginHistory.slice(0, 5).map((h: any, i: number) => (
-                  <tr key={i} className="hover:bg-gray-50/50">
-                    <td className="px-5 py-2.5 text-gray-700 font-medium">{h.user?.fullName || '—'}</td>
-                    <td className="px-4 py-2.5 text-gray-500 font-mono">{h.ipAddress || '—'}</td>
+                  <tr key={i} className="hover:bg-paper">
+                    <td className="px-5 py-2.5 text-ink font-medium">{h.user?.fullName || '—'}</td>
+                    <td className="px-4 py-2.5 text-ink-soft font-mono">{h.ipAddress || '—'}</td>
                     <td className="px-4 py-2.5 text-center">
                       <span className={`px-2 py-0.5 rounded-full font-semibold ${
                         h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
-                        h.status === 'FAILED' ? 'bg-red-100 text-red-600' :
+                        h.status === 'FAILED' ? 'bg-brand-50 text-brand-600' :
                         'bg-brand-100 text-brand-700'
                       }`}>{h.status === 'SUCCESS' ? 'Thành công' : h.status === 'FAILED' ? 'Thất bại' : 'Bị khóa'}</span>
                     </td>
-                    <td className="px-5 py-2.5 text-right text-gray-400">{timeAgo(h.createdAt)}</td>
+                    <td className="px-5 py-2.5 text-right text-ink-faint">{timeAgo(h.createdAt)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -672,8 +668,8 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-black text-gray-900">Bảo mật & Giám sát IP</h2>
-        <button onClick={onRefresh} className="text-xs text-gray-400 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded-xl hover:bg-white transition-all">
+        <h2 className="text-lg font-bold text-ink">Bảo mật & Giám sát IP</h2>
+        <button onClick={onRefresh} className="text-xs text-ink-faint hover:text-ink border border-line px-3 py-1.5 rounded-lg hover:bg-surface transition-all">
           <i className="ri-refresh-line mr-1"></i>Làm mới
         </button>
       </div>
@@ -681,80 +677,77 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
       {/* Stats row */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Login hôm nay', value: successToday + failedToday + lockedToday, icon: 'ri-login-box-line', gradient: 'from-blue-500 to-blue-600' },
-          { label: 'Thành công', value: successToday, icon: 'ri-checkbox-circle-line', gradient: 'from-forest-500 to-brand-600' },
-          { label: 'Thất bại hôm nay', value: failedToday, icon: 'ri-close-circle-line', gradient: 'from-brand-500 to-gold-600' },
-          { label: 'IP bị chặn', value: blockedIps.length, icon: 'ri-shield-cross-line', gradient: 'from-red-500 to-red-700' },
+          { label: 'Login hôm nay', value: successToday + failedToday + lockedToday },
+          { label: 'Thành công', value: successToday },
+          { label: 'Thất bại hôm nay', value: failedToday },
+          { label: 'IP bị chặn', value: blockedIps.length },
         ].map((c, i) => (
-          <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className={`w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center mb-3`}>
-              <i className={`${c.icon} text-white text-base`}></i>
-            </div>
-            <p className="text-2xl font-black text-gray-900">{c.value}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{c.label}</p>
+          <div key={i} className="bg-surface rounded-card p-4 border border-line">
+            <p className="text-2xl font-bold text-ink">{c.value}</p>
+            <p className="text-xs text-ink-faint mt-0.5">{c.label}</p>
           </div>
         ))}
       </div>
 
       {/* Suspicious IPs */}
       {suspiciousIPs.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+        <div className="bg-brand-50 border border-brand-200 rounded-card p-4">
           <div className="flex items-center gap-2 mb-3">
-            <i className="ri-alarm-warning-fill text-red-500 text-lg"></i>
-            <h3 className="font-bold text-red-700">IP đáng ngờ ({suspiciousIPs.length})</h3>
-            <span className="text-xs text-red-500 bg-red-100 px-2 py-0.5 rounded-full">≥ 3 lần thất bại</span>
+            <i className="ri-alarm-warning-fill text-brand-600 text-lg"></i>
+            <h3 className="font-bold text-brand-600">IP đáng ngờ ({suspiciousIPs.length})</h3>
+            <span className="text-xs text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">≥ 3 lần thất bại</span>
           </div>
           <div className="space-y-2">
             {suspiciousIPs.map(([ip, data]) => {
               const isBlocked = blockedIpSet.has(ip);
               return (
-                <div key={ip} className={`bg-white rounded-xl border p-3 flex items-center gap-4 ${isBlocked ? 'border-gray-200 opacity-60' : 'border-red-100'}`}>
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isBlocked ? 'bg-gray-100' : 'bg-red-100'}`}>
-                    <i className={`${isBlocked ? 'ri-lock-line text-gray-400' : 'ri-spy-line text-red-500'}`}></i>
+                <div key={ip} className={`bg-surface rounded-lg border p-3 flex items-center gap-4 ${isBlocked ? 'border-line opacity-60' : 'border-brand-200'}`}>
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isBlocked ? 'bg-paper' : 'bg-brand-50'}`}>
+                    <i className={`${isBlocked ? 'ri-lock-line text-ink-faint' : 'ri-spy-line text-brand-600'}`}></i>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-gray-900 font-mono text-sm">{ip}</p>
-                      {isBlocked && <span className="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-semibold">ĐÃ CHẶN</span>}
+                      <p className="font-bold text-ink font-mono text-sm">{ip}</p>
+                      {isBlocked && <span className="text-[11px] bg-line text-ink-soft px-1.5 py-0.5 rounded font-semibold">ĐÃ CHẶN</span>}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-ink-soft mt-0.5">
                       {data.users.length > 0 ? `Tài khoản: ${data.users.slice(0, 2).join(', ')}${data.users.length > 2 ? ` +${data.users.length - 2}` : ''}` : 'Không xác định'}
                       {' · '}Lần cuối: {timeAgo(data.lastSeen)}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 text-center flex-shrink-0">
                     <div>
-                      <p className="text-lg font-black text-red-600">{data.failed}</p>
-                      <p className="text-[10px] text-gray-400">Thất bại</p>
+                      <p className="text-lg font-bold text-brand-600">{data.failed}</p>
+                      <p className="text-[11px] text-ink-faint">Thất bại</p>
                     </div>
                     <div>
-                      <p className="text-lg font-black text-brand-500">{data.locked}</p>
-                      <p className="text-[10px] text-gray-400">Bị khóa</p>
+                      <p className="text-lg font-bold text-brand-500">{data.locked}</p>
+                      <p className="text-[11px] text-ink-faint">Bị khóa</p>
                     </div>
                     <div>
-                      <p className="text-lg font-black text-forest-600">{data.success}</p>
-                      <p className="text-[10px] text-gray-400">Thành công</p>
+                      <p className="text-lg font-bold text-forest-600">{data.success}</p>
+                      <p className="text-[11px] text-ink-faint">Thành công</p>
                     </div>
                     <div className="ml-1 flex flex-col gap-1.5 items-end">
                       <span className={`text-xs px-2 py-0.5 rounded-lg font-bold ${
-                        data.failed >= 10 ? 'bg-red-600 text-white' :
-                        data.failed >= 5 ? 'bg-red-100 text-red-700' :
+                        data.failed >= 10 ? 'bg-brand-500 text-white' :
+                        data.failed >= 5 ? 'bg-brand-50 text-brand-600' :
                         'bg-brand-100 text-brand-700'
                       }`}>
-                        {data.failed >= 10 ? '🔴 Nguy hiểm' : data.failed >= 5 ? '🟠 Cao' : '🟡 Trung bình'}
+                        {data.failed >= 10 ? 'Nguy hiểm' : data.failed >= 5 ? 'Cao' : 'Trung bình'}
                       </span>
                       {isBlocked ? (
                         <button
                           disabled={blockingIp === ip}
                           onClick={() => handleUnblockIp(ip)}
-                          className="text-xs px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg font-semibold transition-all disabled:opacity-50">
+                          className="text-xs px-2.5 py-1 bg-paper hover:bg-line text-ink-soft rounded-lg font-semibold transition-all disabled:opacity-50">
                           {blockingIp === ip ? '...' : 'Bỏ chặn'}
                         </button>
                       ) : (
                         <button
                           disabled={blockingIp === ip}
                           onClick={() => handleBlockIp(ip, `${data.failed} lần đăng nhập thất bại`)}
-                          className="text-xs px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all disabled:opacity-50">
+                          className="text-xs px-2.5 py-1 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-semibold transition-all disabled:opacity-50">
                           {blockingIp === ip ? '...' : 'Chặn IP'}
                         </button>
                       )}
@@ -768,57 +761,57 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
       )}
 
       {/* Blocked IPs management */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+      <div className="bg-surface rounded-card border border-line overflow-hidden">
+        <div className="px-5 py-4 border-b border-line flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <i className="ri-shield-cross-line text-gray-500"></i>
-            <h3 className="font-bold text-gray-800">IP đang bị chặn ({blockedIps.length})</h3>
+            <i className="ri-shield-cross-line text-ink-soft"></i>
+            <h3 className="font-bold text-ink">IP đang bị chặn ({blockedIps.length})</h3>
           </div>
-          <button onClick={loadBlockedIps} className="text-xs text-gray-400 hover:text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-xl transition-all">
+          <button onClick={loadBlockedIps} className="text-xs text-ink-faint hover:text-ink border border-line px-2.5 py-1.5 rounded-lg transition-all">
             <i className="ri-refresh-line"></i>
           </button>
         </div>
 
         {/* Manual block form */}
-        <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-2 flex-wrap bg-gray-50/50">
+        <div className="px-5 py-3 border-b border-line flex items-center gap-2 flex-wrap bg-paper">
           <input
             type="text" placeholder="Nhập địa chỉ IP..." value={manualIp} onChange={e => setManualIp(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleManualBlock()}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-red-300 bg-white" />
+            className="text-xs border border-line rounded-lg px-3 py-2 w-40 focus:outline-none focus:ring-2 focus:ring-forest-400 bg-surface" />
           <input
             type="text" placeholder="Lý do (tuỳ chọn)..." value={manualReason} onChange={e => setManualReason(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleManualBlock()}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 flex-1 min-w-[160px] focus:outline-none focus:ring-2 focus:ring-red-300 bg-white" />
+            className="text-xs border border-line rounded-lg px-3 py-2 flex-1 min-w-[160px] focus:outline-none focus:ring-2 focus:ring-forest-400 bg-surface" />
           <button
             disabled={addingManual || !manualIp.trim()}
             onClick={handleManualBlock}
-            className="text-xs px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all disabled:opacity-50 flex-shrink-0">
+            className="text-xs px-3 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-semibold transition-all disabled:opacity-50 flex-shrink-0">
             {addingManual ? 'Đang chặn...' : <><i className="ri-add-line mr-1"></i>Chặn IP</>}
           </button>
         </div>
 
         {blockedIps.length === 0 ? (
-          <div className="py-8 text-center text-gray-400 text-sm">
+          <div className="py-8 text-center text-ink-faint text-sm">
             <i className="ri-shield-check-line text-2xl mb-2 block text-forest-400"></i>
             Không có IP nào bị chặn
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-line">
             {blockedIps.map((b: any) => (
-              <div key={b.id} className="px-5 py-3 flex items-center gap-4 hover:bg-gray-50/50">
-                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <i className="ri-lock-line text-red-500 text-sm"></i>
+              <div key={b.id} className="px-5 py-3 flex items-center gap-4 hover:bg-paper">
+                <div className="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i className="ri-lock-line text-brand-600 text-sm"></i>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-mono font-bold text-gray-900 text-sm">{b.ip}</p>
-                  <p className="text-xs text-gray-400 mt-0.5 truncate">
+                  <p className="font-mono font-bold text-ink text-sm">{b.ip}</p>
+                  <p className="text-xs text-ink-faint mt-0.5 truncate">
                     {b.reason || 'Không có lý do'} · {fmtTime(b.createdAt)}
                   </p>
                 </div>
                 <button
                   disabled={blockingIp === b.ip}
                   onClick={() => handleUnblockIp(b.ip)}
-                  className="text-xs px-3 py-1.5 border border-gray-200 hover:bg-red-50 hover:border-red-300 hover:text-red-600 text-gray-500 rounded-xl font-semibold transition-all disabled:opacity-50 flex-shrink-0">
+                  className="text-xs px-3 py-1.5 border border-line hover:bg-brand-50 hover:border-brand-200 hover:text-brand-600 text-ink-soft rounded-lg font-semibold transition-all disabled:opacity-50 flex-shrink-0">
                   {blockingIp === b.ip ? '...' : 'Bỏ chặn'}
                 </button>
               </div>
@@ -828,14 +821,14 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
       </div>
 
       {/* All IP table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between gap-3 flex-wrap">
-          <h3 className="font-bold text-gray-800">Nhật ký đăng nhập ({loginHistory.length})</h3>
+      <div className="bg-surface rounded-card border border-line overflow-hidden">
+        <div className="px-5 py-4 border-b border-line flex items-center justify-between gap-3 flex-wrap">
+          <h3 className="font-bold text-ink">Nhật ký đăng nhập ({loginHistory.length})</h3>
           <div className="flex gap-2">
             <input type="text" placeholder="Tìm IP, tên, email..." value={search} onChange={e => setSearch(e.target.value)}
-              className="text-xs border border-gray-200 rounded-xl px-3 py-2 w-44 focus:outline-none focus:ring-2 focus:ring-red-300" />
+              className="text-xs border border-line rounded-lg px-3 py-2 w-44 focus:outline-none focus:ring-2 focus:ring-forest-400" />
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-              className="text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300">
+              className="text-xs border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-forest-400">
               <option value="">Tất cả</option>
               <option value="SUCCESS">Thành công</option>
               <option value="FAILED">Thất bại</option>
@@ -845,44 +838,44 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
         </div>
         <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-white border-b border-gray-50">
+            <thead className="sticky top-0 bg-surface border-b border-line">
               <tr>
-                <th className="text-left px-5 py-3 font-semibold text-gray-500">Người dùng</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">IP Address</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">User Agent</th>
-                <th className="text-center px-4 py-3 font-semibold text-gray-500">Trạng thái</th>
-                <th className="text-right px-5 py-3 font-semibold text-gray-500">Thời gian</th>
+                <th className="text-left px-5 py-3 font-semibold text-ink-soft">Người dùng</th>
+                <th className="text-left px-4 py-3 font-semibold text-ink-soft">IP Address</th>
+                <th className="text-left px-4 py-3 font-semibold text-ink-soft">User Agent</th>
+                <th className="text-center px-4 py-3 font-semibold text-ink-soft">Trạng thái</th>
+                <th className="text-right px-5 py-3 font-semibold text-ink-soft">Thời gian</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-line">
               {filtered.length === 0 && (
-                <tr><td colSpan={5} className="text-center py-10 text-gray-400">Không có dữ liệu</td></tr>
+                <tr><td colSpan={5} className="text-center py-10 text-ink-faint">Không có dữ liệu</td></tr>
               )}
               {filtered.slice(0, 100).map((h: any, i: number) => (
-                <tr key={i} className={`hover:bg-gray-50/50 ${h.status === 'FAILED' ? 'bg-red-50/30' : h.status === 'LOCKED' ? 'bg-brand-50/30' : ''}`}>
+                <tr key={i} className={`hover:bg-paper ${h.status === 'FAILED' ? 'bg-brand-50/30' : h.status === 'LOCKED' ? 'bg-brand-50/30' : ''}`}>
                   <td className="px-5 py-2.5">
-                    <p className="font-medium text-gray-800">{h.user?.fullName || '—'}</p>
-                    <p className="text-gray-400 text-[10px]">{h.user?.email || h.user?.username}</p>
+                    <p className="font-medium text-ink">{h.user?.fullName || '—'}</p>
+                    <p className="text-ink-faint text-[11px]">{h.user?.email || h.user?.username}</p>
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-gray-600">{h.ipAddress || '—'}</span>
+                      <span className="font-mono text-ink-soft">{h.ipAddress || '—'}</span>
                       {h.ipAddress && blockedIpSet.has(h.ipAddress) && (
-                        <span className="text-[9px] bg-red-100 text-red-600 px-1 py-0.5 rounded font-bold">CHẶN</span>
+                        <span className="text-[11px] bg-brand-50 text-brand-600 px-1 py-0.5 rounded font-bold">CHẶN</span>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-gray-400 max-w-[200px] truncate">{h.userAgent?.split(' ').slice(0, 3).join(' ') || '—'}</td>
+                  <td className="px-4 py-2.5 text-ink-faint max-w-[200px] truncate">{h.userAgent?.split(' ').slice(0, 3).join(' ') || '—'}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
                       h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
-                      h.status === 'FAILED' ? 'bg-red-100 text-red-600' :
+                      h.status === 'FAILED' ? 'bg-brand-50 text-brand-600' :
                       'bg-brand-100 text-brand-700'
                     }`}>
-                      {h.status === 'SUCCESS' ? '✓ Thành công' : h.status === 'FAILED' ? '✗ Thất bại' : '⚠ Bị khóa'}
+                      {h.status === 'SUCCESS' ? 'Thành công' : h.status === 'FAILED' ? 'Thất bại' : 'Bị khóa'}
                     </span>
                   </td>
-                  <td className="px-5 py-2.5 text-right text-gray-400 whitespace-nowrap">{fmtTime(h.createdAt)}</td>
+                  <td className="px-5 py-2.5 text-right text-ink-faint whitespace-nowrap">{fmtTime(h.createdAt)}</td>
                 </tr>
               ))}
             </tbody>
@@ -969,16 +962,16 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-black text-gray-900">Người dùng ({filtered.length}/{usersList.length})</h2>
+        <h2 className="text-lg font-bold text-ink">Người dùng ({filtered.length}/{usersList.length})</h2>
         <div className="flex gap-2 flex-wrap">
           <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300">
+            className="text-xs border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-forest-400">
             <option value="">Tất cả trạng thái</option>
             <option value="active">Hoạt động</option>
             <option value="banned">Đã khóa</option>
           </select>
           <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300">
+            className="text-xs border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-forest-400">
             <option value="">Tất cả role</option>
             <option value="user">User</option>
             <option value="admin">Admin</option>
@@ -986,88 +979,88 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
           </select>
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Tìm tên, email, SĐT..."
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-red-300" />
+            className="text-xs border border-line rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-forest-400" />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-surface rounded-card border border-line overflow-hidden">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-4 py-3 font-semibold text-gray-500">Người dùng</th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-500">Liên hệ</th>
-              <th className="text-center px-3 py-3 font-semibold text-gray-500">Bài đăng</th>
-              <th className="text-center px-3 py-3 font-semibold text-gray-500">IP gần nhất</th>
-              <th className="text-center px-3 py-3 font-semibold text-gray-500">Role</th>
-              <th className="text-center px-3 py-3 font-semibold text-gray-500">Đăng ký</th>
-              <th className="text-center px-4 py-3 font-semibold text-gray-500">Thao tác</th>
+            <tr className="border-b border-line bg-paper">
+              <th className="text-left px-4 py-3 font-semibold text-ink-soft">Người dùng</th>
+              <th className="text-left px-4 py-3 font-semibold text-ink-soft">Liên hệ</th>
+              <th className="text-center px-3 py-3 font-semibold text-ink-soft">Bài đăng</th>
+              <th className="text-center px-3 py-3 font-semibold text-ink-soft">IP gần nhất</th>
+              <th className="text-center px-3 py-3 font-semibold text-ink-soft">Role</th>
+              <th className="text-center px-3 py-3 font-semibold text-ink-soft">Đăng ký</th>
+              <th className="text-center px-4 py-3 font-semibold text-ink-soft">Thao tác</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-line">
             {filtered.length === 0 && (
-              <tr><td colSpan={7} className="text-center py-12 text-gray-400">Không tìm thấy người dùng</td></tr>
+              <tr><td colSpan={7} className="text-center py-12 text-ink-faint">Không tìm thấy người dùng</td></tr>
             )}
             {filtered.map(u => {
               const failedCount = userFailedCount[u.id] || 0;
               const lastIP = userLastIP[u.id];
               return (
-                <tr key={u.id} className={`hover:bg-gray-50/50 transition-colors ${!u.isActive ? 'bg-red-50/20' : ''}`}>
+                <tr key={u.id} className={`hover:bg-paper transition-colors ${!u.isActive ? 'bg-brand-50/20' : ''}`}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 ${
-                        u.role === 'admin' ? 'bg-red-500 text-white' :
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                        u.role === 'admin' ? 'bg-brand-500 text-white' :
                         u.role === 'vip' ? 'bg-gold-400 text-white' :
-                        'bg-gray-200 text-gray-600'
+                        'bg-line text-ink-soft'
                       }`}>
                         {u.fullName?.[0] || '?'}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 text-xs">{u.fullName || 'Chưa đặt tên'}</p>
-                        {u.username && <p className="text-[10px] text-gray-400">@{u.username}</p>}
+                        <p className="font-semibold text-ink text-xs">{u.fullName || 'Chưa đặt tên'}</p>
+                        {u.username && <p className="text-[11px] text-ink-faint">@{u.username}</p>}
                         <div className="flex items-center gap-1 mt-0.5">
-                          {!u.isActive && <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded-full">🔒 Bị khóa</span>}
-                          {failedCount >= 3 && <span className="text-[10px] text-brand-600 font-bold bg-brand-50 px-1.5 py-0.5 rounded-full">⚠ {failedCount} thất bại</span>}
+                          {!u.isActive && <span className="text-[11px] text-brand-600 font-bold bg-brand-50 px-1.5 py-0.5 rounded-full">Bị khóa</span>}
+                          {failedCount >= 3 && <span className="text-[11px] text-brand-600 font-bold bg-brand-50 px-1.5 py-0.5 rounded-full">{failedCount} thất bại</span>}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3 text-ink-soft">
                     <p className="truncate max-w-[140px]">{u.email || '—'}</p>
-                    {u.phone && <p className="text-gray-400">{u.phone}</p>}
+                    {u.phone && <p className="text-ink-faint">{u.phone}</p>}
                   </td>
                   <td className="px-3 py-3 text-center">
-                    <span className="font-bold text-gray-700">{totalPosts(u)}</span>
-                    <p className="text-[10px] text-gray-400">
+                    <span className="font-bold text-ink">{totalPosts(u)}</span>
+                    <p className="text-[11px] text-ink-faint">
                       {u._count?.products || 0}sp · {u._count?.realEstates || 0}bđs · {u._count?.jobs || 0}td
                     </p>
                   </td>
                   <td className="px-3 py-3 text-center">
                     {lastIP ? (
-                      <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${failedCount >= 3 ? 'text-red-600 bg-red-50' : 'text-gray-500'}`}>
+                      <span className={`font-mono text-[11px] px-1.5 py-0.5 rounded ${failedCount >= 3 ? 'text-brand-600 bg-brand-50' : 'text-ink-soft'}`}>
                         {lastIP}
                       </span>
-                    ) : <span className="text-gray-300">—</span>}
+                    ) : <span className="text-ink-faint">—</span>}
                   </td>
                   <td className="px-3 py-3 text-center">
                     <select value={u.role?.toLowerCase() || 'user'} onChange={e => handleRole(u.id, e.target.value.toUpperCase())}
                       disabled={processing === u.id}
-                      className="text-[10px] border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-red-400 disabled:opacity-50">
+                      className="text-[11px] border border-line rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-forest-400 disabled:opacity-50">
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
                       <option value="vip">VIP</option>
                     </select>
                   </td>
-                  <td className="px-3 py-3 text-center text-gray-400 whitespace-nowrap">{fmtDate(u.createdAt)}</td>
+                  <td className="px-3 py-3 text-center text-ink-faint whitespace-nowrap">{fmtDate(u.createdAt)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-center">
                       <button onClick={() => showHistory(u)}
                         title="Lịch sử đăng nhập"
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                        className="p-1.5 text-ink-faint hover:text-ink-soft hover:bg-paper rounded-lg transition-all">
                         <i className="ri-time-line text-sm"></i>
                       </button>
                       <button onClick={() => handleHideAll(u)} disabled={processing === u.id}
                         title="Ẩn tất cả bài đăng"
-                        className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all disabled:opacity-50">
+                        className="p-1.5 text-ink-faint hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all disabled:opacity-50">
                         <i className="ri-eye-off-line text-sm"></i>
                       </button>
                       <button onClick={() => setBanModal({ user: u })} disabled={processing === u.id}
@@ -1075,7 +1068,7 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                         className={`p-1.5 rounded-lg transition-all disabled:opacity-50 ${
                           !u.isActive
                             ? 'text-forest-600 bg-forest-50 hover:bg-forest-100'
-                            : 'text-red-500 hover:text-red-700 hover:bg-red-50'
+                            : 'text-brand-600 hover:text-brand-600 hover:bg-brand-50'
                         }`}>
                         {processing === u.id
                           ? <i className="ri-loader-4-line text-sm animate-spin"></i>
@@ -1093,19 +1086,19 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
       {/* Ban Modal */}
       {banModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+          <div className="bg-surface rounded-card w-full max-w-sm p-6">
             {banModal.user.isActive ? (
               <>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                    <i className="ri-lock-2-line text-red-600 text-lg"></i>
+                  <div className="w-10 h-10 bg-brand-50 rounded-lg flex items-center justify-center">
+                    <i className="ri-lock-2-line text-brand-600 text-lg"></i>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Khóa tài khoản</h3>
-                    <p className="text-xs text-gray-500">{banModal.user.fullName}</p>
+                    <h3 className="font-bold text-ink">Khóa tài khoản</h3>
+                    <p className="text-xs text-ink-soft">{banModal.user.fullName}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Chọn thời hạn khóa:</p>
+                <p className="text-sm text-ink-soft mb-4">Chọn thời hạn khóa:</p>
                 <div className="grid grid-cols-2 gap-2 mb-5">
                   {[
                     { value: '1d', label: '1 ngày' },
@@ -1114,20 +1107,20 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                     { value: 'permanent', label: 'Vĩnh viễn' },
                   ].map(opt => (
                     <button key={opt.value} onClick={() => setBanDuration(opt.value as any)}
-                      className={`py-2.5 rounded-xl text-sm font-semibold border-2 transition-all ${
+                      className={`py-2.5 rounded-lg text-sm font-semibold border-2 transition-all ${
                         banDuration === opt.value
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                          ? 'border-brand-200 bg-brand-50 text-brand-600'
+                          : 'border-line text-ink-soft hover:border-line'
                       }`}>
                       {opt.label}
                     </button>
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={confirmBan} className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all">
+                  <button onClick={confirmBan} className="flex-1 py-2.5 bg-brand-500 text-white rounded-lg font-semibold hover:bg-brand-600 transition-all">
                     Xác nhận khóa
                   </button>
-                  <button onClick={() => setBanModal(null)} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
+                  <button onClick={() => setBanModal(null)} className="flex-1 py-2.5 border border-line rounded-lg text-ink-soft hover:bg-paper transition-all">
                     Huỷ
                   </button>
                 </div>
@@ -1135,19 +1128,19 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 bg-forest-100 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center">
                     <i className="ri-lock-unlock-line text-forest-600 text-lg"></i>
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">Mở khóa tài khoản</h3>
-                    <p className="text-xs text-gray-500">{banModal.user.fullName}</p>
+                    <h3 className="font-bold text-ink">Mở khóa tài khoản</h3>
+                    <p className="text-xs text-ink-soft">{banModal.user.fullName}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={confirmBan} className="flex-1 py-2.5 bg-forest-600 text-white rounded-xl font-semibold hover:bg-forest-700 transition-all">
+                  <button onClick={confirmBan} className="flex-1 py-2.5 bg-forest-600 text-white rounded-lg font-semibold hover:bg-forest-700 transition-all">
                     Mở khóa
                   </button>
-                  <button onClick={() => setBanModal(null)} className="flex-1 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
+                  <button onClick={() => setBanModal(null)} className="flex-1 py-2.5 border border-line rounded-lg text-ink-soft hover:bg-paper transition-all">
                     Huỷ
                   </button>
                 </div>
@@ -1160,44 +1153,44 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
       {/* History Modal */}
       {historyModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
+          <div className="bg-surface rounded-card w-full max-w-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <i className="ri-time-line text-blue-600"></i>
+                <div className="w-9 h-9 bg-paper rounded-lg flex items-center justify-center">
+                  <i className="ri-time-line text-ink-soft"></i>
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900">Lịch sử đăng nhập</h3>
-                  <p className="text-xs text-gray-500">{historyModal.user.fullName}</p>
+                  <h3 className="font-bold text-ink">Lịch sử đăng nhập</h3>
+                  <p className="text-xs text-ink-soft">{historyModal.user.fullName}</p>
                 </div>
               </div>
-              <button onClick={() => setHistoryModal(null)} className="text-gray-400 hover:text-gray-700 p-1">
+              <button onClick={() => setHistoryModal(null)} className="text-ink-faint hover:text-ink p-1">
                 <i className="ri-close-line text-xl"></i>
               </button>
             </div>
             {historyModal.logs.length === 0 ? (
-              <p className="text-center text-gray-400 py-8 text-sm">Chưa có lịch sử đăng nhập</p>
+              <p className="text-center text-ink-faint py-8 text-sm">Chưa có lịch sử đăng nhập</p>
             ) : (
               <div className="max-h-80 overflow-y-auto space-y-2">
                 {historyModal.logs.map((h: any, i: number) => (
-                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${
+                  <div key={i} className={`flex items-center gap-3 p-3 rounded-lg ${
                     h.status === 'SUCCESS' ? 'bg-forest-50' :
-                    h.status === 'FAILED' ? 'bg-red-50' : 'bg-brand-50'
+                    h.status === 'FAILED' ? 'bg-brand-50' : 'bg-brand-50'
                   }`}>
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       h.status === 'SUCCESS' ? 'bg-forest-500' :
-                      h.status === 'FAILED' ? 'bg-red-500' : 'bg-brand-500'
+                      h.status === 'FAILED' ? 'bg-brand-500' : 'bg-brand-500'
                     }`}></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-700 font-mono">{h.ipAddress || '—'}</p>
-                      <p className="text-[10px] text-gray-400 truncate">{h.userAgent?.split(' ').slice(0, 4).join(' ')}</p>
+                      <p className="text-xs font-medium text-ink font-mono">{h.ipAddress || '—'}</p>
+                      <p className="text-[11px] text-ink-faint truncate">{h.userAgent?.split(' ').slice(0, 4).join(' ')}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className={`text-[10px] font-bold ${
+                      <span className={`text-[11px] font-bold ${
                         h.status === 'SUCCESS' ? 'text-forest-700' :
-                        h.status === 'FAILED' ? 'text-red-600' : 'text-brand-600'
+                        h.status === 'FAILED' ? 'text-brand-600' : 'text-brand-600'
                       }`}>{h.status}</span>
-                      <p className="text-[10px] text-gray-400">{fmtTime(h.createdAt)}</p>
+                      <p className="text-[11px] text-ink-faint">{fmtTime(h.createdAt)}</p>
                     </div>
                   </div>
                 ))}
@@ -1281,22 +1274,22 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-black text-gray-900">Kiểm duyệt bài viết</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{items.length} bài chờ duyệt</p>
+          <h2 className="text-lg font-bold text-ink">Kiểm duyệt bài viết</h2>
+          <p className="text-xs text-ink-faint mt-0.5">{items.length} bài chờ duyệt</p>
         </div>
         <a href="/admin/content"
-          className="flex items-center gap-1.5 text-xs font-semibold text-white bg-gray-900 hover:bg-gray-700 px-3 py-2 rounded-xl transition">
+          className="flex items-center gap-1.5 text-xs font-semibold text-white bg-ink hover:bg-ink px-3 py-2 rounded-lg transition">
           <i className="ri-store-2-line"></i> Duyệt SP/BĐS/Việc làm
         </a>
         {selected.size > 0 && (
-          <div className="flex items-center gap-2 bg-brand-50 border border-brand-200 px-4 py-2 rounded-xl">
+          <div className="flex items-center gap-2 bg-brand-50 border border-brand-200 px-4 py-2 rounded-lg">
             <span className="text-xs font-bold text-brand-700">Đã chọn {selected.size}</span>
             <button onClick={bulkApprove} disabled={processing === 'bulk'}
               className="text-xs px-3 py-1.5 bg-forest-600 text-white rounded-lg hover:bg-forest-700 disabled:opacity-50">
-              ✓ Duyệt tất cả
+              Duyệt tất cả
             </button>
             <button onClick={bulkDelete} disabled={processing === 'bulk'}
-              className="text-xs px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50">
+              className="text-xs px-3 py-1.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 disabled:opacity-50">
               Xóa tất cả
             </button>
           </div>
@@ -1304,73 +1297,73 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
       </div>
 
       {items.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
-          <div className="w-16 h-16 bg-forest-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="bg-surface rounded-card border border-line p-16 text-center">
+          <div className="w-16 h-16 bg-forest-50 rounded-card flex items-center justify-center mx-auto mb-4">
             <i className="ri-checkbox-circle-line text-3xl text-forest-400"></i>
           </div>
-          <p className="text-gray-500 font-semibold">Không có bài nào chờ duyệt</p>
-          <p className="text-sm text-gray-400 mt-1">Tất cả bài đã được xử lý ✓</p>
+          <p className="text-ink-soft font-semibold">Không có bài nào chờ duyệt</p>
+          <p className="text-sm text-ink-faint mt-1">Tất cả bài đã được xử lý </p>
         </div>
       ) : (
         <div className="space-y-3">
           {/* Select all row */}
-          <div className="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-3 border border-gray-100">
+          <div className="bg-surface rounded-lg px-5 py-3 flex items-center gap-3 border border-line">
             <input type="checkbox" checked={selected.size === items.length && items.length > 0}
               onChange={toggleAll} className="rounded w-4 h-4 cursor-pointer" />
-            <span className="text-xs text-gray-500 font-medium">Chọn tất cả ({items.length} bài)</span>
+            <span className="text-xs text-ink-soft font-medium">Chọn tất cả ({items.length} bài)</span>
           </div>
 
           {items.map(post => (
-            <div key={post.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <div key={post.id} className="bg-surface rounded-card border border-line p-4">
               <div className="flex items-start gap-3">
                 <input type="checkbox" checked={selected.has(post.id)} onChange={() => toggleSelect(post.id)}
                   className="rounded w-4 h-4 mt-1 cursor-pointer flex-shrink-0" />
-                <div className="w-9 h-9 rounded-xl bg-forest-50 flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-forest-50 flex items-center justify-center flex-shrink-0">
                   <i className="ri-article-line text-forest-500"></i>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div>
-                      <p className="font-bold text-gray-900 text-sm">{post.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {post.isAnonymous ? '🎭 Ẩn danh' : post.user?.fullName} · {post.category} · {timeAgo(post.createdAt)}
+                      <p className="font-bold text-ink text-sm">{post.title}</p>
+                      <p className="text-xs text-ink-faint mt-0.5">
+                        {post.isAnonymous ? 'Ẩn danh' : post.user?.fullName} · {post.category} · {timeAgo(post.createdAt)}
                       </p>
                     </div>
                     <span className="text-xs px-2 py-1 rounded-full bg-brand-100 text-brand-700 font-bold flex-shrink-0">Chờ duyệt</span>
                   </div>
                   {post.content && (
-                    <p className="text-xs text-gray-500 mt-2 line-clamp-2 bg-gray-50 rounded-lg px-3 py-2">{post.content}</p>
+                    <p className="text-xs text-ink-soft mt-2 line-clamp-2 bg-paper rounded-lg px-3 py-2">{post.content}</p>
                   )}
 
-                  {rejectModal?.id === post.id && (
+                  {rejectModal && rejectModal.id === post.id && (
                     <div className="mt-3 flex gap-2">
                       <input type="text" placeholder="Lý do từ chối..." value={rejectModal.text}
                         onChange={e => setRejectModal({ id: post.id, text: e.target.value })}
-                        className="flex-1 text-xs border border-red-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300" autoFocus />
+                        className="flex-1 text-xs border border-brand-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-forest-400" autoFocus />
                       <button onClick={() => reject(post.id, rejectModal.text)} disabled={processing === post.id}
-                        className="px-4 py-2 bg-red-600 text-white text-xs rounded-xl hover:bg-red-700 disabled:opacity-50 font-semibold">Gửi</button>
-                      <button onClick={() => setRejectModal(null)} className="px-4 py-2 border border-gray-200 text-xs rounded-xl hover:bg-gray-50">Huỷ</button>
+                        className="px-4 py-2 bg-brand-500 text-white text-xs rounded-lg hover:bg-brand-600 disabled:opacity-50 font-semibold">Gửi</button>
+                      <button onClick={() => setRejectModal(null)} className="px-4 py-2 border border-line text-xs rounded-lg hover:bg-paper">Huỷ</button>
                     </div>
                   )}
                 </div>
               </div>
 
               {rejectModal?.id !== post.id && (
-                <div className="flex gap-2 mt-3 pt-3 border-t border-gray-50">
+                <div className="flex gap-2 mt-3 pt-3 border-t border-line">
                   <button onClick={() => approve(post.id)} disabled={processing === post.id}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-forest-600 text-white text-xs rounded-xl hover:opacity-90 disabled:opacity-50 font-semibold shadow-sm">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-forest-600 text-white text-xs rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold">
                     <i className="ri-check-line"></i> Duyệt
                   </button>
                   <button onClick={() => setRejectModal({ id: post.id, text: '' })}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-brand-50 text-brand-700 text-xs rounded-xl hover:bg-brand-100 border border-brand-200 font-semibold">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-brand-50 text-brand-700 text-xs rounded-lg hover:bg-brand-100 border border-brand-200 font-semibold">
                     <i className="ri-close-line"></i> Từ chối
                   </button>
                   <Link href={`/forum/${post.id}`} target="_blank"
-                    className="flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-500 text-xs rounded-xl hover:bg-gray-50">
+                    className="flex items-center gap-1.5 px-4 py-2 border border-line text-ink-soft text-xs rounded-lg hover:bg-paper">
                     <i className="ri-external-link-line"></i> Xem
                   </Link>
                   <button onClick={() => deletePost(post.id)} disabled={processing === post.id}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 text-xs rounded-xl hover:bg-red-100 border border-red-100 ml-auto font-semibold disabled:opacity-50">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-brand-50 text-brand-600 text-xs rounded-lg hover:bg-brand-50 border border-brand-200 ml-auto font-semibold disabled:opacity-50">
                     <i className="ri-delete-bin-line"></i> Xóa
                   </button>
                 </div>
@@ -1420,24 +1413,24 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref, onTogg
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-black text-gray-900">{title} ({filtered.length}/{items.length})</h2>
+        <h2 className="text-lg font-bold text-ink">{title} ({filtered.length}/{items.length})</h2>
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Tìm kiếm..."
-          className="text-xs border border-gray-200 rounded-xl px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-red-300" />
+          className="text-xs border border-line rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-forest-400" />
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
-          <p className="text-gray-400">Không có dữ liệu</p>
+        <div className="bg-surface rounded-card border border-line p-12 text-center">
+          <p className="text-ink-faint">Không có dữ liệu</p>
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map(item => (
-            <div key={item.id} className={`bg-white rounded-xl border shadow-sm px-4 py-3 flex items-center gap-3 hover:shadow-md transition-all ${
-              item.isVip ? 'border-gold-200 bg-gold-50/50' : 'border-gray-100'
+            <div key={item.id} className={`bg-surface rounded-lg border px-4 py-3 flex items-center gap-3 transition-all ${
+              item.isVip ? 'border-gold-200 bg-gold-50/50' : 'border-line'
             }`}>
               {item.images?.[0]?.url && (
-                <img src={item.images[0].url} className="w-11 h-11 rounded-xl object-cover flex-shrink-0 border border-gray-100" />
+                <img src={item.images[0].url} className="w-11 h-11 rounded-lg object-cover flex-shrink-0 border border-line" />
               )}
               <div className="flex-1 flex items-center gap-4 min-w-0">
                 {renderRow(item)}
@@ -1445,15 +1438,15 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref, onTogg
               <div className="flex items-center gap-1 flex-shrink-0">
                 {onToggleVip && (
                   <button onClick={() => handleToggleVip(item.id, item.isVip)} disabled={togglingVip === item.id} title={item.isVip ? 'Hủy VIP' : 'Đặt VIP'}
-                    className={`p-2 rounded-xl transition-all disabled:opacity-50 ${item.isVip ? 'text-gold-500 bg-gold-50 hover:bg-gold-100' : 'text-gray-300 hover:text-gold-500 hover:bg-gold-50'}`}>
+                    className={`p-2 rounded-lg transition-all disabled:opacity-50 ${item.isVip ? 'text-gold-500 bg-gold-50 hover:bg-gold-100' : 'text-ink-faint hover:text-gold-500 hover:bg-gold-50'}`}>
                     {togglingVip === item.id ? <i className="ri-loader-4-line text-sm animate-spin"></i> : <i className="ri-vip-crown-fill text-sm"></i>}
                   </button>
                 )}
-                <Link href={editHref(item.id)} className="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Chỉnh sửa">
+                <Link href={editHref(item.id)} className="p-2 text-ink-faint hover:text-ink-soft hover:bg-paper rounded-lg transition-all" title="Chỉnh sửa">
                   <i className="ri-pencil-line text-sm"></i>
                 </Link>
                 <button onClick={() => handleDelete(item.id)} disabled={deleting === item.id}
-                  className="p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all disabled:opacity-50" title="Xóa">
+                  className="p-2 text-ink-faint hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all disabled:opacity-50" title="Xóa">
                   {deleting === item.id ? <i className="ri-loader-4-line text-sm animate-spin"></i> : <i className="ri-delete-bin-line text-sm"></i>}
                 </button>
               </div>
@@ -1482,27 +1475,27 @@ function VipTab({ vipItems, onRefresh }: { vipItems: any[]; onRefresh: () => voi
 
   return (
     <div>
-      <h2 className="text-lg font-black text-gray-900 mb-4">Quản lý VIP ({vipItems.length} bài)</h2>
+      <h2 className="text-lg font-bold text-ink mb-4">Quản lý VIP ({vipItems.length} bài)</h2>
       {vipItems.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
-          <i className="ri-vip-crown-line text-4xl text-gray-200 block mb-3"></i>
-          <p className="text-gray-400">Chưa có bài VIP nào</p>
+        <div className="bg-surface rounded-card border border-line p-12 text-center">
+          <i className="ri-vip-crown-line text-4xl text-ink-faint block mb-3"></i>
+          <p className="text-ink-faint">Chưa có bài VIP nào</p>
         </div>
       ) : (
         <div className="space-y-2">
           {vipItems.map(item => (
-            <div key={item.id} className="bg-white rounded-xl border border-gold-200 shadow-sm px-4 py-3 flex items-center gap-3 bg-gold-50/30">
-              {item.images?.[0]?.url && <img src={item.images[0].url} className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />}
+            <div key={item.id} className="bg-surface rounded-lg border border-gold-200 px-4 py-3 flex items-center gap-3 bg-gold-50/30">
+              {item.images?.[0]?.url && <img src={item.images[0].url} className="w-11 h-11 rounded-lg object-cover flex-shrink-0" />}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-gold-100 text-gold-700 font-bold">{item._type}</span>
-                  <p className="font-semibold text-gray-900 truncate text-sm">{item.title}</p>
+                  <p className="font-semibold text-ink truncate text-sm">{item.title}</p>
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">{item.user?.fullName}</p>
+                <p className="text-xs text-ink-faint mt-0.5">{item.user?.fullName}</p>
                 {item.vipExpiresAt && <p className="text-xs text-brand-500 mt-0.5">Hết hạn: {fmtDate(item.vipExpiresAt)}</p>}
               </div>
               <button onClick={() => removeVip(item)} disabled={processing === item.id}
-                className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-xl hover:bg-red-50 disabled:opacity-50 transition-all flex-shrink-0 font-semibold">
+                className="text-xs px-3 py-1.5 border border-brand-200 text-brand-600 rounded-lg hover:bg-brand-50 disabled:opacity-50 transition-all flex-shrink-0 font-semibold">
                 {processing === item.id ? '...' : 'Hủy VIP'}
               </button>
             </div>
@@ -1532,7 +1525,7 @@ function WalletTab({ txList }: { txList: any[] }) {
     if (!amount || amount <= 0) { setCreditResult({ ok: false, msg: 'Số tiền không hợp lệ' }); return; }
     setCrediting(true); setCreditResult(null);
     try {
-      const res = await wallet.adminCredit(creditUserId.trim(), amount, creditNote || undefined);
+      const res: any = await wallet.adminCredit(creditUserId.trim(), amount, creditNote || undefined);
       setCreditResult({ ok: true, msg: res.message || 'Cộng tiền thành công' });
       setCreditUserId(''); setCreditAmount(''); setCreditNote('');
     } catch (e: any) {
@@ -1549,61 +1542,61 @@ function WalletTab({ txList }: { txList: any[] }) {
   return (
     <div>
       {/* Manual Credit Form */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-5">
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">Công cụ test</p>
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Cộng tiền thủ công vào ví</h3>
+      <div className="bg-surface rounded-card border border-line p-5 mb-5">
+        <p className="text-[11px] font-bold tracking-widest text-ink-faint uppercase mb-1">Công cụ test</p>
+        <h3 className="text-sm font-bold text-ink mb-4">Cộng tiền thủ công vào ví</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">User ID</label>
+            <label className="block text-xs font-semibold text-ink-soft mb-1">User ID</label>
             <input value={creditUserId} onChange={e => setCreditUserId(e.target.value)}
               placeholder="Dán userId từ DB..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent font-mono" />
+              className="w-full px-3 py-2 border border-line rounded-lg text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent font-mono" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Số tiền</label>
+            <label className="block text-xs font-semibold text-ink-soft mb-1">Số tiền</label>
             <input type="number" value={creditAmount} onChange={e => setCreditAmount(e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-line rounded-lg text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent" />
             <div className="flex gap-1 mt-1.5 flex-wrap">
               {PRESET_AMOUNTS.map(a => (
                 <button key={a} onClick={() => setCreditAmount(String(a))}
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${creditAmount === String(a) ? 'bg-brand-500 text-white border-forest-600' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'}`}>
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold border transition ${creditAmount === String(a) ? 'bg-brand-500 text-white border-forest-600' : 'bg-paper text-ink-soft border-line hover:bg-line'}`}>
                   {a / 1000}k
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Ghi chú (tùy chọn)</label>
+            <label className="block text-xs font-semibold text-ink-soft mb-1">Ghi chú (tùy chọn)</label>
             <input value={creditNote} onChange={e => setCreditNote(e.target.value)}
               placeholder="Lý do..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent" />
+              className="w-full px-3 py-2 border border-line rounded-lg text-xs focus:ring-2 focus:ring-brand-400 focus:border-transparent" />
           </div>
         </div>
         <div className="flex items-center gap-3 mt-3">
           <button onClick={handleCredit} disabled={crediting}
-            className="px-5 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold hover:bg-brand-600 disabled:opacity-50 transition">
+            className="px-5 py-2 bg-brand-500 text-white rounded-lg text-xs font-bold hover:bg-brand-600 disabled:opacity-50 transition">
             {crediting ? 'Đang xử lý...' : `+ Cộng ${creditAmount ? new Intl.NumberFormat('vi-VN').format(parseInt(creditAmount) || 0) + 'đ' : 'tiền'}`}
           </button>
           {creditResult && (
-            <p className={`text-xs font-semibold ${creditResult.ok ? 'text-forest-600' : 'text-red-500'}`}>
-              {creditResult.ok ? '✓ ' : '✗ '}{creditResult.msg}
+            <p className={`text-xs font-semibold ${creditResult.ok ? 'text-forest-600' : 'text-brand-600'}`}>
+              {creditResult.ok ? 'Thành công: ' : 'Lỗi: '}{creditResult.msg}
             </p>
           )}
         </div>
       </div>
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-black text-gray-900">Doanh thu & Giao dịch</h2>
+        <h2 className="text-lg font-bold text-ink">Doanh thu & Giao dịch</h2>
         <div className="flex gap-2">
           <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300">
+            className="text-xs border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-forest-400">
             <option value="">Tất cả loại</option>
             <option value="top_up">Nạp tiền</option>
             <option value="spend">Chi tiêu</option>
           </select>
           <select value={filter} onChange={e => setFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300">
+            className="text-xs border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-forest-400">
             <option value="">Tất cả trạng thái</option>
             <option value="pending">Đang xử lý</option>
             <option value="completed">Hoàn thành</option>
@@ -1614,61 +1607,58 @@ function WalletTab({ txList }: { txList: any[] }) {
 
       <div className="grid grid-cols-4 gap-3 mb-5">
         {[
-          { label: 'Tổng nạp thành công', value: fmtMoney(revenue), gradient: 'from-forest-500 to-brand-600', icon: 'ri-money-dollar-circle-line' },
-          { label: 'Đang chờ xác nhận', value: fmtMoney(pending), gradient: 'from-brand-500 to-gold-600', icon: 'ri-time-line' },
-          { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend), gradient: 'from-forest-500 to-forest-600', icon: 'ri-vip-crown-line' },
-          { label: 'Tổng giao dịch', value: txList.length, gradient: 'from-blue-500 to-blue-600', icon: 'ri-exchange-line' },
+          { label: 'Tổng nạp thành công', value: fmtMoney(revenue) },
+          { label: 'Đang chờ xác nhận', value: fmtMoney(pending) },
+          { label: 'Tổng chi tiêu VIP', value: fmtMoney(totalSpend) },
+          { label: 'Tổng giao dịch', value: txList.length },
         ].map((c, i) => (
-          <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className={`w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center mb-3`}>
-              <i className={`${c.icon} text-white text-base`}></i>
-            </div>
-            <p className="text-xl font-black text-gray-900">{c.value}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{c.label}</p>
+          <div key={i} className="bg-surface rounded-card p-4 border border-line">
+            <p className="text-xl font-bold text-ink">{c.value}</p>
+            <p className="text-xs text-ink-faint mt-0.5">{c.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50 flex items-center gap-2">
-          <i className="ri-paypal-line text-blue-500"></i>
-          <p className="text-xs text-gray-400">Giao dịch tự động qua <b>PayOS</b> — không cần xác nhận thủ công</p>
+      <div className="bg-surface rounded-card border border-line overflow-hidden">
+        <div className="px-4 py-3 border-b border-line bg-paper flex items-center gap-2">
+          <i className="ri-paypal-line text-ink-soft"></i>
+          <p className="text-xs text-ink-faint">Giao dịch tự động qua <b>PayOS</b> — không cần xác nhận thủ công</p>
         </div>
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-4 py-3 font-semibold text-gray-500">Người dùng</th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-500">Loại</th>
-              <th className="text-right px-4 py-3 font-semibold text-gray-500">Số tiền</th>
-              <th className="text-center px-4 py-3 font-semibold text-gray-500">Trạng thái</th>
-              <th className="text-center px-4 py-3 font-semibold text-gray-500">Ngày</th>
+            <tr className="border-b border-line bg-paper">
+              <th className="text-left px-4 py-3 font-semibold text-ink-soft">Người dùng</th>
+              <th className="text-left px-4 py-3 font-semibold text-ink-soft">Loại</th>
+              <th className="text-right px-4 py-3 font-semibold text-ink-soft">Số tiền</th>
+              <th className="text-center px-4 py-3 font-semibold text-ink-soft">Trạng thái</th>
+              <th className="text-center px-4 py-3 font-semibold text-ink-soft">Ngày</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
-            {filtered.length === 0 && <tr><td colSpan={5} className="text-center py-12 text-gray-400">Không có giao dịch nào</td></tr>}
+          <tbody className="divide-y divide-line">
+            {filtered.length === 0 && <tr><td colSpan={5} className="text-center py-12 text-ink-faint">Không có giao dịch nào</td></tr>}
             {filtered.map(tx => (
-              <tr key={tx.id} className="hover:bg-gray-50/50">
+              <tr key={tx.id} className="hover:bg-paper">
                 <td className="px-4 py-3">
-                  <p className="font-semibold text-gray-900">{tx.user?.fullName || '—'}</p>
-                  <p className="text-gray-400">{tx.user?.email || tx.user?.phone}</p>
+                  <p className="font-semibold text-ink">{tx.user?.fullName || '—'}</p>
+                  <p className="text-ink-faint">{tx.user?.email || tx.user?.phone}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full font-semibold ${tx.type === 'top_up' ? 'bg-blue-50 text-blue-600' : 'bg-forest-50 text-forest-600'}`}>
+                  <span className={`px-2 py-0.5 rounded-full font-semibold ${tx.type === 'top_up' ? 'bg-paper text-ink-soft' : 'bg-forest-50 text-forest-600'}`}>
                     {typeLabel[tx.type] || tx.type}
                   </span>
                 </td>
-                <td className={`px-4 py-3 text-right font-black ${Number(tx.amount) < 0 ? 'text-red-500' : 'text-gray-900'}`}>
+                <td className={`px-4 py-3 text-right font-bold ${Number(tx.amount) < 0 ? 'text-brand-600' : 'text-ink'}`}>
                   {Number(tx.amount) > 0 ? '+' : ''}{fmtMoney(Number(tx.amount))}
                 </td>
                 <td className="px-4 py-3 text-center">
                   <span className={`px-2 py-0.5 rounded-full font-semibold ${
                     tx.status === 'completed' ? 'bg-forest-100 text-forest-700' :
-                    tx.status === 'pending' ? 'bg-brand-100 text-brand-700' : 'bg-red-100 text-red-600'
+                    tx.status === 'pending' ? 'bg-brand-100 text-brand-700' : 'bg-brand-50 text-brand-600'
                   }`}>
                     {tx.status === 'completed' ? 'Hoàn thành' : tx.status === 'pending' ? 'Đang xử lý' : 'Thất bại'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-center text-gray-400">{fmtDate(tx.createdAt)}</td>
+                <td className="px-4 py-3 text-center text-ink-faint">{fmtDate(tx.createdAt)}</td>
               </tr>
             ))}
           </tbody>
@@ -1685,11 +1675,11 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-black text-gray-900">Nhật ký hoạt động</h2>
-        <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+        <h2 className="text-lg font-bold text-ink">Nhật ký hoạt động</h2>
+        <div className="flex bg-paper rounded-lg p-1 gap-1">
           {[{ id: 'content', label: 'Nội dung', icon: 'ri-file-list-line' }, { id: 'login', label: 'Đăng nhập', icon: 'ri-login-box-line' }].map(t => (
             <button key={t.id} onClick={() => setTab(t.id as any)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${tab === t.id ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${tab === t.id ? 'bg-surface text-ink' : 'text-ink-soft hover:text-ink'}`}>
               <i className={t.icon}></i> {t.label}
             </button>
           ))}
@@ -1697,16 +1687,16 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
       </div>
 
       {tab === 'content' && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-surface rounded-card border border-line overflow-hidden">
           {activity.length === 0 ? (
-            <div className="p-12 text-center text-gray-400">Chưa có hoạt động nào</div>
+            <div className="p-12 text-center text-ink-faint">Chưa có hoạt động nào</div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-line">
               {activity.map((a, i) => (
-                <div key={i} className="flex items-start gap-4 px-5 py-3.5 hover:bg-gray-50/50 transition-colors">
+                <div key={i} className="flex items-start gap-4 px-5 py-3.5 hover:bg-paper transition-colors">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-700"><b>{a.who}</b> {a.verb} <i>{a.title}</i></p>
-                    <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
+                    <p className="text-xs text-ink"><b>{a.who}</b> {a.verb} <i>{a.title}</i></p>
+                    <p className="text-[11px] text-ink-faint mt-0.5 flex items-center gap-1">
                       <i className="ri-time-line"></i>{timeAgo(a.time)}
                     </p>
                   </div>
@@ -1718,32 +1708,32 @@ function ActivityTab({ activity, loginHistory }: { activity: any[]; loginHistory
       )}
 
       {tab === 'login' && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-surface rounded-card border border-line overflow-hidden">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-5 py-3 font-semibold text-gray-500">Người dùng</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-500">IP</th>
-                <th className="text-center px-4 py-3 font-semibold text-gray-500">Trạng thái</th>
-                <th className="text-right px-5 py-3 font-semibold text-gray-500">Thời gian</th>
+              <tr className="border-b border-line bg-paper">
+                <th className="text-left px-5 py-3 font-semibold text-ink-soft">Người dùng</th>
+                <th className="text-left px-4 py-3 font-semibold text-ink-soft">IP</th>
+                <th className="text-center px-4 py-3 font-semibold text-ink-soft">Trạng thái</th>
+                <th className="text-right px-5 py-3 font-semibold text-ink-soft">Thời gian</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50 max-h-[600px] overflow-y-auto">
-              {loginHistory.length === 0 && <tr><td colSpan={4} className="text-center py-12 text-gray-400">Không có dữ liệu</td></tr>}
+            <tbody className="divide-y divide-line max-h-[600px] overflow-y-auto">
+              {loginHistory.length === 0 && <tr><td colSpan={4} className="text-center py-12 text-ink-faint">Không có dữ liệu</td></tr>}
               {loginHistory.map((h: any, i: number) => (
-                <tr key={i} className={`hover:bg-gray-50/50 ${h.status === 'FAILED' ? 'bg-red-50/20' : h.status === 'LOCKED' ? 'bg-brand-50/20' : ''}`}>
+                <tr key={i} className={`hover:bg-paper ${h.status === 'FAILED' ? 'bg-brand-50/20' : h.status === 'LOCKED' ? 'bg-brand-50/20' : ''}`}>
                   <td className="px-5 py-2.5">
-                    <p className="font-medium text-gray-800">{h.user?.fullName || '—'}</p>
-                    <p className="text-[10px] text-gray-400">{h.user?.email}</p>
+                    <p className="font-medium text-ink">{h.user?.fullName || '—'}</p>
+                    <p className="text-[11px] text-ink-faint">{h.user?.email}</p>
                   </td>
-                  <td className="px-4 py-2.5 font-mono text-gray-500">{h.ipAddress || '—'}</td>
+                  <td className="px-4 py-2.5 font-mono text-ink-soft">{h.ipAddress || '—'}</td>
                   <td className="px-4 py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full font-semibold ${
                       h.status === 'SUCCESS' ? 'bg-forest-100 text-forest-700' :
-                      h.status === 'FAILED' ? 'bg-red-100 text-red-600' : 'bg-brand-100 text-brand-700'
+                      h.status === 'FAILED' ? 'bg-brand-50 text-brand-600' : 'bg-brand-100 text-brand-700'
                     }`}>{h.status}</span>
                   </td>
-                  <td className="px-5 py-2.5 text-right text-gray-400">{fmtTime(h.createdAt)}</td>
+                  <td className="px-5 py-2.5 text-right text-ink-faint">{fmtTime(h.createdAt)}</td>
                 </tr>
               ))}
             </tbody>
