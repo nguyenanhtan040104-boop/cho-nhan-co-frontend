@@ -151,7 +151,7 @@ export default function MessengerModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-md h-[600px] flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-2xl">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-500 text-white rounded-t-2xl">
           <div className="flex items-center space-x-3">
             <div className="relative">
               <img

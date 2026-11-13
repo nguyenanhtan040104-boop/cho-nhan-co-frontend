@@ -257,7 +257,7 @@ export default function CreateReportPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
       {/* Banner */}
-      <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-6">
+      <div style={{ background: '#991b1b' }} className="py-6">
         <div className="max-w-2xl mx-auto px-4">
           <Link href="/canh-bao" className="text-red-300 text-sm hover:text-white transition-colors flex items-center gap-1 mb-2">
             <i className="ri-arrow-left-line"></i> Quay lại cảnh báo cộng đồng

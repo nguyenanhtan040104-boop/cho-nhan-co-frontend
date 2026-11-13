@@ -65,7 +65,7 @@ export default function MarketPricesPage() {
 
         {/* ── Bảng Giá Hàng Hóa ── */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-forest-50 to-emerald-50">
+          <div className="flex items-center justify-between px-5 py-4 border-b bg-forest-50">
             <div>
               <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Hàng Hóa Hôm Nay</h2>
               <p className="text-xs text-gray-500">
@@ -182,7 +182,7 @@ export default function MarketPricesPage() {
         </div>
 
         {/* ── Giá Vàng SJC ── */}
-        <div className="bg-gradient-to-r from-gold-50 to-gold-50 border border-gold-200 rounded-2xl p-5 shadow-sm">
+        <div className="bg-gold-50 border border-gold-200 rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gold-400 rounded-xl flex items-center justify-center shadow">

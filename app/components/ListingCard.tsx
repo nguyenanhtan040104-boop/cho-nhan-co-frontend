@@ -20,9 +20,9 @@ export default function ListingCard({ item, type, distanceLabel }: { item: any; 
   return (
     <Link
       href={listingHref(item, type)}
-      className="group block overflow-hidden rounded-card border border-line bg-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-lift"
+      className="group block overflow-hidden rounded-card border border-line bg-surface transition-colors hover:border-forest-500"
     >
-      <div className="relative aspect-[4/3] bg-forest-50">
+      <div className="relative aspect-[4/3] bg-paper">
         {img ? (
           <img
             src={img}
@@ -31,12 +31,12 @@ export default function ListingCard({ item, type, distanceLabel }: { item: any; 
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="grid h-full w-full place-items-center text-forest-300">
+          <div className="grid h-full w-full place-items-center text-ink-faint/50">
             <i className={`${PLACEHOLDER_ICON[type]} text-4xl`} />
           </div>
         )}
         {item.isVip && (
-          <span className="absolute left-2 top-2 rounded-md bg-gold-500 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-ink">
+          <span className="absolute left-2 top-2 rounded bg-gold-500 px-1.5 py-0.5 text-[11px] font-bold text-ink">
             Nổi bật
           </span>
         )}

@@ -45,41 +45,31 @@ export default function NearbySection() {
 
   return (
     <section aria-label="Tin gần bạn">
-      <div className="mb-4 flex items-end justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-forest-100 text-forest-700">
-            <i className="ri-map-pin-2-line text-xl" aria-hidden="true" />
-          </span>
-          <div>
-            <h2 className="text-xl font-extrabold leading-tight text-ink">Gần bạn</h2>
-            <p className="text-[13px] text-ink-faint">Tin trong vòng {RADIUS_KM} km quanh vị trí của bạn</p>
-          </div>
-        </div>
-        {loc && (
-          <Link href="/products" className="inline-flex items-center gap-0.5 whitespace-nowrap rounded-pill px-3 py-1.5 text-[13px] font-bold text-forest-700 transition hover:bg-forest-50">
-            Xem tất cả <i className="ri-arrow-right-s-line text-base" aria-hidden="true" />
-          </Link>
-        )}
+      <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-line pb-2">
+        <h2 className="text-xl font-bold text-ink">
+          Gần bạn
+          <span className="ml-2 text-[13px] font-normal text-ink-faint">trong vòng {RADIUS_KM} km</span>
+        </h2>
+        {loc && <Link href="/products" className="whitespace-nowrap text-[14px] font-semibold text-forest-700 hover:underline">Xem tất cả</Link>}
       </div>
 
       {!loc ? (
-        <div className="flex flex-col items-start gap-3 rounded-card border border-dashed border-forest-300 bg-forest-50 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[14px] text-forest-800">
-            Cho phép xem vị trí để thấy hàng của bà con quanh nhà, gần nhất hiện trước.
-            {denied && <span className="mt-1 block text-[13px] font-semibold text-brand-600">Chưa lấy được vị trí. Bạn kiểm tra quyền vị trí (GPS) của trình duyệt rồi thử lại nhé.</span>}
+        <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[14px] text-ink-soft">
+            Cho phép xem vị trí để thấy hàng quanh nhà bạn, gần nhất hiện trước. Vị trí chỉ lưu trên máy của bạn.
+            {denied && <span className="mt-1 block font-semibold text-brand-600">Chưa lấy được vị trí. Kiểm tra quyền vị trí của trình duyệt rồi thử lại.</span>}
           </p>
           <button onClick={ask} disabled={asking} className="btn-forest shrink-0 disabled:opacity-60">
-            <i className={asking ? 'ri-loader-4-line animate-spin' : 'ri-focus-3-line'} aria-hidden="true" />
             {asking ? 'Đang lấy vị trí...' : 'Bật vị trí của tôi'}
           </button>
         </div>
       ) : loading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {[...Array(5)].map((_, i) => <div key={i} className="aspect-[4/5] animate-pulse rounded-card bg-forest-50" />)}
+          {[...Array(5)].map((_, i) => <div key={i} className="aspect-[4/5] animate-pulse rounded-card bg-line" />)}
         </div>
       ) : items.length === 0 ? (
-        <p className="rounded-card border border-line bg-surface px-5 py-6 text-center text-[14px] text-ink-soft">
-          Chưa có tin trong {RADIUS_KM} km quanh bạn. <Link href="/products" className="font-bold text-forest-700 hover:underline">Xem toàn bộ tin</Link>
+        <p className="rounded-card border border-line bg-surface px-5 py-5 text-[14px] text-ink-soft">
+          Chưa có tin trong {RADIUS_KM} km quanh bạn. <Link href="/products" className="font-semibold text-forest-700 underline underline-offset-2">Xem toàn bộ tin</Link>
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">

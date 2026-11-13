@@ -83,7 +83,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                   {CATEGORIES[ad.category] || ad.category}
                 </span>
                 {ad.isVip && (
-                  <span className="bg-gradient-to-r from-gold-400 to-gold-500 text-white text-xs px-2 py-1 rounded font-bold flex items-center gap-1">
+                  <span className="bg-gold-400 text-white text-xs px-2 py-1 rounded font-bold flex items-center gap-1">
                     <i className="ri-vip-crown-fill"></i>VIP
                   </span>
                 )}
@@ -91,7 +91,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 {currentUserId && (ad.userId === currentUserId || ad.user?.id === currentUserId) && (
                   <Link
                     href={`/advertisements/${ad.id}/upgrade`}
-                    className="ml-auto bg-gradient-to-r from-brand-500 to-gold-500 hover:opacity-95 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
+                    className="ml-auto bg-brand-500 hover:opacity-95 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
                   >
                     <i className="ri-rocket-2-line"></i>
                     {ad.isVip ? 'Gia hạn VIP' : 'Đẩy lên VIP'}

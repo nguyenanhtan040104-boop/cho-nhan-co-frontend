@@ -127,7 +127,7 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
                     </div>
                   )}
                   {item.isVip && (
-                    <span className="absolute top-3 left-3 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow z-10 flex items-center gap-1">
+                    <span className="absolute top-3 left-3 bg-gold-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow z-10 flex items-center gap-1">
                       <i className="ri-vip-crown-fill"></i> VIP
                     </span>
                   )}
@@ -204,11 +204,11 @@ export default function RealEstateDetail({ propertyId }: { propertyId: string })
             <div className="space-y-4">
               <div className="bg-white rounded-2xl shadow-md border border-brand-100 sticky top-4 overflow-hidden">
                 {/* Orange top accent */}
-                <div className="h-1.5 bg-gradient-to-r from-brand-400 to-gold-400"></div>
+                <div className="h-1.5 bg-brand-400"></div>
                 <div className="p-5 space-y-4">
                   {/* VIP badge */}
                   {item.isVip && (
-                    <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                    <div className="inline-flex items-center gap-1.5 bg-gold-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                       <i className="ri-vip-crown-fill"></i> Tin VIP nổi bật
                     </div>
                   )}

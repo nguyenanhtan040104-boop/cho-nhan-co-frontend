@@ -244,8 +244,8 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur-md" suppressHydrationWarning>
       <div className="mx-auto flex h-16 max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
         <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Chợ Nhân Cơ, trang chủ">
-          <Logo size={36} />
-          <span className="hidden text-[19px] font-extrabold tracking-tight text-ink sm:block">Chợ Nhân Cơ</span>
+          <Logo size={34} />
+          <span className="hidden text-[18px] font-bold tracking-tight text-ink sm:block">Chợ Nhân Cơ</span>
         </Link>
 
         <form
@@ -257,7 +257,7 @@ export default function Header() {
           className="min-w-0 flex-1 md:mx-4 md:max-w-2xl"
           role="search"
         >
-          <div className="flex h-11 items-center gap-2 rounded-pill border border-line bg-paper pl-4 pr-1.5 transition-colors focus-within:border-forest-500 focus-within:bg-surface">
+          <div className="flex h-10 items-center gap-2 rounded-lg border border-line bg-paper pl-3 pr-1 transition-colors focus-within:border-forest-600 focus-within:bg-surface">
             <i className="ri-search-line text-ink-faint" aria-hidden="true" />
             <input
               name="q"
@@ -266,7 +266,7 @@ export default function Header() {
               placeholder="Tìm cà phê, tiêu, đất rẫy, việc làm..."
               className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder-ink-faint focus:outline-none"
             />
-            <button type="submit" className="hidden h-8 shrink-0 rounded-pill bg-forest-600 px-4 text-[13px] font-bold text-white transition hover:bg-forest-700 sm:block">
+            <button type="submit" className="hidden h-8 shrink-0 rounded-md bg-forest-700 px-4 text-[13px] font-semibold text-white transition hover:bg-forest-800 sm:block">
               Tìm
             </button>
           </div>
@@ -442,12 +442,16 @@ export default function Header() {
 
       {/* Danh mục — a scrolling row of chips, same on phone and desktop */}
       <nav aria-label="Danh mục" className="border-t border-line/70">
-        <div className="no-scrollbar mx-auto flex max-w-content gap-2 overflow-x-auto px-4 py-2 sm:px-6">
+        <div className="no-scrollbar mx-auto flex max-w-content gap-1 overflow-x-auto px-2 sm:px-4">
           {CATEGORIES.map((c) => {
             const active = isActivePath(pathname, c.href);
             return (
-              <Link key={c.href} href={c.href} aria-current={active ? 'page' : undefined} className={`chip ${active ? 'chip-active' : ''}`}>
-                <i className={`${c.icon} text-base`} aria-hidden="true" />
+              <Link
+                key={c.href}
+                href={c.href}
+                aria-current={active ? 'page' : undefined}
+                className={`whitespace-nowrap border-b-2 px-3 py-2.5 text-[14px] font-semibold transition-colors ${active ? 'border-forest-700 text-forest-800' : 'border-transparent text-ink-soft hover:text-ink'}`}
+              >
                 {c.label}
               </Link>
             );

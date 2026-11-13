@@ -80,7 +80,7 @@ function CanhBaoContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
-      <div style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }} className="py-8">
+      <div style={{ background: '#991b1b' }} className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
             <div>
@@ -294,7 +294,7 @@ function ReportCard({ post }: { post: any }) {
         {thumb ? (
           <img src={thumb} alt={post.title} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300 ease-out" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
+          <div className="w-full h-full flex items-center justify-center bg-red-100">
             <i className="ri-alarm-warning-line text-4xl text-red-400"></i>
           </div>
         )}

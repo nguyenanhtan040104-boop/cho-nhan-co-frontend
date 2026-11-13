@@ -135,7 +135,7 @@ export default function AdminVipPage() {
                   <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{item.user?.fullName}</td>
                   <td className="px-4 py-3 text-center">
                     {item.isVip ? (
-                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-gold-400 to-brand-400 text-white text-xs px-3 py-1 rounded-full font-bold">
+                      <span className="inline-flex items-center gap-1 bg-gold-400 text-white text-xs px-3 py-1 rounded-full font-bold">
                         <i className="ri-vip-crown-fill"></i> VIP
                       </span>
                     ) : (
@@ -147,7 +147,7 @@ export default function AdminVipPage() {
                       className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${
                         item.isVip
                           ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          : 'bg-gradient-to-r from-gold-400 to-brand-400 text-white hover:opacity-90'
+                          : 'bg-gold-400 text-white hover:opacity-90'
                       }`}>
                       {toggling === item.id ? '...' : item.isVip ? 'Hủy VIP' : '⭐ Lên VIP'}
                     </button>

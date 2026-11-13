@@ -217,7 +217,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-br from-red-500 to-rose-700 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-red-200">
+            <div className="w-11 h-11 bg-red-500 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-red-200">
               A
             </div>
             <div>
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
                 <button key={tab.id} onClick={() => handleTabChange(tab.id)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all mb-0.5 ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-200'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-200'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}>
                   <i className={`${tab.icon} text-base flex-shrink-0`}></i>
@@ -456,7 +456,7 @@ function OverviewTab({ stats, products, recentActivity, walletTx, loginHistory, 
         {cards.map((c, i) => (
           <button key={i} onClick={() => c.tab && onTabChange(c.tab)}
             className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all text-left group">
-            <div className={`w-9 h-9 bg-gradient-to-br ${c.gradient} rounded-xl flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform`}>
+            <div className={`w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform`}>
               <i className={`${c.icon} text-white text-base`}></i>
             </div>
             <p className="text-2xl font-black text-gray-900">{c.value}</p>
@@ -688,7 +688,7 @@ function SecurityTab({ loginHistory, onRefresh }: { loginHistory: any[]; onRefre
           { label: 'IP bị chặn', value: blockedIps.length, icon: 'ri-shield-cross-line', gradient: 'from-red-500 to-red-700' },
         ].map((c, i) => (
           <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className={`w-9 h-9 bg-gradient-to-br ${c.gradient} rounded-xl flex items-center justify-center mb-3`}>
+            <div className={`w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center mb-3`}>
               <i className={`${c.icon} text-white text-base`}></i>
             </div>
             <p className="text-2xl font-black text-gray-900">{c.value}</p>
@@ -1016,9 +1016,9 @@ function UsersTab({ usersList, loginHistory, onRefresh }: { usersList: any[]; lo
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 ${
-                        u.role === 'admin' ? 'bg-gradient-to-br from-red-500 to-rose-600 text-white' :
-                        u.role === 'vip' ? 'bg-gradient-to-br from-gold-400 to-gold-500 text-white' :
-                        'bg-gradient-to-br from-gray-200 to-gray-300 text-gray-600'
+                        u.role === 'admin' ? 'bg-red-500 text-white' :
+                        u.role === 'vip' ? 'bg-gold-400 text-white' :
+                        'bg-gray-200 text-gray-600'
                       }`}>
                         {u.fullName?.[0] || '?'}
                       </div>
@@ -1359,7 +1359,7 @@ function ModerationTab({ posts, onRefresh }: { posts: any[]; onRefresh: () => vo
               {rejectModal?.id !== post.id && (
                 <div className="flex gap-2 mt-3 pt-3 border-t border-gray-50">
                   <button onClick={() => approve(post.id)} disabled={processing === post.id}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-forest-600 to-brand-600 text-white text-xs rounded-xl hover:opacity-90 disabled:opacity-50 font-semibold shadow-sm">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-forest-600 text-white text-xs rounded-xl hover:opacity-90 disabled:opacity-50 font-semibold shadow-sm">
                     <i className="ri-check-line"></i> Duyệt
                   </button>
                   <button onClick={() => setRejectModal({ id: post.id, text: '' })}
@@ -1435,7 +1435,7 @@ function ContentTab({ title, items, color, renderRow, onDelete, editHref, onTogg
         <div className="space-y-2">
           {filtered.map(item => (
             <div key={item.id} className={`bg-white rounded-xl border shadow-sm px-4 py-3 flex items-center gap-3 hover:shadow-md transition-all ${
-              item.isVip ? 'border-gold-200 bg-gradient-to-r from-gold-50/50 to-white' : 'border-gray-100'
+              item.isVip ? 'border-gold-200 bg-gold-50/50' : 'border-gray-100'
             }`}>
               {item.images?.[0]?.url && (
                 <img src={item.images[0].url} className="w-11 h-11 rounded-xl object-cover flex-shrink-0 border border-gray-100" />
@@ -1492,7 +1492,7 @@ function VipTab({ vipItems, onRefresh }: { vipItems: any[]; onRefresh: () => voi
       ) : (
         <div className="space-y-2">
           {vipItems.map(item => (
-            <div key={item.id} className="bg-white rounded-xl border border-gold-200 shadow-sm px-4 py-3 flex items-center gap-3 bg-gradient-to-r from-gold-50/30 to-white">
+            <div key={item.id} className="bg-white rounded-xl border border-gold-200 shadow-sm px-4 py-3 flex items-center gap-3 bg-gold-50/30">
               {item.images?.[0]?.url && <img src={item.images[0].url} className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -1621,7 +1621,7 @@ function WalletTab({ txList }: { txList: any[] }) {
           { label: 'Tổng giao dịch', value: txList.length, gradient: 'from-blue-500 to-blue-600', icon: 'ri-exchange-line' },
         ].map((c, i) => (
           <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className={`w-9 h-9 bg-gradient-to-br ${c.gradient} rounded-xl flex items-center justify-center mb-3`}>
+            <div className={`w-9 h-9 bg-forest-700 rounded-xl flex items-center justify-center mb-3`}>
               <i className={`${c.icon} text-white text-base`}></i>
             </div>
             <p className="text-xl font-black text-gray-900">{c.value}</p>

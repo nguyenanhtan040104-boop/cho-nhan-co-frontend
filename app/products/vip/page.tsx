@@ -119,7 +119,7 @@ function VipProductContent() {
   const seconds = countdown % 60;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gold-50 to-brand-50">
+    <div className="min-h-screen bg-gold-50">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/dashboard" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
@@ -234,7 +234,7 @@ function VipProductContent() {
                 </div>
               ) : (
                 <button onClick={handlePay} disabled={creating || !productId}
-                  className="w-full bg-gradient-to-r from-gold-400 to-brand-400 text-white py-3 rounded-xl font-semibold hover:from-gold-500 hover:to-brand-500 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
+                  className="w-full bg-gold-400 text-white py-3 rounded-xl font-semibold hover:from-gold-500 hover:to-brand-500 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
                   {creating ? (
                     <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang tạo...</>
                   ) : (
@@ -256,7 +256,7 @@ function VipProductContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-gold-400 to-brand-400 px-6 py-4 text-white text-center">
+            <div className="bg-gold-400 px-6 py-4 text-white text-center">
               <p className="text-sm font-medium opacity-90">Thanh toán VIP</p>
               <p className="text-2xl font-bold mt-1">{paymentData.amount.toLocaleString()}đ</p>
             </div>

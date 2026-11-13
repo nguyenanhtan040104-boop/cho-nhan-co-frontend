@@ -62,16 +62,17 @@ module.exports = {
         // headings use the same family now; kept as a name so existing pages keep working
         display: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
+      // Small radii and borders over shadows: the look of GOV.UK / Primer / Carbon rather than a "soft app".
       borderRadius: {
-        card: '16px',
-        sheet: '24px',
+        card: '10px',
+        sheet: '14px',
         pill: '999px',
       },
       boxShadow: {
-        card: '0 1px 2px rgba(19,39,29,0.05), 0 2px 10px -4px rgba(19,39,29,0.08)',
-        lift: '0 10px 30px -12px rgba(19,39,29,0.28)',
-        brand: '0 6px 18px -6px rgba(210,59,39,0.5)',
-        nav: '0 -4px 20px -8px rgba(19,39,29,0.18)',
+        card: '0 1px 0 rgba(19,39,29,0.04)',
+        lift: '0 6px 16px -6px rgba(19,39,29,0.22)',
+        brand: '0 1px 2px rgba(19,39,29,0.25)',
+        nav: '0 -1px 0 rgba(19,39,29,0.06)',
       },
       maxWidth: {
         content: '1200px',

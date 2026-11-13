@@ -226,7 +226,7 @@ function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: an
           {thumb ? (
             <img src={thumb} alt={post.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${cat.color}22, ${cat.color}44)` }}>
+            <div className="w-full h-full flex items-center justify-center" style={{ background: `${cat.color}26` }}>
               <i className="ri-article-line text-4xl" style={{ color: cat.color, opacity: 0.5 }}></i>
             </div>
           )}

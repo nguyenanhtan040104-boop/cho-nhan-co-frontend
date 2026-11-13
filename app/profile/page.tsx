@@ -248,7 +248,7 @@ export default function ProfilePage() {
   const showTabs = tab === 'login' || tab === 'register';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-forest-50 to-paper py-12 px-4">
+    <div className="min-h-screen bg-forest-50 py-12 px-4">
       <div className="max-w-md mx-auto bg-white rounded-sheet shadow-lift p-8">
 
         {/* Logo */}

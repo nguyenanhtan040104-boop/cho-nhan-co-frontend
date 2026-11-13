@@ -328,7 +328,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Wallet Balance Card */}
-                <Link href="/wallet" className="bg-gradient-to-r from-brand-600 to-forest-500 rounded-xl p-5 shadow-sm block hover:opacity-90 transition mb-6">
+                <Link href="/wallet" className="bg-brand-600 rounded-xl p-5 shadow-sm block hover:opacity-90 transition mb-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">

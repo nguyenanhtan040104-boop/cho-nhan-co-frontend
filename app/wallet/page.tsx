@@ -167,7 +167,7 @@ function WalletContent() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
 
         {/* Balance card */}
-        <div className="bg-gradient-to-r from-brand-600 to-forest-500 rounded-2xl p-6 text-white shadow-lg">
+        <div className="bg-brand-600 rounded-2xl p-6 text-white shadow-lg">
           <p className="text-forest-100 text-sm mb-1">Số dư hiện tại</p>
           {loading ? (
             <div className="h-10 w-40 bg-white/20 rounded animate-pulse"></div>
@@ -392,7 +392,7 @@ function WalletContent() {
                       <button
                         onClick={() => handleBuyVip(item)}
                         disabled={buyingId === item.id}
-                        className="flex-shrink-0 text-xs bg-gradient-to-r from-gold-400 to-brand-400 text-white px-4 py-1.5 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition"
+                        className="flex-shrink-0 text-xs bg-gold-400 text-white px-4 py-1.5 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition"
                       >
                         {buyingId === item.id ? '...' : '⭐ Mua'}
                       </button>

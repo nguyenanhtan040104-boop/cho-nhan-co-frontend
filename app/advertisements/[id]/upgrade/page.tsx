@@ -185,7 +185,7 @@ export default function AdvertisementUpgradePage() {
         </div>
 
         {/* ─── Wallet balance ───────────────────────────────────────── */}
-        <div className="bg-gradient-to-r from-brand-500 to-gold-500 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between text-white">
+        <div className="bg-brand-500 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between text-white">
           <div>
             <p className="text-[11px] font-bold tracking-widest uppercase opacity-80">Số dư ví</p>
             <p className="text-2xl font-black">{fmtMoney(balance)}</p>
@@ -228,7 +228,7 @@ export default function AdvertisementUpgradePage() {
               >
                 {plan.badge ? (
                   <div className={`text-center py-2 text-xs font-bold ${
-                    highlight ? 'bg-gradient-to-r from-brand-500 to-gold-500 text-white' : 'bg-gray-900 text-white'
+                    highlight ? 'bg-brand-500 text-white' : 'bg-gray-900 text-white'
                   }`}>
                     {plan.badge}
                   </div>
@@ -260,7 +260,7 @@ export default function AdvertisementUpgradePage() {
                       !enough
                         ? 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                         : highlight
-                          ? 'bg-gradient-to-r from-brand-500 to-gold-500 text-white hover:opacity-95'
+                          ? 'bg-brand-500 text-white hover:opacity-95'
                           : 'bg-gray-900 text-white hover:bg-gray-700'
                     } disabled:opacity-60 disabled:cursor-not-allowed`}
                   >

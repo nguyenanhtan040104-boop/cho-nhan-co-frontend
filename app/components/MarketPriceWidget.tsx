@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const ITEMS = [
-  { key: 'cafe',   label: 'Cà phê',      icon: 'ri-cup-line',         unit: 'đ/kg',  catMatch: 'cà phê',   itemIdx: 0 },
-  { key: 'tieu',   label: 'Hồ tiêu',     icon: 'ri-seedling-line',    unit: 'đ/kg',  catMatch: 'hồ tiêu',  itemIdx: 0 },
-  { key: 'xang',   label: 'Xăng RON 95', icon: 'ri-gas-station-line', unit: 'đ/lít', catMatch: 'xăng dầu', itemIdx: 0 },
-  { key: 'cao_su', label: 'Cao su',      icon: 'ri-drop-line',        unit: 'đ/kg',  catMatch: 'cao su',   itemIdx: 0 },
+  { key: 'cafe',   label: 'Cà phê',      unit: 'đ/kg',  catMatch: 'cà phê',   itemIdx: 0 },
+  { key: 'tieu',   label: 'Hồ tiêu',     unit: 'đ/kg',  catMatch: 'hồ tiêu',  itemIdx: 0 },
+  { key: 'xang',   label: 'Xăng RON 95', unit: 'đ/lít', catMatch: 'xăng dầu', itemIdx: 0 },
+  { key: 'cao_su', label: 'Cao su',      unit: 'đ/kg',  catMatch: 'cao su',   itemIdx: 0 },
 ];
 
 type Row = { price: number; priceMax?: number; change: number | null; unit?: string; place?: string };
 
 const fmt = (n: number) => n.toLocaleString('vi-VN');
 
+// A plain price board: label, number, change. No decoration.
 export default function MarketPriceWidget() {
   const [data, setData] = useState<Record<string, Row>>({});
   const [priceDate, setPriceDate] = useState('');
@@ -46,58 +47,44 @@ export default function MarketPriceWidget() {
   }, []);
 
   return (
-    <section className="card p-4 sm:p-5" aria-label="Giá thị trường hôm nay">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div>
-          <h2 className="flex items-center gap-2 text-[17px] font-bold text-ink">
-            <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-forest-400 opacity-60" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-forest-500" />
-            </span>
-            Giá hôm nay
-          </h2>
-          {priceDate && <p className="mt-0.5 text-xs text-ink-faint">Cập nhật ngày {priceDate}</p>}
-        </div>
-        <Link href="/market-prices" className="inline-flex items-center gap-0.5 whitespace-nowrap text-[13px] font-bold text-forest-700 hover:underline">
-          Xem bảng giá <i className="ri-arrow-right-s-line text-base" aria-hidden="true" />
-        </Link>
+    <section aria-label="Giá thị trường hôm nay">
+      <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-line pb-2">
+        <h2 className="text-xl font-bold text-ink">
+          Giá hôm nay
+          {priceDate && <span className="ml-2 text-[13px] font-normal text-ink-faint">{priceDate}</span>}
+        </h2>
+        <Link href="/market-prices" className="whitespace-nowrap text-[14px] font-semibold text-forest-700 hover:underline">Xem bảng giá</Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+      <dl className="grid grid-cols-2 divide-x divide-y divide-line overflow-hidden rounded-card border border-line bg-surface md:grid-cols-4 md:divide-y-0">
         {ITEMS.map(item => {
           const row = data[item.key];
           const up = row?.change != null && row.change > 0;
-          const down = row?.change != null && row.change < 0;
           return (
-            <Link key={item.key} href="/market-prices" className="rounded-xl border border-line bg-paper p-3 transition hover:border-forest-300 hover:bg-forest-50">
-              <div className="flex items-center gap-2 text-xs font-semibold text-ink-soft">
-                <span className="grid h-7 w-7 place-items-center rounded-lg bg-forest-100 text-forest-700"><i className={`${item.icon} text-base`} aria-hidden="true" /></span>
-                {item.label}
-              </div>
+            <Link key={item.key} href="/market-prices" className="block p-3.5 transition-colors hover:bg-paper sm:p-4">
+              <dt className="text-[13px] text-ink-soft">{item.label}</dt>
               {loading ? (
-                <div className="mt-2.5 h-5 w-24 animate-pulse rounded bg-line" />
+                <dd className="mt-2 h-6 w-24 animate-pulse rounded bg-line" />
               ) : row ? (
-                <>
-                  <p className="mt-2 text-[17px] font-extrabold tabular-nums leading-tight text-ink">
-                    {fmt(row.price)}{row.priceMax ? `–${fmt(row.priceMax)}` : ''}
-                    <span className="ml-1 text-[11px] font-medium text-ink-faint">{row.unit ?? item.unit}</span>
-                  </p>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-[11px]">
+                <dd className="mt-1">
+                  <span className="text-xl font-bold tabular-nums text-ink">{fmt(row.price)}{row.priceMax ? `–${fmt(row.priceMax)}` : ''}</span>
+                  <span className="ml-1 text-[12px] text-ink-faint">{row.unit ?? item.unit}</span>
+                  <span className="mt-0.5 block text-[12px]">
                     {row.change != null && row.change !== 0 ? (
-                      <span className={`font-bold ${up ? 'text-brand-600' : 'text-forest-700'}`}>{up ? '▲' : '▼'} {fmt(Math.abs(row.change))}</span>
+                      <span className={`font-semibold ${up ? 'text-brand-600' : 'text-forest-700'}`}>{up ? '▲' : '▼'} {fmt(Math.abs(row.change))}</span>
                     ) : (
                       <span className="text-ink-faint">Không đổi</span>
                     )}
-                    {row.place && <span className="truncate text-ink-faint">· {row.place}</span>}
-                  </p>
-                </>
+                    {row.place && <span className="text-ink-faint"> · {row.place}</span>}
+                  </span>
+                </dd>
               ) : (
-                <p className="mt-2 text-xs text-ink-faint">Đang cập nhật</p>
+                <dd className="mt-2 text-[13px] text-ink-faint">Đang cập nhật</dd>
               )}
             </Link>
           );
         })}
-      </div>
+      </dl>
     </section>
   );
 }

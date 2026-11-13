@@ -408,7 +408,7 @@ function JobCard({ item, onDeleted }: { item: any; onDeleted: (id: string) => vo
             <img src={imgUrl} alt={item.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-1"
-              style={{ background: isEmployer ? 'linear-gradient(135deg,#13271D,#065f46)' : 'linear-gradient(135deg,#0c4a6e,#0369a1)' }}>
+              style={{ background: isEmployer ? '#13271D' : '#0c4a6e' }}>
               <span className="text-4xl font-bold text-white/80 leading-none">
                 {(item.title || 'J')[0].toUpperCase()}
               </span>
@@ -501,7 +501,7 @@ function JobListRow({ item, onDeleted }: { item: any; onDeleted: (id: string) =>
             <img src={imgUrl} alt={item.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center"
-              style={{ background: isEmployer ? 'linear-gradient(135deg,#13271D,#065f46)' : 'linear-gradient(135deg,#0c4a6e,#0369a1)' }}>
+              style={{ background: isEmployer ? '#13271D' : '#0c4a6e' }}>
               <span className="text-3xl font-bold text-white/80">{(item.title || 'J')[0].toUpperCase()}</span>
             </div>
           )}

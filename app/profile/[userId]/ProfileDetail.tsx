@@ -94,7 +94,7 @@ export default function ProfileDetail({ userId }: { userId: string }) {
       {/* ── Banner ── */}
       <div className="relative">
         <div className="h-36 md:h-48 w-full overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #134e2a 0%, #1a6b3a 40%, #2d9e5f 75%, #52c78b 100%)' }}>
+          style={{ background: '#134e2a' }}>
           {/* Decorative shapes */}
           <svg className="absolute inset-0 w-full h-full opacity-15" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid slice">
             <circle cx="50" cy="50" r="80" fill="white" />

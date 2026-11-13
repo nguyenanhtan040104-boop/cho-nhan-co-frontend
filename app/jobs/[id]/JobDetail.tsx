@@ -80,7 +80,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
                     </span>
                   )}
                   {job.isVip && (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-gold-100 to-brand-100 text-gold-800 border border-gold-200">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-gold-100 text-gold-800 border border-gold-200">
                       <i className="ri-vip-crown-fill text-gold-500"></i> VIP
                     </span>
                   )}
@@ -193,7 +193,7 @@ export default function JobDetail({ jobId }: { jobId: string }) {
             <div>
               <div className="bg-white rounded-2xl shadow-md border border-blue-100 sticky top-4 overflow-hidden">
                 {/* Blue top accent */}
-                <div className="h-1.5 bg-gradient-to-r from-blue-500 to-forest-600"></div>
+                <div className="h-1.5 bg-blue-500"></div>
                 <div className="p-5 space-y-4">
                   {/* CTA Buttons */}
                   <div className="space-y-2">
