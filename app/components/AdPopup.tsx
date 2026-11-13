@@ -73,7 +73,7 @@ export default function AdPopup() {
       role="dialog"
       aria-modal="true"
       aria-label="Quảng cáo"
-      className={`fixed inset-0 z-[60] flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[60] flex items-center justify-center bg-ink/60 p-4 transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
     >
       <div
         onClick={e => e.stopPropagation()}

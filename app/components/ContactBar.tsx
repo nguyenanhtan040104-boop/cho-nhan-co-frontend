@@ -14,7 +14,7 @@ export default function ContactBar({ phone, onChat }: { phone?: string | null; o
     <>
       <div aria-hidden="true" className="h-20 md:hidden" />
       <div
-        className="fixed inset-x-0 z-30 border-t border-line bg-surface/95 px-3 py-2 shadow-nav backdrop-blur md:hidden"
+        className="fixed inset-x-0 z-30 border-t border-line bg-surface px-3 py-2 md:hidden"
         style={{ bottom: 'calc(4.25rem + env(safe-area-inset-bottom))' }}
         role="group"
         aria-label="Liên hệ người bán"

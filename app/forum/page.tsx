@@ -171,10 +171,6 @@ function ForumContent() {
           </nav>
         )}
       </div>
-
-      <Link href="/forum/create" aria-label="Viết bài" className="btn-primary fixed bottom-24 right-4 z-30 h-12 w-12 !rounded-full !p-0 shadow-lg sm:hidden">
-        <i className="ri-add-line text-2xl" aria-hidden="true" />
-      </Link>
     </div>
   );
 }

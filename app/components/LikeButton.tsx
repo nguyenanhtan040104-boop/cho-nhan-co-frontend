@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { itemComments, auth } from '../../lib/api';
 
@@ -53,9 +53,9 @@ export default function LikeButton({ itemId, targetType = 'PRODUCT', inline, cla
       <button
         onClick={handleClick}
         aria-label={liked ? 'Bỏ thích' : 'Thích'}
-        className={`flex items-center justify-center hover:scale-110 transition-transform ${className || ''}`}
+        className={`flex items-center justify-center ${className || ''}`}
       >
-        <i className={`${liked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400 hover:text-red-400'} text-base transition-colors`}></i>
+        <i className={`${liked ? 'ri-heart-fill text-brand-500' : 'ri-heart-line text-ink-faint hover:text-brand-500'} text-base transition-colors`}></i>
       </button>
     );
   }
@@ -64,9 +64,9 @@ export default function LikeButton({ itemId, targetType = 'PRODUCT', inline, cla
     <button
       onClick={handleClick}
       aria-label={liked ? 'Bỏ thích' : 'Thích'}
-      className={`absolute top-1.5 right-1.5 w-7 h-7 bg-white/85 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-10 ${className || ''}`}
+      className={`absolute top-1.5 right-1.5 z-10 grid h-8 w-8 place-items-center rounded-full border border-line bg-white ${className || ''}`}
     >
-      <i className={`${liked ? 'ri-heart-fill text-red-500' : 'ri-heart-line text-gray-400'} text-sm transition-colors`}></i>
+      <i className={`${liked ? 'ri-heart-fill text-brand-500' : 'ri-heart-line text-ink-soft'} text-base transition-colors`}></i>
     </button>
   );
 }

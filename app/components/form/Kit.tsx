@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -55,7 +55,7 @@ export function FormError({ message, children }: { message: string; children?: R
 
 export function SubmitBar({ backHref, loading, label, busy = 'Đang lưu...' }: { backHref: string; loading: boolean; label: string; busy?: string }) {
   return (
-    <div className="sticky bottom-[4.5rem] z-20 -mx-4 -mb-4 flex gap-3 border-t border-line bg-surface/95 px-4 py-3 sm:static sm:m-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
+    <div className="sticky bottom-[4.5rem] z-20 -mx-4 -mb-4 flex gap-3 border-t border-line bg-surface px-4 py-3 sm:static sm:m-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
       <Link href={backHref} className="btn-ghost flex-1 sm:flex-none sm:px-8">Hủy</Link>
       <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-50">
         {loading ? <><i className="ri-loader-4-line animate-spin" aria-hidden="true" /> {busy}</> : label}
@@ -67,7 +67,7 @@ export function SubmitBar({ backHref, loading, label, busy = 'Đang lưu...' }: 
 export function SavedOverlay({ title = 'Đăng thành công', note = 'Đang chuyển trang...' }: { title?: string; note?: string }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 px-4" role="status">
-      <div className="w-full max-w-xs rounded-sheet bg-surface p-7 text-center shadow-xl">
+      <div className="w-full max-w-xs rounded-sheet bg-surface p-7 text-center">
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-forest-100 text-forest-700"><i className="ri-check-line text-3xl" /></div>
         <h2 className="mt-3 text-lg font-bold text-ink">{title}</h2>
         <p className="mt-1 text-sm text-ink-soft">{note}</p>

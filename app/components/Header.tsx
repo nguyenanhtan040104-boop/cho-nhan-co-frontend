@@ -241,7 +241,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur-md" suppressHydrationWarning>
+    <header className="sticky top-0 z-50 border-b border-line bg-surface" suppressHydrationWarning>
       <div className="mx-auto flex h-16 max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
         <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Chợ Nhân Cơ, trang chủ">
           <Logo size={34} />
@@ -461,7 +461,7 @@ export default function Header() {
 
       {msgToast && (
         <button
-          className="fixed bottom-24 right-4 z-[9999] flex max-w-xs items-start gap-3 rounded-2xl border border-line bg-surface p-4 text-left shadow-lift md:bottom-5 md:right-5"
+          className="fixed bottom-24 right-4 z-[9999] flex max-w-xs items-start gap-3 rounded-card border border-line bg-surface p-4 text-left md:bottom-5 md:right-5"
           style={{ animation: 'slideUp 0.3s ease' }}
           onClick={() => {
             if (msgToast.conversationId) router.push(`/messages/${msgToast.conversationId}`);

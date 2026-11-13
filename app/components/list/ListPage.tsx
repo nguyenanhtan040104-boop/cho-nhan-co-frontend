@@ -238,10 +238,6 @@ function Inner(c: ListConfig) {
           <span>{c.safety} <Link href="/canh-bao" className="font-semibold text-forest-700 underline">Xem cảnh báo lừa đảo</Link></span>
         </p>
       </div>
-
-      <Link href={c.createHref} aria-label={c.createLabel} className="btn-primary fixed bottom-24 right-4 z-30 h-12 w-12 !rounded-full !p-0 shadow-lg sm:hidden">
-        <i className="ri-add-line text-2xl" aria-hidden="true" />
-      </Link>
     </div>
   );
 }

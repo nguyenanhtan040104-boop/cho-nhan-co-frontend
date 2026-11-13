@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
@@ -197,10 +197,6 @@ function CanhBaoContent() {
           </section>
         </aside>
       </div>
-
-      <Link href={createHref} aria-label="Đăng cảnh báo" className="btn-primary fixed bottom-24 right-4 z-30 h-12 w-12 !rounded-full !p-0 shadow-lg sm:hidden">
-        <i className="ri-add-line text-2xl" aria-hidden="true" />
-      </Link>
     </div>
   );
 }

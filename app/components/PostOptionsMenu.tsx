@@ -55,21 +55,21 @@ export default function PostOptionsMenu({ postId, ownerId, onDelete, editHref }:
     <div ref={ref} className="relative" onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
       <button
         onClick={e => { e.preventDefault(); e.stopPropagation(); setOpen(o => !o); setConfirming(false); }}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-lg text-ink-soft hover:text-ink hover:bg-paper transition-colors"
         title="Tùy chọn"
       >
         <i className="ri-more-2-fill text-lg"></i>
       </button>
 
       {open && (
-        <div className="absolute left-0 top-9 w-44 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50"
+        <div className="absolute left-0 top-9 w-44 rounded-card border border-line bg-surface py-1 z-50"
           onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
           {editHref && (
             <button
               onClick={e => { e.stopPropagation(); setOpen(false); router.push(editHref); }}
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-paper transition-colors"
             >
-              <i className="ri-pencil-line text-blue-500"></i>
+              <i className="ri-pencil-line text-ink-soft"></i>
               Chỉnh sửa
             </button>
           )}
@@ -77,10 +77,10 @@ export default function PostOptionsMenu({ postId, ownerId, onDelete, editHref }:
             onClick={e => { e.stopPropagation(); handleDelete(); }}
             disabled={loading}
             className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
-              confirming ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-700 hover:bg-red-50 hover:text-red-600'
+              confirming ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-ink hover:bg-brand-50 hover:text-brand-600'
             }`}
           >
-            <i className={`text-red-500 ${loading ? 'ri-loader-4-line animate-spin' : 'ri-delete-bin-line'}`}></i>
+            <i className={`text-brand-500 ${loading ? 'ri-loader-4-line animate-spin' : 'ri-delete-bin-line'}`}></i>
             {loading ? 'Đang xóa...' : confirming ? 'Nhấn lần nữa để xóa' : 'Xóa bài đăng'}
           </button>
         </div>

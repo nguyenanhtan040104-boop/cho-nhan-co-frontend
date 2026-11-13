@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -236,7 +236,7 @@ export default function CreateReportPage() {
           <span className="text-sm text-ink">Đăng ẩn danh, không hiện tên của tôi</span>
         </label>
 
-        <div className="sticky bottom-[4.5rem] z-20 -mx-4 -mb-4 flex gap-3 border-t border-line bg-surface/95 px-4 py-3 sm:static sm:m-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
+        <div className="sticky bottom-[4.5rem] z-20 -mx-4 -mb-4 flex gap-3 border-t border-line bg-surface px-4 py-3 sm:static sm:m-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
           <Link href="/canh-bao" className="btn-ghost flex-1 sm:flex-none sm:px-8">Hủy</Link>
           <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-50">
             {loading ? <><i className="ri-loader-4-line animate-spin" aria-hidden="true" /> Đang đăng...</> : 'Đăng cảnh báo'}

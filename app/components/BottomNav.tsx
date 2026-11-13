@@ -66,7 +66,7 @@ export default function BottomNav() {
     <>
       <nav
         aria-label="Điều hướng chính"
-        className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex items-end border-t border-line bg-surface/95 shadow-nav backdrop-blur md:hidden"
+        className="safe-bottom fixed inset-x-0 bottom-0 z-40 flex items-end border-t border-line bg-surface md:hidden"
       >
         {tab(TABS[0])}
         {tab(TABS[1])}
