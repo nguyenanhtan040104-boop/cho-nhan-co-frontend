@@ -35,11 +35,10 @@ export default function ListingCard({ item, type, distanceLabel }: { item: any; 
             <i className={`${PLACEHOLDER_ICON[type]} text-4xl`} />
           </div>
         )}
-        {item.isVip && (
-          <span className="absolute left-2 top-2 rounded bg-gold-500 px-1.5 py-0.5 text-[11px] font-bold text-ink">
-            Nổi bật
-          </span>
-        )}
+        <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+          {item.isUrgent && <span className="rounded bg-brand-500 px-1.5 py-0.5 text-[11px] font-bold text-white">Gấp</span>}
+          {item.isVip && <span className="rounded bg-gold-500 px-1.5 py-0.5 text-[11px] font-bold text-ink">Nổi bật</span>}
+        </div>
         <LikeButton itemId={String(item.id)} targetType={type === 'real-estate' ? 'REAL_ESTATE' : type === 'job' ? 'JOB' : 'PRODUCT'} className="!right-2 !top-2" />
       </div>
       <div className="p-3">
