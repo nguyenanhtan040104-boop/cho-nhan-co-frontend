@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { advertisements, uploads } from '../../../lib/api';
-import { auth as _auth } from '../../../lib/api';
+import { advertisements, uploads, auth as _auth } from '../../../lib/api';
+import { Field, FormCard, FormError, FormShell, ImageField, Row, SavedOverlay, SubmitBar, useImages } from '../../components/form/Kit';
 
 const CATEGORIES = [
   { value: 'KHAI_TRUONG', label: 'Khai trương' },
@@ -19,208 +18,102 @@ export default function CreateAdvertisementPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+    if (!_auth.isLoggedIn()) router.replace('/profile');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const [form, setForm] = useState({
-    title: '', category: 'KHAI_TRUONG', description: '',
-    businessName: '', location: '', contactName: '', contactPhone: '',
-    startDate: '', endDate: '',
+    title: '', category: 'KHAI_TRUONG', description: '', businessName: '', location: '',
+    contactName: '', contactPhone: '', startDate: '', endDate: '',
   });
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const images = useImages(5);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  }
-
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    if (files.length + imageFiles.length > 5) { setError('Tối đa 5 ảnh'); return; }
-    setImageFiles(prev => [...prev, ...files]);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = ev => setImagePreviews(prev => [...prev, ev.target?.result as string]);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function removeImage(i: number) {
-    setImageFiles(prev => prev.filter((_, idx) => idx !== i));
-    setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    if (imageFiles.length === 0) {
+    if (images.files.length === 0) {
       setError('Vui lòng thêm ít nhất 1 ảnh quảng cáo');
+      return;
+    }
+    if (form.startDate && form.endDate && form.endDate < form.startDate) {
+      setError('Ngày kết thúc phải sau ngày bắt đầu');
       return;
     }
     setLoading(true);
     try {
-      let imageUrls: string[] = [];
-      if (imageFiles.length > 0) {
-        const uploaded = await uploads.uploadImages(imageFiles);
-        imageUrls = uploaded.map(u => u.url);
-      }
-
+      const uploaded = await uploads.uploadImages(images.files);
       await advertisements.create({
         title: form.title,
         category: form.category,
         description: form.description,
         businessName: form.businessName || undefined,
-        images: imageUrls,
+        images: uploaded.map(u => u.url),
         location: form.location || undefined,
         contactName: form.contactName || undefined,
         contactPhone: form.contactPhone || undefined,
         startDate: form.startDate || undefined,
         endDate: form.endDate || undefined,
       });
-
       setSuccess(true);
-      setTimeout(() => router.push('/advertisements'), 2000);
-    } catch (e: any) {
-      setError(e.message || 'Đăng thất bại. Vui lòng đăng nhập trước.');
+      setTimeout(() => router.push('/advertisements'), 1800);
+    } catch (err: any) {
+      setError(err.message || 'Đăng thất bại. Vui lòng đăng nhập và thử lại.');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center gap-4">
-          <Link href="/advertisements" className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line text-lg"></i>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Đăng quảng cáo</h1>
-            <p className="text-gray-500 text-sm">Khai trương, khuyến mãi, sự kiện...</p>
-          </div>
-        </div>
-      </div>
+    <FormShell title="Đăng quảng cáo" hint="Khai trương, khuyến mãi, sự kiện" backHref="/advertisements" wide>
+      <FormCard onSubmit={handleSubmit}>
+        <FormError message={error} />
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
+        <ImageField images={images} onError={setError} required />
 
-          {/* Ảnh */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Hình ảnh (tối đa 5 ảnh)</label>
-            <div className="flex flex-wrap gap-3">
-              {imagePreviews.map((src, i) => (
-                <div key={i} className="relative w-24 h-24">
-                  <img src={src} className="w-full h-full object-cover rounded-lg border" alt="" />
-                  <button type="button" onClick={() => removeImage(i)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
-                </div>
-              ))}
-              {imagePreviews.length < 5 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-brand-400">
-                  <i className="ri-image-add-line text-2xl text-gray-400"></i>
-                  <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
-                  <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-                </label>
-              )}
-            </div>
-          </div>
+        <Row>
+          <Field label="Tiêu đề" required>
+            <input type="text" name="title" required value={form.title} onChange={handleChange} placeholder="Ví dụ: Khai trương tạp hóa Minh Phát" className="field" />
+          </Field>
+          <Field label="Loại quảng cáo" required>
+            <select name="category" value={form.category} onChange={handleChange} className="field">
+              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </Field>
+        </Row>
 
-          {/* Tiêu đề & Danh mục */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
-              <input type="text" name="title" required value={form.title} onChange={handleChange}
-                placeholder="Ví dụ: Khai trương cửa hàng tạp hóa Minh Phát..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Loại quảng cáo *</label>
-              <select name="category" value={form.category} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400">
-                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-          </div>
+        <Field label="Tên cửa hàng, doanh nghiệp">
+          <input type="text" name="businessName" value={form.businessName} onChange={handleChange} placeholder="Ví dụ: Tạp hóa Minh Phát" className="field" />
+        </Field>
 
-          {/* Tên cửa hàng */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tên cửa hàng / doanh nghiệp</label>
-            <input type="text" name="businessName" value={form.businessName} onChange={handleChange}
-              placeholder="Ví dụ: Tạp hóa Minh Phát"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-          </div>
+        <Field label="Nội dung quảng cáo" required>
+          <textarea name="description" required rows={5} maxLength={2000} value={form.description} onChange={handleChange} placeholder="Chương trình, ưu đãi, sự kiện..." className="field resize-none" />
+          <span className="mt-1 block text-right text-xs text-ink-faint">{form.description.length}/2000</span>
+        </Field>
 
-          {/* Mô tả */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung quảng cáo *</label>
-            <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
-              placeholder="Mô tả chi tiết về chương trình, khuyến mãi, sự kiện..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400 resize-none"
-              maxLength={2000} />
-            <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
-          </div>
+        <Row>
+          <Field label="Ngày bắt đầu"><input type="date" name="startDate" value={form.startDate} onChange={handleChange} className="field" /></Field>
+          <Field label="Ngày kết thúc"><input type="date" name="endDate" value={form.endDate} min={form.startDate || undefined} onChange={handleChange} className="field" /></Field>
+        </Row>
 
-          {/* Thời gian */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ngày bắt đầu</label>
-              <input type="date" name="startDate" value={form.startDate} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ngày kết thúc</label>
-              <input type="date" name="endDate" value={form.endDate} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-            </div>
-          </div>
+        <Row>
+          <Field label="Địa điểm"><input type="text" name="location" value={form.location} onChange={handleChange} placeholder="Địa chỉ cửa hàng hoặc nơi tổ chức" className="field" /></Field>
+          <Field label="Người liên hệ"><input type="text" name="contactName" value={form.contactName} onChange={handleChange} placeholder="Họ tên" className="field" /></Field>
+        </Row>
 
-          {/* Địa điểm & Liên hệ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Địa điểm</label>
-              <input type="text" name="location" value={form.location} onChange={handleChange}
-                placeholder="Địa chỉ cửa hàng / sự kiện"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tên người liên hệ</label>
-              <input type="text" name="contactName" value={form.contactName} onChange={handleChange}
-                placeholder="Họ tên"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-            </div>
-          </div>
+        <Field label="Số điện thoại liên hệ">
+          <input type="tel" name="contactPhone" value={form.contactPhone} onChange={handleChange} placeholder="0912345678" className="field" />
+        </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại liên hệ</label>
-            <input type="tel" name="contactPhone" value={form.contactPhone} onChange={handleChange}
-              placeholder="0912345678"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-400" />
-          </div>
+        <SubmitBar backHref="/advertisements" loading={loading} label="Đăng quảng cáo" busy="Đang đăng..." />
+      </FormCard>
 
-          <div className="flex gap-4 pt-4 border-t">
-            <Link href="/advertisements" className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-center">Hủy</Link>
-            <button type="submit" disabled={loading}
-              className="flex-1 bg-brand-500 text-white px-6 py-3 rounded-lg hover:bg-brand-600 disabled:opacity-50">
-              {loading ? 'Đang đăng...' : 'Đăng quảng cáo'}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {success && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-line text-forest-600 text-2xl"></i>
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Đăng thành công!</h3>
-            <p className="text-gray-500 text-sm">Đang chuyển trang...</p>
-          </div>
-        </div>
-      )}
-    </div>
+      {success && <SavedOverlay title="Đăng thành công" />}
+    </FormShell>
   );
 }

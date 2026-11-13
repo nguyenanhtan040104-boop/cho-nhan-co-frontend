@@ -3,69 +3,54 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { jobs, uploads } from '../../../lib/api';
-import { auth as _auth } from '../../../lib/api';
+import { jobs, uploads, auth as _auth } from '../../../lib/api';
 import GPSLocationPicker from '../../components/GPSLocationPicker';
+import { Field, FormCard, FormError, FormShell, ImageField, Row, SavedOverlay, SubmitBar, useImages } from '../../components/form/Kit';
 
 const typeOptions = [
-  { value: 'EMPLOYER', label: 'Tuyển dụng' },
-  { value: 'JOB_SEEKER', label: 'Tìm việc' },
+  { value: 'EMPLOYER', label: 'Tuyển dụng', note: 'Bạn cần tuyển người', icon: 'ri-building-2-line' },
+  { value: 'JOB_SEEKER', label: 'Tìm việc', note: 'Bạn đang tìm việc', icon: 'ri-user-search-line' },
 ];
 
-const categoryOptions = [
-  'Nông nghiệp', 'Chăn nuôi', 'Xây dựng', 'Vận tải', 'Buôn bán', 'Giáo dục', 'Y tế', 'Khác',
-];
+const categoryOptions = ['Nông nghiệp', 'Chăn nuôi', 'Xây dựng', 'Vận tải', 'Buôn bán', 'Giáo dục', 'Y tế', 'Khác'];
 
 export default function CreateJobPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!_auth.isLoggedIn()) { router.replace("/profile"); }
+    if (!_auth.isLoggedIn()) router.replace('/profile');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const [form, setForm] = useState({
-    title: '', description: '', type: 'EMPLOYER', category: '',
-    salary: '', location: '', experience: '', benefits: '',
-    deadline: '', isUrgent: false,
+    title: '', description: '', type: 'EMPLOYER', category: '', salary: '', location: '',
+    experience: '', benefits: '', deadline: '', isUrgent: false,
   });
   const [gps, setGps] = useState<{ latitude: number | null; longitude: number | null }>({ latitude: null, longitude: null });
+  const images = useImages(6);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [limitHit, setLimitHit] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    if (files.length + imageFiles.length > 6) { alert('Tối đa 6 ảnh'); return; }
-    setImageFiles(prev => [...prev, ...files]);
-    setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-    e.target.value = '';
-  }
+  const isEmployer = form.type === 'EMPLOYER';
 
-  function removeImage(i: number) {
-    setImageFiles(prev => prev.filter((_, idx) => idx !== i));
-    setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, value, type } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value }));
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    if (imageFiles.length === 0) {
-      setError('Vui lòng thêm ít nhất 1 ảnh cho tin tuyển dụng');
+    setLimitHit(false);
+    if (images.files.length === 0) {
+      setError('Vui lòng thêm ít nhất 1 ảnh');
       return;
     }
     setLoading(true);
     try {
-      let imageUrls: string[] = [];
-      if (imageFiles.length > 0) {
-        const uploaded = await uploads.uploadImages(imageFiles);
-        imageUrls = uploaded.map(u => u.url);
-      }
+      const uploaded = await uploads.uploadImages(images.files);
       await jobs.create({
         title: form.title,
         description: form.description,
@@ -79,16 +64,18 @@ export default function CreateJobPage() {
         benefits: form.benefits || undefined,
         deadline: form.deadline ? new Date(form.deadline) : undefined,
         isUrgent: form.isUrgent,
-        images: imageUrls,
+        images: uploaded.map(u => u.url),
       });
       setSuccess(true);
-      setTimeout(() => router.push('/jobs'), 2000);
-    } catch (e: any) {
-      const status = e?.statusCode || e?.status;
-      if (status === 403 || (e?.message && e.message.toLowerCase().includes('gioi han'))) {
-        setError('Ban da dat gioi han dang bai thang nay. Nang cap VIP de dang them bai.');
+      setTimeout(() => router.push('/jobs'), 1800);
+    } catch (err: any) {
+      const status = err?.statusCode || err?.status;
+      const msg = String(err?.message || '');
+      if (status === 403 || /gioi han|giới hạn|limit/i.test(msg)) {
+        setLimitHit(true);
+        setError('Bạn đã đăng hết số tin của tháng này. Nâng cấp VIP để đăng thêm.');
       } else {
-        setError(e.message || 'Dang tin that bai. Vui long dang nhap truoc.');
+        setError(msg || 'Đăng tin thất bại. Vui lòng đăng nhập và thử lại.');
       }
     } finally {
       setLoading(false);
@@ -96,184 +83,93 @@ export default function CreateJobPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center gap-4">
-          <Link href="/jobs" className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line text-lg"></i>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Đăng tin tuyển dụng</h1>
-            <p className="text-gray-500 text-sm">Tìm kiếm nhân lực phù hợp</p>
-          </div>
-        </div>
+    <FormShell title="Đăng tin việc làm" hint="Tìm nhân lực hoặc tìm việc gần nhà" backHref="/jobs" wide>
+      <div className="mb-4 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Loại tin">
+        {typeOptions.map(o => (
+          <button key={o.value} type="button" role="radio" aria-checked={form.type === o.value} onClick={() => setForm(prev => ({ ...prev, type: o.value }))}
+            className={`flex flex-col items-center gap-1 rounded-card border-2 p-4 transition-colors ${form.type === o.value ? 'border-forest-600 bg-forest-50 text-forest-800' : 'border-line bg-surface text-ink-soft hover:border-forest-400'}`}>
+            <i className={`${o.icon} text-2xl`} aria-hidden="true" />
+            <span className="font-bold">{o.label}</span>
+            <span className="text-xs">{o.note}</span>
+          </button>
+        ))}
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Type selector — 2 big cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {typeOptions.map(o => (
-            <button key={o.value} type="button"
-              onClick={() => setForm(prev => ({ ...prev, type: o.value }))}
-              className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all ${form.type === o.value ? 'border-forest-500 bg-forest-50 text-forest-700' : 'border-gray-200 bg-white text-gray-500 hover:border-forest-300'}`}>
-              <i className={`text-3xl ${o.value === 'EMPLOYER' ? 'ri-building-2-line' : 'ri-user-search-line'}`}></i>
-              <span className="font-semibold text-base">{o.label}</span>
-              <span className="text-xs text-center">{o.value === 'EMPLOYER' ? 'Bạn cần tuyển người' : 'Bạn đang tìm việc'}</span>
-            </button>
-          ))}
+      <FormCard onSubmit={handleSubmit}>
+        <FormError message={error}>
+          {limitHit && <Link href="/pricing" className="mt-1 block font-semibold underline">Xem các gói VIP</Link>}
+        </FormError>
+
+        <Field label="Tiêu đề" required>
+          <input type="text" name="title" required value={form.title} onChange={handleChange}
+            placeholder={isEmployer ? 'Ví dụ: Cần 10 thợ hái cà phê mùa vụ' : 'Ví dụ: Tìm việc làm vườn tại Nhân Cơ'} className="field" />
+        </Field>
+
+        <Row>
+          <Field label="Ngành nghề" required>
+            <select name="category" required value={form.category} onChange={handleChange} className="field">
+              <option value="">Chọn ngành nghề</option>
+              {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+          </Field>
+          <Field label="Địa điểm" required>
+            <input type="text" name="location" required value={form.location} onChange={handleChange} placeholder="Xã, huyện, tỉnh" className="field" />
+          </Field>
+        </Row>
+
+        <div>
+          <p className="mb-1.5 text-sm font-semibold text-ink">Vị trí GPS <span className="font-normal text-ink-faint">tùy chọn</span></p>
+          <GPSLocationPicker
+            value={gps}
+            onChange={setGps}
+            label="Lấy vị trí GPS của nơi làm việc"
+            hint="Đứng tại nơi làm việc rồi bấm để người tìm việc thấy tin gần nhà."
+            onAddressDetected={addr => setForm(prev => ({ ...prev, location: prev.location || addr }))}
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-              {error}
-              {error.includes('gioi han') && (
-                <div className="mt-2">
-                  <Link href="/vip" className="text-red-800 font-semibold underline">Xem goi VIP &rarr;</Link>
-                </div>
-              )}
-            </div>
-          )}
+        <Row>
+          <Field label={isEmployer ? 'Mức lương' : 'Mức lương mong muốn'}>
+            <input type="text" name="salary" value={form.salary} onChange={handleChange}
+              placeholder={isEmployer ? 'Ví dụ: 300.000đ/ngày, thỏa thuận' : 'Ví dụ: 5-7 triệu/tháng'} className="field" />
+          </Field>
+          <Field label={isEmployer ? 'Kinh nghiệm yêu cầu' : 'Kinh nghiệm của bạn'}>
+            <input type="text" name="experience" value={form.experience} onChange={handleChange}
+              placeholder={isEmployer ? 'Ví dụ: Không yêu cầu, 1-2 năm' : 'Ví dụ: 2 năm làm nông'} className="field" />
+          </Field>
+        </Row>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
-            <input type="text" name="title" required value={form.title} onChange={handleChange}
-              placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: Tuyển công nhân hái cà phê mùa vụ...' : 'Ví dụ: Tìm việc làm nông nghiệp tại Đắk Lắk...'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-          </div>
+        {isEmployer && (
+          <Field label="Hạn nộp hồ sơ">
+            <input type="date" name="deadline" value={form.deadline} onChange={handleChange} className="field" />
+          </Field>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ngành nghề *</label>
-              <select name="category" required value={form.category} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500">
-                <option value="">Chọn ngành nghề</option>
-                {categoryOptions.map(o => <option key={o} value={o}>{o}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Địa điểm *</label>
-              <input type="text" name="location" required value={form.location} onChange={handleChange}
-                placeholder="Xã/Huyện/Tỉnh"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-            </div>
-          </div>
+        <Field label={isEmployer ? 'Mô tả công việc' : 'Giới thiệu bản thân'} required>
+          <textarea name="description" required rows={5} maxLength={2000} value={form.description} onChange={handleChange}
+            placeholder={isEmployer ? 'Công việc, yêu cầu, giờ làm...' : 'Kỹ năng và công việc bạn mong muốn...'} className="field resize-none" />
+          <span className="mt-1 block text-right text-xs text-ink-faint">{form.description.length}/2000</span>
+        </Field>
 
-          {/* GPS — tùy chọn */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Vị trí GPS <span className="text-gray-400 font-normal">(tùy chọn)</span>
-            </label>
-            <GPSLocationPicker
-              value={gps}
-              onChange={setGps}
-              label="Lấy vị trí GPS của nơi làm việc"
-              hint="Đứng tại địa điểm làm việc rồi bấm. Giúp người tìm việc thấy việc gần nhà."
-              onAddressDetected={(addr) => setForm(prev => ({ ...prev, location: prev.location || addr }))}
-            />
-          </div>
+        {isEmployer && (
+          <Field label="Quyền lợi">
+            <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange} placeholder="Ăn ở, xe đưa đón, bảo hiểm..." className="field resize-none" />
+          </Field>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {form.type === 'EMPLOYER' ? 'Mức lương' : 'Mức lương mong muốn'}
-              </label>
-              <input type="text" name="salary" value={form.salary} onChange={handleChange}
-                placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: 300.000đ/ngày, thỏa thuận...' : 'Ví dụ: 5-7 triệu/tháng, thỏa thuận...'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {form.type === 'EMPLOYER' ? 'Kinh nghiệm yêu cầu' : 'Kinh nghiệm bản thân'}
-              </label>
-              <input type="text" name="experience" value={form.experience} onChange={handleChange}
-                placeholder={form.type === 'EMPLOYER' ? 'Ví dụ: Không yêu cầu, 1-2 năm...' : 'Ví dụ: 2 năm làm nông, chưa có kinh nghiệm...'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-            </div>
-          </div>
+        <ImageField images={images} onError={setError} required label="Ảnh đính kèm" />
 
-          {/* Chỉ hiển thị cho Tuyển dụng */}
-          {form.type === 'EMPLOYER' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Hạn nộp hồ sơ</label>
-              <input type="date" name="deadline" value={form.deadline} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-            </div>
-          )}
+        {isEmployer && (
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <input type="checkbox" checked={form.isUrgent} onChange={e => setForm(prev => ({ ...prev, isUrgent: e.target.checked }))} className="h-4 w-4 rounded accent-brand-500" />
+            <span className="text-sm text-ink">Đánh dấu <b className="text-brand-600">Tuyển gấp</b></span>
+          </label>
+        )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {form.type === 'EMPLOYER' ? 'Mô tả công việc *' : 'Giới thiệu bản thân *'}
-            </label>
-            <textarea name="description" required rows={5} value={form.description} onChange={handleChange}
-              placeholder={form.type === 'EMPLOYER' ? 'Mô tả chi tiết về công việc, yêu cầu, giờ làm...' : 'Giới thiệu về bản thân, kỹ năng, mong muốn công việc...'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
-              maxLength={2000} />
-            <p className="text-xs text-gray-400 mt-1">{form.description.length}/2000</p>
-          </div>
+        <SubmitBar backHref="/jobs" loading={loading} label="Đăng tin" busy="Đang đăng..." />
+      </FormCard>
 
-          {/* Chỉ hiển thị cho Tuyển dụng */}
-          {form.type === 'EMPLOYER' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Quyền lợi</label>
-              <textarea name="benefits" rows={3} value={form.benefits} onChange={handleChange}
-                placeholder="Ăn ở, xe đưa đón, bảo hiểm..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none" />
-            </div>
-          )}
-
-          {/* Upload ảnh */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh đính kèm (tối đa 6 ảnh)</label>
-            <div className="flex flex-wrap gap-2">
-              {imagePreviews.map((src, i) => (
-                <div key={i} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
-                  <img src={src} alt="" className="w-full h-full object-cover" />
-                  <button type="button" onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
-                    <i className="ri-close-line text-xs"></i>
-                  </button>
-                </div>
-              ))}
-              {imagePreviews.length < 6 && (
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-forest-400 hover:bg-forest-50 transition-colors">
-                  <i className="ri-image-add-line text-2xl text-gray-400"></i>
-                  <span className="text-xs text-gray-400 mt-1">Thêm ảnh</span>
-                  <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-                </label>
-              )}
-            </div>
-          </div>
-
-          {form.type === 'EMPLOYER' && (
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" name="isUrgent" checked={form.isUrgent}
-                onChange={e => setForm(prev => ({ ...prev, isUrgent: e.target.checked }))} className="rounded" />
-              <span className="text-sm text-gray-700">Đánh dấu là <span className="text-red-600 font-medium">Tuyển gấp</span></span>
-            </label>
-          )}
-
-          <div className="flex gap-4 pt-4 border-t">
-            <Link href="/jobs" className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-center">Hủy</Link>
-            <button type="submit" disabled={loading}
-              className="flex-1 bg-forest-600 text-white px-6 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50">
-              {loading ? 'Đang đăng...' : 'Đăng tin'}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {success && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-check-line text-forest-600 text-2xl"></i>
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Đăng tin thành công!</h3>
-            <p className="text-gray-500 text-sm">Đang chuyển trang...</p>
-          </div>
-        </div>
-      )}
-    </div>
+      {success && <SavedOverlay title="Đăng tin thành công" />}
+    </FormShell>
   );
 }

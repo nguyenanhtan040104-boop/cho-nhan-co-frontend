@@ -2,28 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { forum } from '../../../../lib/api';
-
-const categoryOptions = [
-  { value: 'NONG_NGHIEP', label: 'Nông nghiệp tổng hợp' },
-  { value: 'TRONG_TROT', label: 'Trồng trọt' },
-  { value: 'CHAN_NUOI', label: 'Chăn nuôi' },
-  { value: 'THI_TRUONG', label: 'Thị trường nông sản' },
-  { value: 'KY_THUAT', label: 'Công nghệ nông nghiệp' },
-  { value: 'KINH_NGHIEM', label: 'Chia sẻ kinh nghiệm' },
-  { value: 'HOI_DAP', label: 'Hỏi đáp' },
-  { value: 'KINH_DOANH', label: 'Kinh doanh nông nghiệp' },
-  { value: 'KHAC', label: 'Khác' },
-];
+import { FORUM_LEGACY_CATEGORIES, FORUM_TOPICS } from '../../categories';
+import { Field, FormCard, FormError, FormShell, SubmitBar } from '../../../components/form/Kit';
 
 export default function EditPostPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const [form, setForm] = useState({
-    title: '', content: '', category: 'NONG_NGHIEP', tags: '', isAnonymous: false,
-  });
+  const [form, setForm] = useState({ title: '', content: '', category: 'NONG_NGHIEP', tags: '', isAnonymous: false });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -44,10 +31,8 @@ export default function EditPostPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, value, type } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value }));
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,15 +40,9 @@ export default function EditPostPage() {
     setSaving(true);
     try {
       const tags = form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
-      await forum.updatePost(id, {
-        title: form.title,
-        content: form.content,
-        category: form.category,
-        tags,
-        isAnonymous: form.isAnonymous,
-      });
-      setSuccess('Đã lưu thành công!');
-      setTimeout(() => router.push(`/forum/${id}`), 1500);
+      await forum.updatePost(id, { title: form.title, content: form.content, category: form.category, tags, isAnonymous: form.isAnonymous });
+      setSuccess('Đã lưu, đang chuyển về bài viết...');
+      setTimeout(() => router.push(`/forum/${id}`), 1200);
     } catch (e: any) {
       setError(e.message || 'Lưu thất bại');
     } finally {
@@ -71,83 +50,40 @@ export default function EditPostPage() {
     }
   }
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
+  if (loading) {
+    return <div className="grid min-h-[60vh] place-items-center"><div className="h-9 w-9 animate-spin rounded-full border-[3px] border-forest-600 border-t-transparent" /></div>;
+  }
+
+  // Keep a legacy category selectable only when the post already uses it
+  const options = [...FORUM_TOPICS, ...FORUM_LEGACY_CATEGORIES.filter(c => c.value === form.category)];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center gap-4">
-          <Link href={`/forum/${id}`}
-            className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line text-lg"></i>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Chỉnh sửa bài viết</h1>
-            <p className="text-gray-500 text-sm">Cập nhật nội dung bài đăng</p>
-          </div>
-        </div>
-      </div>
+    <FormShell title="Chỉnh sửa bài viết" hint="Cập nhật nội dung bài đăng" backHref={`/forum/${id}`} wide>
+      <FormCard onSubmit={handleSubmit}>
+        <FormError message={error} />
+        {success && <p role="status" className="flex items-center gap-2 rounded-lg border border-forest-200 bg-forest-50 p-3 text-sm text-forest-800"><i className="ri-check-line" aria-hidden="true" />{success}</p>}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4">{error}</div>}
-        {success && (
-          <div className="p-4 bg-forest-50 border border-forest-200 text-forest-700 rounded-lg text-sm mb-4 flex items-center gap-2">
-            <i className="ri-check-circle-line"></i>{success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tiêu đề *</label>
-            <input type="text" name="title" required value={form.title} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Chuyên mục</label>
-            <select name="category" value={form.category} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500">
-              {categoryOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nội dung *</label>
-            <textarea name="content" required rows={10} value={form.content} onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 resize-none"
-              maxLength={5000} />
-            <p className="text-xs text-gray-400 mt-1">{form.content.length}/5000</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tags (phân cách bằng dấu phẩy)</label>
-            <input type="text" name="tags" value={form.tags} onChange={handleChange}
-              placeholder="cà phê, thu hoạch, kinh nghiệm..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500" />
-          </div>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="isAnonymous" checked={form.isAnonymous}
-              onChange={e => setForm(prev => ({ ...prev, isAnonymous: e.target.checked }))} className="rounded" />
-            <span className="text-sm text-gray-700">Đăng ẩn danh</span>
-          </label>
-
-          <div className="flex gap-4 pt-4 border-t">
-            <Link href={`/forum/${id}`}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-center">
-              Hủy
-            </Link>
-            <button type="submit" disabled={saving}
-              className="flex-1 bg-forest-600 text-white px-6 py-3 rounded-lg hover:bg-forest-700 disabled:opacity-50 font-medium">
-              {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <Field label="Tiêu đề" required>
+          <input type="text" name="title" required value={form.title} onChange={handleChange} className="field" />
+        </Field>
+        <Field label="Chủ đề">
+          <select name="category" value={form.category} onChange={handleChange} className="field">
+            {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </Field>
+        <Field label="Nội dung" required>
+          <textarea name="content" required rows={10} maxLength={5000} value={form.content} onChange={handleChange} className="field resize-none" />
+          <span className="mt-1 block text-right text-xs text-ink-faint">{form.content.length}/5000</span>
+        </Field>
+        <Field label="Từ khóa" hint="cách nhau bằng dấu phẩy">
+          <input type="text" name="tags" value={form.tags} onChange={handleChange} placeholder="cà phê, thu hoạch, kinh nghiệm" className="field" />
+        </Field>
+        <label className="flex cursor-pointer items-center gap-2.5">
+          <input type="checkbox" checked={form.isAnonymous} onChange={e => setForm(prev => ({ ...prev, isAnonymous: e.target.checked }))} className="h-4 w-4 rounded accent-forest-600" />
+          <span className="text-sm text-ink">Đăng ẩn danh</span>
+        </label>
+        <SubmitBar backHref={`/forum/${id}`} loading={saving} label="Lưu thay đổi" />
+      </FormCard>
+    </FormShell>
   );
 }

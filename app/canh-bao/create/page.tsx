@@ -4,24 +4,21 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { forum, auth, uploads } from '../../../lib/api';
+import { Field, FormCard, FormError, FormShell, ImageField, Row, useImages } from '../../components/form/Kit';
 
 const REPORT_TYPES = [
   {
     group: 'Lừa đảo',
-    icon: 'ri-money-dollar-circle-line',
-    color: '#dc2626',
     items: [
       { value: 'lua_dao_mua_ban', label: 'Lừa đảo mua bán hàng hóa' },
-      { value: 'lua_dao_dat_coc', label: 'Lừa đảo đặt cọc (BĐS, xe cộ...)' },
+      { value: 'lua_dao_dat_coc', label: 'Lừa đảo đặt cọc (nhà đất, xe cộ...)' },
       { value: 'lua_dao_cho_vay', label: 'Lừa đảo cho vay, tín dụng đen' },
       { value: 'gia_mao_danh_tinh', label: 'Giả mạo danh tính, tài khoản' },
-      { value: 'hang_gia', label: 'Hàng giả / hàng kém chất lượng' },
+      { value: 'hang_gia', label: 'Hàng giả, hàng kém chất lượng' },
     ],
   },
   {
-    group: 'Tội phạm & Mất an ninh',
-    icon: 'ri-shield-cross-line',
-    color: '#7c3aed',
+    group: 'Tội phạm và an ninh',
     items: [
       { value: 'trom_cap', label: 'Trộm cắp tài sản' },
       { value: 'cuop_giat', label: 'Cướp giật, trấn lột' },
@@ -30,34 +27,23 @@ const REPORT_TYPES = [
     ],
   },
   {
-    group: 'Mất đồ & Tìm kiếm',
-    icon: 'ri-search-eye-line',
-    color: '#0369a1',
+    group: 'Mất đồ và tìm kiếm',
     items: [
-      { value: 'mat_do', label: 'Mất đồ (CMND, ví, điện thoại...)' },
-      { value: 'mat_xe', label: 'Mất xe / phương tiện' },
+      { value: 'mat_do', label: 'Mất đồ (giấy tờ, ví, điện thoại...)' },
+      { value: 'mat_xe', label: 'Mất xe, phương tiện' },
       { value: 'mat_vat_nuoi', label: 'Mất vật nuôi, gia súc' },
-      { value: 'nhat_duoc_do', label: 'Nhặt được đồ — cần tìm chủ' },
+      { value: 'nhat_duoc_do', label: 'Nhặt được đồ, cần tìm chủ' },
     ],
   },
-  {
-    group: 'Khác',
-    icon: 'ri-megaphone-line',
-    color: '#6b7280',
-    items: [
-      { value: 'khac', label: 'Thông tin cảnh báo khác' },
-    ],
-  },
+  { group: 'Khác', items: [{ value: 'khac', label: 'Thông tin cảnh báo khác' }] },
 ];
 
-const ALL_TYPES = REPORT_TYPES.flatMap(g => g.items);
-
-function getTypeInfo(value: string) {
+function getTypeLabel(value: string) {
   for (const g of REPORT_TYPES) {
     const found = g.items.find(i => i.value === value);
-    if (found) return { ...found, group: g.group };
+    if (found) return found.label;
   }
-  return null;
+  return '';
 }
 
 function getTitlePrefix(value: string) {
@@ -73,181 +59,95 @@ function getTitlePrefix(value: string) {
   return '[CẢNH BÁO]';
 }
 
-// Các trường phụ theo loại
-function showPhoneField(type: string) {
-  return ['lua_dao_mua_ban', 'lua_dao_dat_coc', 'lua_dao_cho_vay', 'gia_mao_danh_tinh', 'trom_cap', 'cuop_giat'].includes(type);
-}
-function showBankField(type: string) {
-  return ['lua_dao_mua_ban', 'lua_dao_dat_coc', 'lua_dao_cho_vay'].includes(type);
-}
-function showAmountField(type: string) {
-  return ['lua_dao_mua_ban', 'lua_dao_dat_coc', 'lua_dao_cho_vay', 'trom_cap', 'cuop_giat', 'mat_xe'].includes(type);
-}
-function showLocationField(type: string) {
-  return ['trom_cap', 'cuop_giat', 'pha_hoai', 'mat_an_ninh', 'mat_do', 'mat_xe', 'mat_vat_nuoi', 'nhat_duoc_do'].includes(type);
-}
-function showItemField(type: string) {
-  return ['mat_do', 'mat_xe', 'mat_vat_nuoi', 'nhat_duoc_do', 'trom_cap'].includes(type);
-}
+const showPhone = (t: string) => ['lua_dao_mua_ban', 'lua_dao_dat_coc', 'lua_dao_cho_vay', 'gia_mao_danh_tinh', 'trom_cap', 'cuop_giat'].includes(t);
+const showBank = (t: string) => ['lua_dao_mua_ban', 'lua_dao_dat_coc', 'lua_dao_cho_vay'].includes(t);
+const showAmount = (t: string) => ['lua_dao_mua_ban', 'lua_dao_dat_coc', 'lua_dao_cho_vay', 'trom_cap', 'cuop_giat', 'mat_xe'].includes(t);
+const showLocation = (t: string) => ['trom_cap', 'cuop_giat', 'pha_hoai', 'mat_an_ninh', 'mat_do', 'mat_xe', 'mat_vat_nuoi', 'nhat_duoc_do'].includes(t);
+const showItem = (t: string) => ['mat_do', 'mat_xe', 'mat_vat_nuoi', 'nhat_duoc_do', 'trom_cap'].includes(t);
+
+const EMPTY = { subject: '', phone: '', bankAccount: '', amount: '', location: '', itemDescription: '', description: '', isAnonymous: false };
 
 export default function CreateReportPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!auth.isLoggedIn()) { router.replace('/profile'); }
+    if (!auth.isLoggedIn()) router.replace('/profile');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [selectedType, setSelectedType] = useState('lua_dao_mua_ban');
-  const [form, setForm] = useState({
-    subject: '',
-    phone: '',
-    bankAccount: '',
-    amount: '',
-    location: '',
-    itemDescription: '',
-    description: '',
-    isAnonymous: false,
-  });
+  const [form, setForm] = useState(EMPTY);
+  const images = useImages(6);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [limitHit, setLimitHit] = useState(false);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    if (files.length + imageFiles.length > 6) { alert('Tối đa 6 ảnh'); return; }
-    setImageFiles(prev => [...prev, ...files]);
-    setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-    e.target.value = '';
-  }
-
-  function removeImage(i: number) {
-    setImageFiles(prev => prev.filter((_, idx) => idx !== i));
-    setImagePreviews(prev => prev.filter((_, idx) => idx !== i));
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, type, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value }));
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setLimitHit(false);
     if (!form.subject.trim() || !form.description.trim()) {
       setError('Vui lòng điền tiêu đề và mô tả chi tiết');
       return;
     }
-    if (imageFiles.length === 0) {
+    if (images.files.length === 0) {
       setError('Vui lòng thêm ít nhất 1 ảnh bằng chứng');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const typeInfo = getTypeInfo(selectedType);
-      const prefix = getTitlePrefix(selectedType);
-
       const detailLines = [
         form.phone && `Số điện thoại liên quan: ${form.phone}`,
         form.bankAccount && `Số tài khoản ngân hàng: ${form.bankAccount}`,
-        form.amount && `Giá trị tài sản / thiệt hại: ${form.amount}`,
+        form.amount && `Giá trị tài sản, thiệt hại: ${form.amount}`,
         form.location && `Địa điểm: ${form.location}`,
-        form.itemDescription && `Mô tả đồ vật / tài sản: ${form.itemDescription}`,
+        form.itemDescription && `Mô tả đồ vật, tài sản: ${form.itemDescription}`,
       ].filter(Boolean);
 
-      const content = [
-        `<p><strong>Loại:</strong> ${typeInfo?.label}</p>`,
-        detailLines.length ? `<p>${detailLines.join('<br/>')}</p>` : '',
-        `<p>${form.description}</p>`,
-      ].join('');
+      // Plain text: the post page shows content as text, so no HTML tags here
+      const content = [`Loại: ${getTypeLabel(selectedType)}`, detailLines.join('\n'), form.description].filter(Boolean).join('\n\n');
 
-      const title = `${prefix} ${form.subject}`;
-
-      let imageUrls: string[] = [];
-      if (imageFiles.length > 0) {
-        const uploaded = await uploads.uploadImages(imageFiles);
-        imageUrls = uploaded.map(u => u.url);
-      }
+      const uploaded = await uploads.uploadImages(images.files);
       await forum.create({
-        title,
+        title: `${getTitlePrefix(selectedType)} ${form.subject}`,
         content,
         category: 'CANH_BAO',
-        images: imageUrls,
+        images: uploaded.map(u => u.url),
         isAnonymous: form.isAnonymous,
       });
       setSubmitted(true);
-    } catch (e: any) {
-      const status = e?.statusCode || e?.status;
-      if (status === 403 || (e?.message && e.message.toLowerCase().includes('gioi han'))) {
-        setError('Ban da dat gioi han dang bai thang nay. Nang cap VIP de dang them bai.');
+    } catch (err: any) {
+      const status = err?.statusCode || err?.status;
+      const msg = String(err?.message || '');
+      if (status === 403 || /gioi han|giới hạn|limit/i.test(msg)) {
+        setLimitHit(true);
+        setError('Bạn đã đăng hết số bài của tháng này. Nâng cấp VIP để đăng thêm.');
       } else {
-        setError(e.message || 'Dang that bai, thu lai sau');
+        setError(msg || 'Đăng thất bại, thử lại sau');
       }
     } finally {
       setLoading(false);
     }
   }
 
-  const typeInfo = getTypeInfo(selectedType);
-
-  // Màn hình chờ duyệt — sau khi submit thành công
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f8f5f0' }}>
-        <div className="bg-white rounded-3xl shadow-lg p-8 max-w-md w-full text-center">
-          {/* Icon */}
-          <div className="w-20 h-20 bg-gold-100 rounded-full flex items-center justify-center mx-auto mb-5">
-            <i className="ri-time-line text-4xl text-gold-500"></i>
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Đã gửi thành công!</h2>
-          <p className="text-gray-500 text-sm mb-5 leading-relaxed">
-            Bài cảnh báo của bạn đang <span className="font-semibold text-gold-600">chờ admin kiểm duyệt</span>.<br/>
-            Sau khi được duyệt, bài sẽ xuất hiện công khai cho cộng đồng.
+      <div className="grid min-h-[70vh] place-items-center bg-paper px-4">
+        <div className="card w-full max-w-md p-7 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-gold-100 text-gold-700"><i className="ri-time-line text-3xl" /></div>
+          <h1 className="mt-3 text-xl font-bold text-ink">Đã gửi cảnh báo</h1>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            Bài đang chờ kiểm duyệt. Sau khi được duyệt, bài sẽ hiển thị công khai cho cộng đồng. Bạn sẽ nhận thông báo khi có kết quả.
           </p>
-
-          {/* Stepper */}
-          <div className="flex items-center justify-center gap-2 mb-7">
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center">
-                <i className="ri-check-line text-white text-sm"></i>
-              </div>
-              <span className="text-[10px] text-forest-600 font-medium">Đã gửi</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gold-200 max-w-[48px]"></div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gold-400 flex items-center justify-center animate-pulse">
-                <i className="ri-time-line text-white text-sm"></i>
-              </div>
-              <span className="text-[10px] text-gold-600 font-medium">Chờ duyệt</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-gray-200 max-w-[48px]"></div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                <i className="ri-global-line text-gray-400 text-sm"></i>
-              </div>
-              <span className="text-[10px] text-gray-400 font-medium">Công khai</span>
-            </div>
-          </div>
-
-          <div className="bg-gold-50 border border-gold-100 rounded-2xl p-4 mb-6 text-left">
-            <div className="flex gap-2">
-              <i className="ri-information-line text-gold-500 flex-shrink-0 mt-0.5"></i>
-              <p className="text-xs text-gold-700 leading-relaxed">
-                Thông thường bài được duyệt trong vòng <strong>vài giờ</strong>. Bạn sẽ nhận thông báo khi bài được duyệt hoặc nếu có vấn đề.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Link href="/canh-bao"
-              className="block bg-red-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-red-700 transition-colors">
-              Về trang Cảnh báo
-            </Link>
-            <button onClick={() => { setSubmitted(false); setForm({ subject: '', phone: '', bankAccount: '', amount: '', location: '', itemDescription: '', description: '', isAnonymous: false }); setImageFiles([]); setImagePreviews([]); }}
-              className="block text-gray-500 text-sm py-2 hover:text-gray-700 transition-colors">
-              Đăng thêm cảnh báo khác
-            </button>
+          <div className="mt-6 flex flex-col gap-2">
+            <Link href="/canh-bao" className="btn-primary">Về trang cảnh báo</Link>
+            <button onClick={() => { setSubmitted(false); setForm(EMPTY); images.clear(); }} className="btn-ghost">Đăng thêm cảnh báo khác</button>
           </div>
         </div>
       </div>
@@ -255,196 +155,94 @@ export default function CreateReportPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8f5f0' }}>
-      {/* Banner */}
-      <div style={{ background: '#991b1b' }} className="py-6">
-        <div className="max-w-2xl mx-auto px-4">
-          <Link href="/canh-bao" className="text-red-300 text-sm hover:text-white transition-colors flex items-center gap-1 mb-2">
-            <i className="ri-arrow-left-line"></i> Quay lại cảnh báo cộng đồng
-          </Link>
-          <h1 className="text-xl font-bold text-white">Đăng thông tin cảnh báo</h1>
-          <p className="text-red-200 text-sm mt-1">Chia sẻ để cộng đồng cùng biết và phòng tránh</p>
-        </div>
-      </div>
+    <FormShell title="Đăng cảnh báo" hint="Chia sẻ để cộng đồng cùng phòng tránh" backHref="/canh-bao">
+      <p className="mb-3 flex gap-2 rounded-card border border-gold-200 bg-gold-50 p-3 text-[13px] leading-snug text-gold-800">
+        <i className="ri-information-line mt-0.5 shrink-0" aria-hidden="true" />
+        <span>Chỉ đăng thông tin có thật, không vu khống hay bịa đặt. Nếu bị thiệt hại tài sản, hãy trình báo công an để được hỗ trợ pháp lý.</span>
+      </p>
 
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Lưu ý */}
-        <div className="bg-gold-50 border border-gold-200 rounded-2xl p-4 mb-5">
-          <div className="flex gap-2">
-            <i className="ri-information-line text-gold-600 text-base flex-shrink-0 mt-0.5"></i>
-            <p className="text-xs text-gold-800">Thông tin đăng lên mang tính cộng đồng cảnh báo. Không vu khống, bịa đặt. Nếu bị thiệt hại tài sản hãy trình báo công an để được hỗ trợ pháp lý.</p>
-          </div>
-        </div>
+      <FormCard onSubmit={handleSubmit}>
+        <FormError message={error}>
+          {limitHit && <Link href="/pricing" className="mt-1 block font-semibold underline">Xem các gói VIP</Link>}
+        </FormError>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          {/* Chọn loại */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
-            <h2 className="font-semibold text-gray-800 mb-4">Loại thông tin cảnh báo <span className="text-red-500">*</span></h2>
-            <div className="space-y-4">
-              {REPORT_TYPES.map(group => (
-                <div key={group.group}>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5"
-                    style={{ color: group.color }}>
-                    <i className={group.icon}></i>
-                    {group.group}
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {group.items.map(item => (
-                      <button key={item.value} type="button"
-                        onClick={() => setSelectedType(item.value)}
-                        className={`text-left px-3 py-2.5 rounded-xl border text-sm transition-all ${
-                          selectedType === item.value
-                            ? 'border-red-400 bg-red-50 text-red-800 font-medium'
-                            : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                        }`}>
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Tiêu đề */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 space-y-4">
-            <h2 className="font-semibold text-gray-800">Thông tin chính <span className="text-red-500">*</span></h2>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Tiêu đề ngắn <span className="text-red-500">*</span>
-                <span className="text-gray-400 font-normal ml-1">— sẽ tự thêm nhãn {getTitlePrefix(selectedType)}</span>
-              </label>
-              <input type="text" name="subject" value={form.subject} onChange={handleChange}
-                placeholder={
-                  selectedType === 'trom_cap' ? 'VD: Mất xe máy Wave tối qua tại thôn 5...' :
-                  selectedType === 'mat_do' ? 'VD: Mất CMND và ví tại chợ Nhân Cơ...' :
-                  selectedType === 'nhat_duoc_do' ? 'VD: Nhặt được chiếc ví gần cổng trường...' :
-                  'VD: Tài khoản Facebook giả mạo bán đất huyện Đắk R\'Lấp...'
-                }
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
-            </div>
-
-            {/* Các trường phụ tùy loại */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {showPhoneField(selectedType) && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Số điện thoại liên quan</label>
-                  <input type="text" name="phone" value={form.phone} onChange={handleChange}
-                    placeholder="0xxx xxx xxx"
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
-                </div>
-              )}
-              {showBankField(selectedType) && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Số tài khoản ngân hàng</label>
-                  <input type="text" name="bankAccount" value={form.bankAccount} onChange={handleChange}
-                    placeholder="Tên ngân hàng + số TK"
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
-                </div>
-              )}
-              {showAmountField(selectedType) && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    {selectedType === 'trom_cap' || selectedType === 'mat_xe' ? 'Giá trị tài sản mất' : 'Số tiền thiệt hại'}
-                  </label>
-                  <input type="text" name="amount" value={form.amount} onChange={handleChange}
-                    placeholder="VD: 5.000.000đ"
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
-                </div>
-              )}
-              {showLocationField(selectedType) && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Địa điểm xảy ra</label>
-                  <input type="text" name="location" value={form.location} onChange={handleChange}
-                    placeholder="VD: Thôn 3, xã Nhân Cơ..."
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
-                </div>
-              )}
-            </div>
-
-            {showItemField(selectedType) && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  {selectedType === 'nhat_duoc_do' ? 'Mô tả đồ vật nhặt được' : 'Mô tả đồ vật / tài sản mất'}
-                </label>
-                <input type="text" name="itemDescription" value={form.itemDescription} onChange={handleChange}
-                  placeholder={
-                    selectedType === 'mat_xe' ? 'VD: Wave Alpha đỏ, BKS 49G1-xxxxx...' :
-                    selectedType === 'mat_vat_nuoi' ? 'VD: 3 con heo nái, tai có đánh số...' :
-                    'VD: Ví da đen, CMND tên Nguyễn...'
-                  }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300" />
-              </div>
-            )}
-          </div>
-
-          {/* Mô tả chi tiết */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 space-y-4">
-            <h2 className="font-semibold text-gray-800">Mô tả chi tiết <span className="text-red-500">*</span></h2>
-            <textarea name="description" value={form.description} onChange={handleChange} rows={6}
-              placeholder={
-                selectedType === 'trom_cap' ? 'Mô tả thời gian, cách thức, đặc điểm nghi phạm (nếu có)...' :
-                selectedType.startsWith('mat_') ? 'Mô tả chi tiết hoàn cảnh mất đồ, thông tin liên hệ để nhận lại...' :
-                selectedType === 'nhat_duoc_do' ? 'Mô tả đồ vật, nơi nhặt được, cách liên hệ để nhận lại...' :
-                'Mô tả chi tiết sự việc, cách thức, bằng chứng bạn có...'
-              }
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none" />
-
-            {/* Upload ảnh bằng chứng */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ảnh bằng chứng (tối đa 6 ảnh)</label>
-              <div className="flex flex-wrap gap-2">
-                {imagePreviews.map((src, i) => (
-                  <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
-                    <img src={src} alt="" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => removeImage(i)}
-                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">
-                      <i className="ri-close-line text-xs"></i>
+        <fieldset>
+          <legend className="mb-2 text-sm font-semibold text-ink">Loại cảnh báo <span className="text-brand-600">*</span></legend>
+          <div className="space-y-3">
+            {REPORT_TYPES.map(g => (
+              <div key={g.group}>
+                <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-wide text-ink-faint">{g.group}</p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup" aria-label={g.group}>
+                  {g.items.map(item => (
+                    <button key={item.value} type="button" role="radio" aria-checked={selectedType === item.value} onClick={() => setSelectedType(item.value)}
+                      className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${selectedType === item.value ? 'border-forest-600 bg-forest-50 font-semibold text-forest-800' : 'border-line text-ink-soft hover:border-forest-400'}`}>
+                      {item.label}
                     </button>
-                  </div>
-                ))}
-                {imagePreviews.length < 6 && (
-                  <label className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-red-400 hover:bg-red-50 transition-colors">
-                    <i className="ri-camera-line text-xl text-gray-400"></i>
-                    <span className="text-xs text-gray-400 mt-0.5">Thêm ảnh</span>
-                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-                  </label>
-                )}
-              </div>
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" name="isAnonymous" checked={form.isAnonymous}
-                onChange={handleChange} className="w-4 h-4 accent-red-600" />
-              <span className="text-sm text-gray-600">Đăng ẩn danh (không hiển thị tên của bạn)</span>
-            </label>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
-              {error}
-              {error.includes('gioi han') && (
-                <div className="mt-2">
-                  <Link href="/vip" className="text-red-800 font-semibold underline">Xem goi VIP &rarr;</Link>
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Link href="/canh-bao"
-              className="flex-1 text-center px-5 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">
-              Hủy
-            </Link>
-            <button type="submit" disabled={loading}
-              className="flex-1 bg-red-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors">
-              {loading ? 'Đang đăng...' : 'Đăng cảnh báo'}
-            </button>
+              </div>
+            ))}
           </div>
-        </form>
-      </div>
-    </div>
+        </fieldset>
+
+        <Field label="Tiêu đề ngắn" required hint={`tự thêm nhãn ${getTitlePrefix(selectedType)}`}>
+          <input type="text" name="subject" value={form.subject} onChange={handleChange} className="field"
+            placeholder={
+              selectedType === 'trom_cap' ? 'Ví dụ: Mất xe máy tối qua tại thôn 5' :
+              selectedType === 'mat_do' ? 'Ví dụ: Mất ví và giấy tờ tại chợ Nhân Cơ' :
+              selectedType === 'nhat_duoc_do' ? 'Ví dụ: Nhặt được ví gần cổng trường' :
+              'Ví dụ: Tài khoản Facebook giả mạo bán đất'
+            } />
+        </Field>
+
+        <Row>
+          {showPhone(selectedType) && (
+            <Field label="Số điện thoại liên quan"><input type="text" name="phone" value={form.phone} onChange={handleChange} placeholder="0xxx xxx xxx" className="field" /></Field>
+          )}
+          {showBank(selectedType) && (
+            <Field label="Số tài khoản ngân hàng"><input type="text" name="bankAccount" value={form.bankAccount} onChange={handleChange} placeholder="Tên ngân hàng và số tài khoản" className="field" /></Field>
+          )}
+          {showAmount(selectedType) && (
+            <Field label={selectedType === 'trom_cap' || selectedType === 'mat_xe' ? 'Giá trị tài sản mất' : 'Số tiền thiệt hại'}>
+              <input type="text" name="amount" value={form.amount} onChange={handleChange} placeholder="Ví dụ: 5.000.000đ" className="field" />
+            </Field>
+          )}
+          {showLocation(selectedType) && (
+            <Field label="Địa điểm xảy ra"><input type="text" name="location" value={form.location} onChange={handleChange} placeholder="Ví dụ: Thôn 3, xã Nhân Cơ" className="field" /></Field>
+          )}
+        </Row>
+
+        {showItem(selectedType) && (
+          <Field label={selectedType === 'nhat_duoc_do' ? 'Mô tả đồ vật nhặt được' : 'Mô tả đồ vật, tài sản mất'}>
+            <input type="text" name="itemDescription" value={form.itemDescription} onChange={handleChange} className="field"
+              placeholder={selectedType === 'mat_xe' ? 'Ví dụ: Wave Alpha đỏ, biển số 49G1-xxxxx' : selectedType === 'mat_vat_nuoi' ? 'Ví dụ: 3 con heo nái, tai có đánh số' : 'Ví dụ: Ví da đen, CCCD tên Nguyễn...'} />
+          </Field>
+        )}
+
+        <Field label="Mô tả chi tiết" required>
+          <textarea name="description" value={form.description} onChange={handleChange} rows={6} className="field resize-none"
+            placeholder={
+              selectedType === 'trom_cap' ? 'Thời gian, cách thức, đặc điểm đối tượng nếu có...' :
+              selectedType.startsWith('mat_') ? 'Hoàn cảnh mất đồ và cách liên hệ để nhận lại...' :
+              selectedType === 'nhat_duoc_do' ? 'Đồ vật, nơi nhặt được và cách liên hệ để nhận lại...' :
+              'Sự việc, cách thức và bằng chứng bạn có...'
+            } />
+        </Field>
+
+        <ImageField images={images} onError={setError} required label="Ảnh bằng chứng" />
+
+        <label className="flex cursor-pointer items-center gap-2.5">
+          <input type="checkbox" checked={form.isAnonymous} onChange={e => setForm(prev => ({ ...prev, isAnonymous: e.target.checked }))} className="h-4 w-4 rounded accent-forest-600" />
+          <span className="text-sm text-ink">Đăng ẩn danh, không hiện tên của tôi</span>
+        </label>
+
+        <div className="sticky bottom-[4.5rem] z-20 -mx-4 -mb-4 flex gap-3 border-t border-line bg-surface/95 px-4 py-3 sm:static sm:m-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
+          <Link href="/canh-bao" className="btn-ghost flex-1 sm:flex-none sm:px-8">Hủy</Link>
+          <button type="submit" disabled={loading} className="btn-primary flex-[2] disabled:opacity-50">
+            {loading ? <><i className="ri-loader-4-line animate-spin" aria-hidden="true" /> Đang đăng...</> : 'Đăng cảnh báo'}
+          </button>
+        </div>
+      </FormCard>
+    </FormShell>
   );
 }
