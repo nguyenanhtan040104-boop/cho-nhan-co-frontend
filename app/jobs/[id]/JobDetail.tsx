@@ -2,308 +2,135 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { jobs, messages as messagesApi, auth } from '../../../lib/api';
+import { jobs } from '../../../lib/api';
 import CommentSection from '../../../components/CommentSection';
+import ContactBar from '../../components/ContactBar';
+import Gallery from '../../components/detail/Gallery';
+import { Breadcrumb, ContactButtons, DetailSkeleton, Facts, NotFound, SafetyNote, SellerCard } from '../../components/detail/Blocks';
+import { useCurrentUserId, useStartChat, useToast } from '../../components/detail/hooks';
+import { timeAgo } from '../../../lib/format';
 
-const typeLabel: any = {
-  EMPLOYER: 'Tuyển dụng', JOB_SEEKER: 'Tìm việc',
-};
-
-export default function JobDetail({ jobId }: { jobId: string }) {
-  const [job, setJob] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [selectedImg, setSelectedImg] = useState(0);
-  const [lightbox, setLightbox] = useState(false);
-  const [zoom, setZoom] = useState(1);
+export default function JobDetail({ jobId, initialJob }: { jobId: string; initialJob?: any }) {
+  const [job, setJob] = useState<any>(initialJob || null);
+  const [loading, setLoading] = useState(!initialJob);
+  const [liked, setLiked] = useState(false);
+  const currentUserId = useCurrentUserId();
+  const { notify, toast } = useToast();
+  const chat = useStartChat(job?.user?.id, notify);
 
   useEffect(() => {
-    jobs.getOne(jobId)
-      .then(data => setJob(data))
-      .catch(() => setError('Khong tim thay tin tuyen dung'))
-      .finally(() => setLoading(false));
-  }, [jobId]);
+    if (!initialJob) {
+      jobs.getOne(jobId)
+        .then(data => setJob(data))
+        .catch(() => setJob(null))
+        .finally(() => setLoading(false));
+    }
+    try { setLiked((JSON.parse(localStorage.getItem('liked_items') || '[]') as string[]).includes(jobId)); } catch {}
+  }, [jobId, initialJob]);
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-50">
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-blue-700 text-sm font-medium">Đang tải tin tuyển dụng...</p>
-      </div>
-    </div>
-  );
-
-  if (error || !job) return (
-    <div className="min-h-screen flex items-center justify-center flex-col gap-4 bg-blue-50">
-      <i className="ri-briefcase-line text-6xl text-blue-200"></i>
-      <p className="text-gray-500">{error || 'Không tìm thấy'}</p>
-      <Link href="/jobs" className="text-blue-600 underline font-medium">← Quay lại</Link>
-    </div>
-  );
+  if (loading) return <DetailSkeleton />;
+  if (!job) return <NotFound what="tin tuyển dụng" href="/jobs" label="Xem các tin khác" />;
 
   const isEmployer = job.type === 'EMPLOYER';
+  const isOwner = !!currentUserId && job.user?.id === currentUserId;
+  const phone = job.contactPhone || job.user?.phone || '';
+  const images: any[] = job.images || [];
+  const deadline = job.deadline ? new Date(job.deadline).toLocaleDateString('vi-VN') : '';
+
+  const handleLike = () => {
+    try {
+      const ids: string[] = JSON.parse(localStorage.getItem('liked_items') || '[]');
+      const now = !ids.includes(jobId);
+      localStorage.setItem('liked_items', JSON.stringify(now ? [...ids, jobId] : ids.filter(x => x !== jobId)));
+      setLiked(now);
+    } catch {}
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) { try { await navigator.share({ title: job.title, url }); } catch {} }
+    else { try { await navigator.clipboard.writeText(url); notify('Đã sao chép liên kết'); } catch { notify('Không sao chép được liên kết'); } }
+  };
 
   return (
-    <>
-      <div className="min-h-screen bg-slate-50">
-        {/* Breadcrumb */}
-        <div className="bg-white shadow-sm border-b border-blue-50">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-            <Link href="/jobs" className="flex items-center justify-center w-9 h-9 rounded-lg border border-blue-200 hover:bg-blue-50 text-blue-600 transition-colors">
-              <i className="ri-arrow-left-line"></i>
-            </Link>
-            <div className="text-sm text-gray-500 flex-1 min-w-0 flex items-center gap-1">
-              <Link href="/" className="hover:text-blue-600 flex-shrink-0">Trang chủ</Link>
-              <i className="ri-arrow-right-s-line text-gray-400"></i>
-              <Link href="/jobs" className="hover:text-blue-600 flex-shrink-0">Việc làm</Link>
-              <i className="ri-arrow-right-s-line text-gray-400"></i>
-              <span className="text-gray-900 truncate">{job.title}</span>
+    <div className="pb-6">
+      {toast}
+      <div className="mx-auto max-w-content px-4 sm:px-6">
+        <Breadcrumb trail={[{ label: 'Trang chủ', href: '/' }, { label: 'Việc làm', href: '/jobs' }, { label: job.title }]} />
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+          <div className="space-y-5">
+            <div className="card p-4 sm:p-6">
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold">
+                <span className={isEmployer ? 'text-forest-700' : 'text-ink-soft'}>{isEmployer ? 'Tuyển dụng' : 'Tìm việc'}</span>
+                {job.category && <span className="text-ink-faint">{job.category}</span>}
+                {job.isUrgent && <span className="rounded bg-brand-500 px-1.5 py-0.5 text-[11px] text-white">Gấp</span>}
+                {job.isVip && <span className="rounded bg-gold-500 px-1.5 py-0.5 text-[11px] text-ink">Nổi bật</span>}
+              </p>
+              <h1 className="mt-1.5 break-words text-[1.5rem] font-bold leading-snug text-ink sm:text-3xl">{job.title}</h1>
+              <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-ink-faint">
+                {job.location && <span><i className="ri-map-pin-line" aria-hidden="true" /> {job.location}</span>}
+                {job.createdAt && <span>{timeAgo(job.createdAt)}</span>}
+                {job.viewCount !== undefined && <span>{job.viewCount} lượt xem</span>}
+              </p>
+              <p className="mt-4 text-[1.75rem] font-bold leading-none text-forest-700">{job.salary || 'Lương thỏa thuận'}</p>
             </div>
+
+            {images.length > 0 && (
+              <Gallery images={images} title={job.title} icon="ri-briefcase-4-line" liked={liked} onLike={handleLike} onShare={handleShare} />
+            )}
+
+            <div className="card p-4 sm:p-6">
+              <h2 className="text-lg font-bold text-ink">{isEmployer ? 'Mô tả công việc' : 'Giới thiệu bản thân'}</h2>
+              {job.description
+                ? <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-ink-soft">{job.description}</p>
+                : <p className="mt-3 text-sm text-ink-faint">Chưa có mô tả.</p>}
+              {job.benefits && (
+                <>
+                  <h2 className="mt-6 border-t border-line pt-5 text-lg font-bold text-ink">Quyền lợi</h2>
+                  <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-ink-soft">{job.benefits}</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-4 lg:sticky lg:top-36 lg:self-start">
+            <div className="card p-4 sm:p-5">
+              {!isOwner ? (
+                <>
+                  <button onClick={chat} className="btn-primary hidden w-full py-3 text-base md:inline-flex">{isEmployer ? 'Ứng tuyển ngay' : 'Liên hệ'}</button>
+                  <ContactButtons phone={phone} onChat={chat} chatLabel="Nhắn tin" />
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <p className="rounded-lg bg-forest-50 px-4 py-3 text-sm font-semibold text-forest-800">Đây là tin của bạn</p>
+                  <Link href={`/jobs/${jobId}/edit`} className="btn-ghost w-full"><i className="ri-edit-line" aria-hidden="true" /> Chỉnh sửa tin</Link>
+                </div>
+              )}
+              <p className="mt-3 text-[12px] leading-snug text-ink-faint">Liên hệ qua điện thoại, Zalo hoặc nhắn tin trên Chợ Nhân Cơ.</p>
+            </div>
+
+            <Facts title="Thông tin tuyển dụng" items={[
+              { label: 'Mức lương', value: job.salary || '' },
+              { label: 'Địa điểm', value: job.location || '' },
+              { label: 'Kinh nghiệm', value: job.experience || '' },
+              { label: 'Hạn nộp', value: deadline },
+              { label: 'Ngày đăng', value: job.createdAt ? new Date(job.createdAt).toLocaleDateString('vi-VN') : '' },
+            ]} />
+
+            <SellerCard user={job.user} label={isEmployer ? 'Nhà tuyển dụng' : 'Người tìm việc'} />
+            <SafetyNote tips={[
+              'Không đóng phí hay tiền cọc để được nhận việc.',
+              'Hỏi rõ công việc, nơi làm và tiền công trước khi đi.',
+              'Nên gặp nơi đông người và báo cho người thân biết.',
+            ]} />
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* LEFT: 2/3 */}
-            <div className="lg:col-span-2 space-y-5">
-              {/* Header card */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-                {/* Job type badge */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${isEmployer ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                    <i className={isEmployer ? 'ri-user-add-line' : 'ri-search-eye-line'}></i>
-                    {isEmployer ? 'Tuyển dụng' : 'Tìm việc'}
-                  </span>
-                  {job.isUrgent && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-brand-100 text-brand-700">
-                      <i className="ri-alarm-line"></i> Khẩn cấp
-                    </span>
-                  )}
-                  {job.isVip && (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-gold-100 text-gold-800 border border-gold-200">
-                      <i className="ri-vip-crown-fill text-gold-500"></i> VIP
-                    </span>
-                  )}
-                  {job.category && (
-                    <span className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">{job.category}</span>
-                  )}
-                </div>
-
-                {/* Title */}
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">{job.title}</h1>
-
-                {/* Key info pills */}
-                <div className="flex flex-wrap gap-2">
-                  {job.salary && (
-                    <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-2 rounded-xl text-sm font-semibold">
-                      <i className="ri-money-dollar-circle-line"></i>
-                      {job.salary}
-                    </div>
-                  )}
-                  {job.location && (
-                    <div className="flex items-center gap-1.5 bg-forest-50 text-forest-700 px-3 py-2 rounded-xl text-sm font-medium">
-                      <i className="ri-map-pin-2-line"></i>
-                      {job.location}
-                    </div>
-                  )}
-                  {job.experience && (
-                    <div className="flex items-center gap-1.5 bg-slate-100 text-slate-700 px-3 py-2 rounded-xl text-sm font-medium">
-                      <i className="ri-medal-line"></i>
-                      {job.experience}
-                    </div>
-                  )}
-                  {job.deadline && (
-                    <div className="flex items-center gap-1.5 bg-gold-50 text-gold-700 px-3 py-2 rounded-xl text-sm font-medium">
-                      <i className="ri-calendar-close-line"></i>
-                      Hạn: {new Date(job.deadline).toLocaleDateString('vi-VN')}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Image carousel */}
-              {job.images?.length > 0 && (() => {
-                const images = job.images;
-                const cur = images[selectedImg];
-                const imgUrl = typeof cur === 'string' ? cur : cur?.url;
-                return (
-                  <div className="space-y-3">
-                    {lightbox && imgUrl && (
-                      <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center" onClick={() => { setLightbox(false); setZoom(1); }}>
-                        <div className="absolute top-4 right-4 flex gap-2 z-10">
-                          <button onClick={e => { e.stopPropagation(); setZoom(z => Math.min(z + 0.5, 4)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white"><i className="ri-zoom-in-line text-lg"></i></button>
-                          <button onClick={e => { e.stopPropagation(); setZoom(z => Math.max(z - 0.5, 0.5)); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white"><i className="ri-zoom-out-line text-lg"></i></button>
-                          <button onClick={() => { setLightbox(false); setZoom(1); }} className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white"><i className="ri-close-line text-lg"></i></button>
-                        </div>
-                        {images.length > 1 && (<>
-                          <button onClick={e => { e.stopPropagation(); setSelectedImg(i => (i - 1 + images.length) % images.length); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white z-10"><i className="ri-arrow-left-s-line text-2xl"></i></button>
-                          <button onClick={e => { e.stopPropagation(); setSelectedImg(i => (i + 1) % images.length); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-white z-10"><i className="ri-arrow-right-s-line text-2xl"></i></button>
-                          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">{selectedImg + 1} / {images.length}</span>
-                        </>)}
-                        <div className="overflow-auto flex items-center justify-center" onClick={e => e.stopPropagation()}>
-                          <img src={imgUrl} alt="" style={{ transform: `scale(${zoom})`, transition: 'transform 0.2s', maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', cursor: zoom > 1 ? 'zoom-out' : 'zoom-in' }} onClick={() => setZoom(z => z > 1 ? 1 : 2)} />
-                        </div>
-                      </div>
-                    )}
-                    <div className="relative bg-gray-100 rounded-2xl overflow-hidden border border-blue-100" style={{ height: 300 }}>
-                      <img src={imgUrl} alt={job.title} className="w-full h-full object-contain cursor-zoom-in" onClick={() => { setLightbox(true); setZoom(1); }} />
-                      {images.length > 1 && (<>
-                        <button onClick={() => setSelectedImg(i => (i - 1 + images.length) % images.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white z-10"><i className="ri-arrow-left-s-line text-xl text-gray-700"></i></button>
-                        <button onClick={() => setSelectedImg(i => (i + 1) % images.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow hover:bg-white z-10"><i className="ri-arrow-right-s-line text-xl text-gray-700"></i></button>
-                        <span className="absolute bottom-2.5 right-3 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">{selectedImg + 1}/{images.length}</span>
-                      </>)}
-                    </div>
-                    {images.length > 1 && (
-                      <div className="flex gap-2 overflow-x-auto pb-1">
-                        {images.map((img: any, i: number) => {
-                          const url = typeof img === 'string' ? img : img?.url;
-                          return (
-                            <button key={i} onClick={() => setSelectedImg(i)} className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${selectedImg === i ? 'border-blue-400 shadow-md' : 'border-transparent hover:border-gray-300'}`}>
-                              <img src={url} alt="" className="w-full h-full object-cover" />
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* Description card */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-blue-50">
-                <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-base">
-                  <i className={`${isEmployer ? 'ri-file-list-3-line' : 'ri-user-heart-line'} text-blue-600`}></i>
-                  {isEmployer ? 'Mô tả công việc' : 'Giới thiệu bản thân'}
-                </h2>
-                <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{job.description}</div>
-
-                {job.benefits && (
-                  <div className="mt-5 pt-5 border-t border-blue-50">
-                    <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <i className="ri-gift-line text-blue-600"></i>
-                      Quyền lợi
-                    </h2>
-                    <div className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{job.benefits}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* RIGHT: 1/3 sticky */}
-            <div>
-              <div className="bg-white rounded-2xl shadow-md border border-blue-100 sticky top-4 overflow-hidden">
-                {/* Blue top accent */}
-                <div className="h-1.5 bg-blue-500"></div>
-                <div className="p-5 space-y-4">
-                  {/* CTA Buttons */}
-                  <div className="space-y-2">
-                    <button
-                      onClick={async () => {
-                        if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
-                        try {
-                          const conv2 = await messagesApi.getOrCreate(job.user?.id) as any;
-                          window.location.href = `/messages/${conv2.id}`;
-                        } catch { alert('Khong the mo chat'); }
-                      }}
-                      className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-sm text-base">
-                      <i className='ri-send-plane-fill'></i>
-                      {isEmployer ? 'Ứng tuyển ngay' : 'Liên hệ tuyển dụng'}
-                    </button>
-                    <button
-                      onClick={async () => {
-                        if (!auth.isLoggedIn()) { window.location.href = '/profile'; return; }
-                        try {
-                          const conv = await messagesApi.getOrCreate(job.user?.id) as any;
-                          window.location.href = `/messages/${conv.id}`;
-                        } catch { alert('Không thể mở chat'); }
-                      }}
-                      className="w-full flex items-center justify-center gap-2 border-2 border-blue-500 text-blue-600 hover:bg-blue-50 py-3 rounded-xl font-semibold transition-colors">
-                      <i className="ri-message-3-line"></i>
-                      Nhắn tin
-                    </button>
-                  </div>
-
-                  {/* Job meta card */}
-                  <div className="bg-blue-50/60 rounded-xl p-4 space-y-3 border border-blue-100">
-                    <p className="text-xs text-blue-600 uppercase tracking-wide font-bold">Thông tin tin đăng</p>
-                    {job.salary && (
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <i className="ri-money-dollar-circle-line text-blue-600 text-sm"></i>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-gray-400 uppercase">Mức lương</p>
-                          <p className="text-sm font-semibold text-blue-700">{job.salary}</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 bg-forest-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i className="ri-briefcase-line text-forest-600 text-sm"></i>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-gray-400 uppercase">Loại tin</p>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isEmployer ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                          {typeLabel[job.type] || job.type}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i className="ri-calendar-line text-slate-600 text-sm"></i>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-gray-400 uppercase">Ngày đăng</p>
-                        <p className="text-sm font-medium text-gray-700">{new Date(job.createdAt).toLocaleDateString('vi-VN')}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i className="ri-eye-line text-slate-600 text-sm"></i>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-gray-400 uppercase">Lượt xem</p>
-                        <p className="text-sm font-medium text-gray-700">{job.viewCount || 0}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Poster info */}
-                  <div className="border-t border-blue-50 pt-4">
-                    <p className="text-xs text-gray-400 uppercase tracking-wide font-bold mb-3">
-                      {isEmployer ? 'Nhà tuyển dụng' : 'Người tìm việc'}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      {job.user?.avatarUrl ? (
-                        <img src={job.user.avatarUrl} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-blue-200" />
-                      ) : (
-                        <div className="w-11 h-11 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-base border-2 border-blue-200">
-                          {job.user?.fullName?.[0] || 'U'}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm truncate">{job.user?.fullName}</p>
-                        <p className="text-xs text-gray-400">@{job.user?.username}</p>
-                      </div>
-                      <Link href={`/profile/${job.user?.id}`} className="text-blue-500 hover:text-blue-600 text-xs font-medium flex-shrink-0">
-                        Xem
-                      </Link>
-                    </div>
-                    <Link href={`/profile/${job.user?.id}`}
-                      className="w-full flex items-center justify-center gap-2 border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm mt-2">
-                      Xem trang người đăng
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="mt-8"><CommentSection targetType="JOB" targetId={jobId} /></div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-4 pb-6">
-        <CommentSection targetType="JOB" targetId={jobId} />
-      </div>
-    </>
+      {!isOwner && job.user && <ContactBar phone={phone} onChat={chat} />}
+    </div>
   );
 }

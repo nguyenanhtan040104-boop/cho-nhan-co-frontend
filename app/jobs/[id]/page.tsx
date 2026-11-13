@@ -61,7 +61,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           }}
         />
       )}
-      <JobDetail jobId={id} />
+      <JobDetail jobId={id} initialJob={job} />
     </>
   );
 }
