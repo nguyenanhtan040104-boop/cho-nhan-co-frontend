@@ -14,54 +14,6 @@ type Slide = {
   cta: string;
 };
 
-// Local Nhân Cơ / Đắk Nông flavor — coffee, pepper, farmland, shops, services, events
-const FALLBACK_SLIDES: Slide[] = [
-  {
-    id: 'fb-coffee',
-    href: '/advertisements/create',
-    title: 'Cà phê Đắk Nông — Đẩy thương hiệu lên top',
-    description: 'Cho hộ rang xay, vườn cà phê, quán cà phê tại Nhân Cơ. Tiếp cận hàng nghìn khách hàng trong vùng.',
-    image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=1600&h=900&fit=crop&q=80',
-    storeName: 'Quảng cáo · Nông sản',
-    cta: 'Đăng quảng cáo ngay',
-  },
-  {
-    id: 'fb-pepper',
-    href: '/advertisements/create',
-    title: 'Hồ tiêu Nhân Cơ — Tăng đầu ra cho mùa vụ',
-    description: 'Quảng bá vườn tiêu, sản phẩm tiêu sạch đến thương lái và khách hàng tại Đắk Nông.',
-    image: 'https://images.unsplash.com/photo-1599909366516-6c1d0e5b3e9b?w=1600&h=900&fit=crop&q=80',
-    storeName: 'Quảng cáo · Nông sản',
-    cta: 'Đăng quảng cáo ngay',
-  },
-  {
-    id: 'fb-land',
-    href: '/advertisements/create',
-    title: 'Đất rẫy, vườn cây — Bán nhanh trong tuần',
-    description: 'Đẩy tin đất nông nghiệp, rẫy cà phê, vườn tiêu lên đầu trang. Khách thật, gần nhà.',
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&h=900&fit=crop&q=80',
-    storeName: 'Quảng cáo · Bất động sản',
-    cta: 'Đăng quảng cáo ngay',
-  },
-  {
-    id: 'fb-shop',
-    href: '/advertisements/create',
-    title: 'Tạp hóa, quán ăn — Khai trương, khuyến mãi',
-    description: 'Cửa hàng địa phương, dịch vụ sửa chữa, vận chuyển. Thông báo đến cả cộng đồng Nhân Cơ.',
-    image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=1600&h=900&fit=crop&q=80',
-    storeName: 'Quảng cáo · Cửa hàng & Dịch vụ',
-    cta: 'Đăng quảng cáo ngay',
-  },
-  {
-    id: 'fb-event',
-    href: '/advertisements/create',
-    title: 'Sự kiện cộng đồng — Hội chợ, lễ hội',
-    description: 'Quảng bá hội chợ nông sản, ngày hội cà phê, sự kiện làng xã đến đông đảo bà con.',
-    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&h=900&fit=crop&q=80',
-    storeName: 'Quảng cáo · Sự kiện',
-    cta: 'Đăng quảng cáo ngay',
-  },
-];
 
 const AUTO_PLAY_MS = 5000;
 
@@ -118,10 +70,10 @@ export default function AdSponsoredCarousel() {
           return;
         }
 
-        // 3. DB has zero ads at all — last resort: themed CTA placeholders
-        if (!cancelled) setSlides(FALLBACK_SLIDES);
+        // 3. No ads at all: show nothing (no made-up sponsored banners)
+        if (!cancelled) setSlides([]);
       } catch {
-        if (!cancelled) setSlides(FALLBACK_SLIDES);
+        if (!cancelled) setSlides([]);
       }
     }
 
@@ -154,18 +106,13 @@ export default function AdSponsoredCarousel() {
     touchStartX.current = null;
   }
 
-  if (slides.length === 0) {
-    return (
-      <div
-        className="mt-3 w-full rounded-3xl bg-gradient-to-br from-brand-100 via-gold-50 to-brand-50 animate-pulse"
-        style={{ height: 'clamp(220px, 30vw, 380px)' }}
-      />
-    );
-  }
+  // No real advertisements: render nothing instead of a placeholder banner
+  if (slides.length === 0) return null;
 
   return (
     <section
-      className="mt-3 relative w-full overflow-hidden rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
+      aria-label="Quảng cáo"
+      className="relative w-full overflow-hidden rounded-sheet shadow-card"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}
