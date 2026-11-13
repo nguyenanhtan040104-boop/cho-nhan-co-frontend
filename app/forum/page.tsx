@@ -4,45 +4,21 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { forum, auth } from '../../lib/api';
+import { timeAgo } from '../../lib/format';
 import PostOptionsMenu from '../components/PostOptionsMenu';
-import EmptyState from '../components/EmptyState';
+import { FORUM_CATEGORIES, forumCategoryLabel } from './categories';
 
-const categoryOptions = [
-  { value: '', label: 'Tất cả' },
-  { value: 'NONG_NGHIEP', label: 'Nông nghiệp' },
-  { value: 'CHAN_NUOI', label: 'Chăn nuôi' },
-  { value: 'THI_TRUONG', label: 'Thị trường' },
-  { value: 'KY_THUAT', label: 'Kỹ thuật' },
-  { value: 'KINH_NGHIEM', label: 'Kinh nghiệm' },
-  { value: 'KHAC', label: 'Khác' },
-];
-
-const sortOptions = [
+const SORTS = [
   { value: 'newest', label: 'Mới nhất' },
   { value: 'popular', label: 'Phổ biến' },
   { value: 'most_comments', label: 'Nhiều bình luận' },
 ];
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const h = Math.floor(diff / 3600000);
-  if (h < 24) return h < 1 ? 'Vừa đăng' : `${h} giờ trước`;
-  const d = Math.floor(h / 24);
-  return d < 30 ? `${d} ngày trước` : `${Math.floor(d / 30)} tháng trước`;
-}
-
-const catColors: any = {
-  NONG_NGHIEP: { bg: '#F3F7F3', color: '#13271D', label: 'Nông nghiệp' },
-  CHAN_NUOI: { bg: '#F3F7F3', color: '#9a3412', label: 'Chăn nuôi' },
-  THI_TRUONG: { bg: '#eff6ff', color: '#1e40af', label: 'Thị trường' },
-  KY_THUAT: { bg: '#fdf4ff', color: '#6b21a8', label: 'Kỹ thuật' },
-  KINH_NGHIEM: { bg: '#fefce8', color: '#854d0e', label: 'Kinh nghiệm' },
-  KHAC: { bg: '#f9fafb', color: '#374151', label: 'Khác' },
-};
+const PG = 'grid h-9 min-w-9 place-items-center rounded-lg border border-line bg-surface hover:border-forest-500 disabled:opacity-40';
 
 export default function ForumPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Đang tải...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-paper" />}>
       <ForumContent />
     </Suspense>
   );
@@ -56,20 +32,17 @@ function ForumContent() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [text, setText] = useState('');
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
   const [sortBy, setSortBy] = useState('newest');
   const [bulkMode, setBulkMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
-  const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
-  const currentUserId = typeof window !== 'undefined' ? auth.getCurrentUserId() : null;
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  // Đọc query params từ URL (từ header dropdown)
-  useEffect(() => {
-    const cat = searchParams.get('category');
-    if (cat) setCategory(cat);
-  }, [searchParams]);
+  useEffect(() => { setLoggedIn(auth.isLoggedIn()); }, []);
+  useEffect(() => { setCategory(searchParams.get('category') || ''); }, [searchParams]);
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -82,182 +55,170 @@ function ForumContent() {
       setTotal(res.total || 0);
       setTotalPages(res.totalPages || 1);
       setPage(p);
-    } catch { } finally { setLoading(false); }
+    } catch {
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
   }, [search, category, sortBy]);
 
   useEffect(() => { loadData(1); }, [loadData]);
 
-  function toggleSelect(id: string) {
-    setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  }
+  const toggle = (id: string) => setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
-  async function handleBulkDelete() {
+  async function bulkDelete() {
     if (!selected.size || !confirm(`Xóa ${selected.size} bài?`)) return;
     setDeleting(true);
     try {
       await Promise.all([...selected].map(id => forum.delete(id)));
       setPosts(prev => prev.filter(p => !selected.has(p.id)));
-      setSelected(new Set()); setBulkMode(false);
-    } catch (e: any) { alert(e.message); } finally { setDeleting(false); }
+      setSelected(new Set());
+      setBulkMode(false);
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
   }
 
+  const pickCategory = (value: string) => {
+    setCategory(value);
+    router.replace(value ? `/forum?category=${value}` : '/forum');
+  };
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
-      {/* Banner */}
-      <div className="border-b border-line bg-surface py-6">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="min-h-screen bg-paper pb-10">
+      <header className="border-b border-line bg-surface">
+        <div className="mx-auto max-w-content px-4 pb-4 pt-4 sm:px-6">
+          <nav className="mb-2 flex items-center gap-1 text-[13px] text-ink-faint" aria-label="Đường dẫn">
+            <Link href="/" className="hover:text-ink">Trang chủ</Link>
+            <i className="ri-arrow-right-s-line" aria-hidden="true" />
+            <span className="text-ink-soft">Diễn đàn</span>
+          </nav>
+          <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="text-brand-600 text-xs font-bold mb-1">Chợ Nhân Cơ</p>
-              <h1 className="text-2xl font-semibold text-ink">Diễn đàn cộng đồng</h1>
-              <p className="text-ink-soft text-sm mt-1">{total} bài viết · Chia sẻ kinh nghiệm nông nghiệp</p>
+              <h1 className="text-[1.4rem] font-bold leading-tight text-ink sm:text-3xl">Diễn đàn cộng đồng</h1>
+              <p className="mt-1 text-[13px] text-ink-faint"><b className="text-ink">{total.toLocaleString('vi-VN')}</b> bài viết · hỏi đáp, kinh nghiệm canh tác, chăn nuôi</p>
             </div>
-            <div className="flex gap-2">
-              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex gap-2">
-                <input type="text" placeholder="Tìm bài viết..." value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="px-4 py-2 rounded-xl text-sm bg-white border border-line text-ink placeholder-ink-faint focus:outline-none focus:border-brand-300 w-52" />
-                <button type="submit" className="bg-ink text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-black">Tìm</button>
-              </form>
-              <Link href="/forum/create" className="bg-brand-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-600 whitespace-nowrap">
-                + Viết bài
-              </Link>
-            </div>
+            <Link href="/forum/create" className="btn-primary hidden shrink-0 sm:inline-flex"><i className="ri-edit-line" aria-hidden="true" /> Viết bài</Link>
           </div>
-          {/* Filters */}
-          <div className="flex gap-2 mt-4 flex-wrap">
-            {categoryOptions.map(o => (
-              <button key={o.value} onClick={() => setCategory(o.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${category === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-line/40'}`}>
-                {o.label}
-              </button>
-            ))}
-            <div className="ml-auto flex gap-2">
-              {sortOptions.map(o => (
-                <button key={o.value} onClick={() => setSortBy(o.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortBy === o.value ? 'bg-ink text-white' : 'bg-surface border border-line text-ink-soft hover:border-line/40'}`}>
-                  {o.label}
-                </button>
-              ))}
+
+          <form onSubmit={e => { e.preventDefault(); setSearch(text.trim()); }} className="mt-4 flex gap-2" role="search">
+            <div className="relative min-w-0 flex-1">
+              <i className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
+              <input value={text} onChange={e => setText(e.target.value)} placeholder="Tìm bài viết, câu hỏi..." aria-label="Tìm bài viết" className="field !pl-9" />
             </div>
+            <button type="submit" className="btn-forest shrink-0 px-5">Tìm</button>
+          </form>
+
+          <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            {FORUM_CATEGORIES.map(c => (
+              <button key={c.value} onClick={() => pickCategory(c.value)} className={`chip shrink-0 ${category === c.value ? 'chip-active' : ''}`}>{c.label}</button>
+            ))}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {isLoggedIn && (
-          <div className="flex justify-end mb-4 gap-2">
-            <button onClick={() => { setBulkMode(!bulkMode); setSelected(new Set()); }}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${bulkMode ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'}`}>
-              {bulkMode ? 'Thoát chọn' : 'Chọn nhiều'}
-            </button>
-            {bulkMode && selected.size > 0 && (
-              <button onClick={handleBulkDelete} disabled={deleting}
-                className="text-xs px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:opacity-50">
-                {deleting ? 'Đang xóa...' : `Xóa (${selected.size})`}
-              </button>
-            )}
-          </div>
-        )}
-
-        {loading && posts.length === 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="w-full bg-gray-200" style={{ aspectRatio: '4/3' }}></div>
-                <div className="p-3 space-y-2">
-                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </div>
+      <div className="mx-auto max-w-3xl px-4 pt-4 sm:px-6">
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px]">
+          <div className="no-scrollbar flex gap-4 overflow-x-auto" role="tablist" aria-label="Sắp xếp">
+            {SORTS.map(s => (
+              <button key={s.value} role="tab" aria-selected={sortBy === s.value} onClick={() => setSortBy(s.value)}
+                className={`shrink-0 border-b-2 pb-1 font-semibold ${sortBy === s.value ? 'border-forest-600 text-forest-700' : 'border-transparent text-ink-soft hover:text-ink'}`}>{s.label}</button>
             ))}
           </div>
-        ) : posts.length === 0 ? (
-          <EmptyState
-            keyword={search || category ? (search || category) : undefined}
-            entityLabel="bài viết"
-            createHref="/forum/create"
-            createLabel="+ Viết bài đầu tiên"
-            onClearSearch={search || category ? () => { setSearch(''); setCategory(''); router.replace('/forum'); } : undefined}
-          />
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {posts.map(post => (
-                <ForumCard key={post.id} post={post} bulkMode={bulkMode} selected={selected.has(post.id)} onToggle={() => toggleSelect(post.id)} onDeleted={id => setPosts(prev => prev.filter(p => p.id !== id))} />
-              ))}
+          {loggedIn && (
+            <div className="ml-auto flex items-center gap-3">
+              {bulkMode && selected.size > 0 && (
+                <button onClick={bulkDelete} disabled={deleting} className="font-semibold text-brand-600 disabled:opacity-50">{deleting ? 'Đang xóa...' : `Xóa ${selected.size} bài`}</button>
+              )}
+              <button onClick={() => { setBulkMode(!bulkMode); setSelected(new Set()); }} className="font-semibold text-ink-soft hover:text-ink">{bulkMode ? 'Thoát chọn' : 'Chọn nhiều'}</button>
             </div>
-            {totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-10">
-                {[...Array(totalPages)].map((_, i) => (
-                  <button key={i} onClick={() => loadData(i + 1)}
-                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-brand-500 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
+          )}
+        </div>
+
+        {loading && posts.length === 0 ? (
+          <ul className="space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <li key={i} className="card animate-pulse space-y-2 p-4">
+                <div className="h-3 w-24 rounded bg-paper" />
+                <div className="h-4 w-4/5 rounded bg-paper" />
+                <div className="h-3 w-2/3 rounded bg-paper" />
+              </li>
+            ))}
+          </ul>
+        ) : posts.length === 0 ? (
+          <div className="card px-6 py-12 text-center">
+            <i className="ri-chat-3-line text-4xl text-ink-faint" aria-hidden="true" />
+            <h2 className="mt-2 text-lg font-bold text-ink">{search || category ? 'Không có bài phù hợp' : 'Chưa có bài viết nào'}</h2>
+            <p className="mt-1 text-sm text-ink-soft">{search || category ? 'Thử từ khóa khác hoặc xem tất cả chuyên mục.' : 'Hãy là người đầu tiên chia sẻ.'}</p>
+            <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
+              {(search || category) && <button onClick={() => { setText(''); setSearch(''); pickCategory(''); }} className="btn-ghost">Xóa bộ lọc</button>}
+              <Link href="/forum/create" className="btn-primary">Viết bài</Link>
+            </div>
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {posts.map(p => <Row key={p.id} post={p} bulkMode={bulkMode} selected={selected.has(p.id)} onToggle={() => toggle(p.id)} onDeleted={id => setPosts(prev => prev.filter(x => x.id !== id))} />)}
+          </ul>
+        )}
+
+        {totalPages > 1 && !loading && (
+          <nav className="mt-8 flex items-center justify-center gap-1.5" aria-label="Phân trang">
+            <button className={PG} disabled={page === 1} onClick={() => loadData(page - 1)} aria-label="Trang trước"><i className="ri-arrow-left-s-line" /></button>
+            <span className="px-2 text-sm text-ink-soft">Trang <b className="text-ink">{page}</b> / {totalPages}</span>
+            <button className={PG} disabled={page === totalPages} onClick={() => loadData(page + 1)} aria-label="Trang sau"><i className="ri-arrow-right-s-line" /></button>
+          </nav>
         )}
       </div>
+
+      <Link href="/forum/create" aria-label="Viết bài" className="btn-primary fixed bottom-24 right-4 z-30 h-12 w-12 !rounded-full !p-0 shadow-lg sm:hidden">
+        <i className="ri-add-line text-2xl" aria-hidden="true" />
+      </Link>
     </div>
   );
 }
 
-function ForumCard({ post, bulkMode, selected, onToggle, onDeleted }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void; currentUserId?: string | null; onDeleted: (id: string) => void }) {
-  const cat = catColors[post.category] || catColors.KHAC;
-  const thumb = post.images?.[0]?.url || post.images?.[0];
-  const authorName = post.user?.fullName || post.user?.name || '';
-  const authorInitial = authorName?.[0]?.toUpperCase() || 'U';
+function Row({ post, bulkMode, selected, onToggle, onDeleted }: { post: any; bulkMode: boolean; selected: boolean; onToggle: () => void; onDeleted: (id: string) => void }) {
+  const thumb = post.images?.[0]?.url || (typeof post.images?.[0] === 'string' ? post.images[0] : null);
+  const author = post.isAnonymous ? 'Ẩn danh' : (post.user?.fullName || post.user?.username || '');
+  const excerpt = (post.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const likes = post.likeCount ?? post._count?.likes ?? 0;
+  const comments = post.commentCount ?? post._count?.comments ?? 0;
 
   return (
-    <div className="relative group">
-      {bulkMode && (
-        <button onClick={onToggle}
-          className={`absolute top-2 left-2 z-20 w-6 h-6 rounded-md border-2 flex items-center justify-center shadow ${selected ? 'bg-brand-500 border-forest-600' : 'bg-white border-gray-300'}`}>
-          {selected && <i className="ri-check-line text-white text-xs"></i>}
-        </button>
-      )}
-      <Link href={bulkMode ? '#' : `/forum/${post.id}`}
-        onClick={bulkMode ? (e) => { e.preventDefault(); onToggle(); } : undefined}
-        className={`block bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 ${selected ? 'ring-2 ring-forest-500' : ''}`}>
-        {/* Thumbnail */}
-        <div className="relative w-full bg-gray-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
-          {thumb ? (
-            <img src={thumb} alt={post.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: `${cat.color}26` }}>
-              <i className="ri-article-line text-4xl" style={{ color: cat.color, opacity: 0.5 }}></i>
-            </div>
-          )}
-          {post.category && (
-            <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: cat.color, color: '#fff' }}>{cat.label}</span>
-          )}
-          {post.isPinned && <span className="absolute top-2 right-2 text-[10px] bg-gold-400 text-gold-900 font-bold px-1.5 py-0.5 rounded">Ghim</span>}
-        </div>
-        {/* Info */}
-        <div className="p-3">
-          <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2">{post.title}</h3>
-          {/* Author */}
-          <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-5 h-5 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-[10px] flex-shrink-0">
-              {authorInitial}
-            </div>
-            <span className="text-[11px] text-gray-500 truncate max-w-[80px]">{authorName}</span>
-          </div>
-          {/* Stats */}
-          <div className="flex items-center justify-between text-[11px] text-gray-400">
-            <span className="flex items-center gap-2">
-              <span className="flex items-center gap-0.5"><i className="ri-heart-line"></i> {post.likeCount || post._count?.likes || 0}</span>
-              <span className="flex items-center gap-0.5"><i className="ri-chat-3-line"></i> {post.commentCount || post._count?.comments || 0}</span>
-            </span>
+    <li className="relative">
+      <Link
+        href={bulkMode ? '#' : `/forum/${post.id}`}
+        onClick={bulkMode ? e => { e.preventDefault(); onToggle(); } : undefined}
+        className={`card flex gap-3 p-4 pr-12 transition-colors hover:border-forest-500 ${selected ? '!border-forest-600 !bg-forest-50/50' : ''}`}
+      >
+        {bulkMode && (
+          <span className={`mt-1 grid h-5 w-5 shrink-0 place-items-center rounded border-2 ${selected ? 'border-forest-600 bg-forest-600 text-white' : 'border-line bg-white'}`}>
+            {selected && <i className="ri-check-line text-xs" aria-hidden="true" />}
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="flex flex-wrap items-center gap-x-2 text-[12px] font-semibold">
+            {post.category && <span className="text-forest-700">{forumCategoryLabel(post.category)}</span>}
+            {post.isPinned && <span className="rounded bg-gold-100 px-1.5 py-0.5 text-[11px] text-gold-700">Ghim</span>}
+          </p>
+          <h2 className="mt-0.5 line-clamp-2 text-[16px] font-semibold leading-snug text-ink">{post.title}</h2>
+          {excerpt && <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{excerpt}</p>}
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[12px] text-ink-faint">
+            {author && <span className="max-w-[10rem] truncate">{author}</span>}
             <span>{timeAgo(post.createdAt)}</span>
-          </div>
+            <span><i className="ri-heart-line" aria-hidden="true" /> {likes}</span>
+            <span><i className="ri-chat-3-line" aria-hidden="true" /> {comments}</span>
+          </p>
         </div>
+        {thumb && <img src={thumb} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-lg object-cover sm:h-24 sm:w-24" />}
       </Link>
-      <div className="absolute top-2 right-2 z-10">
-        <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} onDelete={async (id) => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
-      </div>
-    </div>
+      {!bulkMode && (
+        <div className="absolute right-2 top-2 z-10">
+          <PostOptionsMenu postId={post.id} ownerId={post.userId || post.user?.id} onDelete={async id => { await forum.delete(id); onDeleted(id); }} editHref={`/forum/${post.id}/edit`} />
+        </div>
+      )}
+    </li>
   );
 }

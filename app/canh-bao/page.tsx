@@ -4,32 +4,32 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { forum, auth } from '../../lib/api';
-import EmptyState from '../components/EmptyState';
+import { timeAgo } from '../../lib/format';
 
-const reportTypes = [
-  { value: '', label: 'Tất cả', icon: 'ri-list-check' },
-  { value: 'Lừa đảo mua bán', label: 'Lừa đảo mua bán', icon: 'ri-shopping-cart-line' },
-  { value: 'Giả mạo danh tính', label: 'Giả mạo danh tính', icon: 'ri-user-unfollow-line' },
-  { value: 'Lừa đảo đặt cọc', label: 'Lừa đảo đặt cọc', icon: 'ri-money-dollar-circle-line' },
-  { value: 'Hàng giả', label: 'Hàng giả / kém CL', icon: 'ri-close-circle-line' },
-  { value: 'Khác', label: 'Khác', icon: 'ri-more-line' },
+const REPORT_TYPES = [
+  { value: '', label: 'Tất cả' },
+  { value: 'Lừa đảo mua bán', label: 'Lừa đảo mua bán' },
+  { value: 'Giả mạo danh tính', label: 'Giả mạo danh tính' },
+  { value: 'Lừa đảo đặt cọc', label: 'Lừa đảo đặt cọc' },
+  { value: 'Hàng giả', label: 'Hàng giả, kém chất lượng' },
+  { value: 'Khác', label: 'Khác' },
 ];
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const h = Math.floor(diff / 3600000);
-  if (h < 24) return h < 1 ? 'Vừa đăng' : `${h} giờ trước`;
-  const d = Math.floor(h / 24);
-  return d < 30 ? `${d} ngày trước` : `${Math.floor(d / 30)} tháng trước`;
-}
+const SORTS = [
+  { v: 'newest', l: 'Mới nhất' },
+  { v: 'popular', l: 'Xem nhiều' },
+  { v: 'most_comments', l: 'Nhiều bình luận' },
+];
 
 const TIPS = [
-  'Cung cấp số điện thoại, tên tài khoản ngân hàng của đối tượng nếu có',
-  'Chụp màn hình cuộc trò chuyện, biên lai chuyển khoản làm bằng chứng',
-  'Trình báo cơ quan công an địa phương khi bị thiệt hại về tài sản',
-  'Không chuyển tiền trước khi nhận hàng hoặc kiểm tra thực tế',
-  'Cảnh giác với giá quá rẻ, ưu đãi hấp dẫn bất thường',
+  'Ghi lại số điện thoại, tài khoản ngân hàng của đối tượng nếu có.',
+  'Chụp màn hình tin nhắn và biên lai chuyển khoản làm bằng chứng.',
+  'Trình báo công an địa phương khi bị thiệt hại về tài sản.',
+  'Không chuyển tiền trước khi nhận hàng hoặc kiểm tra thực tế.',
+  'Cảnh giác với giá quá rẻ hoặc ưu đãi bất thường.',
 ];
+
+const PG = 'grid h-9 min-w-9 place-items-center rounded-lg border border-line bg-surface hover:border-forest-500 disabled:opacity-40';
 
 function CanhBaoContent() {
   const router = useRouter();
@@ -39,282 +39,176 @@ function CanhBaoContent() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [subFilter, setSubFilter] = useState('');
+  const [text, setText] = useState(searchParams.get('search') || '');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [sub, setSub] = useState(searchParams.get('sub') || '');
   const [sortBy, setSortBy] = useState('newest');
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const sub = searchParams.get('sub') || '';
-    const q = searchParams.get('search') || '';
-    setSubFilter(sub);
-    if (q) setSearch(q);
-  }, [searchParams]);
+  useEffect(() => { setLoggedIn(auth.isLoggedIn()); }, []);
+  useEffect(() => { setSub(searchParams.get('sub') || ''); }, [searchParams]);
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
     try {
       const params: any = { page: p, limit: 15, sortBy, category: 'CANH_BAO' };
-      if (search) params.search = search;
-      if (subFilter) params.search = (params.search ? params.search + ' ' : '') + subFilter;
+      const kw = [search, sub].filter(Boolean).join(' ');
+      if (kw) params.search = kw;
       const res = await forum.getAll(params);
       setPosts(res.data || []);
       setTotal(res.total || 0);
       setTotalPages(res.totalPages || 1);
       setPage(p);
-    } catch { } finally { setLoading(false); }
-  }, [search, subFilter, sortBy]);
+    } catch {
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, sub, sortBy]);
 
   useEffect(() => { loadData(1); }, [loadData]);
 
-  const isLoggedIn = typeof window !== 'undefined' && auth.isLoggedIn();
-
-  function handleSubFilter(val: string) {
-    setSubFilter(val);
+  const pickSub = (v: string) => {
+    setSub(v);
     setSearch('');
-    if (val) {
-      router.replace(`/canh-bao?sub=${encodeURIComponent(val)}`);
-    } else {
-      router.replace('/canh-bao');
-    }
-  }
+    setText('');
+    router.replace(v ? `/canh-bao?sub=${encodeURIComponent(v)}` : '/canh-bao');
+  };
+
+  const createHref = loggedIn ? '/canh-bao/create' : '/profile';
+  const filtered = !!(search || sub);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
-      <div style={{ background: '#991b1b' }} className="py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col items-center text-center gap-4 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-paper pb-10">
+      <header className="border-b border-line bg-surface">
+        <div className="mx-auto max-w-content px-4 pb-4 pt-4 sm:px-6">
+          <nav className="mb-2 flex items-center gap-1 text-[13px] text-ink-faint" aria-label="Đường dẫn">
+            <Link href="/" className="hover:text-ink">Trang chủ</Link>
+            <i className="ri-arrow-right-s-line" aria-hidden="true" />
+            <span className="text-ink-soft">Cảnh báo</span>
+          </nav>
+          <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="text-red-300 text-xs uppercase tracking-wider mb-1">Chợ Nhân Cơ · Cộng đồng</p>
-              <h1 className="text-2xl font-bold text-white">Cảnh báo cộng đồng</h1>
-              <p className="text-red-200 text-sm mt-1">{total} thông báo từ cộng đồng · Cùng bảo vệ nhau</p>
+              <h1 className="text-[1.4rem] font-bold leading-tight text-ink sm:text-3xl">Cảnh báo lừa đảo</h1>
+              <p className="mt-1 text-[13px] text-ink-faint"><b className="text-ink">{total.toLocaleString('vi-VN')}</b> cảnh báo từ cộng đồng, cùng nhau tránh bị lừa</p>
             </div>
-            <div className="flex gap-2 w-full">
-              <form onSubmit={e => { e.preventDefault(); loadData(1); }} className="flex flex-1 gap-2">
-                <input type="text" placeholder="Tìm tên, số tài khoản, số điện thoại..." value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-xl text-sm bg-white/10 backdrop-blur border border-white/20 text-white placeholder-red-200 focus:outline-none focus:bg-white/20" />
-                <button type="submit" className="bg-white text-red-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-50">Tìm</button>
-              </form>
-              <Link href="/canh-bao/create"
-                className="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-400 whitespace-nowrap border border-red-400">
-                + Đăng cảnh báo
-              </Link>
-            </div>
+            <Link href={createHref} className="btn-primary hidden shrink-0 sm:inline-flex"><i className="ri-alarm-warning-line" aria-hidden="true" /> Đăng cảnh báo</Link>
           </div>
 
-          {/* Sub-category pills */}
-          <div className="flex gap-2 flex-wrap justify-center mt-5">
-            {reportTypes.map(rt => (
-              <button key={rt.value} onClick={() => handleSubFilter(rt.value)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${subFilter === rt.value ? 'bg-white text-red-700' : 'bg-white/15 text-white hover:bg-white/25'}`}>
-                <i className={`${rt.icon} text-sm`}></i>
-                {rt.label}
-              </button>
-            ))}
-          </div>
+          <form onSubmit={e => { e.preventDefault(); setSub(''); setSearch(text.trim()); }} className="mt-4 flex gap-2" role="search">
+            <div className="relative min-w-0 flex-1">
+              <i className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
+              <input value={text} onChange={e => setText(e.target.value)} placeholder="Tìm tên, số tài khoản, số điện thoại..." aria-label="Tìm cảnh báo" className="field !pl-9" />
+            </div>
+            <button type="submit" className="btn-forest shrink-0 px-5">Tìm</button>
+          </form>
 
-          {/* Sort */}
-          <div className="flex gap-2 flex-wrap justify-center mt-3">
-            {[{ v: 'newest', l: 'Mới nhất' }, { v: 'popular', l: 'Nhiều xem nhất' }, { v: 'most_comments', l: 'Nhiều bình luận' }].map(o => (
-              <button key={o.v} onClick={() => setSortBy(o.v)}
-                className={`px-3 py-1 rounded-full text-xs transition-all ${sortBy === o.v ? 'bg-red-900/60 text-white border border-white/30' : 'text-red-200 hover:text-white'}`}>
-                {o.l}
-              </button>
+          <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            {REPORT_TYPES.map(t => (
+              <button key={t.value} onClick={() => pickSub(t.value)} className={`chip shrink-0 ${sub === t.value ? 'chip-active' : ''}`}>{t.label}</button>
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="flex flex-col lg:flex-row gap-6">
+      <div className="mx-auto grid max-w-content gap-6 px-4 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <main className="min-w-0">
+          <p className="mb-3 flex gap-2 rounded-card border border-gold-200 bg-gold-50 p-3 text-[13px] leading-snug text-gold-800">
+            <i className="ri-information-line mt-0.5 shrink-0" aria-hidden="true" />
+            <span>Các bài đăng do cộng đồng chia sẻ và chưa được kiểm chứng pháp lý. Nếu bị thiệt hại tài sản, hãy trình báo công an để được hỗ trợ.</span>
+          </p>
 
-          {/* Main list */}
-          <div className="flex-1 min-w-0">
-            {subFilter && (
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-sm text-gray-500">Đang lọc:</span>
-                <span className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium flex items-center gap-2">
-                  {subFilter}
-                  <button onClick={() => handleSubFilter('')} className="hover:text-red-900">
-                    <i className="ri-close-line"></i>
-                  </button>
-                </span>
-                <button onClick={() => handleSubFilter('')} className="text-xs text-gray-400 hover:text-gray-600 underline">Bỏ lọc</button>
-              </div>
-            )}
-
-            <div className="bg-gold-50 border border-gold-200 rounded-2xl p-4 mb-5">
-              <div className="flex gap-3">
-                <i className="ri-information-line text-gold-500 text-xl flex-shrink-0 mt-0.5"></i>
-                <div>
-                  <p className="text-sm font-semibold text-gold-800 mb-1">Lưu ý</p>
-                  <p className="text-xs text-gold-700">Các bài đăng mang tính cộng đồng, chưa được kiểm chứng pháp lý. Nếu bị thiệt hại về tài sản, hãy trình báo cơ quan công an để được hỗ trợ.</p>
-                </div>
-              </div>
-            </div>
-
-            {loading && posts.length === 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                    <div className="w-full bg-gray-200 rounded-t-2xl" style={{ aspectRatio: '4/3' }}></div>
-                    <div className="p-3 space-y-2">
-                      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : posts.length === 0 ? (
-              <EmptyState
-                keyword={search || subFilter || undefined}
-                entityLabel="cảnh báo"
-                createHref="/canh-bao/create"
-                createLabel="+ Đăng cảnh báo đầu tiên"
-                onClearSearch={(search || subFilter) ? () => { setSearch(''); handleSubFilter(''); } : undefined}
-              />
-            ) : (
-              <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {posts.map(post => <ReportCard key={post.id} post={post} />)}
-                </div>
-                {totalPages > 1 && (
-                  <div className="flex justify-center gap-2 mt-10">
-                    {[...Array(totalPages)].map((_, i) => (
-                      <button key={i} onClick={() => loadData(i + 1)}
-                        className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i + 1 ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+          <div className="mb-3 flex gap-4 text-[13px]" role="tablist" aria-label="Sắp xếp">
+            {SORTS.map(s => (
+              <button key={s.v} role="tab" aria-selected={sortBy === s.v} onClick={() => setSortBy(s.v)}
+                className={`border-b-2 pb-1 font-semibold ${sortBy === s.v ? 'border-forest-600 text-forest-700' : 'border-transparent text-ink-soft hover:text-ink'}`}>{s.l}</button>
+            ))}
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:w-72 flex-shrink-0 space-y-4">
-            {isLoggedIn ? (
-              <Link href="/canh-bao/create"
-                className="block bg-red-600 hover:bg-red-700 text-white rounded-2xl p-5 transition-colors text-center">
-                <i className="ri-alarm-warning-line text-2xl block mb-2"></i>
-                <p className="font-semibold mb-1">Có thông tin cần cảnh báo?</p>
-                <p className="text-sm text-red-100">Chia sẻ để bảo vệ cộng đồng</p>
-              </Link>
-            ) : (
-              <Link href="/profile"
-                className="block bg-red-600 hover:bg-red-700 text-white rounded-2xl p-5 transition-colors text-center">
-                <i className="ri-alarm-warning-line text-2xl block mb-2"></i>
-                <p className="font-semibold mb-1">Đăng cảnh báo</p>
-                <p className="text-sm text-red-100">Đăng nhập để chia sẻ thông tin</p>
-              </Link>
-            )}
-
-            {/* Lọc theo loại */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i className="ri-filter-3-line text-red-500"></i>
-                Lọc theo loại
-              </h3>
-              <div className="space-y-1">
-                {reportTypes.map(rt => (
-                  <button key={rt.value} onClick={() => handleSubFilter(rt.value)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-left ${subFilter === rt.value ? 'bg-red-50 text-red-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}>
-                    <i className={`${rt.icon} text-base flex-shrink-0 ${subFilter === rt.value ? 'text-red-500' : 'text-gray-400'}`}></i>
-                    <span>{rt.label}</span>
-                    {subFilter === rt.value && <i className="ri-check-line ml-auto text-red-500"></i>}
-                  </button>
-                ))}
+          {loading && posts.length === 0 ? (
+            <ul className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <li key={i} className="card animate-pulse space-y-2 p-4"><div className="h-4 w-4/5 rounded bg-paper" /><div className="h-3 w-1/2 rounded bg-paper" /></li>
+              ))}
+            </ul>
+          ) : posts.length === 0 ? (
+            <div className="card px-6 py-12 text-center">
+              <i className="ri-shield-check-line text-4xl text-ink-faint" aria-hidden="true" />
+              <h2 className="mt-2 text-lg font-bold text-ink">{filtered ? 'Không có cảnh báo phù hợp' : 'Chưa có cảnh báo nào'}</h2>
+              <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
+                {filtered && <button onClick={() => pickSub('')} className="btn-ghost">Xóa bộ lọc</button>}
+                <Link href={createHref} className="btn-primary">Đăng cảnh báo</Link>
               </div>
             </div>
-
-            {/* Tips */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i className="ri-shield-line text-forest-600"></i>
-                Cách tự bảo vệ
-              </h3>
-              <ul className="space-y-2.5">
-                {TIPS.map((tip, i) => (
-                  <li key={i} className="flex gap-2 text-xs text-gray-600">
-                    <span className="w-4 h-4 rounded-full bg-forest-100 text-forest-700 text-xs flex items-center justify-center flex-shrink-0 font-bold mt-0.5">{i + 1}</span>
-                    <span>{tip}</span>
+          ) : (
+            <ul className="space-y-2">
+              {posts.map(p => {
+                const thumb = p.images?.[0]?.url || (typeof p.images?.[0] === 'string' ? p.images[0] : null);
+                return (
+                  <li key={p.id}>
+                    <Link href={`/forum/${p.id}`} className="card flex gap-3 border-l-4 !border-l-brand-500 p-4 transition-colors hover:border-forest-500 hover:!border-l-brand-500">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="line-clamp-2 text-[16px] font-semibold leading-snug text-ink">{p.title}</h2>
+                        <p className="mt-2 flex flex-wrap items-center gap-x-3 text-[12px] text-ink-faint">
+                          {p.user?.fullName && <span className="max-w-[10rem] truncate">{p.user.fullName}</span>}
+                          <span>{timeAgo(p.createdAt)}</span>
+                          <span><i className="ri-eye-line" aria-hidden="true" /> {p.viewCount || 0}</span>
+                          <span><i className="ri-chat-3-line" aria-hidden="true" /> {p.commentCount || p._count?.comments || 0}</span>
+                        </p>
+                      </div>
+                      {thumb && <img src={thumb} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-lg object-cover" />}
+                    </Link>
                   </li>
-                ))}
-              </ul>
-            </div>
+                );
+              })}
+            </ul>
+          )}
 
-            {/* Hotline */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <i className="ri-phone-line text-blue-600"></i>
-                Đường dây nóng
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center py-1.5 border-b border-gray-50">
-                  <span className="text-gray-600">Công an Đắk Nông</span>
-                  <span className="font-bold text-blue-700">113</span>
+          {totalPages > 1 && !loading && (
+            <nav className="mt-8 flex items-center justify-center gap-1.5" aria-label="Phân trang">
+              <button className={PG} disabled={page === 1} onClick={() => loadData(page - 1)} aria-label="Trang trước"><i className="ri-arrow-left-s-line" /></button>
+              <span className="px-2 text-sm text-ink-soft">Trang <b className="text-ink">{page}</b> / {totalPages}</span>
+              <button className={PG} disabled={page === totalPages} onClick={() => loadData(page + 1)} aria-label="Trang sau"><i className="ri-arrow-right-s-line" /></button>
+            </nav>
+          )}
+        </main>
+
+        <aside className="space-y-4">
+          <section className="card p-4">
+            <h2 className="text-[15px] font-bold text-ink">Cách tự bảo vệ</h2>
+            <ol className="mt-3 space-y-2.5">
+              {TIPS.map((t, i) => (
+                <li key={i} className="flex gap-2.5 text-[13px] leading-snug text-ink-soft">
+                  <span className="w-4 shrink-0 font-bold text-forest-700">{i + 1}.</span><span>{t}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+          <section className="card p-4">
+            <h2 className="text-[15px] font-bold text-ink">Số khẩn cấp</h2>
+            <dl className="mt-2 divide-y divide-line text-sm">
+              {[['Công an', '113'], ['Cứu hỏa', '114'], ['Cấp cứu', '115']].map(([k, v]) => (
+                <div key={k} className="flex items-center justify-between py-2">
+                  <dt className="text-ink-soft">{k}</dt>
+                  <dd><a href={`tel:${v}`} className="font-bold tabular-nums text-forest-700">{v}</a></dd>
                 </div>
-                <div className="flex justify-between items-center py-1.5 border-b border-gray-50">
-                  <span className="text-gray-600">Cảnh sát kinh tế</span>
-                  <span className="font-bold text-blue-700">069.2349.567</span>
-                </div>
-                <div className="flex justify-between items-center py-1.5">
-                  <span className="text-gray-600">Tố giác tội phạm</span>
-                  <span className="font-bold text-blue-700">1900.5656</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              ))}
+            </dl>
+          </section>
+        </aside>
       </div>
+
+      <Link href={createHref} aria-label="Đăng cảnh báo" className="btn-primary fixed bottom-24 right-4 z-30 h-12 w-12 !rounded-full !p-0 shadow-lg sm:hidden">
+        <i className="ri-add-line text-2xl" aria-hidden="true" />
+      </Link>
     </div>
   );
 }
 
 export default function CanhBaoPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F3F7F3' }}>
-        <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense fallback={<div className="min-h-screen bg-paper" />}>
       <CanhBaoContent />
     </Suspense>
-  );
-}
-
-function ReportCard({ post }: { post: any }) {
-  const thumb = post.images?.[0]?.url || post.images?.[0];
-
-  return (
-    <Link href={`/forum/${post.id}`}
-      className="block bg-white rounded-2xl border border-red-100 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_8px_rgba(0,0,0,0.06),0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all overflow-hidden group">
-      <div className="relative w-full bg-red-50 rounded-t-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
-        {thumb ? (
-          <img src={thumb} alt={post.title} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-300 ease-out" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-red-100">
-            <i className="ri-alarm-warning-line text-4xl text-red-400"></i>
-          </div>
-        )}
-        <span className="absolute top-2 left-2 text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded">Cảnh báo</span>
-      </div>
-      <div className="p-3">
-        <h3 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug mb-2 group-hover:text-red-700 transition-colors">{post.title}</h3>
-        <div className="flex items-center justify-between text-[11px] text-gray-400">
-          <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-bold text-[10px] flex-shrink-0">
-              {post.user?.fullName?.[0] || 'U'}
-            </div>
-            <span className="truncate max-w-[60px]">{post.user?.fullName}</span>
-          </div>
-          <span className="flex items-center gap-2">
-            <span><i className="ri-chat-3-line"></i> {post.commentCount || post._count?.comments || 0}</span>
-            <span>{timeAgo(post.createdAt)}</span>
-          </span>
-        </div>
-      </div>
-    </Link>
   );
 }

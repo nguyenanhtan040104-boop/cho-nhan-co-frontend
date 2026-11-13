@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { forum, auth } from '../../../lib/api';
+import { forumCategoryLabel } from '../categories';
 
 function getCurrentUserId(): string | null {
   try {
@@ -13,12 +14,11 @@ function getCurrentUserId(): string | null {
   } catch { return null; }
 }
 
-function Avatar({ user, size = 8 }: { user: any; size?: number }) {
-  const s = `w-${size} h-${size}`;
-  if (user?.avatarUrl)
-    return <img src={user.avatarUrl} alt="" className={`${s} rounded-full object-cover flex-shrink-0`} />;
+function Avatar({ user, px = 32 }: { user: any; px?: number }) {
+  const style = { width: px, height: px };
+  if (user?.avatarUrl) return <img src={user.avatarUrl} alt="" style={style} className="shrink-0 rounded-full object-cover" />;
   return (
-    <div className={`${s} bg-forest-100 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-forest-700`}>
+    <div style={style} className="grid shrink-0 place-items-center rounded-full bg-forest-100 text-xs font-bold text-forest-700">
       {user?.fullName?.[0] || user?.username?.[0] || 'U'}
     </div>
   );
@@ -72,7 +72,7 @@ export default function PostDetail({ postId }: { postId: string }) {
   async function handleLike() {
     if (!auth.isLoggedIn()) { alert('Vui lòng đăng nhập để thích bài viết'); return; }
     try {
-      const res = await forum.likePost(postId);
+      const res: any = await forum.likePost(postId);
       if (res && typeof res.liked === 'boolean') {
         setLiked(res.liked);
         setPost((prev: any) => ({ ...prev, likeCount: res.likeCount }));
@@ -84,7 +84,7 @@ export default function PostDetail({ postId }: { postId: string }) {
   async function handleCommentLike(commentId: string) {
     if (!auth.isLoggedIn()) { alert('Vui lòng đăng nhập'); return; }
     try {
-      const res = await forum.likeComment(commentId);
+      const res: any = await forum.likeComment(commentId);
       if (res && typeof res.liked === 'boolean') {
         setCommentLikes(prev => ({ ...prev, [commentId]: { liked: res.liked, count: res.likeCount } }));
       }
@@ -98,7 +98,7 @@ export default function PostDetail({ postId }: { postId: string }) {
     if (!comment.trim()) return;
     setSubmitting(true);
     try {
-      const newComment = await forum.addComment(postId, comment);
+      const newComment: any = await forum.addComment(postId, comment);
       setPost((prev: any) => ({ ...prev, comments: [...(prev.comments || []), newComment] }));
       setCommentLikes(prev => ({ ...prev, [newComment.id]: { liked: false, count: 0 } }));
       setComment('');
@@ -116,7 +116,7 @@ export default function PostDetail({ postId }: { postId: string }) {
     if (!replyText.trim() || !replyingTo) return;
     setReplySubmitting(true);
     try {
-      const newReply = await forum.addReply(postId, replyText, replyingTo.id);
+      const newReply: any = await forum.addReply(postId, replyText, replyingTo.id);
       setPost((prev: any) => ({
         ...prev,
         comments: prev.comments.map((c: any) =>
@@ -195,302 +195,166 @@ export default function PostDetail({ postId }: { postId: string }) {
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
+    <div className="grid min-h-[60vh] place-items-center">
+      <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-forest-600 border-t-transparent" />
     </div>
   );
 
   if (error || !post) return (
-    <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-      <p className="text-gray-500">{error || 'Không tìm thấy bài viết'}</p>
-      <Link href="/forum" className="text-forest-600 underline">Quay lại diễn đàn</Link>
+    <div className="grid min-h-[60vh] place-items-center px-4 text-center">
+      <div>
+        <i className="ri-file-search-line text-4xl text-ink-faint" aria-hidden="true" />
+        <p className="mb-4 mt-2 text-ink-soft">{error || 'Không tìm thấy bài viết'}</p>
+        <Link href="/forum" className="btn-primary">Về diễn đàn</Link>
+      </div>
     </div>
   );
 
-  const isPostOwner = currentUserId && post.user?.id === currentUserId;
-  const sortedComments = [...(post.comments || [])].sort((a: any, b: any) =>
-    (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0)
-  );
+  const isPostOwner = !!currentUserId && post.user?.id === currentUserId;
+  const sortedComments = [...(post.comments || [])].sort((a: any, b: any) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
   const totalComments = sortedComments.reduce((acc: number, c: any) => acc + 1 + (c.replies?.length || 0), 0);
+  const when = (d: string, withYear = false) =>
+    new Date(d).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', ...(withYear ? { year: 'numeric' } : {}), hour: '2-digit', minute: '2-digit' });
+  const act = 'inline-flex items-center gap-1 text-[12px] font-semibold text-ink-faint transition-colors';
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link href="/forum" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line"></i>
-          </Link>
-          <div className="text-sm text-gray-500 flex-1">
-            <Link href="/forum" className="hover:text-forest-600">Diễn đàn</Link>
-            <span className="mx-2">/</span>
-            <span className="text-gray-900 line-clamp-1">{post.title}</span>
+  // One renderer for a comment and for a reply to it (parentId is set for replies)
+  const renderComment = (c: any, parentId?: string) => {
+    const isReply = !!parentId;
+    const owner = !!currentUserId && c.user?.id === currentUserId;
+    const editing = editingCommentId === c.id;
+    const like = commentLikes[c.id] ?? { liked: false, count: c.likeCount ?? 0 };
+    return (
+      <div key={c.id} className="flex gap-2.5">
+        <Avatar user={c.user} px={isReply ? 28 : 36} />
+        <div className="min-w-0 flex-1">
+          <div className={`rounded-xl px-3.5 py-2.5 ${c.isPinned ? 'border border-gold-200 bg-gold-50' : 'bg-paper'}`}>
+            <p className="flex flex-wrap items-center gap-x-2 text-[13px]">
+              <span className="font-semibold text-ink">{c.user?.fullName || c.user?.username}</span>
+              {c.isPinned && <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-gold-700"><i className="ri-pushpin-fill" aria-hidden="true" />Đã ghim</span>}
+              <span className="text-[12px] text-ink-faint">{when(c.createdAt)}</span>
+            </p>
+            {editing ? (
+              <div className="mt-1.5">
+                <textarea value={editingContent} onChange={e => setEditingContent(e.target.value)} rows={2} className="field resize-none" />
+                <div className="mt-1.5 flex gap-2">
+                  <button onClick={() => handleUpdateComment(c.id, parentId)} className="btn-forest !px-3 !py-1.5 text-[13px]">Lưu</button>
+                  <button onClick={() => setEditingCommentId(null)} className="btn-ghost !px-3 !py-1.5 text-[13px]">Hủy</button>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed text-ink-soft">{c.content}</p>
+            )}
           </div>
-          {isPostOwner && (
-            <Link href={`/forum/${postId}/edit`}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-forest-600 text-white rounded-lg hover:bg-forest-700 text-sm font-medium">
-              <i className="ri-edit-line"></i> Chỉnh sửa
-            </Link>
+
+          {!editing && (
+            <div className="ml-1 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+              <button onClick={() => handleCommentLike(c.id)} className={`${act} ${like.liked ? '!text-brand-600' : 'hover:text-brand-600'}`}>
+                <i className={like.liked ? 'ri-heart-fill' : 'ri-heart-line'} aria-hidden="true" />
+                Thích{like.count > 0 && ` (${like.count})`}
+              </button>
+              {!isReply && (
+                <button
+                  onClick={() => {
+                    if (replyingTo?.id === c.id) { setReplyingTo(null); setReplyText(''); }
+                    else { setReplyingTo({ id: c.id, name: c.user?.fullName || c.user?.username || 'người dùng' }); setReplyText(''); }
+                  }}
+                  className={`${act} hover:text-forest-700`}>
+                  <i className="ri-reply-line" aria-hidden="true" />Trả lời
+                </button>
+              )}
+              {owner && <button onClick={() => { setEditingCommentId(c.id); setEditingContent(c.content); }} className={`${act} hover:text-forest-700`}><i className="ri-edit-line" aria-hidden="true" />Sửa</button>}
+              {(owner || isPostOwner) && <button onClick={() => handleDeleteComment(c.id, parentId)} className={`${act} hover:text-brand-600`}><i className="ri-delete-bin-line" aria-hidden="true" />Xóa</button>}
+              {!isReply && isPostOwner && (
+                <button onClick={() => handlePinComment(c.id)} className={`${act} hover:text-gold-700`}>
+                  <i className={c.isPinned ? 'ri-pushpin-fill' : 'ri-pushpin-line'} aria-hidden="true" />{c.isPinned ? 'Bỏ ghim' : 'Ghim'}
+                </button>
+              )}
+            </div>
+          )}
+
+          {!isReply && replyingTo?.id === c.id && (
+            <form onSubmit={handleReply} className="mt-2">
+              <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder={`Trả lời ${replyingTo?.name}...`} rows={2} autoFocus className="field resize-none" />
+              <div className="mt-1.5 flex gap-2">
+                <button type="submit" disabled={replySubmitting || !replyText.trim()} className="btn-forest !px-3 !py-1.5 text-[13px] disabled:opacity-50">{replySubmitting ? 'Đang gửi...' : 'Gửi'}</button>
+                <button type="button" onClick={() => { setReplyingTo(null); setReplyText(''); }} className="btn-ghost !px-3 !py-1.5 text-[13px]">Hủy</button>
+              </div>
+            </form>
+          )}
+
+          {!isReply && c.replies?.length > 0 && (
+            <div className="mt-2 space-y-3 border-l-2 border-line pl-3">{c.replies.map((r: any) => renderComment(r, c.id))}</div>
           )}
         </div>
       </div>
+    );
+  };
 
-      <div className="max-w-4xl mx-auto px-4 py-4 md:py-8 space-y-6">
-        {/* Post */}
-        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            {post.isAnonymous ? (
-              <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                <i className="ri-user-line text-gray-500"></i>
-              </div>
-            ) : (
-              <Avatar user={post.user} size={10} />
-            )}
-            <div>
-              <p className="font-medium text-gray-900">{post.isAnonymous ? 'Ẩn danh' : (post.user?.fullName || post.user?.username)}</p>
-              <p className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+  return (
+    <div className="min-h-screen bg-paper pb-10">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <nav className="flex items-center gap-1 py-3 text-[13px] text-ink-faint" aria-label="Đường dẫn">
+          <Link href="/" className="hover:text-ink">Trang chủ</Link>
+          <i className="ri-arrow-right-s-line" aria-hidden="true" />
+          <Link href="/forum" className="hover:text-ink">Diễn đàn</Link>
+          <i className="ri-arrow-right-s-line" aria-hidden="true" />
+          <span className="truncate text-ink-soft">{post.title}</span>
+        </nav>
+
+        <article className="card p-4 sm:p-6">
+          <p className="flex items-center gap-2 text-[13px] font-semibold">
+            {post.category && <Link href={`/forum?category=${post.category}`} className="text-forest-700 hover:underline">{forumCategoryLabel(post.category)}</Link>}
+          </p>
+          <h1 className="mt-1 break-words text-[1.5rem] font-bold leading-snug text-ink sm:text-3xl">{post.title}</h1>
+
+          <div className="mt-3 flex items-center gap-3">
+            {post.isAnonymous
+              ? <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-paper text-ink-faint"><i className="ri-user-line" aria-hidden="true" /></div>
+              : <Avatar user={post.user} px={40} />}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink">{post.isAnonymous ? 'Ẩn danh' : (post.user?.fullName || post.user?.username)}</p>
+              <p className="text-[12px] text-ink-faint">{when(post.createdAt, true)} · {post.viewCount} lượt xem</p>
             </div>
-            {post.category && (
-              <span className="ml-auto bg-forest-50 text-forest-600 text-xs px-2 py-1 rounded">{post.category}</span>
-            )}
+            {isPostOwner && <Link href={`/forum/${postId}/edit`} className="btn-ghost shrink-0"><i className="ri-edit-line" aria-hidden="true" /> Sửa</Link>}
           </div>
-
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">{post.title}</h1>
 
           {post.images?.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className={`mt-4 grid gap-2 ${post.images.length > 1 ? 'grid-cols-2' : ''}`}>
               {post.images.map((img: any, i: number) => (
-                <img key={i} src={img.url || img} alt="" className="rounded-lg w-full h-auto max-h-72 object-contain bg-gray-100" />
+                <img key={i} src={img.url || img} alt="" className="max-h-96 w-full rounded-lg bg-paper object-contain" />
               ))}
             </div>
           )}
 
-          <div className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">{post.content}</div>
+          <div className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-ink-soft">{post.content}</div>
 
           {post.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-4">
-              {post.tags.map((tag: string, i: number) => (
-                <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">#{tag}</span>
-              ))}
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {post.tags.map((tag: string, i: number) => <span key={i} className="rounded bg-paper px-2 py-0.5 text-[12px] text-ink-soft">#{tag}</span>)}
             </div>
           )}
 
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t">
-            <button onClick={handleLike}
-              className={`flex items-center gap-1.5 text-sm transition-colors ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}>
-              <i className={liked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
-              {post.likeCount} thích
+          <div className="mt-5 flex items-center gap-5 border-t border-line pt-4 text-sm">
+            <button onClick={handleLike} className={`inline-flex items-center gap-1.5 font-semibold transition-colors ${liked ? 'text-brand-600' : 'text-ink-soft hover:text-brand-600'}`}>
+              <i className={liked ? 'ri-heart-fill' : 'ri-heart-line'} aria-hidden="true" />{post.likeCount} thích
             </button>
-            <span className="flex items-center gap-1.5 text-sm text-gray-500">
-              <i className="ri-chat-1-line"></i> {totalComments} bình luận
-            </span>
-            <span className="flex items-center gap-1.5 text-sm text-gray-500 ml-auto">
-              <i className="ri-eye-line"></i> {post.viewCount}
-            </span>
+            <span className="inline-flex items-center gap-1.5 text-ink-soft"><i className="ri-chat-1-line" aria-hidden="true" />{totalComments} bình luận</span>
           </div>
-        </div>
+        </article>
 
-        {/* Comments */}
-        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
-          <h2 className="font-semibold text-gray-900 mb-4">Bình luận ({totalComments})</h2>
+        <section className="card mt-4 p-4 sm:p-6" aria-label="Bình luận">
+          <h2 className="text-lg font-bold text-ink">Bình luận ({totalComments})</h2>
 
-          {/* Main comment form */}
-          <form onSubmit={handleComment} className="mb-6">
-            <textarea value={comment} onChange={e => setComment(e.target.value)}
-              placeholder="Viết bình luận của bạn..."
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-forest-500 resize-none mb-2" />
-            <button type="submit" disabled={submitting || !comment.trim()}
-              className="bg-forest-600 text-white px-5 py-2 rounded-lg hover:bg-forest-700 disabled:opacity-50 text-sm">
-              {submitting ? 'Đang gửi...' : 'Gửi bình luận'}
-            </button>
+          <form onSubmit={handleComment} className="mt-3">
+            <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Viết bình luận của bạn..." rows={3} aria-label="Bình luận" className="field resize-none" />
+            <button type="submit" disabled={submitting || !comment.trim()} className="btn-forest mt-2 disabled:opacity-50">{submitting ? 'Đang gửi...' : 'Gửi bình luận'}</button>
           </form>
 
-          {/* Comments list */}
-          <div className="space-y-4">
-            {sortedComments.map((c: any) => {
-              const isCommentOwner = currentUserId && c.user?.id === currentUserId;
-              const isEditing = editingCommentId === c.id;
-              const cLike = commentLikes[c.id] ?? { liked: false, count: c.likeCount ?? 0 };
-
-              return (
-                <div key={c.id}>
-                  {/* Main comment */}
-                  <div className={`flex gap-3 ${c.isPinned ? 'bg-gold-50 border border-gold-200 rounded-xl p-3' : ''}`}>
-                    <Avatar user={c.user} size={8} />
-                    <div className="flex-1 min-w-0">
-                      <div className="bg-gray-50 rounded-xl px-4 py-3">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-sm font-semibold text-gray-900">{c.user?.fullName || c.user?.username}</span>
-                          {c.isPinned && (
-                            <span className="flex items-center gap-0.5 text-xs text-gold-600 font-medium">
-                              <i className="ri-pushpin-fill"></i> Đã ghim
-                            </span>
-                          )}
-                          <span className="text-xs text-gray-400">{new Date(c.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-
-                        {isEditing ? (
-                          <div className="mt-1">
-                            <textarea value={editingContent} onChange={e => setEditingContent(e.target.value)}
-                              rows={2}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-forest-500 resize-none" />
-                            <div className="flex gap-2 mt-1">
-                              <button onClick={() => handleUpdateComment(c.id)}
-                                className="text-xs bg-forest-600 text-white px-3 py-1 rounded hover:bg-forest-700">Lưu</button>
-                              <button onClick={() => setEditingCommentId(null)}
-                                className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Hủy</button>
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-gray-700 leading-relaxed">{c.content}</p>
-                        )}
-                      </div>
-
-                      {/* Comment action row */}
-                      {!isEditing && (
-                        <div className="flex items-center gap-3 mt-1.5 ml-1">
-                          {/* Like */}
-                          <button onClick={() => handleCommentLike(c.id)}
-                            className={`flex items-center gap-1 text-xs transition-colors ${cLike.liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}>
-                            <i className={cLike.liked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
-                            {cLike.count > 0 && <span>{cLike.count}</span>}
-                            <span>Thích</span>
-                          </button>
-
-                          {/* Reply */}
-                          <button
-                            onClick={() => {
-                              if (replyingTo?.id === c.id) { setReplyingTo(null); setReplyText(''); }
-                              else { setReplyingTo({ id: c.id, name: c.user?.fullName || c.user?.username || 'người dùng' }); setReplyText(''); }
-                            }}
-                            className="flex items-center gap-1 text-xs text-gray-400 hover:text-forest-600 transition-colors">
-                            <i className="ri-reply-line"></i> Trả lời
-                          </button>
-
-                          {isCommentOwner && (
-                            <button onClick={() => { setEditingCommentId(c.id); setEditingContent(c.content); }}
-                              className="flex items-center gap-1 text-xs text-gray-400 hover:text-forest-600 transition-colors">
-                              <i className="ri-edit-line"></i> Sửa
-                            </button>
-                          )}
-                          {(isCommentOwner || isPostOwner) && (
-                            <button onClick={() => handleDeleteComment(c.id)}
-                              className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors">
-                              <i className="ri-delete-bin-line"></i> Xóa
-                            </button>
-                          )}
-                          {isPostOwner && (
-                            <button onClick={() => handlePinComment(c.id)}
-                              className={`flex items-center gap-1 text-xs transition-colors ${c.isPinned ? 'text-gold-500 hover:text-gray-400' : 'text-gray-400 hover:text-gold-500'}`}>
-                              <i className={c.isPinned ? 'ri-pushpin-fill' : 'ri-pushpin-line'}></i>
-                              {c.isPinned ? 'Bỏ ghim' : 'Ghim'}
-                            </button>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Reply form */}
-                      {replyingTo?.id === c.id && (
-                        <form onSubmit={handleReply} className="mt-2 flex gap-2 items-start">
-                          <div className="flex-1">
-                            <textarea
-                              value={replyText}
-                              onChange={e => setReplyText(e.target.value)}
-                              placeholder={`Trả lời ${replyingTo.name}...`}
-                              rows={2}
-                              autoFocus
-                              className="w-full px-3 py-2 border border-forest-300 rounded-lg text-sm focus:ring-2 focus:ring-forest-500 resize-none"
-                            />
-                            <div className="flex gap-2 mt-1">
-                              <button type="submit" disabled={replySubmitting || !replyText.trim()}
-                                className="text-xs bg-forest-600 text-white px-3 py-1.5 rounded-lg hover:bg-forest-700 disabled:opacity-50">
-                                {replySubmitting ? 'Đang gửi...' : 'Gửi'}
-                              </button>
-                              <button type="button" onClick={() => { setReplyingTo(null); setReplyText(''); }}
-                                className="text-xs border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-50">
-                                Hủy
-                              </button>
-                            </div>
-                          </div>
-                        </form>
-                      )}
-
-                      {/* Replies */}
-                      {c.replies?.length > 0 && (
-                        <div className="mt-2 space-y-2 pl-4 border-l-2 border-forest-100">
-                          {c.replies.map((r: any) => {
-                            const isReplyOwner = currentUserId && r.user?.id === currentUserId;
-                            const isEditingReply = editingCommentId === r.id;
-                            const rLike = commentLikes[r.id] ?? { liked: false, count: r.likeCount ?? 0 };
-
-                            return (
-                              <div key={r.id} className="flex gap-2">
-                                <Avatar user={r.user} size={7} />
-                                <div className="flex-1 min-w-0">
-                                  <div className="bg-forest-50 rounded-xl px-3 py-2">
-                                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                                      <span className="text-xs font-semibold text-gray-900">{r.user?.fullName || r.user?.username}</span>
-                                      <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-
-                                    {isEditingReply ? (
-                                      <div>
-                                        <textarea value={editingContent} onChange={e => setEditingContent(e.target.value)}
-                                          rows={2}
-                                          className="w-full px-2 py-1 border border-gray-300 rounded-lg text-xs focus:ring-1 focus:ring-forest-500 resize-none" />
-                                        <div className="flex gap-2 mt-1">
-                                          <button onClick={() => handleUpdateComment(r.id, c.id)}
-                                            className="text-xs bg-forest-600 text-white px-2 py-0.5 rounded hover:bg-forest-700">Lưu</button>
-                                          <button onClick={() => setEditingCommentId(null)}
-                                            className="text-xs border border-gray-300 px-2 py-0.5 rounded">Hủy</button>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <p className="text-xs text-gray-700 leading-relaxed">{r.content}</p>
-                                    )}
-                                  </div>
-
-                                  {!isEditingReply && (
-                                    <div className="flex items-center gap-3 mt-1 ml-1">
-                                      <button onClick={() => handleCommentLike(r.id)}
-                                        className={`flex items-center gap-1 text-xs transition-colors ${rLike.liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}>
-                                        <i className={rLike.liked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
-                                        {rLike.count > 0 && <span>{rLike.count}</span>}
-                                        <span>Thích</span>
-                                      </button>
-
-                                      {isReplyOwner && (
-                                        <button onClick={() => { setEditingCommentId(r.id); setEditingContent(r.content); }}
-                                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-forest-600 transition-colors">
-                                          <i className="ri-edit-line"></i> Sửa
-                                        </button>
-                                      )}
-                                      {(isReplyOwner || isPostOwner) && (
-                                        <button onClick={() => handleDeleteComment(r.id, c.id)}
-                                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors">
-                                          <i className="ri-delete-bin-line"></i> Xóa
-                                        </button>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-            {sortedComments.length === 0 && (
-              <p className="text-center text-gray-400 text-sm py-4">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
-            )}
+          <div className="mt-6 space-y-5">
+            {sortedComments.map((c: any) => renderComment(c))}
+            {sortedComments.length === 0 && <p className="py-4 text-center text-sm text-ink-faint">Chưa có bình luận nào. Hãy là người đầu tiên.</p>}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
