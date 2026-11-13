@@ -13,7 +13,7 @@ const VIP_PLANS = [
 
 export default function VipProductPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-4 border-gold-400 border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<div className="grid min-h-[60vh] place-items-center text-ink-faint">Đang tải...</div>}>
       <VipProductContent />
     </Suspense>
   );
@@ -119,192 +119,100 @@ function VipProductContent() {
   const seconds = countdown % 60;
 
   return (
-    <div className="min-h-screen bg-gold-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link href="/dashboard" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line"></i>
-          </Link>
-          <h1 className="text-lg font-bold text-gray-900">Nâng cấp VIP sản phẩm</h1>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 py-10">
-
-        {/* Hero */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Tin VIP - Hiển thị nổi bật hơn</h2>
-          <p className="text-gray-500 max-w-xl mx-auto">Sản phẩm VIP được ưu tiên hiển thị đầu trang, có nhãn VIP nổi bật, thu hút nhiều người mua hơn</p>
-        </div>
-
-        {/* Lợi ích */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          {[
-            { title: 'Hiển thị đầu trang', desc: 'Luôn xuất hiện trên đầu danh sách tìm kiếm' },
-            { title: 'Nhãn VIP nổi bật', desc: 'Badge vàng đặc biệt thu hút sự chú ý' },
-            { title: 'Nhiều lượt xem hơn', desc: 'Tăng 3-5x lượt xem so với tin thường' },
-          ].map((item, i) => (
-            <div key={i} className="bg-white rounded-xl p-5 shadow-sm text-center">
-              <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-              <p className="text-sm text-gray-500">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Chọn gói */}
+    <div className="min-h-screen bg-paper pb-10">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <div className="flex items-center gap-3 py-4">
+          <Link href="/dashboard" aria-label="Quay lại" className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-surface hover:border-forest-500"><i className="ri-arrow-left-line text-lg" /></Link>
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Chọn gói VIP</h3>
-            <div className="space-y-3">
+            <h1 className="text-xl font-bold text-ink sm:text-2xl">Đẩy tin lên nổi bật</h1>
+            <p className="text-[13px] text-ink-faint">Tin VIP hiện trên đầu danh sách và có nhãn "Nổi bật"</p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+          <section aria-labelledby="goi">
+            <h2 id="goi" className="mb-2 text-lg font-bold text-ink">Chọn thời gian</h2>
+            <div className="space-y-2" role="radiogroup" aria-labelledby="goi">
               {VIP_PLANS.map(p => (
-                <button key={p.days} onClick={() => setSelectedPlan(p.days)}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${selectedPlan === p.days ? 'border-gold-400 bg-gold-50' : 'border-gray-200 bg-white hover:border-gold-300'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPlan === p.days ? 'border-gold-500 bg-gold-500' : 'border-gray-300'}`}>
-                        {selectedPlan === p.days && <div className="w-2 h-2 bg-white rounded-full"></div>}
-                      </div>
-                      <div>
-                        <span className="font-semibold text-gray-900">{p.label}</span>
-                        {p.popular && <span className="ml-2 text-xs bg-brand-500 text-white px-1.5 py-0.5 rounded">Phổ biến</span>}
-                        <p className="text-xs text-gray-500">{p.desc}</p>
-                      </div>
-                    </div>
-                    <span className="font-bold text-gray-900">{p.price.toLocaleString()}đ</span>
-                  </div>
+                <button key={p.days} role="radio" aria-checked={selectedPlan === p.days} onClick={() => setSelectedPlan(p.days)}
+                  className={`flex w-full items-center justify-between gap-3 rounded-card border p-4 text-left transition-colors ${selectedPlan === p.days ? 'border-forest-600 bg-forest-50' : 'border-line bg-surface hover:border-forest-400'}`}>
+                  <span>
+                    <span className="font-semibold text-ink">{p.label}</span>
+                    {p.popular && <span className="ml-2 rounded bg-gold-100 px-1.5 py-0.5 text-[11px] font-semibold text-gold-700">Phổ biến</span>}
+                    <span className="block text-[13px] text-ink-soft">{p.desc}</span>
+                  </span>
+                  <span className="text-lg font-bold tabular-nums text-ink">{p.price.toLocaleString('vi-VN')}đ</span>
                 </button>
               ))}
             </div>
-          </div>
+            <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-ink-soft marker:text-forest-600">
+              <li>Hiện trên đầu danh sách trong thời gian VIP</li>
+              <li>Có nhãn "Nổi bật" bên cạnh ảnh</li>
+            </ul>
+          </section>
 
-          {/* Thanh toán */}
-          <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Xác nhận</h3>
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              {/* Sản phẩm được chọn */}
-              {loading ? (
-                <div className="flex justify-center py-4">
-                  <div className="w-6 h-6 border-2 border-gold-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : product ? (
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                    {product.images?.[0] ? (
-                      <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100"></div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 text-sm truncate">{product.title}</p>
-                    <p className="text-xs text-gray-500">{Number(product.price).toLocaleString()}đ/{product.unit}</p>
-                    {product.isVip && product.vipExpiresAt && (
-                      <p className="text-xs text-gold-600">VIP đến: {new Date(product.vipExpiresAt).toLocaleDateString('vi-VN')}</p>
-                    )}
-                  </div>
-                </div>
-              ) : !productId ? (
-                <div className="p-3 bg-brand-50 border border-brand-200 rounded-lg mb-4 text-sm text-brand-700">
-                  Chưa chọn sản phẩm. Vào <Link href="/dashboard" className="underline">Dashboard</Link> → Sản phẩm → Nâng VIP
-                </div>
-              ) : null}
+          <section className="card p-4 sm:p-5" aria-labelledby="xn">
+            <h2 id="xn" className="text-lg font-bold text-ink">Xác nhận</h2>
 
-              {/* Tóm tắt */}
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Gói VIP</span>
-                  <span className="font-medium">{plan.label}</span>
+            {loading ? (
+              <p className="py-6 text-center text-sm text-ink-faint">Đang tải tin...</p>
+            ) : product ? (
+              <div className="mt-3 flex items-center gap-3 rounded-lg border border-line p-2.5">
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-paper">
+                  {product.images?.[0] && <img src={product.images[0].url} alt="" className="h-full w-full object-cover" />}
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Giá</span>
-                  <span className="font-bold text-gold-600">{plan.price.toLocaleString()}đ</span>
-                </div>
-                <div className="flex justify-between text-sm pt-2 border-t">
-                  <span className="font-semibold">Tổng cộng</span>
-                  <span className="font-bold text-lg">{plan.price.toLocaleString()}đ</span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-ink">{product.title}</p>
+                  <p className="text-[12px] text-ink-faint">{Number(product.price).toLocaleString('vi-VN')}đ/{product.unit}</p>
+                  {product.isVip && product.vipExpiresAt && <p className="text-[12px] font-semibold text-gold-700">VIP đến {new Date(product.vipExpiresAt).toLocaleDateString('vi-VN')}</p>}
                 </div>
               </div>
-
-              {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-
-              {success ? (
-                <div className="text-center py-4">
-                  <p className="font-semibold text-forest-700">Nâng cấp VIP thành công!</p>
-                  <p className="text-sm text-gray-500 mt-1">Đang chuyển về trang quản lý...</p>
-                </div>
-              ) : (
-                <button onClick={handlePay} disabled={creating || !productId}
-                  className="w-full bg-gold-400 text-white py-3 rounded-xl font-semibold hover:from-gold-500 hover:to-brand-500 disabled:opacity-50 transition-all shadow-md flex items-center justify-center gap-2">
-                  {creating ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang tạo...</>
-                  ) : (
-                    <>Tiến hành thanh toán</>
-                  )}
-                </button>
-              )}
-
-              <p className="text-xs text-gray-400 text-center mt-3">
-                Thanh toán qua PayOS - tự động xác nhận sau khi nhận tiền
+            ) : !productId ? (
+              <p className="mt-3 rounded-lg border border-gold-200 bg-gold-50 p-3 text-sm text-gold-800">
+                Chưa chọn tin. Vào <Link href="/dashboard?tab=products" className="font-semibold underline">Quản lý tin</Link>, chọn tin rồi bấm "Nâng VIP".
               </p>
-            </div>
-          </div>
+            ) : null}
+
+            <dl className="mt-4 divide-y divide-line border-t border-line text-sm">
+              <div className="flex justify-between py-2"><dt className="text-ink-soft">Gói</dt><dd className="font-medium text-ink">{plan.label}</dd></div>
+              <div className="flex justify-between py-2"><dt className="font-bold text-ink">Tổng cộng</dt><dd className="text-lg font-bold tabular-nums text-forest-700">{plan.price.toLocaleString('vi-VN')}đ</dd></div>
+            </dl>
+
+            {error && <p role="alert" className="mt-3 text-sm text-brand-600">{error}</p>}
+
+            {success ? (
+              <p role="status" className="mt-4 rounded-lg border border-forest-200 bg-forest-50 p-3 text-center text-sm text-forest-800"><b>Nâng cấp VIP thành công.</b> Đang chuyển về trang quản lý...</p>
+            ) : (
+              <button onClick={handlePay} disabled={creating || !productId} className="btn-forest mt-4 w-full py-3 disabled:opacity-50">
+                {creating ? <><i className="ri-loader-4-line animate-spin" aria-hidden="true" /> Đang tạo thanh toán...</> : 'Tiến hành thanh toán'}
+              </button>
+            )}
+            <p className="mt-3 text-center text-[12px] text-ink-faint">Thanh toán qua PayOS, tự xác nhận sau khi nhận được tiền.</p>
+          </section>
         </div>
       </div>
 
-      {/* Payment Modal */}
       {showModal && paymentData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-            {/* Header */}
-            <div className="bg-gold-400 px-6 py-4 text-white text-center">
-              <p className="text-sm font-medium opacity-90">Thanh toán VIP</p>
-              <p className="text-2xl font-bold mt-1">{paymentData.amount.toLocaleString()}đ</p>
+        <div className="fixed inset-0 z-[60] grid place-items-center bg-ink/60 p-4" role="dialog" aria-modal="true" aria-label="Thanh toán VIP">
+          <div className="w-full max-w-sm rounded-sheet bg-surface p-5">
+            <p className="text-sm text-ink-soft">Thanh toán VIP</p>
+            <p className="text-3xl font-bold tabular-nums text-ink">{paymentData.amount.toLocaleString('vi-VN')}đ</p>
+
+            <div className="mt-4 grid place-items-center">
+              <div className="grid h-52 w-52 place-items-center overflow-hidden rounded-card border border-line bg-white">
+                {paymentData.qrCode ? <img src={paymentData.qrCode} alt="Mã QR thanh toán" className="h-full w-full object-contain" /> : <i className="ri-qr-code-line text-5xl text-ink-faint" />}
+              </div>
             </div>
 
-            <div className="px-6 py-5">
-              {/* QR Code */}
-              <div className="flex justify-center mb-4">
-                <div className="w-52 h-52 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex items-center justify-center">
-                  {paymentData.qrCode ? (
-                    <img src={paymentData.qrCode} alt="QR thanh toán" className="w-full h-full object-contain" />
-                  ) : (
-                    <i className="ri-qr-code-line text-5xl text-gray-400"></i>
-                  )}
-                </div>
-              </div>
+            <p className="mt-4 text-center text-sm text-ink-soft">Mã QR hết hạn sau</p>
+            <p className={`text-center text-2xl font-bold tabular-nums ${countdown <= 60 ? 'text-brand-600' : 'text-ink'}`} aria-live="off">
+              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+            </p>
+            <p className="mt-2 text-center text-[13px] text-ink-soft">Đang chờ thanh toán, tự xác nhận khi nhận được tiền.</p>
 
-              {/* Countdown */}
-              <div className="text-center mb-4">
-                <p className="text-sm text-gray-500 mb-1">Mã QR hết hạn sau</p>
-                <p className={`text-2xl font-bold tabular-nums ${countdown <= 60 ? 'text-red-500' : 'text-gray-800'}`}>
-                  {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-                </p>
-              </div>
-
-              {/* Status */}
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-5">
-                <div className="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></div>
-                Đang chờ thanh toán... tự động xác nhận khi nhận tiền
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <a
-                  href={paymentData.checkoutUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 bg-blue-600 text-white text-sm py-2.5 rounded-xl font-semibold text-center hover:bg-blue-700 transition flex items-center justify-center gap-1.5"
-                >
-                  <i className="ri-external-link-line"></i>
-                  Mở trang thanh toán
-                </a>
-                <button
-                  onClick={handleCancelModal}
-                  className="flex-1 border border-gray-300 text-gray-700 text-sm py-2.5 rounded-xl font-semibold hover:bg-gray-50 transition"
-                >
-                  Hủy
-                </button>
-              </div>
+            <div className="mt-5 flex gap-3">
+              <a href={paymentData.checkoutUrl} target="_blank" rel="noreferrer" className="btn-forest flex-1">Mở trang thanh toán</a>
+              <button onClick={handleCancelModal} className="btn-ghost flex-1">Hủy</button>
             </div>
           </div>
         </div>

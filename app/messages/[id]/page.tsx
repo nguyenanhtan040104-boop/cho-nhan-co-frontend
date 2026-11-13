@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -198,85 +198,62 @@ export default function ChatPage() {
     } catch { alert('Thất bại'); }
   }
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
+  if (loading) {
+    return <div className="grid min-h-[60vh] place-items-center"><div className="h-9 w-9 animate-spin rounded-full border-[3px] border-forest-600 border-t-transparent" /></div>;
+  }
 
+  const otherName = otherUser?.fullName || otherUser?.username || 'Người dùng';
+
+  // A focused view: full screen on phones (covers the tab bar so the input is never hidden),
+  // a bordered panel on larger screens.
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b flex-shrink-0">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href="/messages" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
-            <i className="ri-arrow-left-line"></i>
+    <div className="fixed inset-0 z-[55] flex flex-col bg-paper md:static md:z-auto md:mx-auto md:my-4 md:h-[calc(100dvh-9rem)] md:max-w-3xl md:overflow-hidden md:rounded-card md:border md:border-line">
+      <div className="shrink-0 border-b border-line bg-surface">
+        <div className="flex items-center gap-3 px-3 py-2.5 sm:px-4">
+          <Link href="/messages" aria-label="Quay lại danh sách" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-line hover:border-forest-500">
+            <i className="ri-arrow-left-line" />
           </Link>
           {otherUser?.avatarUrl ? (
-            <img src={otherUser.avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover" />
+            <img src={otherUser.avatarUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />
           ) : (
-            <div className="w-9 h-9 bg-forest-100 rounded-full flex items-center justify-center text-forest-700 font-bold">
-              {otherUser?.fullName?.[0] || otherUser?.username?.[0] || 'U'}
-            </div>
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-forest-100 font-bold text-forest-800">{otherName[0]?.toUpperCase()}</div>
           )}
-          <div className="flex-1">
-            <p className="font-semibold text-gray-900 text-sm">{otherUser?.fullName || otherUser?.username || 'Người dùng'}</p>
-            {typing && <p className="text-xs text-forest-600 animate-pulse">Đang nhập...</p>}
-            {!socketReady && <p className="text-xs text-gold-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-gold-400 rounded-full animate-pulse inline-block"></span>Đang kết nối...</p>}
-            {socketReady && !typing && <p className="text-xs text-forest-500 flex items-center gap-1"><span className="w-1.5 h-1.5 bg-forest-400 rounded-full inline-block"></span>Đang hoạt động</p>}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-ink">{otherName}</p>
+            <p className="text-[12px] text-ink-faint">
+              {typing ? 'Đang nhập...' : socketReady ? 'Đang trực tuyến' : 'Đang kết nối...'}
+            </p>
           </div>
           <div className="relative">
-            <button onClick={() => setShowMenu(!showMenu)}
-              className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-lg">
-              <i className="ri-more-2-line text-xl"></i>
+            <button onClick={() => setShowMenu(!showMenu)} aria-label="Tùy chọn" aria-expanded={showMenu} className="grid h-9 w-9 place-items-center rounded-lg text-ink-soft hover:bg-paper">
+              <i className="ri-more-2-line text-xl" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-10 bg-white rounded-xl shadow-lg border w-44 z-10 overflow-hidden">
-                {otherUser?.id && (
-                  <Link href={`/profile/${otherUser.id}`}
-                    className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-                    <i className="ri-user-line"></i> Xem trang cá nhân
-                  </Link>
-                )}
-                <button onClick={handleBlock}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-500 hover:bg-red-50">
-                  <i className="ri-forbid-line"></i> Chặn người dùng
-                </button>
+              <div className="absolute right-0 top-10 z-10 w-48 rounded-card border border-line bg-surface py-1">
+                {otherUser?.id && <Link href={`/profile/${otherUser.id}`} className="block px-4 py-2.5 text-sm text-ink hover:bg-paper">Xem trang cá nhân</Link>}
+                <button onClick={handleBlock} className="block w-full px-4 py-2.5 text-left text-sm text-brand-600 hover:bg-brand-50">Chặn người dùng</button>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 max-w-2xl mx-auto w-full" onClick={() => setShowMenu(false)}>
-        <div className="space-y-3">
-          {msgs.length === 0 && (
-            <p className="text-center text-gray-400 text-sm py-10">Bắt đầu cuộc trò chuyện nào!</p>
-          )}
+      <div className="flex-1 overflow-y-auto px-3 py-4 sm:px-4" onClick={() => setShowMenu(false)}>
+        <div className="space-y-2.5">
+          {msgs.length === 0 && <p className="py-10 text-center text-sm text-ink-faint">Hãy gửi lời chào đầu tiên.</p>}
           {msgs.map((msg: any) => {
             const isMe = msg.senderId === myId || msg.sender?.id === myId;
             return (
-              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} gap-2`}>
-                {!isMe && (
-                  <div className="w-7 h-7 bg-forest-100 rounded-full flex items-center justify-center text-forest-700 text-xs font-bold flex-shrink-0 mt-1">
-                    {otherUser?.fullName?.[0] || 'U'}
-                  </div>
-                )}
-                <div className={`max-w-[70%] flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex max-w-[78%] flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
                   {msg.type === 'IMAGE' && msg.fileUrl ? (
-                    <img src={msg.fileUrl} alt="ảnh" onClick={() => window.open(msg.fileUrl, '_blank')}
-                      className={`rounded-2xl max-w-full max-h-60 object-cover cursor-pointer ${isMe ? 'rounded-br-sm' : 'rounded-bl-sm'}`} />
+                    <img src={msg.fileUrl} alt="Ảnh đã gửi" onClick={() => window.open(msg.fileUrl, '_blank')} className="max-h-60 max-w-full cursor-pointer rounded-card object-cover" />
                   ) : (
-                    <div className={`px-4 py-2.5 rounded-2xl text-sm ${isMe
-                      ? 'bg-brand-500 text-white rounded-br-sm'
-                      : 'bg-white text-gray-900 rounded-bl-sm shadow-sm border border-gray-100'}`}>
-                      {msg.content}
-                    </div>
+                    <div className={`whitespace-pre-wrap break-words rounded-card px-3.5 py-2 text-[15px] ${isMe ? 'bg-forest-600 text-white' : 'border border-line bg-surface text-ink'}`}>{msg.content}</div>
                   )}
-                  <span className="text-xs text-gray-400 px-1">
+                  <span className="px-1 text-[11px] text-ink-faint">
                     {new Date(msg.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                    {isMe && msg.isRead && <span className="ml-1 text-forest-500">✓✓</span>}
+                    {isMe && msg.isRead && ' · Đã xem'}
                   </span>
                 </div>
               </div>
@@ -286,27 +263,19 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Input */}
-      <div className="bg-white border-t flex-shrink-0">
-        <div className="max-w-2xl mx-auto px-4 py-3">
+      <div className="safe-bottom shrink-0 border-t border-line bg-surface">
+        <div className="px-3 py-2.5 sm:px-4">
           {blocked ? (
-            <p className="text-center text-gray-400 text-sm py-2">Bạn đã chặn người dùng này</p>
+            <p className="py-2 text-center text-sm text-ink-faint">Bạn đã chặn người dùng này</p>
           ) : (
             <form onSubmit={handleSend} className="flex items-center gap-2">
-              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSend} className="hidden" />
-              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImg}
-                className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-brand-600 hover:bg-forest-50 rounded-full transition-colors disabled:opacity-50">
-                {uploadingImg
-                  ? <div className="w-4 h-4 border-2 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
-                  : <i className="ri-image-line text-xl"></i>}
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageSend} className="sr-only" tabIndex={-1} />
+              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImg} aria-label="Gửi ảnh"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-ink-soft hover:bg-paper disabled:opacity-50">
+                {uploadingImg ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-forest-600 border-t-transparent" /> : <i className="ri-image-line text-xl" />}
               </button>
-              <input value={text} onChange={handleTextChange}
-                placeholder="Nhập tin nhắn..."
-                className="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-colors" />
-              <button type="submit" disabled={!text.trim()}
-                className="w-10 h-10 bg-brand-500 text-white rounded-full flex items-center justify-center hover:bg-brand-600 disabled:opacity-40 transition-colors">
-                <i className="ri-send-plane-fill"></i>
-              </button>
+              <input value={text} onChange={handleTextChange} placeholder="Nhập tin nhắn..." aria-label="Tin nhắn" className="field min-w-0 flex-1" />
+              <button type="submit" disabled={!text.trim()} className="btn-forest shrink-0 disabled:opacity-40">Gửi</button>
             </form>
           )}
         </div>

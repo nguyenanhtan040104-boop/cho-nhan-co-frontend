@@ -1,4 +1,4 @@
-﻿# Chợ Nhân Cơ: design rules
+# Chợ Nhân Cơ: design rules
 
 ## Direction
 
@@ -83,6 +83,6 @@ in words. Empty states say what is missing and give one next action.
 4. **No floating "+"**: the tab bar already has it; two post buttons on one screen was noise.
 5. **Menus without colour-coded icons** (blue pencil, red bin, brand-coloured share): wording does the job.
 
-## Still on the old style (to be rebuilt)
+## Coverage
 
-Admin area, VIP checkout, messages.
+Every page now follows these rules. When adding a page, run the audit table above on it before merging.

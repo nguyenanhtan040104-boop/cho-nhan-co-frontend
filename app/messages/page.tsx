@@ -2,16 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { auth, messages as messagesApi } from '../../lib/api';
 
 type FilterTab = 'all' | 'unread';
-
-const COLORS = ['bg-gold-400', 'bg-blue-400', 'bg-forest-400', 'bg-pink-400', 'bg-forest-400'];
-
-function getInitials(name: string) {
-  const parts = (name || 'U').trim().split(' ');
-  return parts[parts.length - 1][0].toUpperCase();
-}
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -35,19 +29,14 @@ export default function MessagesPage() {
     messagesApi.getConversations()
       .then((data: any) => {
         const list: any[] = Array.isArray(data) ? data : [];
-        // Override unreadCount từ localStorage nếu user đã đọc conversation đó
-        // Chỉ override nếu tin nhắn cuối CHƯA có cái nào mới hơn thời điểm đọc
+        // A conversation the user already opened keeps unread at 0 until a newer message arrives
         try {
           const readMap: Record<string, string> = JSON.parse(localStorage.getItem('readConversations') || '{}');
           setConversations(list.map(c => {
             const readAt = readMap[c.id];
             if (!readAt) return c;
             const lastMsgTime = c.messages?.[0]?.createdAt;
-            // Tin nhắn cuối cũ hơn hoặc bằng thời điểm đọc → override về 0
-            if (!lastMsgTime || new Date(lastMsgTime) <= new Date(readAt)) {
-              return { ...c, unreadCount: 0 };
-            }
-            // Có tin mới hơn thời điểm đọc → giữ nguyên unreadCount từ API
+            if (!lastMsgTime || new Date(lastMsgTime) <= new Date(readAt)) return { ...c, unreadCount: 0 };
             return c;
           }));
         } catch {
@@ -56,6 +45,7 @@ export default function MessagesPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = conversations.filter(c => {
@@ -66,8 +56,7 @@ export default function MessagesPage() {
     return true;
   });
 
-  function handleConvClick(conv: any) {
-    // Lưu timestamp vào localStorage — dùng để so sánh với tin nhắn mới
+  function open(conv: any) {
     try {
       const readMap: Record<string, string> = JSON.parse(localStorage.getItem('readConversations') || '{}');
       readMap[conv.id] = new Date().toISOString();
@@ -75,105 +64,79 @@ export default function MessagesPage() {
     } catch {}
 
     if (conv.unreadCount > 0) {
-      // Xóa bold ngay lập tức trong local state
-      setConversations(prev => prev.map(c =>
-        c.id === conv.id ? { ...c, unreadCount: 0 } : c
-      ));
-      // Báo Header giảm badge xuống đúng số
-      window.dispatchEvent(new CustomEvent('conversation-read', {
-        detail: { unreadCount: conv.unreadCount }
-      }));
+      setConversations(prev => prev.map(c => (c.id === conv.id ? { ...c, unreadCount: 0 } : c)));
+      // Tell the header to lower its badge
+      window.dispatchEvent(new CustomEvent('conversation-read', { detail: { unreadCount: conv.unreadCount } }));
     }
     router.push(`/messages/${conv.id}`);
   }
 
   return (
-    <div className="flex h-[calc(100vh-56px)] bg-white">
+    <div className="min-h-screen bg-paper pb-10">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+        <h1 className="py-4 text-xl font-bold text-ink sm:text-2xl">Tin nhắn</h1>
 
-      {/* LEFT: contact list */}
-      <div className="w-full sm:w-80 lg:w-96 flex-shrink-0 border-r border-gray-200 flex flex-col">
-
-        {/* Header */}
-        <div className="px-4 pt-4 pb-2 border-b border-gray-100">
-          <h2 className="text-base font-bold text-gray-900 mb-3">Tin nhắn</h2>
-          <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
-            <i className="ri-search-line text-gray-400 text-sm flex-shrink-0"></i>
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Tìm kiếm..."
-              className="flex-1 text-sm bg-transparent focus:outline-none text-gray-800 placeholder-gray-400"
-            />
-          </div>
-          <div className="flex gap-1 mt-3">
-            {([['all', 'Tất cả'], ['unread', 'Chưa đọc']] as [FilterTab, string][]).map(([key, label]) => (
-              <button key={key} onClick={() => setFilter(key as FilterTab)}
-                className={`text-xs font-medium px-3 py-1.5 rounded-full transition ${filter === key ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* List */}
-        <div className="flex-1 overflow-y-auto">
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="w-6 h-6 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
+        <div className="card overflow-hidden">
+          <div className="space-y-3 border-b border-line p-3 sm:p-4">
+            <div className="relative">
+              <i className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
+              <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm theo tên" aria-label="Tìm cuộc trò chuyện" className="field !pl-9" />
             </div>
+            <div className="flex gap-2" role="tablist" aria-label="Lọc tin nhắn">
+              {([['all', 'Tất cả'], ['unread', 'Chưa đọc']] as [FilterTab, string][]).map(([key, label]) => (
+                <button key={key} role="tab" aria-selected={filter === key} onClick={() => setFilter(key)} className={`chip ${filter === key ? 'chip-active' : ''}`}>{label}</button>
+              ))}
+            </div>
+          </div>
+
+          {loading ? (
+            <ul className="divide-y divide-line">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <li key={i} className="flex animate-pulse items-center gap-3 px-4 py-3.5">
+                  <div className="h-11 w-11 rounded-full bg-paper" />
+                  <div className="flex-1 space-y-2"><div className="h-3 w-1/3 rounded bg-paper" /><div className="h-3 w-2/3 rounded bg-paper" /></div>
+                </li>
+              ))}
+            </ul>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
-              <i className="ri-chat-3-line text-4xl mb-2"></i>
-              <p className="text-sm">Chưa có tin nhắn nào</p>
-              <p className="text-xs mt-1 text-center px-4">Nhắn tin với người bán từ trang sản phẩm</p>
+            <div className="px-6 py-14 text-center">
+              <i className="ri-chat-3-line text-4xl text-ink-faint" aria-hidden="true" />
+              <p className="mt-2 font-semibold text-ink">{filter === 'unread' || search ? 'Không có cuộc trò chuyện phù hợp' : 'Chưa có tin nhắn nào'}</p>
+              {!search && filter === 'all' && <p className="mt-1 text-sm text-ink-soft">Hãy nhắn tin cho người bán từ trang chi tiết của tin.</p>}
+              {!search && filter === 'all' && <Link href="/products" className="btn-forest mt-4">Xem tin đang bán</Link>}
             </div>
           ) : (
-            filtered.map((conv: any, i: number) => {
-              const other = conv.otherUser;
-              const name = other?.fullName || other?.username || 'Người dùng';
-              const lastMsg = conv.messages?.[0];
-              const lastText = lastMsg?.type === 'IMAGE' ? '🖼 Đã gửi ảnh' : (lastMsg?.content || 'Bắt đầu trò chuyện');
-              return (
-                <button key={conv.id} onClick={() => handleConvClick(conv)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition text-left border-b border-gray-50">
-                  <div className="relative flex-shrink-0">
-                    {other?.avatarUrl ? (
-                      <img src={other.avatarUrl} alt="" className="w-11 h-11 rounded-full object-cover" />
-                    ) : (
-                      <div className={`w-11 h-11 rounded-full ${COLORS[i % COLORS.length]} flex items-center justify-center text-white font-bold text-base`}>
-                        {getInitials(name)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm truncate ${conv.unreadCount ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>{name}</span>
-                      {lastMsg && <span className="text-xs text-gray-400 flex-shrink-0 ml-1">{timeAgo(lastMsg.createdAt)}</span>}
-                    </div>
-                    <div className="flex items-center justify-between mt-0.5">
-                      <span className={`text-xs truncate ${conv.unreadCount ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>{lastText}</span>
-                      {conv.unreadCount > 0 && (
-                        <span className="ml-1 flex-shrink-0 w-5 h-5 bg-brand-500 text-white text-xs font-bold rounded-full flex items-center justify-center">{conv.unreadCount}</span>
+            <ul className="divide-y divide-line">
+              {filtered.map((conv: any) => {
+                const other = conv.otherUser;
+                const name = other?.fullName || other?.username || 'Người dùng';
+                const lastMsg = conv.messages?.[0];
+                const lastText = lastMsg?.type === 'IMAGE' ? 'Đã gửi một ảnh' : (lastMsg?.content || 'Bắt đầu trò chuyện');
+                const unread = conv.unreadCount > 0;
+                return (
+                  <li key={conv.id}>
+                    <button onClick={() => open(conv)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-paper">
+                      {other?.avatarUrl ? (
+                        <img src={other.avatarUrl} alt="" className="h-11 w-11 shrink-0 rounded-full object-cover" />
+                      ) : (
+                        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-forest-100 font-bold text-forest-800">{name.trim().split(' ').pop()![0].toUpperCase()}</div>
                       )}
-                    </div>
-                  </div>
-                  <i className="ri-arrow-right-s-line text-gray-300 flex-shrink-0 text-lg"></i>
-                </button>
-              );
-            })
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className={`truncate text-[15px] ${unread ? 'font-bold text-ink' : 'font-medium text-ink'}`}>{name}</span>
+                          {lastMsg && <span className="shrink-0 text-[12px] text-ink-faint">{timeAgo(lastMsg.createdAt)}</span>}
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-between gap-2">
+                          <span className={`truncate text-sm ${unread ? 'font-medium text-ink' : 'text-ink-soft'}`}>{lastText}</span>
+                          {unread && <span className="shrink-0 rounded-full bg-brand-500 px-1.5 text-[11px] font-bold text-white" aria-label={`${conv.unreadCount} tin chưa đọc`}>{conv.unreadCount}</span>}
+                        </div>
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           )}
-        </div>
-      </div>
-
-      {/* RIGHT: empty state — desktop only */}
-      <div className="hidden sm:flex flex-1 flex-col items-center justify-center gap-4 text-center px-8 bg-gray-50">
-        <div className="w-28 h-28 bg-gold-50 rounded-full flex items-center justify-center">
-          <i className="ri-message-3-line text-gold-400 text-5xl"></i>
-        </div>
-        <div>
-          <p className="text-lg font-bold text-gray-800">Tích cực chat, chốc lát chốt đơn!</p>
-          <p className="text-sm text-gray-400 mt-1">Chọn một cuộc trò chuyện để bắt đầu nhắn tin</p>
         </div>
       </div>
     </div>
