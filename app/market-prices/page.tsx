@@ -2,6 +2,22 @@
 
 import { useState, useEffect } from 'react';
 
+const vnd = (n: number) => n.toLocaleString('vi-VN');
+
+// Direction is shown by sign and arrow as well as colour. Colours follow the
+// Vietnamese price-board habit: up is green, down is red.
+function Change({ value, unit = '', digits }: { value: number | null | undefined; unit?: string; digits?: (n: number) => string }) {
+  if (value == null || value === 0) return <span className="text-ink-faint">-</span>;
+  const abs = Math.abs(value);
+  const text = digits ? digits(abs) : vnd(abs);
+  return value > 0
+    ? <span className="font-semibold text-forest-700">▲ +{text}{unit}</span>
+    : <span className="font-semibold text-brand-600">▼ -{text}{unit}</span>;
+}
+
+const th = 'px-4 py-2.5 text-[12px] font-semibold text-ink-soft sm:px-5';
+const td = 'px-4 py-3 sm:px-5';
+
 export default function MarketPricesPage() {
   const [goldPrices, setGoldPrices] = useState<any[]>([]);
   const [goldUpdatedAt, setGoldUpdatedAt] = useState('');
@@ -17,156 +33,122 @@ export default function MarketPricesPage() {
   const [openCat, setOpenCat] = useState<string>('');
   const [openProvince, setOpenProvince] = useState<string>('dakLak');
 
-  useEffect(() => {
-    fetch('/api/gold-prices').then(r => r.json()).then(d => {
+  const loadGold = () => {
+    setGoldLoading(true);
+    return fetch('/api/gold-prices').then(r => r.json()).then(d => {
       setGoldPrices(d.data || []); setGoldUpdatedAt(d.updatedAt || ''); setGoldSource(d.source || ''); setGoldData(d);
     }).catch(() => {}).finally(() => setGoldLoading(false));
+  };
 
-    fetch('/api/agri-prices').then(r => r.json()).then(d => {
-      setAgriCategories(d.categories || []);
-      setAgriUpdatedAt(d.updatedAt || '');
-      setAgriDateLabel(d.dateLabel || ''); setAgriPriceDate(d.priceDate || '');
-      if (d.categories?.length > 0) setOpenCat(d.categories[0].category);
-    }).catch(() => {}).finally(() => setAgriLoading(false));
-  }, []);
-
-  function refreshGold() {
-    setGoldLoading(true);
-    fetch('/api/gold-prices').then(r => r.json()).then(d => {
-      setGoldPrices(d.data || []); setGoldUpdatedAt(d.updatedAt || ''); setGoldSource(d.source || ''); setGoldData(d);
-    }).finally(() => setGoldLoading(false));
-  }
-
-  function refreshAgri() {
+  const loadAgri = (first = false) => {
     setAgriLoading(true);
-    fetch('/api/agri-prices').then(r => r.json()).then(d => {
+    return fetch('/api/agri-prices').then(r => r.json()).then(d => {
       setAgriCategories(d.categories || []);
       setAgriUpdatedAt(d.updatedAt || '');
       setAgriDateLabel(d.dateLabel || ''); setAgriPriceDate(d.priceDate || '');
-    }).finally(() => setAgriLoading(false));
-  }
+      if (first && d.categories?.length > 0) setOpenCat(d.categories[0].category);
+    }).catch(() => {}).finally(() => setAgriLoading(false));
+  };
+
+  useEffect(() => { loadGold(); loadAgri(true); }, []);
 
   const currentCat = agriCategories.find(c => c.category === openCat);
+  const time = (iso: string) => new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const goldReal = goldSource === 'webgia.com' || goldSource === 'sjc.com.vn';
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F3F7F3' }}>
-      {/* Banner */}
-      <div className="border-b border-line bg-surface py-6">
-        <div className="max-w-5xl mx-auto px-4">
-          <p className="text-brand-600 text-xs font-bold mb-1">Chợ Nhân Cơ</p>
-          <h1 className="text-2xl font-semibold text-ink">Giá thị trường</h1>
-          <p className="text-ink-soft text-sm mt-1">
+    <div className="min-h-screen bg-paper pb-10">
+      <header className="border-b border-line bg-surface">
+        <div className="mx-auto max-w-content px-4 py-5 sm:px-6">
+          <h1 className="text-[1.5rem] font-bold leading-tight text-ink sm:text-3xl">Giá thị trường hôm nay</h1>
+          <p className="mt-1 text-sm text-ink-soft">
             {agriDateLabel || new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
           </p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-
-        {/* ── Bảng Giá Hàng Hóa ── */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b bg-forest-50">
+      <div className="mx-auto max-w-content space-y-6 px-4 pt-5 sm:px-6">
+        {/* ── Nông sản, hàng hóa ── */}
+        <section className="card overflow-hidden" aria-labelledby="hh">
+          <div className="flex items-start justify-between gap-3 px-4 py-4 sm:px-5">
             <div>
-              <h2 className="font-bold text-gray-900 text-lg">Bảng Giá Hàng Hóa Hôm Nay</h2>
-              <p className="text-xs text-gray-500">
-                {agriDateLabel}{agriPriceDate && ` · Giá ngày ${agriPriceDate}`}
-                {agriUpdatedAt && ` · ${new Date(agriUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+              <h2 id="hh" className="text-lg font-bold text-ink">Nông sản và hàng hóa</h2>
+              <p className="mt-0.5 text-[12px] text-ink-faint">
+                {agriPriceDate && `Giá ngày ${agriPriceDate}`}
+                {agriUpdatedAt && `${agriPriceDate ? ' · ' : ''}cập nhật lúc ${time(agriUpdatedAt)}`}
               </p>
             </div>
-            <button onClick={refreshAgri} className="text-forest-600 hover:text-forest-700 p-2 rounded-lg hover:bg-forest-100 transition-colors">
-              <i className={`ri-refresh-line text-lg ${agriLoading ? 'animate-spin' : ''}`}></i>
+            <button onClick={() => loadAgri()} disabled={agriLoading} className="btn-ghost shrink-0 !px-3 !py-1.5 text-[13px] disabled:opacity-50">
+              <i className={`ri-refresh-line ${agriLoading ? 'animate-spin' : ''}`} aria-hidden="true" /> Làm mới
             </button>
           </div>
 
-          {agriLoading ? (
-            <div className="p-6 space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="h-10 bg-gray-100 rounded-lg animate-pulse"></div>)}</div>
+          {agriLoading && agriCategories.length === 0 ? (
+            <div className="space-y-2 px-4 pb-5 sm:px-5">{[...Array(4)].map((_, i) => <div key={i} className="h-10 animate-pulse rounded-lg bg-paper" />)}</div>
           ) : (
             <>
-              {/* Tab danh mục */}
-              <div className="flex flex-wrap gap-1.5 px-5 py-3 border-b bg-gray-50">
+              <div className="no-scrollbar flex gap-2 overflow-x-auto border-y border-line px-4 py-3 sm:px-5">
                 {agriCategories.map(cat => (
-                  <button key={cat.category} onClick={() => setOpenCat(cat.category)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${openCat === cat.category ? 'bg-forest-600 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                    {cat.category}
-                    {cat.isLive && <span className={`w-1.5 h-1.5 rounded-full ${openCat === cat.category ? 'bg-forest-200' : 'bg-forest-500'}`}></span>}
-                  </button>
+                  <button key={cat.category} onClick={() => setOpenCat(cat.category)} className={`chip shrink-0 ${openCat === cat.category ? 'chip-active' : ''}`}>{cat.category}</button>
                 ))}
               </div>
 
-              {/* Nội dung theo danh mục */}
               {currentCat && (
                 <div>
-                  <div className="px-5 py-2.5 bg-gray-50 border-b flex flex-wrap items-center gap-2 text-sm">
-                    <span className="font-medium text-gray-700">{currentCat.category}</span>{currentCat.note && <span className="w-full text-xs text-gold-700 bg-gold-50 px-3 py-1.5 rounded-lg">{currentCat.note}</span>}
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${currentCat.isLive ? 'text-forest-600 bg-forest-50' : 'text-gray-400 bg-gray-100'}`}>
-                      {currentCat.source}
-                    </span>
-                  </div>
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 text-[12px] text-ink-faint sm:px-5">
+                    <span>Nguồn: {currentCat.source}</span>
+                    {!currentCat.isLive && <span className="font-semibold text-gold-700">Dữ liệu tham khảo, chưa phải giá trực tiếp</span>}
+                  </p>
+                  {currentCat.note && <p className="mx-4 mb-2 rounded-lg border border-gold-200 bg-gold-50 px-3 py-2 text-[13px] text-gold-800 sm:mx-5">{currentCat.note}</p>}
 
-                  {/* Cà phê nội địa — bảng lịch sử theo tỉnh */}
                   {currentCat.type === 'coffee_history' && currentCat.provinces?.length > 0 ? (
                     <CoffeeHistoryTable provinces={currentCat.provinces} openProvince={openProvince} setOpenProvince={setOpenProvince} />
                   ) : currentCat.type === 'fuel_table' ? (
-                    /* Bảng xăng dầu Vùng 1 / Vùng 2 */
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
-                          <tr>
-                            <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
-                            <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Vùng 1</th>
-                            <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Vùng 2</th>
-                          </tr>
+                        <caption className="sr-only">Giá xăng dầu theo vùng</caption>
+                        <thead className="border-y border-line bg-paper">
+                          <tr><th scope="col" className={`${th} text-left`}>Sản phẩm</th><th scope="col" className={`${th} text-right`}>Vùng 1</th><th scope="col" className={`${th} text-right`}>Vùng 2</th></tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-line">
                           {currentCat.items?.map((item: any, i: number) => (
-                            <tr key={i} className="hover:bg-blue-50/20 transition-colors">
-                              <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                              <td className="px-5 py-3 text-right">
-                                <span className="font-bold text-blue-700">{item.price.toLocaleString('vi-VN')}đ</span>
-                                <span className="text-xs text-gray-400 ml-0.5">/{item.unit}</span>
-                              </td>
-                              <td className="px-5 py-3 text-right">
-                                {item.price2
-                                  ? <><span className="font-semibold text-gray-700">{item.price2.toLocaleString('vi-VN')}đ</span><span className="text-xs text-gray-400 ml-0.5">/{item.unit}</span></>
-                                  : <span className="text-gray-300">—</span>}
-                              </td>
+                            <tr key={i}>
+                              <th scope="row" className={`${td} text-left text-sm font-medium text-ink`}>{item.name}</th>
+                              <td className={`${td} text-right`}><b className="tabular-nums text-ink">{vnd(item.price)}đ</b><span className="text-[12px] text-ink-faint">/{item.unit}</span></td>
+                              <td className={`${td} text-right tabular-nums text-ink-soft`}>{item.price2 ? <>{vnd(item.price2)}đ<span className="text-[12px] text-ink-faint">/{item.unit}</span></> : '-'}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                      <p className="text-xs text-gray-400 px-5 py-2 border-t bg-gray-50/50">Vùng 1: đồng bằng · Vùng 2: miền núi, hải đảo · Nguồn: Petrolimex/Bộ Công Thương</p>
+                      <p className="border-t border-line px-4 py-2.5 text-[12px] text-ink-faint sm:px-5">Vùng 1: đồng bằng. Vùng 2: miền núi, hải đảo. Nguồn: Petrolimex, Bộ Công Thương.</p>
                     </div>
                   ) : (
-                    /* Bảng thông thường */
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
+                        <caption className="sr-only">Giá {currentCat.category}</caption>
+                        <thead className="border-y border-line bg-paper">
                           <tr>
-                            <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Sản phẩm</th>
-                            <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Giá</th>
-                            <th className="text-right px-5 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
-                            <th className="text-left px-5 py-2.5 text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Khu vực</th>
+                            <th scope="col" className={`${th} text-left`}>Sản phẩm</th>
+                            <th scope="col" className={`${th} text-right`}>Giá</th>
+                            <th scope="col" className={`${th} text-right`}>Thay đổi</th>
+                            <th scope="col" className={`${th} hidden text-left sm:table-cell`}>Khu vực</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {(!currentCat.items || currentCat.items.length === 0) && (<tr><td colSpan={4} className="px-5 py-6 text-center text-sm text-gray-400">Chưa lấy được giá từ nguồn này, thử làm mới sau ít phút.</td></tr>)}{currentCat.items?.map((item: any, i: number) => {
-                            const ch = item.change;
-                            return (
-                              <tr key={i} className="hover:bg-forest-50/30 transition-colors">
-                                <td className="px-5 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                                <td className="px-5 py-3 text-right">
-                                  <span className="font-bold text-forest-600">{item.price.toLocaleString('vi-VN')}{item.priceMax ? ` – ${item.priceMax.toLocaleString('vi-VN')}` : ''}đ</span>
-                                  <span className="text-xs text-gray-400">/{item.unit}</span>
-                                </td>
-                                <td className="px-5 py-3 text-right text-sm font-medium">
-                                  {ch == null || ch === 0 ? <span className="text-gray-300">—</span>
-                                    : ch > 0 ? <span className="text-red-500">▲ {Math.abs(ch).toLocaleString('vi-VN')}</span>
-                                    : <span className="text-forest-600">▼ {Math.abs(ch).toLocaleString('vi-VN')}</span>}
-                                </td>
-                                <td className="px-5 py-3 text-sm text-gray-500 hidden sm:table-cell">{item.location}</td>
-                              </tr>
-                            );
-                          })}
+                        <tbody className="divide-y divide-line">
+                          {(!currentCat.items || currentCat.items.length === 0) && (
+                            <tr><td colSpan={4} className="px-5 py-8 text-center text-sm text-ink-faint">Chưa lấy được giá từ nguồn này. Thử làm mới sau ít phút.</td></tr>
+                          )}
+                          {currentCat.items?.map((item: any, i: number) => (
+                            <tr key={i}>
+                              <th scope="row" className={`${td} text-left text-sm font-medium text-ink`}>{item.name}</th>
+                              <td className={`${td} text-right`}>
+                                <b className="tabular-nums text-forest-700">{vnd(item.price)}{item.priceMax ? ` - ${vnd(item.priceMax)}` : ''}đ</b>
+                                <span className="text-[12px] text-ink-faint">/{item.unit}</span>
+                              </td>
+                              <td className={`${td} text-right text-sm tabular-nums`}><Change value={item.change} /></td>
+                              <td className={`${td} hidden text-sm text-ink-soft sm:table-cell`}>{item.location}</td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
@@ -176,91 +158,79 @@ export default function MarketPricesPage() {
             </>
           )}
 
-          <p className="text-xs text-gray-400 px-5 py-3 border-t text-center">
-            Nguồn: giacafe.vn · banggianongsan.com · webgia.com · Chỉ mang tính tham khảo
+          <p className="border-t border-line px-4 py-3 text-[12px] text-ink-faint sm:px-5">
+            Nguồn: giacafe.vn, banggianongsan.com, webgia.com. Chỉ để tham khảo, giá thực tế tùy nơi thu mua.
           </p>
-        </div>
+        </section>
 
-        {/* ── Giá Vàng SJC ── */}
-        <div className="bg-gold-50 border border-gold-200 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gold-400 rounded-xl flex items-center justify-center shadow">
-                <span className="text-base font-bold text-white">Au</span>
-              </div>
-              <div>
-                <h2 className="font-bold text-gray-900 text-lg">Giá Vàng SJC Hôm Nay</h2>
-                <p className="text-xs text-gray-500">
-                  {goldSource === 'webgia.com' || goldSource === 'sjc.com.vn' ? 'Dữ liệu thực' : 'Dữ liệu tham khảo'}
-                  {goldData?.sourceUpdatedAt ? ` · Cập nhật ${goldData.sourceUpdatedAt}` : (goldUpdatedAt && ` · ${new Date(goldUpdatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`)}
-                </p>
-              </div>
+        {/* ── Vàng ── */}
+        <section className="card overflow-hidden" aria-labelledby="vang">
+          <div className="flex items-start justify-between gap-3 px-4 py-4 sm:px-5">
+            <div>
+              <h2 id="vang" className="text-lg font-bold text-ink">Giá vàng SJC</h2>
+              <p className="mt-0.5 text-[12px] text-ink-faint">
+                {goldReal ? 'Dữ liệu thực' : 'Dữ liệu tham khảo'}
+                {goldData?.sourceUpdatedAt ? ` · cập nhật ${goldData.sourceUpdatedAt}` : goldUpdatedAt ? ` · cập nhật lúc ${time(goldUpdatedAt)}` : ''}
+              </p>
             </div>
-            <button onClick={refreshGold} className="text-gold-600 hover:text-gold-700 p-2 rounded-lg hover:bg-gold-100 transition-colors">
-              <i className={`ri-refresh-line text-lg ${goldLoading ? 'animate-spin' : ''}`}></i>
+            <button onClick={() => loadGold()} disabled={goldLoading} className="btn-ghost shrink-0 !px-3 !py-1.5 text-[13px] disabled:opacity-50">
+              <i className={`ri-refresh-line ${goldLoading ? 'animate-spin' : ''}`} aria-hidden="true" /> Làm mới
             </button>
           </div>
 
-          {goldLoading ? (
-            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-xl p-3 animate-pulse h-14"></div>)}</div>
+          {goldLoading && goldPrices.length === 0 ? (
+            <div className="space-y-2 px-4 pb-5 sm:px-5">{[...Array(3)].map((_, i) => <div key={i} className="h-10 animate-pulse rounded-lg bg-paper" />)}</div>
           ) : (
             <>
               {goldData?.worldPrice && (
-                <div className="bg-gold-100/60 rounded-xl px-4 py-2.5 mb-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Vàng thế giới (XAU/USD)</span>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-gray-900">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</span>
-                    {goldData.worldChange != null && (
-                      <span className={`text-sm font-semibold ${goldData.worldChange >= 0 ? 'text-red-500' : 'text-forest-600'}`}>
-                        {goldData.worldChange >= 0 ? '▲' : '▼'} {Math.abs(goldData.worldChange).toFixed(2)}
-                      </span>
+                <p className="flex flex-wrap items-center justify-between gap-x-4 border-t border-line px-4 py-2.5 text-sm sm:px-5">
+                  <span className="text-ink-soft">Vàng thế giới (XAU/USD)</span>
+                  <span>
+                    <b className="tabular-nums text-ink">${goldData.worldPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}/oz</b>
+                    {goldData.worldChange != null && goldData.worldChange !== 0 && (
+                      <span className="ml-3 tabular-nums"><Change value={goldData.worldChange} digits={n => n.toFixed(2)} /></span>
                     )}
-                  </div>
-                </div>
+                  </span>
+                </p>
               )}
-              <div className="overflow-x-auto rounded-xl border border-gold-100">
+              <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gold-50 border-b border-gold-100">
+                  <caption className="sr-only">Giá vàng miếng SJC</caption>
+                  <thead className="border-y border-line bg-paper">
                     <tr>
-                      <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Hệ thống bán vàng miếng SJC</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Mua vào</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Bán ra</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Thay đổi</th>
+                      <th scope="col" className={`${th} text-left`}>Hệ thống</th>
+                      <th scope="col" className={`${th} text-right`}>Mua vào</th>
+                      <th scope="col" className={`${th} text-right`}>Bán ra</th>
+                      <th scope="col" className={`${th} text-right`}>Thay đổi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gold-50">
-                    {goldPrices.map((item: any, i: number) => {
-                      const ch = item.change;
-                      return (
-                        <tr key={i} className="hover:bg-gold-50/40 transition-colors bg-white">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-bold text-blue-600 text-sm">{item.buy > 0 ? (item.buy / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
-                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <span className="font-bold text-red-500 text-sm">{item.sell > 0 ? (item.sell / 1_000_000).toFixed(2) + ' tr' : '—'}</span>
-                            <span className="text-xs text-gray-400 block">/{item.unit ?? 'lượng'}</span>
-                          </td>
-                          <td className="px-4 py-3 text-right text-sm font-medium">
-                            {ch == null || ch === 0 ? <span className="text-gray-300">—</span>
-                              : ch > 0 ? <span className="text-red-500">▲ {(Math.abs(ch) / 1000).toFixed(0)}k</span>
-                              : <span className="text-forest-600">▼ {(Math.abs(ch) / 1000).toFixed(0)}k</span>}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                  <tbody className="divide-y divide-line">
+                    {goldPrices.map((item: any, i: number) => (
+                      <tr key={i}>
+                        <th scope="row" className={`${td} text-left text-sm font-medium text-ink`}>{item.name}</th>
+                        <td className={`${td} text-right tabular-nums text-ink-soft`}>
+                          {item.buy > 0 ? (item.buy / 1_000_000).toFixed(2) + ' tr' : '-'}
+                          <span className="block text-[11px] text-ink-faint">/{item.unit ?? 'lượng'}</span>
+                        </td>
+                        <td className={`${td} text-right tabular-nums`}>
+                          <b className="text-ink">{item.sell > 0 ? (item.sell / 1_000_000).toFixed(2) + ' tr' : '-'}</b>
+                          <span className="block text-[11px] text-ink-faint">/{item.unit ?? 'lượng'}</span>
+                        </td>
+                        <td className={`${td} text-right text-sm tabular-nums`}><Change value={item.change} unit="k" digits={n => (n / 1000).toFixed(0)} /></td>
+                      </tr>
+                    ))}
                     {goldPrices.length === 0 && (
-                      <tr><td colSpan={4} className="px-4 py-6 text-center text-gray-400 text-sm">Không thể tải giá vàng</td></tr>
+                      <tr><td colSpan={4} className="px-5 py-8 text-center text-sm text-ink-faint">Không tải được giá vàng. Thử làm mới sau ít phút.</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
             </>
           )}
-          <p className="text-xs text-gray-400 mt-3 text-center">Nguồn: webgia.com · Giá vàng miếng SJC tại TP.HCM, vàng nhẫn và trang sức có giá riêng · 1 lượng = 10 chỉ = 37,5g · Chỉ mang tính tham khảo</p>
-        </div>
-
+          <p className="border-t border-line px-4 py-3 text-[12px] leading-relaxed text-ink-faint sm:px-5">
+            Nguồn: webgia.com. Giá vàng miếng SJC tại TP.HCM; vàng nhẫn và trang sức có giá riêng. 1 lượng = 10 chỉ = 37,5 g. Chỉ để tham khảo.
+          </p>
+        </section>
       </div>
     </div>
   );
@@ -275,57 +245,39 @@ function CoffeeHistoryTable({ provinces, openProvince, setOpenProvince }: {
 
   return (
     <div>
-      {/* Tab tỉnh */}
-      <div className="flex border-b border-gray-100 bg-blue-50/40 px-5 pt-3 gap-1 overflow-x-auto">
+      <div className="no-scrollbar flex gap-5 overflow-x-auto border-b border-line px-4 sm:px-5" role="tablist" aria-label="Chọn tỉnh">
         {provinces.map(p => (
-          <button key={p.key} onClick={() => setOpenProvince(p.key)}
-            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap ${
-              openProvince === p.key
-                ? 'bg-white border border-b-0 border-blue-200 text-blue-700 -mb-px'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}>
+          <button key={p.key} role="tab" aria-selected={current?.key === p.key} onClick={() => setOpenProvince(p.key)}
+            className={`shrink-0 border-b-2 py-2.5 text-sm font-semibold ${current?.key === p.key ? 'border-forest-600 text-forest-700' : 'border-transparent text-ink-soft hover:text-ink'}`}>
             {p.province}
           </button>
         ))}
       </div>
 
-      {/* Bảng lịch sử */}
       {current && (
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <caption className="sr-only">Giá cà phê {current.province} theo ngày</caption>
+            <thead className="border-b border-line bg-paper">
               <tr>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-600 uppercase">Ngày</th>
-                <th className="text-right px-5 py-3 text-xs font-semibold text-gray-600 uppercase">Giá (VNĐ/kg)</th>
-                <th className="text-right px-5 py-3 text-xs font-semibold text-gray-600 uppercase">Thay đổi</th>
+                <th scope="col" className={`${th} text-left`}>Ngày</th>
+                <th scope="col" className={`${th} text-right`}>Giá (đồng/kg)</th>
+                <th scope="col" className={`${th} text-right`}>Thay đổi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {current.rows.map((row, i) => {
-                const ch = row.change;
-                return (
-                  <tr key={i} className={`transition-colors ${i === 0 ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}>
-                    <td className="px-5 py-3 text-sm text-gray-700 font-medium">{row.date}</td>
-                    <td className="px-5 py-3 text-right">
-                      <span className={`font-bold text-sm ${i === 0 ? 'text-blue-700 text-base' : 'text-gray-800'}`}>
-                        {row.price.toLocaleString('vi-VN')}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-right text-sm font-semibold">
-                      {ch == null || ch === 0 ? <span className="text-gray-300 font-normal">—</span>
-                        : ch > 0 ? <span className="text-red-500">+{Math.abs(ch).toLocaleString('vi-VN')}</span>
-                        : <span className="text-forest-600">-{Math.abs(ch).toLocaleString('vi-VN')}</span>}
-                    </td>
-                  </tr>
-                );
-              })}
+            <tbody className="divide-y divide-line">
+              {current.rows.map((row, i) => (
+                <tr key={i} className={i === 0 ? 'bg-forest-50/60' : ''}>
+                  <th scope="row" className={`${td} text-left text-sm font-medium text-ink`}>{row.date}{i === 0 && <span className="ml-2 text-[11px] font-semibold text-forest-700">Mới nhất</span>}</th>
+                  <td className={`${td} text-right tabular-nums ${i === 0 ? 'text-base font-bold text-forest-700' : 'text-sm font-semibold text-ink'}`}>{vnd(row.price)}</td>
+                  <td className={`${td} text-right text-sm tabular-nums`}><Change value={row.change} /></td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       )}
-      <p className="text-xs text-gray-400 px-5 py-2 border-t border-gray-50 bg-gray-50/50">
-        Đơn vị tính: VNĐ/kg · Nguồn: giacafe.vn · Chỉ mang tính tham khảo
-      </p>
+      <p className="border-t border-line px-4 py-2.5 text-[12px] text-ink-faint sm:px-5">Đơn vị: đồng/kg. Nguồn: giacafe.vn. Chỉ để tham khảo.</p>
     </div>
   );
 }

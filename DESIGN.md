@@ -1,4 +1,4 @@
-# Chợ Nhân Cơ: design rules
+﻿# Chợ Nhân Cơ: design rules
 
 ## Direction
 
@@ -85,4 +85,4 @@ in words. Empty states say what is missing and give one next action.
 
 ## Still on the old style (to be rebuilt)
 
-Admin area, wallet, payment, pricing, VIP checkout, profile pages, messages, market-prices page.
+Admin area, VIP checkout, messages.
