@@ -43,7 +43,9 @@ Every market stall has an awning. It is the one recognisable shape of this site.
 ## Components
 
 - Header: logo, one search field with a green button, "Đăng tin", icons, then a category strip with icons and an ink underline for the active one.
-- `ListingRow` (default on list pages): small photo on the left with tags (Hết hàng, Gấp, Nổi bật) and a photo count; on the right the title, one muted attributes line (type, stock, area, legal status), price per unit, place and age, seller, heart. Hairline between rows, no boxes. Learned from how Vietnamese classifieds lay out lists (dense rows, attributes line, small tags), not from their colours or artwork.`n- `ListingCard`: the grid alternative (view toggle, remembered on the device) and the home page.`n- Desktop list pages add a right column: post CTA, popular searches, safety note.
+- `ListingRow` (default on list pages): small photo on the left with tags (Hết hàng, Gấp, Nổi bật) and a photo count; on the right the title, one muted attributes line (type, stock, area, legal status), price per unit, place and age, seller, heart. Hairline between rows, no boxes. Learned from how Vietnamese classifieds lay out lists (dense rows, attributes line, small tags), not from their colours or artwork.
+- `ListingCard`: the grid alternative (view toggle, remembered on the device) and the home page.
+- Desktop list pages add a right column: post CTA, popular searches, safety note.
 - `ListPage`: title and real count, search, category chips, quick filters, price filter where the API supports it, sort, nearby, pager. Loading shows skeletons, a failed request shows an error with a retry button, an empty result says so and offers one action.
 - Forms: `components/form/Kit`. Detail pages: `components/detail/*`.
 
