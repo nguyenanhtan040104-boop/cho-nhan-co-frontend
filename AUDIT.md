@@ -23,8 +23,8 @@ Nothing here assumes a business requirement that is not already in the code or t
 | H3 | The API supports a price range for products but the page had no price filter. | Fixed on products, livestock, services. Real estate has no such API support, so none was added. |
 | H4 | Brand had no recognisable mark: plain "Cơ" square, plain "C" favicon. | Fixed: awning mark, awning strip in header and footer, favicon, share image. |
 | H5 | Phone toolbar wrapped ("Lọc theo giá", "Vị trí của tôi" over two lines). | Fixed with short labels. |
-| H6 | Two search boxes on phone list pages (header and page). | Open: header search routes by keyword guess, page search filters the list. Needs a decision on which one stays. |
-| H7 | Header search sends "cà phê" to the category, not to a keyword search, so results may not match what was typed. | Open: change `smartSearch` or drop it. |
+| H6 | Two search boxes on list pages (header and page). | Fixed: one search box, in the header. It shows "Tìm trong ...", keeps the keyword after searching, and has a "Xóa từ khóa" link. Popular-search logging moved into it. |
+| H7 | Header search ignored which section you were in, so a keyword went to a guessed section. (An earlier note here said it dropped the keyword; that was wrong, it always kept it.) | Fixed: unknown words search the current section, a bare section name ("việc làm") opens that section, words that clearly belong to another section still jump there. |
 
 ## Frontend technical debt
 

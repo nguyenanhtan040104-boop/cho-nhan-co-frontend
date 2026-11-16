@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { search as searchApi } from '../../../lib/api';
 import { captureUserLocation, clearUserLocation, distanceKm, formatDistance, getUserLocation, type UserLocation } from '../../../lib/userLocation';
 import type { ListingType } from '../../../lib/format';
 import ListingCard from '../ListingCard';
@@ -62,7 +61,6 @@ function Inner(c: ListConfig) {
   const router = useRouter();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [text, setText] = useState(params.get('search') || '');
   const [query, setQuery] = useState(params.get('search') || '');
   const [sub, setSub] = useState(params.get(c.subParam) || '');
   const [quick, setQuick] = useState('');
@@ -89,7 +87,7 @@ function Inner(c: ListConfig) {
   // The URL is the source of truth for the keyword and the sub-category.
   useEffect(() => {
     const s = params.get('search') || '';
-    setText(s); setQuery(s); setSub(params.get(c.subParam) || ''); setPage(1);
+    setQuery(s); setSub(params.get(c.subParam) || ''); setPage(1);
   }, [params, c.subParam]);
 
   useEffect(() => {
@@ -130,14 +128,6 @@ function Inner(c: ListConfig) {
     if (nextSub) q.set(c.subParam, nextSub);
     router.replace(c.basePath + (q.toString() ? `?${q}` : ''));
   };
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const s = text.trim();
-    if (s) searchApi.log(s, c.logKind);
-    go(s, sub);
-  };
-
   const visible = useMemo(() => {
     const withDist = items.map(i =>
       userLoc && typeof i.latitude === 'number' && typeof i.longitude === 'number'
@@ -184,22 +174,13 @@ function Inner(c: ListConfig) {
                 {query ? `Kết quả cho “${query}”` : c.title}
               </h1>
               <p className="mt-1 text-[13px] text-ink-faint">
-                {error ? 'Chưa tải được số lượng tin' : loading && total === 0 ? 'Đang tải...' : <><b className="text-ink">{fmt(total)}</b> {c.noun} tại Đắk Nông</>}
+                {error ? 'Chưa tải được số lượng tin' : loading && total === 0 ? 'Đang tải...' : <><b className="text-ink">{fmt(total)}</b> {c.noun} tại Đắk Nông{query && <> · <button onClick={() => go('', sub)} className="font-medium text-forest-700 underline">Xóa từ khóa</button></>}</>}
               </p>
             </div>
             <Link href={c.createHref} className="btn-primary hidden shrink-0 sm:inline-flex">
               <i className="ri-add-line" aria-hidden="true" /> Đăng tin
             </Link>
           </div>
-
-          <form onSubmit={submit} className="mt-4 flex gap-2" role="search">
-            <div className="relative min-w-0 flex-1">
-              <i className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
-              <input value={text} onChange={e => setText(e.target.value)} placeholder={c.placeholder} aria-label="Tìm kiếm" className="field !pl-9" />
-            </div>
-            <button type="submit" className="btn-forest shrink-0 px-5">Tìm</button>
-          </form>
-
           <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
             {c.subCats.map(s => (
               <button key={s.value} onClick={() => go(query, s.value)} className={`chip shrink-0 ${sub === s.value ? 'chip-active' : ''}`}>{s.name}</button>

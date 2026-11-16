@@ -32,8 +32,7 @@ function ForumContent() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [text, setText] = useState('');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [sortBy, setSortBy] = useState('newest');
   const [bulkMode, setBulkMode] = useState(false);
@@ -42,7 +41,7 @@ function ForumContent() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => { setLoggedIn(auth.isLoggedIn()); }, []);
-  useEffect(() => { setCategory(searchParams.get('category') || ''); }, [searchParams]);
+  useEffect(() => { setCategory(searchParams.get('category') || ''); setSearch(searchParams.get('search') || ''); }, [searchParams]);
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -98,19 +97,10 @@ function ForumContent() {
           <div className="flex items-end justify-between gap-3">
             <div>
               <h1 className="text-[1.4rem] font-bold leading-tight text-ink sm:text-3xl">Diễn đàn cộng đồng</h1>
-              <p className="mt-1 text-[13px] text-ink-faint"><b className="text-ink">{total.toLocaleString('vi-VN')}</b> bài viết · hỏi đáp, kinh nghiệm canh tác, chăn nuôi</p>
+              <p className="mt-1 text-[13px] text-ink-faint"><b className="text-ink">{total.toLocaleString('vi-VN')}</b> bài viết · hỏi đáp, kinh nghiệm canh tác, chăn nuôi{search && <> · từ khóa “{search}” <button onClick={() => router.replace(category ? `/forum?category=${category}` : '/forum')} className="font-medium text-forest-700 underline">Xóa</button></>}</p>
             </div>
             <Link href="/forum/create" className="btn-primary hidden shrink-0 sm:inline-flex"><i className="ri-edit-line" aria-hidden="true" /> Viết bài</Link>
           </div>
-
-          <form onSubmit={e => { e.preventDefault(); setSearch(text.trim()); }} className="mt-4 flex gap-2" role="search">
-            <div className="relative min-w-0 flex-1">
-              <i className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
-              <input value={text} onChange={e => setText(e.target.value)} placeholder="Tìm bài viết, câu hỏi..." aria-label="Tìm bài viết" className="field !pl-9" />
-            </div>
-            <button type="submit" className="btn-forest shrink-0 px-5">Tìm</button>
-          </form>
-
           <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
             {FORUM_CATEGORIES.map(c => (
               <button key={c.value} onClick={() => pickCategory(c.value)} className={`chip shrink-0 ${category === c.value ? 'chip-active' : ''}`}>{c.label}</button>
@@ -153,7 +143,7 @@ function ForumContent() {
             <h2 className="mt-2 text-lg font-bold text-ink">{search || category ? 'Không có bài phù hợp' : 'Chưa có bài viết nào'}</h2>
             <p className="mt-1 text-sm text-ink-soft">{search || category ? 'Thử từ khóa khác hoặc xem tất cả chuyên mục.' : 'Hãy là người đầu tiên chia sẻ.'}</p>
             <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
-              {(search || category) && <button onClick={() => { setText(''); setSearch(''); pickCategory(''); }} className="btn-ghost">Xóa bộ lọc</button>}
+              {(search || category) && <button onClick={() => { setSearch(''); pickCategory(''); }} className="btn-ghost">Xóa bộ lọc</button>}
               <Link href="/forum/create" className="btn-primary">Viết bài</Link>
             </div>
           </div>
