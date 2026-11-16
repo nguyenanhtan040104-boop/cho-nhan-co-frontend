@@ -114,9 +114,9 @@ export default function RealEstateDetail({ propertyId, initialItem }: { property
           </div>
         </div>
 
-        <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+        <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start lg:gap-12">
           <div className="space-y-5">
-            <div className="card p-4 sm:p-6">
+            <div className="border-t border-line pt-6">
               <h2 className="text-lg font-bold text-ink">Mô tả chi tiết</h2>
               {item.description
                 ? <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-ink-soft">{item.description}</p>
@@ -124,7 +124,7 @@ export default function RealEstateDetail({ propertyId, initialItem }: { property
             </div>
 
             {history.length > 0 && (
-              <div className="card p-4 sm:p-6">
+              <div className="border-t border-line pt-6">
                 <h2 className="text-lg font-bold text-ink">Lịch sử thay đổi giá</h2>
                 <table className="mt-3 w-full text-[14px]">
                   <thead><tr className="border-b border-line text-left text-[12px] text-ink-faint"><th className="py-2 font-medium">Ngày</th><th className="py-2 text-right font-medium">Giá</th></tr></thead>

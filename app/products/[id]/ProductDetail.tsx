@@ -188,8 +188,8 @@ export default function ProductDetail({ productId, initialProduct }: ProductDeta
           </div>
         </div>
 
-        <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
-          <div className="card p-4 sm:p-6">
+        <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start lg:gap-12">
+          <div className="border-t border-line pt-6">
             <h2 className="text-lg font-bold text-ink">Mô tả chi tiết</h2>
             {product.description
               ? <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-ink-soft">{product.description}</p>

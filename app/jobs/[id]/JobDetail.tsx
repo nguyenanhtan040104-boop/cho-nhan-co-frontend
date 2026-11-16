@@ -60,12 +60,12 @@ export default function JobDetail({ jobId, initialJob }: { jobId: string; initia
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
           <div className="space-y-5">
-            <div className="card p-4 sm:p-6">
+            <div className="border-t border-line pt-6">
               <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold">
                 <span className={isEmployer ? 'text-forest-700' : 'text-ink-soft'}>{isEmployer ? 'Tuyển dụng' : 'Tìm việc'}</span>
                 {job.category && <span className="text-ink-faint">{job.category}</span>}
-                {job.isUrgent && <span className="rounded bg-brand-500 px-1.5 py-0.5 text-[11px] text-white">Gấp</span>}
-                {job.isVip && <span className="rounded bg-gold-500 px-1.5 py-0.5 text-[11px] text-ink">Nổi bật</span>}
+                {job.isUrgent && <span className="rounded-full bg-paper px-2.5 py-0.5 text-[12px] font-bold text-brand-600">Gấp</span>}
+                {job.isVip && <span className="rounded-full bg-paper px-2.5 py-0.5 text-[12px] font-bold text-ink">Nổi bật</span>}
               </p>
               <h1 className="mt-1.5 break-words text-[1.5rem] font-bold leading-snug text-ink sm:text-3xl">{job.title}</h1>
               <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-ink-faint">
@@ -80,7 +80,7 @@ export default function JobDetail({ jobId, initialJob }: { jobId: string; initia
               <Gallery images={images} title={job.title} icon="ri-briefcase-4-line" liked={liked} onLike={handleLike} onShare={handleShare} />
             )}
 
-            <div className="card p-4 sm:p-6">
+            <div className="border-t border-line pt-6">
               <h2 className="text-lg font-bold text-ink">{isEmployer ? 'Mô tả công việc' : 'Giới thiệu bản thân'}</h2>
               {job.description
                 ? <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-ink-soft">{job.description}</p>

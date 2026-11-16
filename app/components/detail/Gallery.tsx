@@ -76,7 +76,7 @@ export default function Gallery({ images, title, icon, badge, liked, onLike, onS
             <span className="text-center"><i className={`${icon} block text-6xl`} /><span className="mt-1 block text-sm">Chưa có ảnh</span></span>
           </div>
         )}
-        {badge && <span className="absolute left-3 top-3 rounded bg-gold-500 px-2 py-1 text-xs font-bold text-ink">{badge}</span>}
+        {badge && <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-[13px] font-bold text-ink">{badge}</span>}
         {(onLike || onShare) && (
           <div className="absolute right-3 top-3 flex gap-2">
             {onLike && (

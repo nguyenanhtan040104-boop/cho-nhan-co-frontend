@@ -58,7 +58,7 @@ export function Facts({ title = 'Thông tin nhanh', items }: { title?: string; i
   const rows = items.filter(i => i.value);
   if (rows.length === 0) return null;
   return (
-    <div className="card p-4 sm:p-6">
+    <div className="border-t border-line pt-6">
       <h2 className="text-lg font-bold text-ink">{title}</h2>
       <dl className="mt-3 divide-y divide-line text-[14px]">
         {rows.map(f => (
@@ -77,7 +77,7 @@ export function SellerCard({ user, label = 'Người đăng' }: { user: any; lab
   const name = user.fullName || user.username || 'Người dùng';
   const avatar = user.avatar || user.avatarUrl;
   return (
-    <div className="card flex items-center gap-3 p-4">
+    <div className="flex items-center gap-3 rounded-card bg-paper p-4">
       {avatar ? (
         <img src={avatar} alt="" className="h-12 w-12 shrink-0 rounded-full border border-line object-cover" />
       ) : (
@@ -100,12 +100,12 @@ export function SafetyNote({ tips }: { tips?: string[] }) {
     'Không đọc mã OTP hay gửi ảnh thẻ ngân hàng cho bất kỳ ai.',
   ];
   return (
-    <div className="rounded-card border border-gold-200 bg-gold-50 p-4">
-      <p className="text-[14px] font-bold text-gold-800">Lưu ý an toàn</p>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-[13px] leading-snug text-gold-900/80">
+    <div className="rounded-card bg-paper p-4">
+      <p className="text-[14px] font-bold text-ink">Lưu ý an toàn</p>
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-[13px] leading-snug text-ink-soft marker:text-ink-faint">
         {list.map(t => <li key={t}>{t}</li>)}
       </ul>
-      <Link href="/canh-bao" className="mt-2 inline-block text-[13px] font-semibold text-brand-600 underline underline-offset-2">Báo cáo tin có dấu hiệu lừa đảo</Link>
+      <Link href="/canh-bao" className="mt-2 inline-block text-[13px] font-medium text-ink underline underline-offset-2 hover:text-forest-700">Báo cáo tin có dấu hiệu lừa đảo</Link>
     </div>
   );
 }
