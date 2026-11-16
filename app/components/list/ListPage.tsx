@@ -71,6 +71,7 @@ function Inner(c: ListConfig) {
   const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [reload, setReload] = useState(0);
   const [showPrice, setShowPrice] = useState(false);
   const [minIn, setMinIn] = useState('');
@@ -94,8 +95,12 @@ function Inner(c: ListConfig) {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    c.load({ search: query, sub, quick, sortBy, page, userLoc, minPrice: price.min, maxPrice: price.max })
-      .then(res => {
+    setSlow(false);
+    // The free server sleeps when idle; the first request can take up to a minute. Say so, and stop waiting after 70s.
+    const slowTimer = setTimeout(() => { if (!cancelled) setSlow(true); }, 6000);
+    const timeout = new Promise<never>((_, rej) => setTimeout(() => rej(new Error('timeout')), 70000));
+    Promise.race([c.load({ search: query, sub, quick, sortBy, page, userLoc, minPrice: price.min, maxPrice: price.max }), timeout])
+      .then((res: any) => {
         if (cancelled) return;
         setItems(res?.data || []);
         setTotal(res?.total || 0);
@@ -103,8 +108,8 @@ function Inner(c: ListConfig) {
       })
       // A failed request is not an empty market: say so and let the person retry.
       .catch(() => { if (!cancelled) { setItems([]); setTotal(0); setError(true); } })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .finally(() => { clearTimeout(slowTimer); if (!cancelled) { setLoading(false); setSlow(false); } });
+    return () => { cancelled = true; clearTimeout(slowTimer); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, sub, quick, sortBy, page, userLoc, price, reload]);
 
@@ -242,6 +247,12 @@ function Inner(c: ListConfig) {
           <p className="mb-4 flex flex-wrap items-center gap-2 text-[13px] text-ink-soft">
             <span><b className="text-ink">{fmt(total)}</b> kết quả</span>
             {priceLabel && <button onClick={clearPrice} className="inline-flex items-center gap-1 rounded border border-line bg-surface px-2 py-1 font-medium text-ink hover:border-ink">{priceLabel} <i className="ri-close-line" aria-label="Bỏ lọc giá" /></button>}
+          </p>
+        )}
+
+        {loading && slow && (
+          <p role="status" className="mb-4 rounded-card bg-paper p-3 text-sm text-ink-soft">
+            <b className="text-ink">Máy chủ đang khởi động.</b> Lần đầu trong ngày có thể mất khoảng 30 đến 60 giây, bạn chờ một chút nhé. Những lần sau sẽ nhanh.
           </p>
         )}
 
