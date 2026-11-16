@@ -8,7 +8,7 @@ import AdPopup from './components/AdPopup';
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
 });
@@ -45,13 +45,11 @@ export const metadata = {
     siteName,
     title: 'Chợ Nhân Cơ — Mua bán nông sản, bất động sản tại Đắk Nông',
     description: 'Nền tảng mua bán trực tuyến cho cộng đồng Nhân Cơ, Đắk Nông. Đăng tin miễn phí, kết nối người mua và người bán.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Chợ Nhân Cơ - Marketplace Đắk Nông' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Chợ Nhân Cơ — Marketplace Đắk Nông',
     description: 'Mua bán nông sản, bất động sản, việc làm tại Nhân Cơ, Đắk Nông.',
-    images: ['/og-image.png'],
   },
   robots: {
     index: true,

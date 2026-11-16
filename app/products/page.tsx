@@ -6,6 +6,7 @@ import { products as productsApi } from '../../lib/api';
 export default function ProductsPage() {
   return (
     <ListPage
+      priceFilter
       basePath="/products"
       subParam="category"
       title="Mua bán sản phẩm tại Nhân Cơ"
@@ -34,8 +35,8 @@ export default function ProductsPage() {
       ]}
       popular={['Cà phê nhân', 'Hồ tiêu', 'Sầu riêng', 'Bơ booth', 'Mít Thái', 'Cao su', 'Điều khô', 'Mắc ca']}
       safety="Gặp trực tiếp nơi đông người, kiểm tra hàng trước khi trả tiền, không chuyển khoản trước."
-      load={({ search, sub, quick, sortBy, page, userLoc }) =>
-        productsApi.getAll({ search, category: sub || undefined, sortBy, page, limit: 12, ...nearParams(quick, userLoc) } as any)}
+      load={({ search, sub, quick, sortBy, page, userLoc, minPrice, maxPrice }) =>
+        productsApi.getAll({ search, category: sub || undefined, sortBy, page, limit: 12, ...(minPrice ? { minPrice } : {}), ...(maxPrice ? { maxPrice } : {}), ...nearParams(quick, userLoc) } as any)}
     />
   );
 }

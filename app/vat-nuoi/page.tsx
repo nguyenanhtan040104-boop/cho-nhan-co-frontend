@@ -6,6 +6,7 @@ import { products as productsApi } from '../../lib/api';
 export default function VatNuoiPage() {
   return (
     <ListPage
+      priceFilter
       basePath="/vat-nuoi"
       subParam="sub"
       title="Mua bán vật nuôi tại Nhân Cơ"
@@ -35,8 +36,8 @@ export default function VatNuoiPage() {
       ]}
       popular={['Chó corgi', 'Mèo anh lông ngắn', 'Gà thả đồi', 'Heo rừng', 'Cá koi', 'Bò sữa', 'Dê núi', 'Vịt xiêm']}
       safety="Xem tận nơi, hỏi giấy tiêm phòng, không chuyển khoản trước khi gặp vật nuôi."
-      load={({ search, sub, quick, sortBy, page, userLoc }) =>
-        productsApi.getAll({ category: 'VAT_NUOI', search: [search, sub].filter(Boolean).join(' ') || undefined, sortBy, page, limit: 12, ...nearParams(quick, userLoc) } as any)}
+      load={({ search, sub, quick, sortBy, page, userLoc, minPrice, maxPrice }) =>
+        productsApi.getAll({ category: 'VAT_NUOI', search: [search, sub].filter(Boolean).join(' ') || undefined, sortBy, page, limit: 12, ...(minPrice ? { minPrice } : {}), ...(maxPrice ? { maxPrice } : {}), ...nearParams(quick, userLoc) } as any)}
     />
   );
 }

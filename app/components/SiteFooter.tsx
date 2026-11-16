@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import Logo from './Logo';
+import Awning from './Awning';
 import { CATEGORIES } from './nav-data';
 
 export default function SiteFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-12 border-t border-line bg-surface pb-24 pt-10 md:pb-10">
+    <footer className="mt-16 bg-surface pb-24 md:pb-10">
+      <Awning id="awn-foot" height={10} />
+      <div className="h-10" />
       <div className="mx-auto grid max-w-content gap-8 px-4 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5">

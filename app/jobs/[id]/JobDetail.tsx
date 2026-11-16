@@ -64,8 +64,8 @@ export default function JobDetail({ jobId, initialJob }: { jobId: string; initia
               <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold">
                 <span className={isEmployer ? 'text-forest-700' : 'text-ink-soft'}>{isEmployer ? 'Tuyển dụng' : 'Tìm việc'}</span>
                 {job.category && <span className="text-ink-faint">{job.category}</span>}
-                {job.isUrgent && <span className="rounded-full bg-paper px-2.5 py-0.5 text-[12px] font-bold text-brand-600">Gấp</span>}
-                {job.isVip && <span className="rounded-full bg-paper px-2.5 py-0.5 text-[12px] font-bold text-ink">Nổi bật</span>}
+                {job.isUrgent && <span className="rounded bg-brand-50 px-2 py-0.5 text-[12px] font-bold text-brand-700">Gấp</span>}
+                {job.isVip && <span className="rounded bg-gold-100 px-2 py-0.5 text-[12px] font-bold text-gold-800">Nổi bật</span>}
               </p>
               <h1 className="mt-1.5 break-words text-[1.5rem] font-bold leading-snug text-ink sm:text-3xl">{job.title}</h1>
               <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-ink-faint">

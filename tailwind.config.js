@@ -53,9 +53,10 @@ module.exports = {
           soft: '#484848',    // body copy
           faint: '#6A6A6A',   // meta, captions (5.4:1 on white)
         },
-        paper: '#F7F7F7',   // soft grey for app screens; public pages sit on white
+        canvas: '#FAF8F4',  // warm off-white page background
+        paper: '#F4F1EA',   // warm fill for panels and app screens
         surface: '#FFFFFF', // cards
-        line: '#DDDDDD',    // hairline / borders
+        line: '#E3DDD2',    // warm hairline / borders
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],

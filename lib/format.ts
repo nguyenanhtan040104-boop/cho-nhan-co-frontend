@@ -27,7 +27,7 @@ export function shortMoney(n: number): string {
 export function listingPrice(item: any, type: ListingType): string {
   if (type === 'product') {
     const p = Number(item.price);
-    return p > 0 ? `${p.toLocaleString('vi-VN')}đ` : 'Thỏa thuận';
+    return p > 0 ? `${p.toLocaleString('vi-VN')}đ${item.unit ? '/' + item.unit : ''}` : 'Thỏa thuận';
   }
   if (type === 'real-estate') return shortMoney(Number(item.price));
   if (type === 'job') return item.salary || 'Thỏa thuận';

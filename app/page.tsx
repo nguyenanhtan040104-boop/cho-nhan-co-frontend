@@ -61,7 +61,8 @@ export default async function HomePage() {
   return (
     <main className="pb-24 md:pb-8">
       <section className="mx-auto max-w-content px-4 pb-1 pt-7 sm:px-6 sm:pt-12">
-        <h1 className="max-w-2xl text-[1.75rem] font-bold leading-tight text-ink sm:text-[2.5rem] sm:leading-[1.15]">Mua bán ngay trong xã Nhân Cơ</h1>
+        <p className="kicker">Chợ của bà con Nhân Cơ, Đắk Nông</p>
+        <h1 className="mt-3 max-w-2xl text-[1.75rem] font-bold leading-tight text-ink sm:text-[2.5rem] sm:leading-[1.15]">Mua bán ngay trong xã Nhân Cơ</h1>
         <p className="mt-2 max-w-xl text-[16px] leading-relaxed text-ink-soft">Nông sản, đất rẫy, việc làm mùa vụ. Đăng tin miễn phí, gặp người bán gần nhà.</p>
         <div className="no-scrollbar -mx-4 mt-4 flex items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Tìm nhiều">
           <span className="mr-1 hidden shrink-0 text-sm text-ink-faint sm:inline">Tìm nhiều:</span>

@@ -1,71 +1,63 @@
 # Chợ Nhân Cơ: design rules
 
-## References and what we took from them
+## What this site is
 
-Structure follows two files from VoltAgent/awesome-design-md (Airbnb and mydealz). Nothing is copied: the
-palette, wording, icons and layout are our own. We borrowed principles only.
+A local market for the people of Nhân Cơ, Đắk Nông: farmers, small sellers, neighbours looking for land,
+work or a service. It must feel like a real, practical, trustworthy place, not a SaaS template and not a
+copy of a national shop.
 
-| From | Principle we use |
-| --- | --- |
-| Airbnb | White canvas. One accent colour, used sparingly. Near-black ink (never pure black). Photos carry the page, so cards have no frame. One pill search bar. Category strip with icons and an underline. One shadow tier, only for things that float. |
-| mydealz | Green means "act" and "price". Prices are always bold. Weights 500 and 700 do most of the work. Hairlines and canvas gutters separate things, not boxes and shadows. |
+References read: VoltAgent/awesome-design-md (Airbnb and mydealz for structure), plus the owner's brief.
+We took principles only. Palette, copy, icons and the brand mark are our own.
 
-## Direction
+## Identity: the market awning
 
-A village market online. White, quiet, photo-first. People look at a picture, read a price, call a neighbour.
-Everything that is not a photo, a price or a way to act stays out of the way.
+Every market stall has an awning. It is the one recognisable shape of this site.
 
-## Why it looked cheap before (and the rule that fixes it)
+- Logo: striped awning over "Cơ", with one red dot (a ripe coffee cherry, the crop Nhân Cơ is known for).
+- A thin scalloped awning strip sits at the top of the header and the footer. It is the only decoration.
+- Favicon and the link-preview image (Zalo, Facebook) use the same awning.
+- Voice: plain, local, respectful. "Chợ của bà con Nhân Cơ", not "nền tảng thương mại điện tử".
 
-| Smell | Rule |
-| --- | --- |
-| Two loud colours (green band + red button) | One accent: green. Red only for errors, delete, the saved heart and unread counts. |
-| Green-tinted page background | White for browse pages, `#F7F7F7` for app screens (dashboard, forms, admin). |
-| A box around every card | Listing cards have no frame. Content blocks use a hairline or a soft grey fill, never both. |
-| Heavy type (800, 900) | Only 400, 500, 600, 700. Prices and titles 700. |
-| Cartoon illustrations, emoji, gradients, glass | None. Empty states are one icon, two lines, one action. |
-| Dark hero band | The header search is the hero. The home page opens with a headline and quick chips. |
+## Principles
+
+1. Practical first: what it is, what it costs, is it available, who sells it, where. In that order.
+2. Structure with whitespace, type and hairlines. Not every block is a card.
+3. One accent (green) for actions and prices. Earth-gold only for "Nổi bật". Red only for errors, delete, hearts, unread.
+4. Soft, not fancy: no gradients, glass, glow, floating buttons, emoji, auto-moving carousels.
+5. Few pills: only the avatar, round icon buttons and count dots are circles. Buttons, fields, chips and tags are rounded rectangles.
+6. Mobile first. The bottom tab bar is the main navigation on phones.
 
 ## Tokens (`tailwind.config.js`, `app/globals.css`)
 
 **Colour**
 
-- `ink` `#222222`, `ink-soft` `#484848` (body), `ink-faint` `#6A6A6A` (meta, 5.4:1 on white).
-- `surface` white, `paper` `#F7F7F7`, `line` `#DDDDDD`.
-- `forest` is the only accent: 600 for buttons, 700 for prices and links on light, 50 for selected rows.
-- `brand` red: errors, destructive actions, the heart, unread counts. Never a main button.
-- `gold`: "Nổi bật" and pinned only, as a quiet tint.
+- `canvas` `#FAF8F4` warm page background. `paper` `#F4F1EA` warm fill for panels. `surface` white for header, fields, cards that need to lift.
+- `line` `#E3DDD2` warm hairline. Fields use `#B0B0B0` so they read as controls.
+- `ink` `#222222`, `ink-soft` `#484848` body, `ink-faint` `#6A6A6A` meta.
+- `forest` deep green: 600 buttons, 700 prices and links. `gold` muted earth: tags and pinned. `brand` red: errors and hearts.
 
-**Type** (Be Vietnam Pro, full Vietnamese diacritics)
+**Type**: Be Vietnam Pro, weights 400 to 700. Home H1 28/40px, section title 22px, card title 15px 500, price 17px 700, meta 13px.
 
-- Home H1 `1.75rem` mobile, `2.5rem` desktop, 700. Section title 22px 700. Card title 15px 500. Meta 13px `ink-faint`. Price 16px 700 `forest-700`.
-- Buttons 15px 500. Chips 14px 500.
-
-**Radius and depth**
-
-- Photos and cards 12px, sheets 16px, buttons and fields 8px, chips and search full round.
-- Flat by default. `shadow-lift` (Airbnb tier) is only for the header search pill, menus and dropdowns.
+**Shape and depth**: photos and cards 12px, buttons and fields 8px, tags 4px. Flat by default; one soft shadow (`shadow-lift`) for menus only.
 
 ## Components
 
-- Header: logo, centred pill search with a green disc, "Đăng tin" (green), icons, avatar. Below it, category strip with icons; the active one gets a 2px ink underline.
-- `ListingCard`: 4:3 photo with 12px radius, heart top-right on the photo, white pill badges ("Nổi bật", "Gấp") top-left, then title, muted meta line, bold green price.
-- `.btn-primary` green, `.btn-ghost` white with an ink outline, `.chip` white with hairline, `.chip-active` ink fill.
-- `.field` has a grey border, ink border on hover and focus, no glow.
-- Section header: 22px title left, underlined "Xem tất cả" right. No rule under it.
-- Lists: `ListPage`. Forms: `components/form/Kit`. Detail pages: `components/detail/*`.
+- Header: logo, one search field with a green button, "Đăng tin", icons, then a category strip with icons and an ink underline for the active one.
+- `ListingCard`: 4:3 photo, tags on the photo (Hết hàng, Gấp, Nổi bật), heart, title, price per unit, stock if known, seller, place and age.
+- `ListPage`: title and real count, search, category chips, quick filters, price filter where the API supports it, sort, nearby, pager. Loading shows skeletons, a failed request shows an error with a retry button, an empty result says so and offers one action.
+- Forms: `components/form/Kit`. Detail pages: `components/detail/*`.
 
 ## States
 
-Hover changes a border or text colour, never scales. Focus uses a 2px ink outline for keyboard users.
-Loading shows a skeleton shaped like the final content. Errors say what happened in words.
+Loading: skeletons shaped like the content. Error: say what failed, offer retry. Empty: one line, one action.
+Success: short confirmation. Never show an error as an empty list.
 
-## Responsive
+## Accessibility
 
-Mobile first. The bottom tab bar is the main navigation under 768px; its centre button posts a listing and is green.
-Chip rows scroll sideways without a scrollbar. Grids go 2, 3, 4, 5 columns.
+Visible keyboard focus (2px ink), labelled inputs, `alt` on images, tables with captions, 44px touch targets on phone,
+colour never the only cue (price changes use arrows and signs).
 
 ## Audit before merging a page
 
-Search it for: `gradient`, `backdrop-blur`, `shadow-lg`, `rounded-2xl`, `text-gray-`, `bg-brand-` on a button,
-`font-extrabold`, emoji. Each one needs a reason to stay.
+Search for `gradient`, `backdrop-blur`, `shadow-lg`, `rounded-2xl`, `text-gray-`, a red button, `font-extrabold`, emoji,
+an `<img>` without `alt`. Open it at 375px and check there is no sideways scroll. See `AUDIT.md` for the current list.

@@ -15,6 +15,8 @@ export interface LoadArgs {
   sortBy: string;
   page: number;
   userLoc: UserLocation | null;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface ListConfig {
@@ -36,6 +38,7 @@ export interface ListConfig {
   matchQuick?: (item: any, quick: string) => boolean;
   safety: string;
   simple?: boolean;                 // no quick filters, sort or location row (for ads)
+  priceFilter?: boolean;            // show a price range filter (only where the API supports it)
 }
 
 const DAY = 86400000;
@@ -69,6 +72,12 @@ function Inner(c: ListConfig) {
   const [totalPages, setTotalPages] = useState(1);
   const [userLoc, setUserLoc] = useState<UserLocation | null>(null);
   const [locating, setLocating] = useState(false);
+  const [error, setError] = useState(false);
+  const [reload, setReload] = useState(0);
+  const [showPrice, setShowPrice] = useState(false);
+  const [minIn, setMinIn] = useState('');
+  const [maxIn, setMaxIn] = useState('');
+  const [price, setPrice] = useState<{ min?: number; max?: number }>({});
 
   useEffect(() => {
     setUserLoc(getUserLocation());
@@ -86,18 +95,34 @@ function Inner(c: ListConfig) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    c.load({ search: query, sub, quick, sortBy, page, userLoc })
+    setError(false);
+    c.load({ search: query, sub, quick, sortBy, page, userLoc, minPrice: price.min, maxPrice: price.max })
       .then(res => {
         if (cancelled) return;
         setItems(res?.data || []);
         setTotal(res?.total || 0);
         setTotalPages(res?.totalPages || 1);
       })
-      .catch(() => { if (!cancelled) { setItems([]); setTotal(0); } })
+      // A failed request is not an empty market: say so and let the person retry.
+      .catch(() => { if (!cancelled) { setItems([]); setTotal(0); setError(true); } })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, sub, quick, sortBy, page, userLoc]);
+  }, [query, sub, quick, sortBy, page, userLoc, price, reload]);
+
+  const applyPrice = (e: React.FormEvent) => {
+    e.preventDefault();
+    const min = Number(minIn) > 0 ? Number(minIn) : undefined;
+    const max = Number(maxIn) > 0 ? Number(maxIn) : undefined;
+    if (min && max && min > max) { setMinIn(String(max)); setMaxIn(String(min)); setPrice({ min: max, max: min }); }
+    else setPrice({ min, max });
+    setPage(1);
+    setShowPrice(false);
+  };
+  const clearPrice = () => { setMinIn(''); setMaxIn(''); setPrice({}); setPage(1); };
+  const priceLabel = price.min || price.max
+    ? `Giá ${price.min ? `từ ${fmt(price.min)}đ` : ''}${price.min && price.max ? ' ' : ''}${price.max ? `đến ${fmt(price.max)}đ` : ''}`
+    : '';
 
   const go = (nextSearch: string, nextSub: string) => {
     const q = new URLSearchParams();
@@ -142,10 +167,10 @@ function Inner(c: ListConfig) {
     if (!loc) alert('Không lấy được vị trí. Hãy cho phép trình duyệt dùng GPS.');
   };
 
-  const filtered = !!(query || sub);
+  const filtered = !!(query || sub || price.min || price.max);
 
   return (
-    <div className="min-h-screen bg-surface pb-8">
+    <div className="min-h-screen bg-canvas pb-8">
       <header className="border-b border-line bg-surface">
         <div className="mx-auto max-w-content px-4 pb-4 pt-4 sm:px-6">
           <nav className="mb-2 flex items-center gap-1 text-[13px] text-ink-faint" aria-label="Đường dẫn">
@@ -158,7 +183,9 @@ function Inner(c: ListConfig) {
               <h1 className="truncate text-[1.4rem] font-bold leading-tight text-ink sm:text-3xl">
                 {query ? `Kết quả cho “${query}”` : c.title}
               </h1>
-              <p className="mt-1 text-[13px] text-ink-faint"><b className="text-ink">{fmt(total)}</b> {c.noun} tại Đắk Nông</p>
+              <p className="mt-1 text-[13px] text-ink-faint">
+                {error ? 'Chưa tải được số lượng tin' : loading && total === 0 ? 'Đang tải...' : <><b className="text-ink">{fmt(total)}</b> {c.noun} tại Đắk Nông</>}
+              </p>
             </div>
             <Link href={c.createHref} className="btn-primary hidden shrink-0 sm:inline-flex">
               <i className="ri-add-line" aria-hidden="true" /> Đăng tin
@@ -189,16 +216,22 @@ function Inner(c: ListConfig) {
                 className={`chip shrink-0 ${quick === f.value ? 'chip-active' : ''}`}>{f.label}</button>
             ))}
           </div>
-          <div className="ml-auto flex items-center gap-3 text-[13px]">
+          <div className="ml-auto flex items-center gap-3 whitespace-nowrap text-[13px]">
+            {c.priceFilter && (
+              <button onClick={() => setShowPrice(v => !v)} aria-expanded={showPrice} aria-controls="price-filter"
+                className={`inline-flex items-center gap-1 font-semibold ${price.min || price.max ? 'text-forest-700' : 'text-ink-soft hover:text-ink'}`}>
+                <i className="ri-equalizer-line" aria-hidden="true" /> Giá
+              </button>
+            )}
             <button onClick={userLoc ? clearUserLocation : locate} disabled={locating}
               className={`inline-flex items-center gap-1 font-semibold ${userLoc ? 'text-forest-700' : 'text-ink-soft hover:text-ink'} disabled:opacity-50`}>
               <i className={locating ? 'ri-loader-4-line animate-spin' : userLoc ? 'ri-map-pin-2-fill' : 'ri-map-pin-line'} aria-hidden="true" />
-              {locating ? 'Đang lấy vị trí' : userLoc ? 'Đã có vị trí' : 'Vị trí của tôi'}
+              {locating ? 'Đang lấy...' : userLoc ? 'Đã có vị trí' : 'Gần tôi'}
             </button>
             <label className="flex items-center gap-1.5 text-ink-soft">
-              <span className="sr-only sm:not-sr-only">Sắp xếp</span>
+              <span className="sr-only">Sắp xếp</span>
               <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
-                className="rounded-lg border border-line bg-surface px-2 py-1.5 font-medium text-ink focus:border-ink focus:outline-none">
+                className="rounded-lg border border-[#B0B0B0] bg-surface px-2 py-1.5 font-medium text-ink focus:border-ink focus:outline-none">
                 <option value="newest">Mới nhất</option>
                 <option value="price_asc">Giá thấp trước</option>
                 <option value="price_desc">Giá cao trước</option>
@@ -209,8 +242,36 @@ function Inner(c: ListConfig) {
         </div>}
         {c.simple && <div className="mb-3" />}
 
+        {c.priceFilter && showPrice && (
+          <form id="price-filter" onSubmit={applyPrice} className="mb-5 flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface p-4">
+            <label className="block">
+              <span className="mb-1 block text-[13px] font-medium text-ink">Giá từ (đồng)</span>
+              <input type="number" inputMode="numeric" min="0" value={minIn} onChange={e => setMinIn(e.target.value)} placeholder="0" className="field !w-36" />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[13px] font-medium text-ink">Đến (đồng)</span>
+              <input type="number" inputMode="numeric" min="0" value={maxIn} onChange={e => setMaxIn(e.target.value)} placeholder="Không giới hạn" className="field !w-40" />
+            </label>
+            <button type="submit" className="btn-primary">Áp dụng</button>
+            {(price.min || price.max) && <button type="button" onClick={() => { clearPrice(); setShowPrice(false); }} className="btn-ghost">Xóa lọc giá</button>}
+          </form>
+        )}
+
+        {!loading && !error && (priceLabel || quick) && (
+          <p className="mb-4 flex flex-wrap items-center gap-2 text-[13px] text-ink-soft">
+            <span><b className="text-ink">{fmt(total)}</b> kết quả</span>
+            {priceLabel && <button onClick={clearPrice} className="inline-flex items-center gap-1 rounded border border-line bg-surface px-2 py-1 font-medium text-ink hover:border-ink">{priceLabel} <i className="ri-close-line" aria-label="Bỏ lọc giá" /></button>}
+          </p>
+        )}
+
         {loading ? (
           <Grid>{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} />)}</Grid>
+        ) : error ? (
+          <div role="alert" className="mx-auto max-w-md rounded-card border border-line bg-surface px-6 py-12 text-center">
+            <h2 className="text-lg font-bold text-ink">Không tải được danh sách</h2>
+            <p className="mt-1 text-sm text-ink-soft">Có thể mạng đang yếu hoặc máy chủ đang khởi động. Bạn thử lại nhé.</p>
+            <button onClick={() => setReload(n => n + 1)} className="btn-primary mt-5">Thử lại</button>
+          </div>
         ) : visible.length === 0 ? (
           <Empty c={c} filtered={filtered || !!quick} onClear={() => { setQuick(''); go('', ''); }} />
         ) : (

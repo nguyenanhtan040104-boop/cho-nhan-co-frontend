@@ -6,6 +6,7 @@ import { products as productsApi } from '../../lib/api';
 export default function DichVuPage() {
   return (
     <ListPage
+      priceFilter
       basePath="/dich-vu"
       subParam="sub"
       title="Dịch vụ tại Nhân Cơ"
@@ -36,8 +37,8 @@ export default function DichVuPage() {
       ]}
       popular={['Sửa xe máy', 'Chở hàng', 'Xây nhà', 'Giặt ủi', 'Vệ sinh máy lạnh', 'Gia sư toán', 'Cắt tóc', 'Sơn nhà']}
       safety="Thỏa thuận giá và công việc rõ ràng trước khi làm, chỉ trả tiền khi nghiệm thu."
-      load={({ search, sub, quick, sortBy, page, userLoc }) =>
-        productsApi.getAll({ category: 'DICH_VU', search: [search, sub].filter(Boolean).join(' ') || undefined, sortBy, page, limit: 12, ...nearParams(quick, userLoc) } as any)}
+      load={({ search, sub, quick, sortBy, page, userLoc, minPrice, maxPrice }) =>
+        productsApi.getAll({ category: 'DICH_VU', search: [search, sub].filter(Boolean).join(' ') || undefined, sortBy, page, limit: 12, ...(minPrice ? { minPrice } : {}), ...(maxPrice ? { maxPrice } : {}), ...nearParams(quick, userLoc) } as any)}
     />
   );
 }

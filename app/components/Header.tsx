@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
 import Logo from './Logo';
+import Awning from './Awning';
 import { CATEGORIES, POST_ITEMS, isActivePath } from './nav-data';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://cho-nhan-co-backend.onrender.com/api';
@@ -242,6 +243,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-surface" suppressHydrationWarning>
+      <Awning id="awn-top" />
       <div className="mx-auto flex h-[72px] max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
         <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Chợ Nhân Cơ, trang chủ">
           <Logo size={34} />
@@ -257,8 +259,8 @@ export default function Header() {
           className="min-w-0 flex-1 md:mx-4 md:max-w-2xl"
           role="search"
         >
-          {/* A single pill; the green disc is the only colour in the bar */}
-          <div className="flex h-12 items-center gap-2 rounded-full border border-line bg-surface pl-5 pr-1.5 shadow-lift transition-colors focus-within:border-ink">
+          {/* One search field; the green button is the only colour in the bar */}
+          <div className="flex h-11 items-center gap-2 rounded-lg border border-[#B0B0B0] bg-surface pl-4 pr-1 transition-colors hover:border-ink focus-within:border-ink">
             <input
               name="q"
               type="search"
@@ -266,7 +268,7 @@ export default function Header() {
               placeholder="Tìm cà phê, tiêu, đất rẫy, việc làm"
               className="min-w-0 flex-1 bg-transparent text-[15px] text-ink placeholder-ink-faint focus:outline-none"
             />
-            <button type="submit" aria-label="Tìm" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-forest-600 text-white transition hover:bg-forest-700">
+            <button type="submit" aria-label="Tìm" className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-forest-600 text-white transition hover:bg-forest-700">
               <i className="ri-search-line text-lg" aria-hidden="true" />
             </button>
           </div>
@@ -409,7 +411,7 @@ export default function Header() {
             )}
           </Link>
 
-          <button onClick={() => navDashboard('products')} className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-ink transition hover:bg-paper lg:block">
+          <button onClick={() => navDashboard('products')} className="hidden rounded-lg px-3 py-2 text-[15px] font-medium text-ink transition hover:bg-paper lg:block">
             Quản lý tin
           </button>
 
