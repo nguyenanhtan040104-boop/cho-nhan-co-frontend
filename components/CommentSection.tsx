@@ -97,33 +97,33 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
           {c.user?.avatarUrl ? <img src={c.user.avatarUrl} className="w-full h-full rounded-full object-cover" alt="" /> : initial}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="bg-gray-100 rounded-2xl px-3 py-2">
-            <p className="text-xs font-bold text-gray-900">{name}</p>
-            <p className="text-sm text-gray-800 mt-0.5 leading-relaxed">{c.content}</p>
+          <div className="bg-paper rounded-card px-3 py-2">
+            <p className="text-xs font-bold text-ink">{name}</p>
+            <p className="text-sm text-ink mt-0.5 leading-relaxed">{c.content}</p>
           </div>
           <div className="flex items-center gap-3 mt-1 px-1">
-            <span className="text-[11px] text-gray-400">{timeAgo(c.createdAt)}</span>
+            <span className="text-[11px] text-ink-faint">{timeAgo(c.createdAt)}</span>
             {/* Like button */}
             <button onClick={handleCommentLike}
-              className={`flex items-center gap-1 text-[11px] font-semibold transition ${cLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}>
+              className={`flex items-center gap-1 text-[11px] font-semibold transition ${cLiked ? 'text-brand-600' : 'text-ink-faint hover:text-brand-600'}`}>
               <i className={cLiked ? 'ri-heart-fill' : 'ri-heart-line'}></i>
               {cLikeCount > 0 && <span>{cLikeCount}</span>}
             </button>
             {!parentId && (
               <button onClick={() => setReplyTo({ id: c.id, name })}
-                className="text-[11px] text-gray-500 font-semibold hover:text-gray-800">
+                className="text-[11px] text-ink-soft font-semibold hover:text-ink">
                 Phản hồi
               </button>
             )}
             {isOwn && (
               <button onClick={() => handleDelete(c.id, parentId)}
-                className="text-[11px] text-red-400 hover:text-red-600">
+                className="text-[11px] text-brand-600 hover:text-brand-600">
                 Xóa
               </button>
             )}
           </div>
           {c.replies?.length > 0 && (
-            <div className="mt-2 space-y-2 pl-2 border-l-2 border-gray-100">
+            <div className="mt-2 space-y-2 pl-2 border-l-2 border-line">
               {c.replies.map((r: any) => <CommentItem key={r.id} c={r} parentId={c.id} />)}
             </div>
           )}
@@ -133,36 +133,36 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
   }
 
   return (
-    <div className="bg-white border-t border-gray-100 px-4 py-5">
-      <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <i className="ri-chat-3-line text-gray-500"></i>
-        Bình luận {comments.length > 0 && <span className="text-gray-400 font-normal text-sm">({comments.length})</span>}
+    <div className="bg-surface border-t border-line px-4 py-5">
+      <h3 className="font-bold text-ink mb-4 flex items-center gap-2">
+        <i className="ri-chat-3-line text-ink-soft"></i>
+        Bình luận {comments.length > 0 && <span className="text-ink-faint font-normal text-sm">({comments.length})</span>}
       </h3>
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="mb-5">
         {replyTo && (
-          <div className="flex items-center gap-2 text-xs text-blue-600 mb-2 bg-blue-50 px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-2 text-xs text-ink-soft mb-2 bg-paper px-3 py-1.5 rounded-lg">
             <i className="ri-corner-down-right-line"></i>
             Đang phản hồi <strong>{replyTo.name}</strong>
-            <button type="button" onClick={() => setReplyTo(null)} className="ml-auto text-gray-400 hover:text-gray-600">
+            <button type="button" onClick={() => setReplyTo(null)} className="ml-auto text-ink-faint hover:text-ink-soft">
               <i className="ri-close-line"></i>
             </button>
           </div>
         )}
         <div className="flex gap-2 items-end">
-          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-line flex items-center justify-center flex-shrink-0">
             {currentUser?.avatarUrl
               ? <img src={currentUser.avatarUrl} className="w-full h-full rounded-full object-cover" alt="" />
-              : <i className="ri-user-line text-gray-500 text-sm"></i>}
+              : <i className="ri-user-line text-ink-soft text-sm"></i>}
           </div>
-          <div className="flex-1 bg-gray-100 rounded-2xl px-4 py-2 flex items-end gap-2">
+          <div className="flex-1 bg-paper rounded-card px-4 py-2 flex items-end gap-2">
             <textarea
               value={content}
               onChange={e => setContent(e.target.value)}
               placeholder={auth.isLoggedIn() ? 'Viết bình luận...' : 'Đăng nhập để bình luận'}
               rows={1}
-              className="flex-1 bg-transparent resize-none focus:outline-none text-sm text-gray-800 placeholder-gray-400 max-h-24"
+              className="flex-1 bg-transparent resize-none focus:outline-none text-sm text-ink placeholder-gray-400 max-h-24"
               style={{ minHeight: 24 }}
               onInput={e => {
                 const el = e.target as HTMLTextAreaElement;
@@ -182,7 +182,7 @@ export default function CommentSection({ targetType, targetId }: CommentSectionP
       {loading ? (
         <div className="flex justify-center py-6"><div className="w-6 h-6 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div></div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-8 text-gray-400">
+        <div className="text-center py-8 text-ink-faint">
           <i className="ri-chat-3-line text-3xl block mb-1"></i>
           <p className="text-sm">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
         </div>

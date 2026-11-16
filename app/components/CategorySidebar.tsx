@@ -75,7 +75,7 @@ export default function CategorySidebar({
       {/* ── 1. Tin nổi bật VIP ─────────────────────────────────────── */}
       {vipItems.length > 0 && (
         <Widget title="Tin nổi bật VIP" eyebrow="Được đề xuất">
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-line">
             {vipItems.slice(0, 4).map((item) => {
               const img = item.images?.[0]?.url || (typeof item.images?.[0] === 'string' ? item.images[0] : null);
               return (
@@ -90,11 +90,11 @@ export default function CategorySidebar({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12.5px] font-medium text-gray-900 line-clamp-1 leading-snug">{item.title}</p>
+                    <p className="text-[12.5px] font-medium text-ink line-clamp-1 leading-snug">{item.title}</p>
                     {item.price !== undefined && (
-                      <p className="text-[12px] font-semibold text-red-700 mt-0.5">{fmt(Number(item.price))}đ</p>
+                      <p className="text-[12px] font-semibold text-brand-600 mt-0.5">{fmt(Number(item.price))}đ</p>
                     )}
-                    <p className="text-[11px] text-gray-400 truncate">{item.location || 'Đắk Nông'}</p>
+                    <p className="text-[11px] text-ink-faint truncate">{item.location || 'Đắk Nông'}</p>
                   </div>
                 </Link>
               );
@@ -120,7 +120,7 @@ export default function CategorySidebar({
               <Link
                 key={q}
                 href={searchHref ? searchHref(q) : `/products?search=${encodeURIComponent(q)}`}
-                className="px-2 py-0.5 text-[12px] text-gray-600 border border-line rounded hover:border-line hover:text-gray-900 transition-colors capitalize"
+                className="px-2 py-0.5 text-[12px] text-ink-soft border border-line rounded hover:border-line hover:text-ink transition-colors capitalize"
               >
                 {q}
               </Link>
@@ -133,24 +133,24 @@ export default function CategorySidebar({
       <Widget title="Mẹo an toàn" eyebrow="Trước khi giao dịch">
         <ul className="px-3 pb-3 pt-1 space-y-1.5">
           {safetyTips.map((tip, i) => (
-            <li key={i} className="text-[12px] text-gray-600 leading-relaxed flex gap-1.5">
-              <span className="text-gray-400 mt-0.5 flex-shrink-0">{i + 1}.</span>
+            <li key={i} className="text-[12px] text-ink-soft leading-relaxed flex gap-1.5">
+              <span className="text-ink-faint mt-0.5 flex-shrink-0">{i + 1}.</span>
               <span>{tip}</span>
             </li>
           ))}
         </ul>
         <Link
           href="/canh-bao"
-          className="block px-3 pb-3 text-[12px] font-semibold text-gray-700 hover:text-gray-900 hover:underline underline-offset-4"
+          className="block px-3 pb-3 text-[12px] font-semibold text-ink hover:text-ink hover:underline underline-offset-4"
         >
           Xem tất cả cảnh báo →
         </Link>
       </Widget>
 
       {/* ── 5. CTA đăng tin (compact, no gradient) ─────────────────── */}
-      <div className="bg-white border border-line rounded-lg p-4">
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1.5">Miễn phí đăng tin</p>
-        <p className="text-[13px] text-gray-700 leading-relaxed mb-3">
+      <div className="bg-surface border border-line rounded-lg p-4">
+        <p className="text-[11px] font-bold tracking-widest text-ink-faint uppercase mb-1.5">Miễn phí đăng tin</p>
+        <p className="text-[13px] text-ink leading-relaxed mb-3">
           Đăng tin bán cà phê, hồ tiêu, đất rẫy, tuyển công nhật... gần nhà bạn tại Nhân Cơ.
         </p>
         <Link
@@ -167,10 +167,10 @@ export default function CategorySidebar({
 // ─── Reusable subtle-styled widget shell ─────────────────────────────
 function Widget({ title, eyebrow, children }: { title: string; eyebrow?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-line rounded-lg overflow-hidden">
+    <div className="bg-surface border border-line rounded-lg overflow-hidden">
       <div className="px-3 pt-3 pb-1.5 border-b border-line">
-        {eyebrow && <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">{eyebrow}</p>}
-        <h4 className="text-[13px] font-bold text-gray-900 mt-0.5">{title}</h4>
+        {eyebrow && <p className="text-[11px] font-semibold tracking-wider text-ink-faint uppercase">{eyebrow}</p>}
+        <h4 className="text-[13px] font-bold text-ink mt-0.5">{title}</h4>
       </div>
       {children}
     </div>
@@ -203,17 +203,17 @@ function SidebarAdSlot() {
     return (
       <Link
         href="/advertisements/create"
-        className="block bg-white border border-line rounded-lg overflow-hidden hover:border-line transition-colors"
+        className="block bg-surface border border-line rounded-lg overflow-hidden hover:border-line transition-colors"
       >
         <div className="px-3 pt-3 pb-1.5 border-b border-line flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">Quảng cáo</p>
-            <h4 className="text-[13px] font-bold text-gray-900 mt-0.5">Cửa hàng của bạn?</h4>
+            <p className="text-[11px] font-semibold tracking-wider text-ink-faint uppercase">Quảng cáo</p>
+            <h4 className="text-[13px] font-bold text-ink mt-0.5">Cửa hàng của bạn?</h4>
           </div>
           <i className="ri-megaphone-line text-ink-faint text-lg"></i>
         </div>
-        <div className="px-3 py-3 text-[12px] text-gray-600 leading-relaxed">
-          Đẩy thương hiệu lên đầu trang chủ chỉ từ <b className="text-gray-900">50.000đ / 7 ngày</b>.
+        <div className="px-3 py-3 text-[12px] text-ink-soft leading-relaxed">
+          Đẩy thương hiệu lên đầu trang chủ chỉ từ <b className="text-ink">50.000đ / 7 ngày</b>.
           <span className="block mt-2 text-forest-700 font-semibold">Tìm hiểu →</span>
         </div>
       </Link>
@@ -224,10 +224,10 @@ function SidebarAdSlot() {
   return (
     <Link
       href={`/advertisements/${ad.id}`}
-      className="block bg-white border border-line rounded-lg overflow-hidden hover:border-line transition-colors"
+      className="block bg-surface border border-line rounded-lg overflow-hidden hover:border-line transition-colors"
     >
       <div className="px-3 pt-3 pb-1.5 border-b border-line flex items-center justify-between">
-        <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">Quảng cáo địa phương</p>
+        <p className="text-[11px] font-semibold tracking-wider text-ink-faint uppercase">Quảng cáo địa phương</p>
         <i className="ri-megaphone-line text-ink-faint"></i>
       </div>
       {image && (
@@ -237,11 +237,11 @@ function SidebarAdSlot() {
       )}
       <div className="px-3 py-2.5">
         {ad.businessName && (
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 truncate">{ad.businessName}</p>
+          <p className="text-[11px] font-semibold text-ink-faint uppercase tracking-wider mb-0.5 truncate">{ad.businessName}</p>
         )}
-        <p className="text-[13px] font-bold text-gray-900 line-clamp-2 leading-snug">{ad.title}</p>
+        <p className="text-[13px] font-bold text-ink line-clamp-2 leading-snug">{ad.title}</p>
         {ad.description && (
-          <p className="text-[12px] text-gray-500 line-clamp-2 mt-1 leading-relaxed">{ad.description}</p>
+          <p className="text-[12px] text-ink-soft line-clamp-2 mt-1 leading-relaxed">{ad.description}</p>
         )}
       </div>
     </Link>

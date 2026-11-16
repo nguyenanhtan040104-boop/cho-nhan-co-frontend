@@ -5,7 +5,7 @@ export default function Logo({ size = 36 }: { size?: number }) {
       role="img"
       aria-label="Chợ Nhân Cơ"
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
-      className="grid shrink-0 place-items-center rounded-md bg-forest-700 font-extrabold leading-none tracking-tight text-white"
+      className="grid shrink-0 place-items-center rounded-md bg-forest-700 font-bold leading-none tracking-tight text-white"
     >
       Cơ
     </span>

@@ -60,37 +60,16 @@ export default async function HomePage() {
 
   return (
     <main className="pb-24 md:pb-8">
-      {/* Search first: it is what most visitors came to do */}
-      <section className="bg-forest-700 text-white">
-        <div className="mx-auto max-w-content px-4 py-6 sm:px-6 sm:py-9">
-          <h1 className="text-[1.6rem] font-bold leading-tight sm:text-4xl">Mua bán ngay trong xã Nhân Cơ</h1>
-          <p className="mt-1.5 max-w-xl text-[15px] text-forest-100">Nông sản, đất rẫy, việc làm mùa vụ. Đăng tin miễn phí, gặp người bán gần nhà.</p>
-
-          <form action="/products" method="get" role="search" className="mt-5 flex max-w-2xl gap-2">
-            <label htmlFor="home-search" className="sr-only">Tìm trên Chợ Nhân Cơ</label>
-            <input
-              id="home-search"
-              name="search"
-              type="search"
-              placeholder="Bạn đang tìm gì? Ví dụ: cà phê nhân, đất rẫy"
-              className="h-12 min-w-0 flex-1 rounded-lg border-0 bg-white px-4 text-[15px] text-ink placeholder-ink-faint focus:outline-none focus:ring-2 focus:ring-white/60"
-            />
-            <button type="submit" className="btn-primary h-12 px-6">Tìm</button>
-          </form>
-
-          <p className="mt-3 text-[13px] text-forest-100">
-            Tìm nhiều:{' '}
-            {POPULAR.map((p, i) => (
-              <span key={p.label}>
-                <Link href={p.href} className="font-semibold text-white underline decoration-white/40 underline-offset-2 hover:decoration-white">{p.label}</Link>
-                {i < POPULAR.length - 1 && <span className="px-1.5 text-forest-300">·</span>}
-              </span>
-            ))}
-          </p>
+      <section className="mx-auto max-w-content px-4 pb-1 pt-7 sm:px-6 sm:pt-12">
+        <h1 className="max-w-2xl text-[1.75rem] font-bold leading-tight text-ink sm:text-[2.5rem] sm:leading-[1.15]">Mua bán ngay trong xã Nhân Cơ</h1>
+        <p className="mt-2 max-w-xl text-[16px] leading-relaxed text-ink-soft">Nông sản, đất rẫy, việc làm mùa vụ. Đăng tin miễn phí, gặp người bán gần nhà.</p>
+        <div className="no-scrollbar -mx-4 mt-4 flex items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0" aria-label="Tìm nhiều">
+          <span className="mr-1 hidden shrink-0 text-sm text-ink-faint sm:inline">Tìm nhiều:</span>
+          {POPULAR.map(p => <Link key={p.label} href={p.href} className="chip">{p.label}</Link>)}
         </div>
       </section>
 
-      <div className="mx-auto max-w-content space-y-9 px-4 pt-5 sm:px-6 sm:pt-6">
+      <div className="mx-auto max-w-content space-y-12 px-4 pt-8 sm:px-6 sm:pt-10">
         <MarketPriceWidget />
 
         <NearbySection />
@@ -120,24 +99,24 @@ export default async function HomePage() {
         )}
 
         <Section title="Chuyện của bà con" href="/forum" empty={forum.length === 0} emptyLabel="Chưa có bài viết nào">
-          <ul className="divide-y divide-line rounded-card border border-line bg-surface">
+          <ul className="divide-y divide-line border-y border-line">
             {forum.map((post: any) => <ForumRow key={post.id} post={post} />)}
           </ul>
         </Section>
 
-        <aside className="rounded-card border border-line bg-surface p-4 text-[14px] leading-relaxed text-ink-soft sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-5">
+        <aside className="text-[14px] leading-relaxed text-ink-soft sm:flex sm:items-center sm:justify-between sm:gap-6">
           <p>
             <b className="text-ink">Mua bán an toàn.</b> Gặp trực tiếp, xem hàng rồi mới trả tiền. Không chuyển tiền đặt cọc cho người chưa gặp mặt.
           </p>
           <Link href="/canh-bao" className="mt-2 inline-block shrink-0 font-semibold text-forest-700 underline underline-offset-2 sm:mt-0">Xem cảnh báo lừa đảo</Link>
         </aside>
 
-        <section className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="flex flex-col gap-4 rounded-card bg-paper p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
           <div>
             <h2 className="text-lg font-bold text-ink">Có hàng cần bán?</h2>
             <p className="text-[14px] text-ink-soft">Đăng tin trong vài phút. Người mua liên hệ bạn qua Zalo hoặc điện thoại.</p>
           </div>
-          <Link href="/dashboard" className="btn-primary shrink-0 px-6 py-3">Đăng tin miễn phí</Link>
+          <Link href="/dashboard" className="btn-primary shrink-0 px-6 py-3.5">Đăng tin miễn phí</Link>
         </section>
       </div>
     </main>
@@ -151,9 +130,9 @@ function Section({ title, href, empty, emptyLabel, children }: {
 }) {
   return (
     <section>
-      <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-line pb-2">
-        <h2 className="text-xl font-bold text-ink">{title}</h2>
-        <Link href={href} className="whitespace-nowrap text-[14px] font-semibold text-forest-700 hover:underline">Xem tất cả</Link>
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <h2 className="text-[22px] font-bold leading-tight text-ink">{title}</h2>
+        <Link href={href} className="whitespace-nowrap text-[15px] font-medium text-ink underline underline-offset-4 hover:text-forest-700">Xem tất cả</Link>
       </div>
       {empty ? <EmptyBlock label={emptyLabel} /> : children}
     </section>
@@ -161,14 +140,14 @@ function Section({ title, href, empty, emptyLabel, children }: {
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">{children}</div>;
 }
 
 function ForumRow({ post }: { post: any }) {
   const name = post.user?.fullName || post.user?.username || 'Ẩn danh';
   return (
     <li>
-      <Link href={`/forum/${post.id}`} className="block px-4 py-3.5 transition-colors hover:bg-paper">
+      <Link href={`/forum/${post.id}`} className="block py-4 transition-colors hover:bg-paper sm:px-2">
         <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-ink">{post.title}</p>
         <p className="mt-1 text-[12px] text-ink-faint">
           {name} · {post.likeCount || 0} thích · {post._count?.comments || 0} bình luận{post.createdAt ? ` · ${timeAgo(post.createdAt)}` : ''}
@@ -180,7 +159,7 @@ function ForumRow({ post }: { post: any }) {
 
 function EmptyBlock({ label }: { label: string }) {
   return (
-    <div className="rounded-card border border-dashed border-line bg-surface px-6 py-8 text-center">
+    <div className="rounded-card bg-paper px-6 py-10 text-center">
       <p className="text-[15px] font-semibold text-ink">{label}</p>
       <p className="mt-1 text-[13px] text-ink-faint">Bạn có thể là người đầu tiên đăng tin ở mục này.</p>
       <Link href="/dashboard" className="btn-forest mt-4">Đăng tin</Link>

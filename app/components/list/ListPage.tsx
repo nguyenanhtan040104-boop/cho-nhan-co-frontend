@@ -35,6 +35,7 @@ export interface ListConfig {
   load: (a: LoadArgs) => Promise<any>;
   matchQuick?: (item: any, quick: string) => boolean;
   safety: string;
+  simple?: boolean;                 // no quick filters, sort or location row (for ads)
 }
 
 const DAY = 86400000;
@@ -144,7 +145,7 @@ function Inner(c: ListConfig) {
   const filtered = !!(query || sub);
 
   return (
-    <div className="min-h-screen bg-paper pb-8">
+    <div className="min-h-screen bg-surface pb-8">
       <header className="border-b border-line bg-surface">
         <div className="mx-auto max-w-content px-4 pb-4 pt-4 sm:px-6">
           <nav className="mb-2 flex items-center gap-1 text-[13px] text-ink-faint" aria-label="Đường dẫn">
@@ -181,7 +182,7 @@ function Inner(c: ListConfig) {
       </header>
 
       <div className="mx-auto max-w-content px-4 pt-4 sm:px-6">
-        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+        {!c.simple && <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
             {c.quickFilters.map(f => (
               <button key={f.value} onClick={() => { setQuick(f.value); setPage(1); }}
@@ -197,7 +198,7 @@ function Inner(c: ListConfig) {
             <label className="flex items-center gap-1.5 text-ink-soft">
               <span className="sr-only sm:not-sr-only">Sắp xếp</span>
               <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
-                className="rounded-lg border border-line bg-surface px-2 py-1.5 font-medium text-ink focus:border-forest-500 focus:outline-none">
+                className="rounded-lg border border-line bg-surface px-2 py-1.5 font-medium text-ink focus:border-ink focus:outline-none">
                 <option value="newest">Mới nhất</option>
                 <option value="price_asc">Giá thấp trước</option>
                 <option value="price_desc">Giá cao trước</option>
@@ -205,7 +206,8 @@ function Inner(c: ListConfig) {
               </select>
             </label>
           </div>
-        </div>
+        </div>}
+        {c.simple && <div className="mb-3" />}
 
         {loading ? (
           <Grid>{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} />)}</Grid>
@@ -243,17 +245,17 @@ function Inner(c: ListConfig) {
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">{children}</div>;
 }
 
 function Skeleton() {
   return (
-    <div className="animate-pulse overflow-hidden rounded-card border border-line bg-surface">
-      <div className="aspect-[4/3] bg-paper" />
-      <div className="space-y-2 p-3">
-        <div className="h-3 w-4/5 rounded bg-paper" />
-        <div className="h-4 w-1/2 rounded bg-paper" />
-        <div className="h-3 w-2/3 rounded bg-paper" />
+    <div className="animate-pulse">
+      <div className="aspect-[4/3] rounded-card bg-paper" />
+      <div className="mt-2.5 space-y-2">
+        <div className="h-3.5 w-4/5 rounded bg-paper" />
+        <div className="h-3 w-1/2 rounded bg-paper" />
+        <div className="h-4 w-1/3 rounded bg-paper" />
       </div>
     </div>
   );

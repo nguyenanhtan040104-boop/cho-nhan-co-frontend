@@ -115,7 +115,7 @@ export default function GPSLocationPicker({
           type="button"
           onClick={capture}
           disabled={status === 'loading'}
-          className="w-full flex items-center justify-center gap-2 border border-line hover:border-forest-700 text-gray-700 hover:text-forest-800 rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 border border-line hover:border-forest-700 text-ink hover:text-forest-800 rounded-md px-3 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50"
         >
           <i className={`${status === 'loading' ? 'ri-loader-4-line animate-spin' : 'ri-map-pin-add-line'} text-lg`}></i>
           {status === 'loading' ? 'Đang lấy vị trí...' : label}
@@ -141,14 +141,14 @@ export default function GPSLocationPicker({
       )}
 
       {status === 'error' && error && (
-        <p className="text-[12px] text-red-600 flex items-start gap-1.5">
+        <p className="text-[12px] text-brand-600 flex items-start gap-1.5">
           <i className="ri-error-warning-line mt-0.5 flex-shrink-0"></i>
           <span>{error}</span>
         </p>
       )}
 
       {!hasGPS && status !== 'error' && hint && (
-        <p className="text-[11.5px] text-gray-500 leading-relaxed">{hint}</p>
+        <p className="text-[11.5px] text-ink-soft leading-relaxed">{hint}</p>
       )}
     </div>
   );

@@ -102,7 +102,7 @@ export default function AdPopup() {
 
         <div className="p-5">
           {ad.businessName && <p className="mb-1 text-xs font-bold text-forest-700">{ad.businessName}</p>}
-          <h3 className="mb-2 line-clamp-2 text-lg font-extrabold leading-tight text-ink">{ad.title}</h3>
+          <h3 className="mb-2 line-clamp-2 text-lg font-bold leading-tight text-ink">{ad.title}</h3>
           {ad.description && <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-ink-soft">{ad.description}</p>}
           <div className="flex gap-2">
             <button onClick={close} className="btn-ghost flex-1">Để sau</button>

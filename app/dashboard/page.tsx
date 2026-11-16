@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -562,9 +562,9 @@ function SecurityTab() {
 
   function getStatusStyle(status: string) {
     if (status === 'SUCCESS') return 'bg-forest-100 text-forest-700';
-    if (status === 'FAILED') return 'bg-red-100 text-red-700';
+    if (status === 'FAILED') return 'bg-brand-50 text-brand-600';
     if (status === 'LOCKED') return 'bg-brand-100 text-brand-700';
-    return 'bg-gray-100 text-gray-700';
+    return 'bg-paper text-ink';
   }
 
   function getStatusLabel(status: string) {
@@ -585,31 +585,31 @@ function SecurityTab() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Bảo mật tài khoản</h2>
+      <h2 className="text-xl font-bold text-ink mb-6">Bảo mật tài khoản</h2>
 
-      <div className="bg-white rounded-xl p-6  mb-6">
+      <div className="bg-surface rounded-lg p-6  mb-6">
         <div className="flex items-center gap-2 mb-2">
           <i className="ri-lock-password-line text-forest-600 text-xl"></i>
-          <h3 className="font-semibold text-gray-900">Khóa tài khoản tự động</h3>
+          <h3 className="font-semibold text-ink">Khóa tài khoản tự động</h3>
         </div>
-        <p className="text-sm text-gray-500">Tài khoản sẽ bị khóa <strong>15 phút</strong> nếu nhập sai mật khẩu <strong>5 lần liên tiếp</strong>.</p>
+        <p className="text-sm text-ink-soft">Tài khoản sẽ bị khóa <strong>15 phút</strong> nếu nhập sai mật khẩu <strong>5 lần liên tiếp</strong>.</p>
       </div>
 
-      <div className="bg-white rounded-xl p-6 ">
-        <h3 className="font-semibold text-gray-900 mb-4">Lịch sử đăng nhập gần đây</h3>
+      <div className="bg-surface rounded-lg p-6 ">
+        <h3 className="font-semibold text-ink mb-4">Lịch sử đăng nhập gần đây</h3>
         {loading ? (
-          <p className="text-gray-400 text-sm">Đang tải...</p>
+          <p className="text-ink-faint text-sm">Đang tải...</p>
         ) : history.length === 0 ? (
-          <p className="text-gray-400 text-sm">Chưa có lịch sử đăng nhập</p>
+          <p className="text-ink-faint text-sm">Chưa có lịch sử đăng nhập</p>
         ) : (
           <div className="space-y-3">
             {history.map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+              <div key={item.id} className="flex items-center justify-between py-3 border-b border-line last:border-0">
                 <div className="flex items-center gap-3">
-                  <i className={`text-xl ${item.status === 'SUCCESS' ? 'ri-shield-check-line text-forest-500' : 'ri-shield-cross-line text-red-500'}`}></i>
+                  <i className={`text-xl ${item.status === 'SUCCESS' ? 'ri-shield-check-line text-forest-500' : 'ri-shield-cross-line text-brand-600'}`}></i>
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{formatDevice(item.userAgent)}</p>
-                    <p className="text-xs text-gray-400">{item.ipAddress} · {new Date(item.createdAt).toLocaleString('vi-VN')}</p>
+                    <p className="text-sm font-medium text-ink">{formatDevice(item.userAgent)}</p>
+                    <p className="text-xs text-ink-faint">{item.ipAddress} · {new Date(item.createdAt).toLocaleString('vi-VN')}</p>
                   </div>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusStyle(item.status)}`}>
@@ -752,11 +752,11 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Cài đặt tài khoản</h2>
+      <h2 className="text-xl font-bold text-ink mb-6">Cài đặt tài khoản</h2>
 
       {/* Avatar */}
-      <div className="bg-white rounded-xl p-6  mb-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Ảnh đại diện</h3>
+      <div className="bg-surface rounded-lg p-6  mb-6">
+        <h3 className="font-semibold text-ink mb-4">Ảnh đại diện</h3>
         <div className="flex items-center gap-5">
           {user.avatarUrl ? (
             <img src={user.avatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-forest-200" />
@@ -767,14 +767,14 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           )}
           <div>
             {user.isEmailVerified ? (
-              <label className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${avatarUploading ? 'bg-gray-400' : 'bg-brand-500 hover:bg-brand-600'}`}>
+              <label className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors ${avatarUploading ? 'bg-ink' : 'bg-forest-600 hover:bg-forest-700'}`}>
                 <i className={avatarUploading ? 'ri-loader-4-line animate-spin' : 'ri-camera-line'}></i>
                 {avatarUploading ? 'Đang tải...' : 'Đổi ảnh đại diện'}
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={avatarUploading} />
               </label>
             ) : (
               <div>
-                <button disabled className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-300 cursor-not-allowed">
+                <button disabled className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-line cursor-not-allowed">
                   <i className="ri-camera-line"></i> Đổi ảnh đại diện
                 </button>
                 <p className="text-xs text-brand-500 mt-1.5 flex items-center gap-1">
@@ -783,50 +783,50 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
               </div>
             )}
             {avatarMsg && (
-              <p className={`text-xs mt-1.5 ${avatarMsg.includes('thành công') ? 'text-forest-600' : 'text-red-500'}`}>{avatarMsg}</p>
+              <p className={`text-xs mt-1.5 ${avatarMsg.includes('thành công') ? 'text-forest-600' : 'text-brand-600'}`}>{avatarMsg}</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Profile Info */}
-      <div className="bg-white rounded-xl p-6  mb-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Thông tin cá nhân</h3>
+      <div className="bg-surface rounded-lg p-6  mb-6">
+        <h3 className="font-semibold text-ink mb-4">Thông tin cá nhân</h3>
         <form onSubmit={handleSaveProfile}>
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Họ tên</label>
+              <label className="block text-sm font-medium text-ink mb-1">Họ tên</label>
               <input
                 type="text"
                 value={form.fullName}
                 onChange={e => setForm({ ...form, fullName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+              <label className="block text-sm font-medium text-ink mb-1">Số điện thoại</label>
               <input
                 type="text"
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+              <label className="block text-sm font-medium text-ink mb-1">Địa chỉ</label>
               <input
                 type="text"
                 value={form.address}
                 onChange={e => setForm({ ...form, address: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
               />
             </div>
           </div>
 
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-ink mb-1">Email</label>
             <div className="flex items-center gap-2">
-              <input type="text" value={user.email || 'Chưa có email'} disabled className="flex-1 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500" />
+              <input type="text" value={user.email || 'Chưa có email'} disabled className="flex-1 px-4 py-2 border border-line rounded-lg bg-paper text-ink-soft" />
               {user.isEmailVerified
                 ? <span className="text-forest-600 text-sm font-medium whitespace-nowrap">Đã xác thực</span>
                 : <span className="text-brand-500 text-sm font-medium whitespace-nowrap">Chưa xác thực</span>
@@ -835,7 +835,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           </div>
 
           {msg && (
-            <p className={`mt-3 text-sm ${msg.includes('thành công') ? 'text-forest-600' : 'text-red-600'}`}>{msg}</p>
+            <p className={`mt-3 text-sm ${msg.includes('thành công') ? 'text-forest-600' : 'text-brand-600'}`}>{msg}</p>
           )}
 
           <button
@@ -849,50 +849,50 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       </div>
 
       {/* Change Password */}
-      <div className="bg-white rounded-xl p-6 ">
-        <h3 className="font-semibold text-gray-900 mb-4">Đổi mật khẩu</h3>
+      <div className="bg-surface rounded-lg p-6 ">
+        <h3 className="font-semibold text-ink mb-4">Đổi mật khẩu</h3>
         <form onSubmit={handleChangePassword}>
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
+              <label className="block text-sm font-medium text-ink mb-1">Mật khẩu hiện tại</label>
               <input
                 type="password"
                 value={pwForm.currentPassword}
                 onChange={e => setPwForm({ ...pwForm, currentPassword: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
+              <label className="block text-sm font-medium text-ink mb-1">Mật khẩu mới</label>
               <input
                 type="password"
                 value={pwForm.newPassword}
                 onChange={e => setPwForm({ ...pwForm, newPassword: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
                 minLength={6}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
+              <label className="block text-sm font-medium text-ink mb-1">Xác nhận mật khẩu mới</label>
               <input
                 type="password"
                 value={pwForm.confirmPassword}
                 onChange={e => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 required
               />
             </div>
           </div>
 
           {pwMsg && (
-            <p className={`mt-3 text-sm ${pwMsg.includes('thành công') ? 'text-forest-600' : 'text-red-600'}`}>{pwMsg}</p>
+            <p className={`mt-3 text-sm ${pwMsg.includes('thành công') ? 'text-forest-600' : 'text-brand-600'}`}>{pwMsg}</p>
           )}
 
           <button
             type="submit"
-            className="mt-4 bg-brand-600 text-white px-6 py-2 rounded-lg hover:bg-brand-700 transition-colors"
+            className="mt-4 bg-forest-600 text-white px-6 py-2 rounded-lg hover:bg-forest-700 transition-colors"
           >
             Đổi mật khẩu
           </button>
@@ -901,20 +901,20 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
 
       {/* Email Verification */}
       {!user.isEmailVerified && (
-        <div className="bg-white rounded-xl p-6  mt-6">
+        <div className="bg-surface rounded-lg p-6  mt-6">
           <div className="flex items-center gap-2 mb-4">
-            <h3 className="font-semibold text-gray-900">Xác thực email</h3>
+            <h3 className="font-semibold text-ink">Xác thực email</h3>
             <span className="bg-brand-100 text-brand-600 text-xs px-2 py-0.5 rounded-full">Bắt buộc để đăng bài</span>
           </div>
 
           {emailMsg && (
-            <p className={`mb-3 text-sm ${emailMsg.includes('thành công') ? 'text-forest-600' : emailMsg.includes('gửi') ? 'text-forest-600' : 'text-red-600'}`}>{emailMsg}</p>
+            <p className={`mb-3 text-sm ${emailMsg.includes('thành công') ? 'text-forest-600' : emailMsg.includes('gửi') ? 'text-forest-600' : 'text-brand-600'}`}>{emailMsg}</p>
           )}
 
           {emailStep === 'idle' ? (
             <form onSubmit={handleSendEmailOtp} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   {user.email ? 'Email của bạn' : 'Thêm email'}
                 </label>
                 <input
@@ -923,7 +923,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                   onChange={e => setEmailInput(e.target.value)}
                   placeholder="email@example.com"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-line rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                 />
               </div>
               <button type="submit" disabled={emailLoading}
@@ -934,14 +934,14 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
           ) : (
             <form onSubmit={handleVerifyEmail} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mã OTP (6 chữ số)</label>
+                <label className="block text-sm font-medium text-ink mb-1">Mã OTP (6 chữ số)</label>
                 <input
                   type="text"
                   value={otpInput}
                   onChange={e => setOtpInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   maxLength={6}
-                  className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 font-mono"
+                  className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-line rounded-lg focus:ring-2 focus:ring-brand-500 font-mono"
                 />
               </div>
               <div className="flex gap-2">
@@ -950,7 +950,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
                   {emailLoading ? 'Đang xác nhận...' : 'Xác nhận'}
                 </button>
                 <button type="button" onClick={handleSendEmailOtp} disabled={countdown > 0 || emailLoading}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm">
+                  className="border border-line text-ink px-4 py-2 rounded-lg hover:bg-paper disabled:opacity-50 text-sm">
                   {countdown > 0 ? `Gửi lại (${countdown}s)` : 'Gửi lại OTP'}
                 </button>
               </div>
@@ -960,7 +960,7 @@ function SettingsTab({ user, onUpdate }: { user: any; onUpdate: (u: any) => void
       )}
 
       {user.isEmailVerified && (
-        <div className="bg-forest-50 border border-forest-200 rounded-xl p-4 mt-6 flex items-center gap-3">
+        <div className="bg-forest-50 border border-forest-200 rounded-lg p-4 mt-6 flex items-center gap-3">
           <i className="ri-checkbox-circle-fill text-forest-600 text-xl"></i>
           <div>
             <p className="font-medium text-forest-800">Email đã được xác thực</p>
@@ -1039,23 +1039,23 @@ function ProductsTab({
   const statusColor: any = {
     ACTIVE: 'bg-forest-100 text-forest-700',
     PAUSED: 'bg-gold-100 text-gold-700',
-    SOLD_OUT: 'bg-red-100 text-red-700',
-    DRAFT: 'bg-gray-100 text-gray-600',
+    SOLD_OUT: 'bg-brand-50 text-brand-600',
+    DRAFT: 'bg-paper text-ink-soft',
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">{title} ({myProducts.length})</h2>
+        <h2 className="text-xl font-bold text-ink">{title} ({myProducts.length})</h2>
         <Link href={createHref} className={`bg-${accentColor}-600 text-white px-4 py-2 rounded-lg hover:bg-${accentColor}-700 text-sm`}>
           {createLabel}
         </Link>
       </div>
 
       {myProducts.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 text-center ">
-          <i className="ri-plant-line text-5xl text-gray-300 block mb-3"></i>
-          <p className="text-gray-500 mb-4">Bạn chưa có {emptyLabel} nào</p>
+        <div className="bg-surface rounded-lg p-12 text-center ">
+          <i className="ri-plant-line text-5xl text-ink-faint block mb-3"></i>
+          <p className="text-ink-soft mb-4">Bạn chưa có {emptyLabel} nào</p>
           <Link href={createHref} className={`bg-${accentColor}-600 text-white px-6 py-2 rounded-lg hover:bg-${accentColor}-700`}>
             Đăng {emptyLabel} ngay
           </Link>
@@ -1063,15 +1063,15 @@ function ProductsTab({
       ) : (
         <div className="space-y-3">
           {myProducts.map(product => (
-            <div key={product.id} className={`bg-white rounded-xl p-4  ${product.isDeleted ? 'opacity-60' : ''}`}>
+            <div key={product.id} className={`bg-surface rounded-lg p-4  ${product.isDeleted ? 'opacity-60' : ''}`}>
               <div className="flex items-start gap-4">
                 {/* Ảnh */}
-                <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="w-16 h-16 bg-paper rounded-lg overflow-hidden flex-shrink-0">
                   {product.images?.[0] ? (
                     <img src={product.images[0].url} alt={product.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <i className="ri-image-line text-gray-400 text-xl"></i>
+                      <i className="ri-image-line text-ink-faint text-xl"></i>
                     </div>
                   )}
                 </div>
@@ -1079,8 +1079,8 @@ function ProductsTab({
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-medium text-gray-900 truncate">{product.title}</h4>
-                    <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 ${statusColor[product.status] || 'bg-gray-100 text-gray-600'}`}>
+                    <h4 className="font-medium text-ink truncate">{product.title}</h4>
+                    <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 ${statusColor[product.status] || 'bg-paper text-ink-soft'}`}>
                       {statusLabel[product.status] || product.status}
                     </span>
                   </div>
@@ -1090,26 +1090,26 @@ function ProductsTab({
                     {product.isVip && (
                       <span className="text-xs bg-gold-100 text-gold-700 px-1.5 py-0.5 rounded">VIP</span>
                     )}
-                    <span className="text-xs text-gray-400"><i className="ri-eye-line mr-1"></i>{product.viewCount}</span>
+                    <span className="text-xs text-ink-faint"><i className="ri-eye-line mr-1"></i>{product.viewCount}</span>
                   </div>
 
                   {/* Tồn kho */}
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-gray-500">Tồn kho:</span>
+                    <span className="text-xs text-ink-soft">Tồn kho:</span>
                     {editingQuantity === product.id ? (
                       <div className="flex items-center gap-1">
                         <input type="number" value={quantityValue} onChange={e => setQuantityValue(e.target.value)}
-                          className="w-20 px-2 py-0.5 border border-gray-300 rounded text-xs" min="0" autoFocus />
+                          className="w-20 px-2 py-0.5 border border-line rounded text-xs" min="0" autoFocus />
                         <button onClick={() => handleSaveQuantity(product.id)}
                           disabled={actionLoading === product.id + '-qty'}
                           className={`text-xs bg-${accentColor}-600 text-white px-2 py-0.5 rounded hover:bg-${accentColor}-700 disabled:opacity-50`}>
                           {actionLoading === product.id + '-qty' ? '...' : 'Lưu'}
                         </button>
-                        <button onClick={() => setEditingQuantity(null)} className="text-xs text-gray-500 hover:text-gray-700">Hủy</button>
+                        <button onClick={() => setEditingQuantity(null)} className="text-xs text-ink-soft hover:text-ink">Hủy</button>
                       </div>
                     ) : (
                       <button onClick={() => { setEditingQuantity(product.id); setQuantityValue(String(product.quantity ?? 0)); }}
-                        className="text-xs text-blue-600 hover:underline">
+                        className="text-xs text-ink-soft hover:underline">
                         {product.quantity ?? 0} {product.unit} (sửa)
                       </button>
                     )}
@@ -1120,13 +1120,13 @@ function ProductsTab({
               {/* Actions */}
               <div className="flex items-center gap-2 mt-3 pt-3 border-t flex-wrap">
                 <Link href={`/products/${product.id}`}
-                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-blue-600 px-2 py-1 rounded hover:bg-blue-50">
+                  className="flex items-center gap-1 text-xs text-ink-soft hover:text-ink-soft px-2 py-1 rounded hover:bg-paper">
                   <i className="ri-eye-line"></i> Xem
                 </Link>
 
                 {!product.isDeleted && (
                   <Link href={`/products/${product.id}/edit`}
-                    className="flex items-center gap-1 text-xs text-gray-600 hover:text-brand-600 px-2 py-1 rounded hover:bg-forest-50">
+                    className="flex items-center gap-1 text-xs text-ink-soft hover:text-brand-600 px-2 py-1 rounded hover:bg-forest-50">
                     <i className="ri-edit-line"></i> Sửa
                   </Link>
                 )}
@@ -1154,14 +1154,14 @@ function ProductsTab({
                 {!product.isDeleted ? (
                   <button onClick={() => handleDelete(product.id)}
                     disabled={actionLoading === product.id + '-delete'}
-                    className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 ml-auto disabled:opacity-50">
+                    className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-600 px-2 py-1 rounded hover:bg-brand-50 ml-auto disabled:opacity-50">
                     <i className="ri-delete-bin-line"></i>
                     {actionLoading === product.id + '-delete' ? '...' : 'Xóa'}
                   </button>
                 ) : (
                   <button onClick={() => handleRestore(product.id)}
                     disabled={actionLoading === product.id + '-restore'}
-                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50 ml-auto disabled:opacity-50">
+                    className="flex items-center gap-1 text-xs text-ink-soft hover:text-ink-soft px-2 py-1 rounded hover:bg-paper ml-auto disabled:opacity-50">
                     <i className="ri-restart-line"></i>
                     {actionLoading === product.id + '-restore' ? '...' : 'Khôi phục'}
                   </button>
@@ -1197,35 +1197,35 @@ function AnalyticsTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Hiệu suất tin đăng</h2>
+      <h2 className="text-xl font-bold text-ink">Hiệu suất tin đăng</h2>
 
       {/* Sản phẩm */}
-      <div className="bg-white rounded-xl p-6 ">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="bg-surface rounded-lg p-6 ">
+        <h3 className="font-semibold text-ink mb-4 flex items-center gap-2">
           <i className="ri-plant-line text-forest-600"></i>
           Top sản phẩm theo lượt xem
         </h3>
         {products.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-6">Chưa có dữ liệu</p>
+          <p className="text-ink-faint text-sm text-center py-6">Chưa có dữ liệu</p>
         ) : (
           <div className="space-y-3">
             {products.map((p: any, i: number) => (
               <div key={p.id} className="flex items-center gap-3">
-                <span className="w-6 text-sm text-gray-400 text-center font-medium">{i + 1}</span>
+                <span className="w-6 text-sm text-ink-faint text-center font-medium">{i + 1}</span>
                 {p.images?.[0] && (
                   <img src={p.images[0].url} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" alt="" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
+                  <p className="text-sm font-medium text-ink truncate">{p.title}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                    <div className="flex-1 bg-paper rounded-full h-1.5">
                       <div className="bg-brand-500 h-1.5 rounded-full" style={{ width: `${(p.viewCount / maxViews) * 100}%` }}></div>
                     </div>
-                    <span className="text-xs text-gray-500 whitespace-nowrap">{p.viewCount} lượt xem</span>
+                    <span className="text-xs text-ink-soft whitespace-nowrap">{p.viewCount} lượt xem</span>
                   </div>
                 </div>
                 {p.isVip && <span className="text-xs bg-gold-100 text-gold-700 px-1.5 py-0.5 rounded font-medium">VIP</span>}
-                <span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'ACTIVE' ? 'bg-forest-100 text-forest-700' : 'bg-gray-100 text-gray-500'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'ACTIVE' ? 'bg-forest-100 text-forest-700' : 'bg-paper text-ink-soft'}`}>
                   {p.status === 'ACTIVE' ? 'Hoạt động' : 'Ẩn'}
                 </span>
               </div>
@@ -1233,36 +1233,36 @@ function AnalyticsTab() {
           </div>
         )}
         {data?.totalViews !== undefined && (
-          <p className="text-xs text-gray-400 mt-4 pt-4 border-t">Tổng lượt xem sản phẩm: <strong className="text-gray-700">{data.totalViews.toLocaleString()}</strong></p>
+          <p className="text-xs text-ink-faint mt-4 pt-4 border-t">Tổng lượt xem sản phẩm: <strong className="text-ink">{data.totalViews.toLocaleString()}</strong></p>
         )}
       </div>
 
       {/* Bất động sản */}
-      <div className="bg-white rounded-xl p-6 ">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <i className="ri-home-4-line text-blue-600"></i>
+      <div className="bg-surface rounded-lg p-6 ">
+        <h3 className="font-semibold text-ink mb-4 flex items-center gap-2">
+          <i className="ri-home-4-line text-ink-soft"></i>
           Bất động sản theo lượt xem
         </h3>
         {reData.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-6">Chưa có dữ liệu</p>
+          <p className="text-ink-faint text-sm text-center py-6">Chưa có dữ liệu</p>
         ) : (
           <div className="space-y-3">
             {reData.map((r: any, i: number) => (
               <div key={r.id} className="flex items-center gap-3">
-                <span className="w-6 text-sm text-gray-400 text-center font-medium">{i + 1}</span>
+                <span className="w-6 text-sm text-ink-faint text-center font-medium">{i + 1}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{r.title}</p>
+                  <p className="text-sm font-medium text-ink truncate">{r.title}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <div className="flex-1 bg-gray-100 rounded-full h-1.5">
-                      <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${(r.viewCount / Math.max(...reData.map((x: any) => x.viewCount), 1)) * 100}%` }}></div>
+                    <div className="flex-1 bg-paper rounded-full h-1.5">
+                      <div className="bg-paper0 h-1.5 rounded-full" style={{ width: `${(r.viewCount / Math.max(...reData.map((x: any) => x.viewCount), 1)) * 100}%` }}></div>
                     </div>
-                    <span className="text-xs text-gray-500 whitespace-nowrap">{r.viewCount} lượt xem</span>
+                    <span className="text-xs text-ink-soft whitespace-nowrap">{r.viewCount} lượt xem</span>
                   </div>
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   r.status === 'NEW' ? 'bg-forest-100 text-forest-700' :
                   r.status === 'TRADING' ? 'bg-gold-100 text-gold-700' :
-                  r.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
+                  r.status === 'COMPLETED' ? 'bg-paper text-ink-soft' : 'bg-paper text-ink-soft'
                 }`}>
                   {r.status === 'NEW' ? 'Mới' : r.status === 'TRADING' ? 'Giao dịch' : r.status === 'COMPLETED' ? 'Hoàn tất' : 'Tạm dừng'}
                 </span>
@@ -1326,8 +1326,8 @@ function EngagementTab() {
 
   function getNotifIcon(type: string) {
     const t = (type || '').toUpperCase();
-    if (t.includes('LIKE') || t.includes('REACT')) return { icon: 'ri-heart-fill', color: 'text-red-500 bg-red-100' };
-    if (t.includes('COMMENT')) return { icon: 'ri-chat-1-fill', color: 'text-blue-500 bg-blue-100' };
+    if (t.includes('LIKE') || t.includes('REACT')) return { icon: 'ri-heart-fill', color: 'text-brand-600 bg-brand-50' };
+    if (t.includes('COMMENT')) return { icon: 'ri-chat-1-fill', color: 'text-ink-soft bg-paper' };
     if (t.includes('FOLLOW')) return { icon: 'ri-user-follow-fill', color: 'text-forest-500 bg-forest-100' };
     return { icon: 'ri-notification-2-fill', color: 'text-gold-600 bg-gold-100' };
   }
@@ -1340,50 +1340,50 @@ function EngagementTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Tương tác</h2>
+      <h2 className="text-xl font-bold text-ink">Tương tác</h2>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: 'Tổng lượt xem', value: totalViews.toLocaleString(), icon: 'ri-eye-line', color: 'bg-blue-100 text-blue-600' },
-          { label: 'Lượt thích', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-red-100 text-red-500' },
+          { label: 'Tổng lượt xem', value: totalViews.toLocaleString(), icon: 'ri-eye-line', color: 'bg-paper text-ink-soft' },
+          { label: 'Lượt thích', value: summary.totalForumLikes || 0, icon: 'ri-heart-line', color: 'bg-brand-50 text-brand-600' },
           { label: 'Bình luận', value: summary.totalForumComments || 0, icon: 'ri-chat-1-line', color: 'bg-forest-100 text-forest-600' },
           { label: 'View BĐS', value: (summary.totalRealEstateViews || 0).toLocaleString(), icon: 'ri-home-4-line', color: 'bg-forest-100 text-forest-600' },
         ].map((item, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
+          <div key={i} className="bg-surface border border-line rounded-lg p-4">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2 ${item.color}`}>
               <i className={`${item.icon} text-base`}></i>
             </div>
-            <p className="text-xl font-bold text-gray-900">{item.value}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{item.label}</p>
+            <p className="text-xl font-bold text-ink">{item.value}</p>
+            <p className="text-xs text-ink-faint mt-0.5">{item.label}</p>
           </div>
         ))}
       </div>
 
       {/* Sản phẩm đã thích */}
       {likedProducts.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <i className="ri-heart-fill text-red-500"></i>
+        <div className="bg-surface border border-line rounded-lg overflow-hidden">
+          <div className="px-5 py-4 border-b border-line flex items-center justify-between">
+            <h3 className="font-semibold text-ink flex items-center gap-2">
+              <i className="ri-heart-fill text-brand-600"></i>
               Sản phẩm đã thích
             </h3>
-            <span className="text-xs text-gray-400">{likedProducts.length} sản phẩm</span>
+            <span className="text-xs text-ink-faint">{likedProducts.length} sản phẩm</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[1px] bg-gray-100">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[1px] bg-paper">
             {likedProducts.map((p: any) => (
-              <a key={p.id} href={`/products/${p.id}`} className="bg-white hover:bg-gray-50 transition block">
+              <a key={p.id} href={`/products/${p.id}`} className="bg-surface hover:bg-paper transition block">
                 <div className="relative" style={{ aspectRatio: '4/3' }}>
                   {p.images?.[0]?.url ? (
                     <img src={p.images[0].url} alt={p.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                      <i className="ri-image-line text-2xl text-gray-300"></i>
+                    <div className="w-full h-full bg-paper flex items-center justify-center">
+                      <i className="ri-image-line text-2xl text-ink-faint"></i>
                     </div>
                   )}
                 </div>
                 <div className="px-2 py-2">
-                  <p className="text-xs font-medium text-gray-800 line-clamp-1">{p.title}</p>
+                  <p className="text-xs font-medium text-ink line-clamp-1">{p.title}</p>
                   <p className="text-sm font-bold mt-0.5" style={{ color: '#B32E1D' }}>{Number(p.price).toLocaleString('vi-VN')}đ</p>
                 </div>
               </a>
@@ -1393,34 +1393,34 @@ function EngagementTab() {
       )}
 
       {/* Feed tương tác kiểu Facebook */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-            <i className="ri-heart-line text-red-500"></i>
+      <div className="bg-surface border border-line rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-line">
+          <h3 className="font-semibold text-ink flex items-center gap-2">
+            <i className="ri-heart-line text-brand-600"></i>
             Hoạt động gần đây
           </h3>
-          <p className="text-xs text-gray-400 mt-0.5">Ai đã thích và bình luận bài của bạn</p>
+          <p className="text-xs text-ink-faint mt-0.5">Ai đã thích và bình luận bài của bạn</p>
         </div>
         {notifs.length === 0 ? (
-          <div className="flex flex-col items-center py-12 text-gray-400">
+          <div className="flex flex-col items-center py-12 text-ink-faint">
             <i className="ri-heart-line text-4xl mb-2"></i>
             <p className="text-sm">Chưa có tương tác nào</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-line">
             {notifs.map((n: any) => {
               const { icon, color } = getNotifIcon(n.type);
               const senderName = n.sender?.fullName || n.sender?.username || n.actorName || 'Ai đó';
               const senderAvatar = n.sender?.avatarUrl || null;
               const initial = senderName[0]?.toUpperCase() || 'A';
               return (
-                <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition ${!n.isRead ? 'bg-gold-50/40' : ''}`}>
+                <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 hover:bg-paper transition ${!n.isRead ? 'bg-gold-50/40' : ''}`}>
                   {/* Avatar + icon badge */}
                   <div className="relative flex-shrink-0">
                     {senderAvatar ? (
                       <img src={senderAvatar} alt="" className="w-10 h-10 rounded-full object-cover" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-line flex items-center justify-center text-ink-soft font-bold text-sm">
                         {initial}
                       </div>
                     )}
@@ -1430,11 +1430,11 @@ function EngagementTab() {
                   </div>
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 leading-snug">
+                    <p className="text-sm text-ink leading-snug">
                       <span className="font-semibold">{senderName}</span>{' '}
                       {n.message || 'đã tương tác với bài của bạn'}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">{timeAgoEng(n.createdAt)}</p>
+                    <p className="text-xs text-ink-faint mt-0.5">{timeAgoEng(n.createdAt)}</p>
                   </div>
                   {!n.isRead && <div className="w-2.5 h-2.5 bg-gold-400 rounded-full flex-shrink-0 mt-1.5"></div>}
                 </div>
@@ -1446,22 +1446,22 @@ function EngagementTab() {
 
       {/* Forum posts engagement */}
       {forumPosts.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-surface border border-line rounded-lg p-5">
+          <h3 className="font-semibold text-ink mb-4 flex items-center gap-2">
             <i className="ri-chat-3-line text-forest-500"></i>
             Bài viết diễn đàn
           </h3>
           <div className="space-y-2">
             {forumPosts.map((p: any) => (
-              <div key={p.id} className="flex items-center gap-4 py-2.5 border-b border-gray-50 last:border-0">
+              <div key={p.id} className="flex items-center gap-4 py-2.5 border-b border-line last:border-0">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
-                  <p className="text-xs text-gray-400">{new Date(p.createdAt).toLocaleDateString('vi-VN')}</p>
+                  <p className="text-sm font-medium text-ink truncate">{p.title}</p>
+                  <p className="text-xs text-ink-faint">{new Date(p.createdAt).toLocaleDateString('vi-VN')}</p>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-500 flex-shrink-0">
-                  <span className="flex items-center gap-1"><i className="ri-heart-line text-red-400"></i>{p.likeCount}</span>
-                  <span className="flex items-center gap-1"><i className="ri-chat-1-line text-blue-400"></i>{p._count?.comments || 0}</span>
-                  <span className="flex items-center gap-1"><i className="ri-eye-line text-gray-400"></i>{p.viewCount}</span>
+                <div className="flex items-center gap-3 text-sm text-ink-soft flex-shrink-0">
+                  <span className="flex items-center gap-1"><i className="ri-heart-line text-brand-600"></i>{p.likeCount}</span>
+                  <span className="flex items-center gap-1"><i className="ri-chat-1-line text-ink-soft"></i>{p._count?.comments || 0}</span>
+                  <span className="flex items-center gap-1"><i className="ri-eye-line text-ink-faint"></i>{p.viewCount}</span>
                 </div>
               </div>
             ))}

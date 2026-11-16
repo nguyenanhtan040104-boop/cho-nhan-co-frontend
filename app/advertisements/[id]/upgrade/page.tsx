@@ -97,7 +97,7 @@ export default function AdvertisementUpgradePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-paper">
         <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -105,8 +105,8 @@ export default function AdvertisementUpgradePage() {
 
   if (!ad) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col gap-3">
-        <p className="text-gray-500">Không tìm thấy quảng cáo</p>
+      <div className="min-h-screen flex items-center justify-center bg-paper flex-col gap-3">
+        <p className="text-ink-soft">Không tìm thấy quảng cáo</p>
         <Link href="/advertisements" className="text-brand-600 underline">Quay lại</Link>
       </div>
     );
@@ -116,8 +116,8 @@ export default function AdvertisementUpgradePage() {
   const isOwner = ad.userId === currentUserId || ad.user?.id === currentUserId;
   if (!isOwner) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 flex-col gap-3">
-        <p className="text-gray-500">Bạn không phải chủ của quảng cáo này</p>
+      <div className="min-h-screen flex items-center justify-center bg-paper flex-col gap-3">
+        <p className="text-ink-soft">Bạn không phải chủ của quảng cáo này</p>
         <Link href={`/advertisements/${adId}`} className="text-brand-600 underline">Quay lại</Link>
       </div>
     );
@@ -130,17 +130,17 @@ export default function AdvertisementUpgradePage() {
     <div className="min-h-screen pb-20" style={{ backgroundColor: '#f7f7f3' }}>
 
       {/* ─── Top bar ──────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-surface border-b border-line">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link href={`/advertisements/${adId}`} className="w-9 h-9 border border-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-50">
+          <Link href={`/advertisements/${adId}`} className="w-9 h-9 border border-line rounded-lg flex items-center justify-center hover:bg-paper">
             <i className="ri-arrow-left-line"></i>
           </Link>
-          <div className="text-sm text-gray-500 flex-1 min-w-0">
+          <div className="text-sm text-ink-soft flex-1 min-w-0">
             <Link href="/advertisements" className="hover:text-brand-600">Quảng cáo</Link>
-            <span className="mx-1.5 text-gray-300">/</span>
+            <span className="mx-1.5 text-ink-faint">/</span>
             <Link href={`/advertisements/${adId}`} className="hover:text-brand-600 truncate">{ad.title}</Link>
-            <span className="mx-1.5 text-gray-300">/</span>
-            <span className="text-gray-900">Nâng VIP</span>
+            <span className="mx-1.5 text-ink-faint">/</span>
+            <span className="text-ink">Nâng VIP</span>
           </div>
         </div>
       </div>
@@ -149,50 +149,50 @@ export default function AdvertisementUpgradePage() {
 
         {/* ─── Header ───────────────────────────────────────────────── */}
         <div className="mb-6">
-          <p className="text-[10px] font-bold tracking-widest text-brand-700 uppercase mb-2">
+          <p className="text-[11px] font-bold tracking-widest text-brand-700 uppercase mb-2">
             <span className="inline-block w-6 h-px bg-brand-700 align-middle mr-2"></span>
             Thanh toán quảng cáo
           </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2" style={{ letterSpacing: '-0.5px' }}>
+          <h1 className="text-2xl sm:text-3xl font-bold text-ink mb-2" style={{ letterSpacing: '-0.5px' }}>
             Đẩy quảng cáo lên VIP
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-ink-soft text-sm">
             Thanh toán bằng số dư ví — quảng cáo sẽ xuất hiện trên banner chạy ở mọi trang và popup khi khách mở site.
           </p>
         </div>
 
         {/* ─── Ad summary ───────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 mb-5 flex items-center gap-4">
+        <div className="bg-surface rounded-card border border-line p-4 mb-5 flex items-center gap-4">
           {ad.images?.[0] ? (
-            <img src={ad.images[0]} alt={ad.title} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
+            <img src={ad.images[0]} alt={ad.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
           ) : (
-            <div className="w-16 h-16 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-16 h-16 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
               <i className="ri-megaphone-line text-brand-500 text-2xl"></i>
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="font-black text-gray-900 truncate">{ad.title}</p>
-            {ad.businessName && <p className="text-xs text-gray-500 truncate">{ad.businessName}</p>}
+            <p className="font-bold text-ink truncate">{ad.title}</p>
+            {ad.businessName && <p className="text-xs text-ink-soft truncate">{ad.businessName}</p>}
             {vipActive ? (
               <p className="text-xs text-forest-600 mt-1 font-semibold">
                 <i className="ri-vip-crown-fill mr-1"></i>
                 VIP đến {new Date(ad.vipExpiresAt).toLocaleDateString('vi-VN')}
               </p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1">Chưa có VIP</p>
+              <p className="text-xs text-ink-faint mt-1">Chưa có VIP</p>
             )}
           </div>
         </div>
 
         {/* ─── Wallet balance ───────────────────────────────────────── */}
-        <div className="bg-brand-500 rounded-2xl px-5 py-4 mb-6 flex items-center justify-between text-white">
+        <div className="bg-brand-500 rounded-card px-5 py-4 mb-6 flex items-center justify-between text-white">
           <div>
             <p className="text-[11px] font-bold tracking-widest uppercase opacity-80">Số dư ví</p>
-            <p className="text-2xl font-black">{fmtMoney(balance)}</p>
+            <p className="text-2xl font-bold">{fmtMoney(balance)}</p>
           </div>
           <Link
             href="/wallet"
-            className="bg-white/15 hover:bg-white/25 backdrop-blur border border-white/20 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+            className="bg-surface hover:bg-surface border border-white/20 px-3 py-2 rounded-lg text-xs font-semibold transition-all"
           >
             <i className="ri-add-line mr-1"></i>Nạp thêm
           </Link>
@@ -200,7 +200,7 @@ export default function AdvertisementUpgradePage() {
 
         {/* ─── Result message ───────────────────────────────────────── */}
         {resultMsg && (
-          <div className="bg-forest-50 border border-forest-200 rounded-2xl px-5 py-4 mb-5 flex items-start gap-3">
+          <div className="bg-forest-50 border border-forest-200 rounded-card px-5 py-4 mb-5 flex items-start gap-3">
             <i className="ri-checkbox-circle-fill text-forest-600 text-xl flex-shrink-0"></i>
             <div className="flex-1">
               <p className="font-bold text-forest-800 text-sm">Thanh toán thành công</p>
@@ -213,7 +213,7 @@ export default function AdvertisementUpgradePage() {
         )}
 
         {/* ─── Plan cards ───────────────────────────────────────────── */}
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Chọn gói VIP</p>
+        <p className="text-[11px] font-bold tracking-widest text-ink-faint uppercase mb-3">Chọn gói VIP</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {AD_PLANS.map(plan => {
             const enough = balance >= plan.price;
@@ -222,13 +222,13 @@ export default function AdvertisementUpgradePage() {
             return (
               <div
                 key={plan.id}
-                className={`bg-white rounded-2xl overflow-hidden flex flex-col ${
-                  highlight ? 'ring-2 ring-brand-500 shadow-lg' : 'border border-gray-200'
+                className={`bg-surface rounded-card overflow-hidden flex flex-col ${
+                  highlight ? 'ring-2 ring-brand-500' : 'border border-line'
                 }`}
               >
                 {plan.badge ? (
                   <div className={`text-center py-2 text-xs font-bold ${
-                    highlight ? 'bg-brand-500 text-white' : 'bg-gray-900 text-white'
+                    highlight ? 'bg-brand-500 text-white' : 'bg-ink text-white'
                   }`}>
                     {plan.badge}
                   </div>
@@ -236,18 +236,18 @@ export default function AdvertisementUpgradePage() {
                   <div className="py-2" />
                 )}
                 <div className="px-5 pt-3 pb-5 flex flex-col flex-1">
-                  <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-1">{plan.name}</p>
+                  <p className="text-[11px] font-bold tracking-widest text-ink-faint uppercase mb-1">{plan.name}</p>
                   <div className="mb-5">
-                    <span className={`text-3xl font-black ${highlight ? 'text-brand-600' : 'text-gray-900'}`}>
+                    <span className={`text-3xl font-bold ${highlight ? 'text-brand-600' : 'text-ink'}`}>
                       {fmtMoney(plan.price)}
                     </span>
-                    <span className="text-sm text-gray-400 ml-1">/ {plan.id} ngày</span>
+                    <span className="text-sm text-ink-faint ml-1">/ {plan.id} ngày</span>
                   </div>
 
                   <ul className="space-y-2.5 mb-6 flex-1">
                     {plan.benefits.map((b, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                        <i className={`ri-check-line mt-0.5 flex-shrink-0 ${highlight ? 'text-brand-500' : 'text-gray-700'}`}></i>
+                      <li key={i} className="flex items-start gap-2 text-sm text-ink-soft">
+                        <i className={`ri-check-line mt-0.5 flex-shrink-0 ${highlight ? 'text-brand-500' : 'text-ink'}`}></i>
                         <span>{b}</span>
                       </li>
                     ))}
@@ -256,12 +256,12 @@ export default function AdvertisementUpgradePage() {
                   <button
                     disabled={isBusy || purchasing !== null}
                     onClick={() => handleBuy(plan.id)}
-                    className={`block w-full text-center py-2.5 rounded-xl text-sm transition-all font-bold ${
+                    className={`block w-full text-center py-2.5 rounded-lg text-sm transition-all font-bold ${
                       !enough
-                        ? 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                        ? 'bg-paper text-ink-faint hover:bg-line'
                         : highlight
                           ? 'bg-brand-500 text-white hover:opacity-95'
-                          : 'bg-gray-900 text-white hover:bg-gray-700'
+                          : 'bg-ink text-white hover:bg-ink'
                     } disabled:opacity-60 disabled:cursor-not-allowed`}
                   >
                     {isBusy
@@ -271,7 +271,7 @@ export default function AdvertisementUpgradePage() {
                         : `Thanh toán ${fmtMoney(plan.price)}`}
                   </button>
                   {!enough && (
-                    <p className="text-[11px] text-red-500 mt-2 text-center">
+                    <p className="text-[11px] text-brand-600 mt-2 text-center">
                       Thiếu {fmtMoney(plan.price - balance)}
                     </p>
                   )}
@@ -282,7 +282,7 @@ export default function AdvertisementUpgradePage() {
         </div>
 
         {/* ─── Info ─────────────────────────────────────────────────── */}
-        <div className="mt-6 text-xs text-gray-400 text-center">
+        <div className="mt-6 text-xs text-ink-faint text-center">
           <p>Tiền sẽ được trừ trực tiếp từ ví. Nếu quảng cáo đang VIP, thời gian sẽ được cộng dồn.</p>
           <p className="mt-1">Bạn có thắc mắc? <Link href="/wallet" className="text-brand-600 underline">Xem lịch sử ví</Link></p>
         </div>

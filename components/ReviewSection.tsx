@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import { auth, reviews as reviewsApi } from '../lib/api';
@@ -69,40 +69,40 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
   }
 
   return (
-    <div className="bg-white rounded-xl p-5 mt-4">
+    <div className="bg-surface rounded-lg p-5 mt-4">
       <div className="flex items-center gap-3 mb-4">
-        <h3 className="font-bold text-gray-900 text-base">Danh gia san pham</h3>
+        <h3 className="font-bold text-ink text-base">Danh gia san pham</h3>
         {total > 0 && (
           <div className="flex items-center gap-1.5">
             <StarRating rating={avgRating} size="sm" />
-            <span className="text-sm font-semibold text-gray-700">{avgRating}</span>
-            <span className="text-xs text-gray-400">({total} danh gia)</span>
+            <span className="text-sm font-semibold text-ink">{avgRating}</span>
+            <span className="text-xs text-ink-faint">({total} danh gia)</span>
           </div>
         )}
       </div>
       {isLoggedIn && !isSeller && !alreadyReviewed && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-4 mb-5">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Viet danh gia cua ban</p>
+        <form onSubmit={handleSubmit} className="bg-paper rounded-lg p-4 mb-5">
+          <p className="text-sm font-semibold text-ink mb-2">Viet danh gia cua ban</p>
           <div className="flex items-center gap-2 mb-3">
             <StarRating rating={myRating} interactive onRate={setMyRating} size="lg" />
-            {myRating > 0 && <span className="text-sm text-gray-500">{['', 'Rat te', 'Te', 'Binh thuong', 'Tot', 'Rat tot'][myRating]}</span>}
+            {myRating > 0 && <span className="text-sm text-ink-soft">{['', 'Rat te', 'Te', 'Binh thuong', 'Tot', 'Rat tot'][myRating]}</span>}
           </div>
           <textarea value={comment} onChange={e => setComment(e.target.value)}
             placeholder="Chia se trai nghiem cua ban..." rows={3}
-            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold-400 resize-none" />
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            className="w-full text-sm border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold-400 resize-none" />
+          {error && <p className="text-xs text-brand-600 mt-1">{error}</p>}
           {success && <p className="text-xs text-forest-600 mt-1">{success}</p>}
           <button type="submit" disabled={submitting}
-            className="mt-2 bg-gold-400 hover:bg-gold-500 text-gray-900 font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
+            className="mt-2 bg-gold-400 hover:bg-gold-500 text-ink font-bold text-sm px-5 py-2 rounded-lg transition disabled:opacity-50">
             {submitting ? 'Dang gui...' : 'Gui danh gia'}
           </button>
         </form>
       )}
       {alreadyReviewed && <p className="text-xs text-forest-600 bg-forest-50 px-3 py-2 rounded-lg mb-4">Ban da danh gia san pham nay</p>}
-      {isSeller && <p className="text-xs text-gray-400 mb-4">Ban khong the danh gia san pham cua chinh minh</p>}
-      {!isLoggedIn && <p className="text-xs text-gray-400 mb-4">Dang nhap de gui danh gia</p>}
+      {isSeller && <p className="text-xs text-ink-faint mb-4">Ban khong the danh gia san pham cua chinh minh</p>}
+      {!isLoggedIn && <p className="text-xs text-ink-faint mb-4">Dang nhap de gui danh gia</p>}
       {reviews.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-4">Chua co danh gia nao. Hay la nguoi dau tien!</p>
+        <p className="text-sm text-ink-faint text-center py-4">Chua co danh gia nao. Hay la nguoi dau tien!</p>
       ) : (
         <div className="space-y-4">
           {reviews.map(r => (
@@ -113,14 +113,14 @@ export default function ReviewSection({ productId, sellerId }: { productId: stri
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-semibold text-gray-800">{r.author?.fullName || r.author?.username}</span>
+                  <span className="text-sm font-semibold text-ink">{r.author?.fullName || r.author?.username}</span>
                   <StarRating rating={r.rating} size="sm" />
-                  <span className="text-xs text-gray-400">{timeAgo(r.createdAt)}</span>
+                  <span className="text-xs text-ink-faint">{timeAgo(r.createdAt)}</span>
                   {r.author?.id === currentUserId && (
-                    <button onClick={() => handleDelete(r.id)} className="text-xs text-red-400 hover:text-red-600 ml-auto">Xoa</button>
+                    <button onClick={() => handleDelete(r.id)} className="text-xs text-brand-600 hover:text-brand-600 ml-auto">Xoa</button>
                   )}
                 </div>
-                {r.comment && <p className="text-sm text-gray-600 mt-1">{r.comment}</p>}
+                {r.comment && <p className="text-sm text-ink-soft mt-1">{r.comment}</p>}
               </div>
             </div>
           ))}

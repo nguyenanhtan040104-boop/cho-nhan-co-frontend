@@ -45,16 +45,16 @@ export default function NearbySection() {
 
   return (
     <section aria-label="Tin gần bạn">
-      <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-line pb-2">
-        <h2 className="text-xl font-bold text-ink">
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <h2 className="text-[22px] font-bold leading-tight text-ink">
           Gần bạn
-          <span className="ml-2 text-[13px] font-normal text-ink-faint">trong vòng {RADIUS_KM} km</span>
+          <span className="ml-2 text-[14px] font-normal text-ink-faint">trong vòng {RADIUS_KM} km</span>
         </h2>
-        {loc && <Link href="/products" className="whitespace-nowrap text-[14px] font-semibold text-forest-700 hover:underline">Xem tất cả</Link>}
+        {loc && <Link href="/products" className="whitespace-nowrap text-[15px] font-medium text-ink underline underline-offset-4 hover:text-forest-700">Xem tất cả</Link>}
       </div>
 
       {!loc ? (
-        <div className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-card bg-paper p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[14px] text-ink-soft">
             Cho phép xem vị trí để thấy hàng quanh nhà bạn, gần nhất hiện trước. Vị trí chỉ lưu trên máy của bạn.
             {denied && <span className="mt-1 block font-semibold text-brand-600">Chưa lấy được vị trí. Kiểm tra quyền vị trí của trình duyệt rồi thử lại.</span>}

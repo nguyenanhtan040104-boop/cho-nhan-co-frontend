@@ -10,7 +10,7 @@ export default function SiteFooter() {
         <div>
           <div className="flex items-center gap-2.5">
             <Logo size={34} />
-            <span className="text-lg font-extrabold text-ink">Chợ Nhân Cơ</span>
+            <span className="text-lg font-bold text-ink">Chợ Nhân Cơ</span>
           </div>
           <p className="mt-3 max-w-sm text-[13px] leading-relaxed text-ink-soft">
             Chợ trực tuyến của bà con xã Nhân Cơ, Đắk Nông. Đăng tin miễn phí, gặp người bán ngay trong vùng, giao dịch tại chỗ.

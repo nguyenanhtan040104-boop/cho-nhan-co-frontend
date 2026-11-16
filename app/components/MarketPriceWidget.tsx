@@ -48,12 +48,12 @@ export default function MarketPriceWidget() {
 
   return (
     <section aria-label="Giá thị trường hôm nay">
-      <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-line pb-2">
-        <h2 className="text-xl font-bold text-ink">
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <h2 className="text-[22px] font-bold leading-tight text-ink">
           Giá hôm nay
-          {priceDate && <span className="ml-2 text-[13px] font-normal text-ink-faint">{priceDate}</span>}
+          {priceDate && <span className="ml-2 text-[14px] font-normal text-ink-faint">{priceDate}</span>}
         </h2>
-        <Link href="/market-prices" className="whitespace-nowrap text-[14px] font-semibold text-forest-700 hover:underline">Xem bảng giá</Link>
+        <Link href="/market-prices" className="whitespace-nowrap text-[15px] font-medium text-ink underline underline-offset-4 hover:text-forest-700">Xem bảng giá</Link>
       </div>
 
       <dl className="grid grid-cols-2 divide-x divide-y divide-line overflow-hidden rounded-card border border-line bg-surface md:grid-cols-4 md:divide-y-0">

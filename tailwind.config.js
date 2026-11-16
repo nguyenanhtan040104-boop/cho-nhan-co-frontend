@@ -49,13 +49,13 @@ module.exports = {
           900: '#4D3105',
         },
         ink: {
-          DEFAULT: '#13271D', // deep green-black
-          soft: '#4C6054',
-          faint: '#7F9187',
+          DEFAULT: '#222222', // near-black, never pure black
+          soft: '#484848',    // body copy
+          faint: '#6A6A6A',   // meta, captions (5.4:1 on white)
         },
-        paper: '#F3F7F3',   // app background, slightly green so white cards lift off it
+        paper: '#F7F7F7',   // soft grey for app screens; public pages sit on white
         surface: '#FFFFFF', // cards
-        line: '#E1E9E3',    // hairline / borders
+        line: '#DDDDDD',    // hairline / borders
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
@@ -64,15 +64,16 @@ module.exports = {
       },
       // Small radii and borders over shadows: the look of GOV.UK / Primer / Carbon rather than a "soft app".
       borderRadius: {
-        card: '10px',
-        sheet: '14px',
+        card: '12px',
+        sheet: '16px',
         pill: '999px',
       },
       boxShadow: {
-        card: '0 1px 0 rgba(19,39,29,0.04)',
-        lift: '0 6px 16px -6px rgba(19,39,29,0.22)',
-        brand: '0 1px 2px rgba(19,39,29,0.25)',
-        nav: '0 -1px 0 rgba(19,39,29,0.06)',
+        // Flat by default. One shadow tier, only for menus and things that float.
+        card: 'none',
+        lift: '0 0 0 1px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.1)',
+        brand: 'none',
+        nav: 'none',
       },
       maxWidth: {
         content: '1200px',

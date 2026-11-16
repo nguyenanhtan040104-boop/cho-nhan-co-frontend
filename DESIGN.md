@@ -1,88 +1,71 @@
 # Chợ Nhân Cơ: design rules
 
+## References and what we took from them
+
+Structure follows two files from VoltAgent/awesome-design-md (Airbnb and mydealz). Nothing is copied: the
+palette, wording, icons and layout are our own. We borrowed principles only.
+
+| From | Principle we use |
+| --- | --- |
+| Airbnb | White canvas. One accent colour, used sparingly. Near-black ink (never pure black). Photos carry the page, so cards have no frame. One pill search bar. Category strip with icons and an underline. One shadow tier, only for things that float. |
+| mydealz | Green means "act" and "price". Prices are always bold. Weights 500 and 700 do most of the work. Hairlines and canvas gutters separate things, not boxes and shadows. |
+
 ## Direction
 
-The site is a **village notice board that happens to be online**. People come to look at a
-photo, read a price, and call a neighbour. So the interface gets out of the way:
-flat paper-coloured surfaces, thin rules instead of shadows, one strong green for
-"trust and prices", one red reserved for "act now" (post a listing, warnings).
+A village market online. White, quiet, photo-first. People look at a picture, read a price, call a neighbour.
+Everything that is not a photo, a price or a way to act stays out of the way.
 
-What we are deliberately not: a SaaS dashboard (gradients, glass, glow, icon tiles,
-centered hero plus three cards) or a copy of another marketplace.
+## Why it looked cheap before (and the rule that fixes it)
 
-## Audit method
-
-Before changing a page, search it for the things below. Each one needs a reason to stay.
-
-| Smell | Why it is removed |
+| Smell | Rule |
 | --- | --- |
-| `bg-gradient`, `from-*`, `to-*` | Decoration. Colour should carry meaning (price, status, action). |
-| `backdrop-blur`, `bg-white/20` panels | Glass hurts contrast on photos and costs GPU on cheap phones. |
-| `shadow-lg/xl/2xl`, glow, `ring-2` on idle cards | Depth is not information. Borders are enough. |
-| `rounded-2xl/3xl`, pill buttons everywhere | Same radius on everything flattens hierarchy. |
-| Icon in a pastel square next to a label | The label already says it. |
-| Floating buttons | The bottom tab bar already has the post action. |
-| Auto-advancing carousels | Moves content under the reader, fails "pause or stop" for accessibility. |
-| Emoji as icons | Render differently per phone, read as clip art. |
-| Invented numbers (fake members, fake stats) | Trust is the product. |
+| Two loud colours (green band + red button) | One accent: green. Red only for errors, delete, the saved heart and unread counts. |
+| Green-tinted page background | White for browse pages, `#F7F7F7` for app screens (dashboard, forms, admin). |
+| A box around every card | Listing cards have no frame. Content blocks use a hairline or a soft grey fill, never both. |
+| Heavy type (800, 900) | Only 400, 500, 600, 700. Prices and titles 700. |
+| Cartoon illustrations, emoji, gradients, glass | None. Empty states are one icon, two lines, one action. |
+| Dark hero band | The header search is the hero. The home page opens with a headline and quick chips. |
 
 ## Tokens (`tailwind.config.js`, `app/globals.css`)
 
 **Colour**
 
-- `paper` `#F3F7F3` page background, `surface` white for content, `line` `#E1E9E3` for every rule and border.
-- `ink` (text), `ink-soft` (secondary), `ink-faint` (meta, placeholders). Do not use `gray-*`; they do not match the green-tinted paper.
-- `forest` is the main colour: 600 for buttons and chips, 700 for prices and links, 50 for selected rows.
-- `brand` (red) only for: post a listing, destructive actions, errors, urgent. Never for decoration.
-- `gold` only for "featured/VIP" and pinned.
-- Blue and purple are not part of the identity. Info states use `ink-soft` or `gold`.
+- `ink` `#222222`, `ink-soft` `#484848` (body), `ink-faint` `#6A6A6A` (meta, 5.4:1 on white).
+- `surface` white, `paper` `#F7F7F7`, `line` `#DDDDDD`.
+- `forest` is the only accent: 600 for buttons, 700 for prices and links on light, 50 for selected rows.
+- `brand` red: errors, destructive actions, the heart, unread counts. Never a main button.
+- `gold`: "Nổi bật" and pinned only, as a quiet tint.
 
-**Type** (Be Vietnam Pro, supports full Vietnamese diacritics)
+**Type** (Be Vietnam Pro, full Vietnamese diacritics)
 
-- Page title `text-[1.4rem] sm:text-3xl font-bold`; section title `text-lg/xl font-bold`.
-- Body `text-[15px]`, meta `text-[12–13px]` in `ink-faint`.
-- Prices are always `tabular-nums font-bold text-forest-700`; the largest text on a listing.
-
-**Space and grid**
-
-- 4px base. Page gutter 16px (mobile) / 24px (`sm`+). Content max width `max-w-content` (1200px).
-- Lists: 2 columns on phones, 3 at `sm`, 4 at `lg`. Reading pages (forum, forms): 672–768px.
+- Home H1 `1.75rem` mobile, `2.5rem` desktop, 700. Section title 22px 700. Card title 15px 500. Meta 13px `ink-faint`. Price 16px 700 `forest-700`.
+- Buttons 15px 500. Chips 14px 500.
 
 **Radius and depth**
 
-- `card` 10px for content, `sheet` 14px for modals, `rounded-lg` for fields and buttons. Full round only for avatars and chips.
-- One shadow token (`shadow-card`, barely visible) for cards that need separation on `paper`. Menus and modals use a border, not a shadow.
+- Photos and cards 12px, sheets 16px, buttons and fields 8px, chips and search full round.
+- Flat by default. `shadow-lift` (Airbnb tier) is only for the header search pill, menus and dropdowns.
 
 ## Components
 
-- `.btn-primary` red (post), `.btn-forest` green (everything else that submits), `.btn-ghost` white with border.
-- `.chip` / `.chip-active` for filters and tabs; selection is shown by fill, not by icon.
-- `.field` for every input. Labels sit above the field; required is a red asterisk; hints are in the label line.
-- Lists use `ListPage`; forms use `components/form/Kit` (frame, field, image picker, error, submit bar);
-  detail pages use `components/detail/*`.
-- Status is text plus a quiet tint (`ok`, `warn`, `bad`, `off`). No pulsing badges.
-- Skeletons may pulse; nothing else may.
+- Header: logo, centred pill search with a green disc, "Đăng tin" (green), icons, avatar. Below it, category strip with icons; the active one gets a 2px ink underline.
+- `ListingCard`: 4:3 photo with 12px radius, heart top-right on the photo, white pill badges ("Nổi bật", "Gấp") top-left, then title, muted meta line, bold green price.
+- `.btn-primary` green, `.btn-ghost` white with an ink outline, `.chip` white with hairline, `.chip-active` ink fill.
+- `.field` has a grey border, ink border on hover and focus, no glow.
+- Section header: 22px title left, underlined "Xem tất cả" right. No rule under it.
+- Lists: `ListPage`. Forms: `components/form/Kit`. Detail pages: `components/detail/*`.
 
 ## States
 
-Every interactive element needs: hover (border or text colour, not scale), focus-visible ring from the browser
-default, disabled (`opacity-50`), loading (spinner inside the button, label changes), and an error message
-in words. Empty states say what is missing and give one next action.
+Hover changes a border or text colour, never scales. Focus uses a 2px ink outline for keyboard users.
+Loading shows a skeleton shaped like the final content. Errors say what happened in words.
 
-## Responsive rules
+## Responsive
 
-- Mobile first. The bottom tab bar (`BottomNav`) is the primary navigation under 768px, so pages add no floating action button.
-- Primary submit stays visible above the tab bar on long forms (sticky bar at `bottom-[4.5rem]`).
-- Horizontal chip rows scroll without a scrollbar (`no-scrollbar`) and bleed to the screen edge.
+Mobile first. The bottom tab bar is the main navigation under 768px; its centre button posts a listing and is green.
+Chip rows scroll sideways without a scrollbar. Grids go 2, 3, 4, 5 columns.
 
-## Decisions and reasons
+## Audit before merging a page
 
-1. **Plain thread list for the forum** instead of photo cards: people scan titles and questions, not pictures.
-2. **Ad strip instead of an auto-fading hero**: photo next to a solid text panel, manual next/previous, the word "Quảng cáo" always shown.
-3. **Opaque sticky bars**: header, tab bar and contact bar are solid; blur looked soft and made text harder to read over photos.
-4. **No floating "+"**: the tab bar already has it; two post buttons on one screen was noise.
-5. **Menus without colour-coded icons** (blue pencil, red bin, brand-coloured share): wording does the job.
-
-## Coverage
-
-Every page now follows these rules. When adding a page, run the audit table above on it before merging.
+Search it for: `gradient`, `backdrop-blur`, `shadow-lg`, `rounded-2xl`, `text-gray-`, `bg-brand-` on a button,
+`font-extrabold`, emoji. Each one needs a reason to stay.

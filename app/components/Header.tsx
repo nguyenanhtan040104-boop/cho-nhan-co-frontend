@@ -75,8 +75,8 @@ function timeAgoHeader(d: string) {
   return `${Math.floor(h / 24)} ngày trước`;
 }
 
-const iconBtn = 'relative grid h-10 w-10 place-items-center rounded-full text-ink-soft transition hover:bg-forest-50 hover:text-forest-700';
-const dropdown = 'absolute right-0 top-12 z-50 overflow-hidden rounded-2xl border border-line bg-surface shadow-lift';
+const iconBtn = 'relative grid h-10 w-10 place-items-center rounded-full text-ink transition hover:bg-paper';
+const dropdown = 'absolute right-0 top-12 z-50 overflow-hidden rounded-card border border-line bg-surface shadow-lift';
 
 export default function Header() {
   const [showPostMenu, setShowPostMenu] = useState(false);
@@ -242,7 +242,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-surface" suppressHydrationWarning>
-      <div className="mx-auto flex h-16 max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
+      <div className="mx-auto flex h-[72px] max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
         <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Chợ Nhân Cơ, trang chủ">
           <Logo size={34} />
           <span className="hidden text-[18px] font-bold tracking-tight text-ink sm:block">Chợ Nhân Cơ</span>
@@ -257,17 +257,17 @@ export default function Header() {
           className="min-w-0 flex-1 md:mx-4 md:max-w-2xl"
           role="search"
         >
-          <div className="flex h-10 items-center gap-2 rounded-lg border border-line bg-paper pl-3 pr-1 transition-colors focus-within:border-forest-600 focus-within:bg-surface">
-            <i className="ri-search-line text-ink-faint" aria-hidden="true" />
+          {/* A single pill; the green disc is the only colour in the bar */}
+          <div className="flex h-12 items-center gap-2 rounded-full border border-line bg-surface pl-5 pr-1.5 shadow-lift transition-colors focus-within:border-ink">
             <input
               name="q"
               type="search"
               aria-label="Tìm kiếm trên Chợ Nhân Cơ"
-              placeholder="Tìm cà phê, tiêu, đất rẫy, việc làm..."
-              className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder-ink-faint focus:outline-none"
+              placeholder="Tìm cà phê, tiêu, đất rẫy, việc làm"
+              className="min-w-0 flex-1 bg-transparent text-[15px] text-ink placeholder-ink-faint focus:outline-none"
             />
-            <button type="submit" className="hidden h-8 shrink-0 rounded-md bg-forest-700 px-4 text-[13px] font-semibold text-white transition hover:bg-forest-800 sm:block">
-              Tìm
+            <button type="submit" aria-label="Tìm" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-forest-600 text-white transition hover:bg-forest-700">
+              <i className="ri-search-line text-lg" aria-hidden="true" />
             </button>
           </div>
         </form>
@@ -409,7 +409,7 @@ export default function Header() {
             )}
           </Link>
 
-          <button onClick={() => navDashboard('products')} className="hidden rounded-pill px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-forest-50 hover:text-forest-700 lg:block">
+          <button onClick={() => navDashboard('products')} className="hidden rounded-full px-3 py-2 text-[15px] font-medium text-ink transition hover:bg-paper lg:block">
             Quản lý tin
           </button>
 
@@ -423,7 +423,7 @@ export default function Header() {
                 <p className="border-b border-line px-4 py-2 text-xs font-bold text-ink-faint">Bạn muốn đăng gì?</p>
                 {POST_ITEMS.map(item => (
                   <Link key={item.href} href={item.href} onClick={() => setShowPostMenu(false)} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-paper">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest-100 text-forest-700"><i className={`${item.icon} text-lg`} /></span>
+                    <i className={`${item.icon} w-6 shrink-0 text-center text-xl text-ink-soft`} aria-hidden="true" />
                     <span>
                       <span className="block text-sm font-semibold text-ink">{item.label}</span>
                       <span className="block text-xs text-ink-faint">{item.sub}</span>
@@ -434,15 +434,15 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/dashboard" aria-label="Tài khoản của tôi" className="ml-1 hidden h-10 w-10 place-items-center rounded-full bg-forest-100 text-forest-700 transition hover:bg-forest-200 md:grid">
+          <Link href="/dashboard" aria-label="Tài khoản của tôi" className="ml-1 hidden h-10 w-10 place-items-center rounded-full border border-line text-ink transition hover:bg-paper md:grid">
             <i className="ri-user-3-line text-lg" />
           </Link>
         </div>
       </div>
 
       {/* Danh mục — a scrolling row of chips, same on phone and desktop */}
-      <nav aria-label="Danh mục" className="border-t border-line/70">
-        <div className="no-scrollbar mx-auto flex max-w-content gap-1 overflow-x-auto px-2 sm:px-4">
+      <nav aria-label="Danh mục">
+        <div className="no-scrollbar mx-auto flex max-w-content gap-2 overflow-x-auto px-2 sm:gap-4 sm:px-4 lg:justify-center">
           {CATEGORIES.map((c) => {
             const active = isActivePath(pathname, c.href);
             return (
@@ -450,9 +450,10 @@ export default function Header() {
                 key={c.href}
                 href={c.href}
                 aria-current={active ? 'page' : undefined}
-                className={`whitespace-nowrap border-b-2 px-3 py-2.5 text-[14px] font-semibold transition-colors ${active ? 'border-forest-700 text-forest-800' : 'border-transparent text-ink-soft hover:text-ink'}`}
+                className={`group flex shrink-0 flex-col items-center gap-1 border-b-2 px-2.5 pb-2 pt-2 text-[12px] font-medium transition-colors ${active ? 'border-ink text-ink' : 'border-transparent text-ink-faint hover:border-line hover:text-ink'}`}
               >
-                {c.label}
+                <i className={`${c.icon} text-[22px] leading-none`} aria-hidden="true" />
+                <span className="whitespace-nowrap">{c.label}</span>
               </Link>
             );
           })}

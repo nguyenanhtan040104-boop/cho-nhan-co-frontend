@@ -74,7 +74,7 @@ export default function BottomNav() {
           <button
             onClick={openPost}
             aria-label="Đăng tin"
-            className="-mt-5 mb-1 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-brand-500 text-white shadow-brand ring-4 ring-surface transition active:scale-95"
+            className="-mt-5 mb-1 flex h-14 w-14 flex-col items-center justify-center rounded-full bg-forest-600 text-white ring-4 ring-surface transition hover:bg-forest-700"
           >
             <i className="ri-add-line text-3xl leading-none" aria-hidden="true" />
           </button>

@@ -64,7 +64,7 @@ export default function LikeButton({ itemId, targetType = 'PRODUCT', inline, cla
     <button
       onClick={handleClick}
       aria-label={liked ? 'Bỏ thích' : 'Thích'}
-      className={`absolute top-1.5 right-1.5 z-10 grid h-8 w-8 place-items-center rounded-full border border-line bg-white ${className || ''}`}
+      className={`absolute top-1.5 right-1.5 z-10 grid h-8 w-8 place-items-center rounded-full bg-white ${className || ''}`}
     >
       <i className={`${liked ? 'ri-heart-fill text-brand-500' : 'ri-heart-line text-ink-soft'} text-base transition-colors`}></i>
     </button>

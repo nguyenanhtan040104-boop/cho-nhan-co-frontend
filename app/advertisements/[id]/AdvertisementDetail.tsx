@@ -32,7 +32,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
   if (error || !ad) return (
     <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-      <p className="text-gray-500">{error || 'Không tìm thấy'}</p>
+      <p className="text-ink-soft">{error || 'Không tìm thấy'}</p>
       <Link href="/advertisements" className="text-brand-500 underline">Quay lại</Link>
     </div>
   );
@@ -40,16 +40,16 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
   const images = ad.images || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-paper">
+      <div className="bg-surface border-b">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link href="/advertisements" className="w-9 h-9 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
+          <Link href="/advertisements" className="w-9 h-9 border border-line rounded-lg flex items-center justify-center hover:bg-paper">
             <i className="ri-arrow-left-line"></i>
           </Link>
-          <div className="text-sm text-gray-500 flex-1 min-w-0">
+          <div className="text-sm text-ink-soft flex-1 min-w-0">
             <Link href="/advertisements" className="hover:text-brand-500 flex-shrink-0">Quảng cáo</Link>
             <span className="mx-2">/</span>
-            <span className="text-gray-900 truncate">{ad.title}</span>
+            <span className="text-ink truncate">{ad.title}</span>
           </div>
         </div>
       </div>
@@ -59,8 +59,8 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
           <div className="lg:col-span-2 space-y-6">
             {/* Images */}
             {images.length > 0 && (
-              <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="bg-gray-100">
+              <div className="bg-surface rounded-lg overflow-hidden">
+                <div className="bg-paper">
                   <img src={images[selectedImg]} alt={ad.title} className="w-full h-auto max-h-[500px] object-contain" />
                 </div>
                 {images.length > 1 && (
@@ -77,7 +77,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
             )}
 
             {/* Content */}
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm">
+            <div className="bg-surface rounded-lg p-4 md:p-6">
               <div className="flex flex-wrap gap-2 mb-3 items-center">
                 <span className="bg-brand-100 text-brand-700 text-xs px-2 py-1 rounded font-medium">
                   {CATEGORIES[ad.category] || ad.category}
@@ -91,7 +91,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 {currentUserId && (ad.userId === currentUserId || ad.user?.id === currentUserId) && (
                   <Link
                     href={`/advertisements/${ad.id}/upgrade`}
-                    className="ml-auto bg-brand-500 hover:opacity-95 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
+                    className="ml-auto bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-opacity"
                   >
                     <i className="ri-rocket-2-line"></i>
                     {ad.isVip ? 'Gia hạn VIP' : 'Đẩy lên VIP'}
@@ -99,7 +99,7 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 )}
               </div>
 
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{ad.title}</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-ink mb-2">{ad.title}</h1>
               {ad.businessName && (
                 <p className="text-brand-600 font-semibold text-lg mb-4">{ad.businessName}</p>
               )}
@@ -115,16 +115,16 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                 </div>
               )}
 
-              <div className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">{ad.description}</div>
+              <div className="text-ink leading-relaxed whitespace-pre-line text-sm">{ad.description}</div>
 
               {ad.location && (
-                <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
+                <div className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
                   <i className="ri-map-pin-line text-brand-500"></i>
                   {ad.location}
                 </div>
               )}
 
-              <p className="text-xs text-gray-400 mt-4">
+              <p className="text-xs text-ink-faint mt-4">
                 Đăng ngày {new Date(ad.createdAt).toLocaleDateString('vi-VN')} • {ad.viewCount} lượt xem
               </p>
             </div>
@@ -132,8 +132,8 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
 
           {/* Sidebar - Contact */}
           <div>
-            <div className="bg-white rounded-xl p-5 shadow-sm sticky top-4">
-              <h3 className="font-semibold text-gray-900 mb-4">Thông tin liên hệ</h3>
+            <div className="bg-surface rounded-lg p-5 sticky top-4">
+              <h3 className="font-semibold text-ink mb-4">Thông tin liên hệ</h3>
 
               {ad.contactName && (
                 <div className="flex items-center gap-3 mb-4">
@@ -141,8 +141,8 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                     <i className="ri-user-line text-brand-600"></i>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{ad.contactName}</p>
-                    {ad.businessName && <p className="text-sm text-gray-500">{ad.businessName}</p>}
+                    <p className="font-medium text-ink">{ad.contactName}</p>
+                    {ad.businessName && <p className="text-sm text-ink-soft">{ad.businessName}</p>}
                   </div>
                 </div>
               )}
@@ -163,13 +163,13 @@ export default function AdvertisementDetail({ adId }: { adId: string }) {
                       window.location.href = `/messages/${conv.id}`;
                     } catch { alert('Không thể mở chat'); }
                   }}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 mb-2">
+                  className="w-full flex items-center justify-center gap-2 bg-forest-600 text-white py-3 rounded-lg hover:bg-forest-700 mb-2">
                   <i className="ri-message-3-line"></i> Nhắn tin
                 </button>
               )}
               {ad.user?.id && (
                 <Link href={`/profile/${ad.user.id}`}
-                  className="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 text-sm">
+                  className="w-full flex items-center justify-center gap-2 border border-line text-ink py-3 rounded-lg hover:bg-paper text-sm">
                   Xem trang người đăng
                 </Link>
               )}
