@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { captureUserLocation, clearUserLocation, distanceKm, formatDistance, getUserLocation, type UserLocation } from '../../../lib/userLocation';
 import type { ListingType } from '../../../lib/format';
 import ListingCard from '../ListingCard';
+import ListingRow from '../ListingRow';
 
 export interface LoadArgs {
   search: string;
@@ -72,6 +73,10 @@ function Inner(c: ListConfig) {
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState(false);
   const [slow, setSlow] = useState(false);
+  // Rows by default (more listings per screen, titles readable). The choice is remembered on this device.
+  const [view, setViewState] = useState<'list' | 'grid'>('list');
+  useEffect(() => { try { if (localStorage.getItem('listView') === 'grid') setViewState('grid'); } catch {} }, []);
+  const setView = (v: 'list' | 'grid') => { setViewState(v); try { localStorage.setItem('listView', v); } catch {} };
   const [reload, setReload] = useState(0);
   const [showPrice, setShowPrice] = useState(false);
   const [minIn, setMinIn] = useState('');
@@ -194,8 +199,9 @@ function Inner(c: ListConfig) {
         </div>
       </header>
 
-      <div className="mx-auto max-w-content px-4 pt-4 sm:px-6">
-        {!c.simple && <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="mx-auto grid max-w-content gap-8 px-4 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="min-w-0">
+        {!c.simple && <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
             {c.quickFilters.map(f => (
               <button key={f.value} onClick={() => { setQuick(f.value); setPage(1); }}
@@ -243,11 +249,15 @@ function Inner(c: ListConfig) {
           </form>
         )}
 
-        {!loading && !error && (priceLabel || quick) && (
-          <p className="mb-4 flex flex-wrap items-center gap-2 text-[13px] text-ink-soft">
-            <span><b className="text-ink">{fmt(total)}</b> kết quả</span>
+        {!loading && !error && (
+          <div className="mb-1 flex flex-wrap items-center gap-2 border-b border-line pb-2 text-[13px] text-ink-soft">
+            <span><b className="text-ink">{fmt(quick ? visible.length : total)}</b> kết quả</span>
             {priceLabel && <button onClick={clearPrice} className="inline-flex items-center gap-1 rounded border border-line bg-surface px-2 py-1 font-medium text-ink hover:border-ink">{priceLabel} <i className="ri-close-line" aria-label="Bỏ lọc giá" /></button>}
-          </p>
+            <div className="ml-auto flex items-center gap-1" role="group" aria-label="Kiểu xem">
+              <button onClick={() => setView('list')} aria-pressed={view === 'list'} aria-label="Xem dạng danh sách" className={`grid h-8 w-8 place-items-center rounded-md ${view === 'list' ? 'bg-ink text-white' : 'text-ink-soft hover:bg-paper'}`}><i className="ri-list-unordered" /></button>
+              <button onClick={() => setView('grid')} aria-pressed={view === 'grid'} aria-label="Xem dạng lưới" className={`grid h-8 w-8 place-items-center rounded-md ${view === 'grid' ? 'bg-ink text-white' : 'text-ink-soft hover:bg-paper'}`}><i className="ri-layout-grid-line" /></button>
+            </div>
+          </div>
         )}
 
         {loading && slow && (
@@ -257,7 +267,7 @@ function Inner(c: ListConfig) {
         )}
 
         {loading ? (
-          <Grid>{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} />)}</Grid>
+          view === 'list' ? <div>{Array.from({ length: 6 }).map((_, i) => <RowSkeleton key={i} />)}</div> : <Grid>{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} />)}</Grid>
         ) : error ? (
           <div role="alert" className="mx-auto max-w-md rounded-card border border-line bg-surface px-6 py-12 text-center">
             <h2 className="text-lg font-bold text-ink">Không tải được danh sách</h2>
@@ -266,6 +276,13 @@ function Inner(c: ListConfig) {
           </div>
         ) : visible.length === 0 ? (
           <Empty c={c} filtered={filtered || !!quick} onClear={() => { setQuick(''); go('', ''); }} />
+        ) : view === 'list' ? (
+          <div>
+            {visible.map(i => (
+              <ListingRow key={i.id} item={i} type={c.type}
+                distanceLabel={typeof i._distanceKm === 'number' ? formatDistance(i._distanceKm) : undefined} />
+            ))}
+          </div>
         ) : (
           <Grid>
             {visible.map(i => (
@@ -278,7 +295,7 @@ function Inner(c: ListConfig) {
         {totalPages > 1 && !loading && <Pager page={page} totalPages={totalPages} onPage={p => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />}
 
         {!loading && !filtered && visible.length < 8 && (
-          <section className="mt-8 rounded-card border border-line bg-surface p-4 sm:p-5">
+          <section className="mt-8 rounded-card border border-line bg-surface p-4 sm:p-5 lg:hidden">
             <h2 className="text-[15px] font-bold text-ink">Tìm nhanh</h2>
             <div className="mt-3 flex flex-wrap gap-2">
               {c.popular.map(p => (
@@ -288,10 +305,44 @@ function Inner(c: ListConfig) {
           </section>
         )}
 
-        <p className="mt-8 flex items-start gap-2 text-[13px] leading-snug text-ink-soft">
+        <p className="mt-8 flex items-start gap-2 text-[13px] leading-snug text-ink-soft lg:hidden">
           <i className="ri-shield-check-line mt-0.5 text-forest-700" aria-hidden="true" />
           <span>{c.safety} <Link href="/canh-bao" className="font-semibold text-forest-700 underline">Xem cảnh báo lừa đảo</Link></span>
         </p>
+        </div>
+
+        <aside className="hidden space-y-6 lg:block" aria-label="Thông tin thêm">
+          <section className="rounded-card bg-paper p-5">
+            <h2 className="text-[16px] font-bold text-ink">Có hàng cần bán?</h2>
+            <p className="mt-1 text-[14px] leading-relaxed text-ink-soft">Đăng tin miễn phí. Người mua liên hệ bạn qua điện thoại hoặc Zalo.</p>
+            <Link href={c.createHref} className="btn-primary mt-4 w-full">{c.createLabel}</Link>
+          </section>
+          <section>
+            <h2 className="text-[15px] font-bold text-ink">Tìm nhiều</h2>
+            <ul className="mt-2 divide-y divide-line border-y border-line">
+              {c.popular.slice(0, 6).map(p => (
+                <li key={p}><Link href={`${c.basePath}?search=${encodeURIComponent(p)}`} className="block py-2 text-[14px] text-ink-soft hover:text-forest-700 hover:underline">{p}</Link></li>
+              ))}
+            </ul>
+          </section>
+          <p className="text-[13px] leading-relaxed text-ink-soft">
+            <b className="text-ink">Mua bán an toàn.</b> {c.safety} <Link href="/canh-bao" className="font-medium text-forest-700 underline">Xem cảnh báo lừa đảo</Link>
+          </p>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function RowSkeleton() {
+  return (
+    <div className="flex animate-pulse gap-3 border-b border-line py-4 sm:gap-4">
+      <div className="aspect-[4/3] w-[124px] shrink-0 rounded-lg bg-paper sm:w-[200px]" />
+      <div className="flex-1 space-y-2.5 pt-1">
+        <div className="h-4 w-4/5 rounded bg-paper" />
+        <div className="h-3 w-2/5 rounded bg-paper" />
+        <div className="h-5 w-1/3 rounded bg-paper" />
+        <div className="h-3 w-3/5 rounded bg-paper" />
       </div>
     </div>
   );

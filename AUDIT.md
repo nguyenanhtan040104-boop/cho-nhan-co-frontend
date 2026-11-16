@@ -14,7 +14,7 @@ Nothing here assumes a business requirement that is not already in the code or t
 | C4 | Three different VIP price lists (pricing page, wallet, `products/vip`). | Open: needs a decision from the owner. |
 | C5 | Public profile showed the user's email. | Fixed in the UI. Backend still returns it. |
 
-## High (hurts discovery and trust)
+| C6 | First visit after idle looked frozen: the free Render server sleeps and the first request takes up to a minute, with only grey boxes on screen. | Fixed: a notice after 6s, a retry after 70s, and a scheduled ping every 10 minutes (`.github/workflows/keep-alive.yml`). |`n`n## High (hurts discovery and trust)
 
 | # | Issue | Status |
 | --- | --- | --- |

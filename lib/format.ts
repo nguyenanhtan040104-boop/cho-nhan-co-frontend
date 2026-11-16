@@ -49,3 +49,28 @@ export function listingImage(item: any): string | null {
   const first = item?.images?.[0];
   return (first && (first.url || (typeof first === 'string' ? first : null))) || item?.imageUrl || null;
 }
+
+// ---- Labels for the small "attributes" line on listing rows. Only fields the API returns. ----
+const PRODUCT_CATEGORY: Record<string, string> = { NONG_SAN: 'Nông sản', VAT_NUOI: 'Vật nuôi', DICH_VU: 'Dịch vụ', DO_DUNG_GIA_DINH: 'Đồ dùng gia đình', HANG_TIEU_DUNG: 'Hàng tiêu dùng' };
+const RE_TYPE: Record<string, string> = { NHA_O: 'Nhà ở', DAT_NEN: 'Đất nền', PHONG_TRO: 'Phòng trọ', MAT_BANG: 'Mặt bằng', CHO_THUE: 'Cho thuê' };
+const AD_CATEGORY: Record<string, string> = { KHAI_TRUONG: 'Khai trương', KHUYEN_MAI: 'Khuyến mãi', SAN_PHAM_MOI: 'Sản phẩm mới', DICH_VU: 'Dịch vụ', SU_KIEN: 'Sự kiện', KHAC: 'Khác' };
+
+export function listingFacts(item: any, type: ListingType): string[] {
+  const out: string[] = [];
+  if (type === 'product') {
+    if (item.category) out.push(PRODUCT_CATEGORY[item.category] || '');
+    const qty = Number(item.quantity);
+    if (item.status !== 'SOLD_OUT' && qty > 1) out.push(`Còn ${qty.toLocaleString('vi-VN')}${item.unit ? ' ' + item.unit : ''}`);
+  } else if (type === 'real-estate') {
+    out.push(RE_TYPE[item.type] || '');
+    if (item.area) out.push(`${Number(item.area).toLocaleString('vi-VN')} m²`);
+    if (item.legalStatus) out.push(item.legalStatus);
+  } else if (type === 'job') {
+    out.push(item.type === 'EMPLOYER' ? 'Tuyển dụng' : item.type === 'JOB_SEEKER' ? 'Tìm việc' : '');
+    if (item.category) out.push(item.category);
+    if (item.experience) out.push(item.experience);
+  } else if (type === 'ad') {
+    out.push(AD_CATEGORY[item.category] || '');
+  }
+  return out.filter(Boolean);
+}
