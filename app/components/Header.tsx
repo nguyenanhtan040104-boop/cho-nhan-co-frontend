@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../../lib/api';
 import Logo from './Logo';
-import Awning from './Awning';
 import HeaderSearch from './HeaderSearch';
 import { CATEGORIES, POST_ITEMS, isActivePath } from './nav-data';
 
@@ -189,7 +188,6 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-surface" suppressHydrationWarning>
-      <Awning id="awn-top" />
       <div className="mx-auto flex h-[72px] max-w-content items-center gap-3 px-4 sm:px-6" suppressHydrationWarning>
         <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Chợ Nhân Cơ, trang chủ">
           <Logo size={34} />
