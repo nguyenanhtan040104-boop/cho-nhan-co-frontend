@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import MarketPriceWidget from './components/MarketPriceWidget';
 import AdSponsoredCarousel from './components/AdSponsoredCarousel';
-import ListingCard from './components/ListingCard';
+import ListingRow from './components/ListingRow';
 import NearbySection from './components/NearbySection';
 import { timeAgo } from '../lib/format';
 import { mockProducts, mockRealEstate, mockJobs, mockForum, isDev } from '../lib/devMock';
@@ -76,26 +76,26 @@ export default async function HomePage() {
         <NearbySection />
 
         <Section title="Tin mới đăng" href="/products" empty={products.length === 0} emptyLabel="Chưa có sản phẩm nào">
-          <Grid>{products.map((item: any) => <ListingCard key={item.id} item={item} type="product" />)}</Grid>
+          <Rows>{products.map((item: any) => <ListingRow key={item.id} item={item} type="product" />)}</Rows>
         </Section>
 
         <AdSponsoredCarousel />
 
         <Section title="Nhà đất và vườn rẫy" href="/real-estate" empty={realEstate.length === 0} emptyLabel="Chưa có tin nhà đất">
-          <Grid>{realEstate.map((item: any) => <ListingCard key={item.id} item={item} type="real-estate" />)}</Grid>
+          <Rows>{realEstate.map((item: any) => <ListingRow key={item.id} item={item} type="real-estate" />)}</Rows>
         </Section>
 
         <Section title="Việc làm mùa vụ" href="/jobs" empty={jobs.length === 0} emptyLabel="Chưa có tin tuyển dụng">
-          <Grid>{jobs.map((item: any) => <ListingCard key={item.id} item={item} type="job" />)}</Grid>
+          <Rows>{jobs.map((item: any) => <ListingRow key={item.id} item={item} type="job" />)}</Rows>
         </Section>
 
         <Section title="Vật nuôi" href="/vat-nuoi" empty={vatNuoi.length === 0} emptyLabel="Chưa có tin vật nuôi">
-          <Grid>{vatNuoi.map((item: any) => <ListingCard key={item.id} item={item} type="product" />)}</Grid>
+          <Rows>{vatNuoi.map((item: any) => <ListingRow key={item.id} item={item} type="product" />)}</Rows>
         </Section>
 
         {dichVu.length > 0 && (
           <Section title="Dịch vụ" href="/dich-vu" empty={false} emptyLabel="">
-            <Grid>{dichVu.map((item: any) => <ListingCard key={item.id} item={item} type="product" />)}</Grid>
+            <Rows>{dichVu.map((item: any) => <ListingRow key={item.id} item={item} type="product" />)}</Rows>
           </Section>
         )}
 
@@ -140,8 +140,8 @@ function Section({ title, href, empty, emptyLabel, children }: {
   );
 }
 
-function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-5">{children}</div>;
+function Rows({ children }: { children: React.ReactNode }) {
+  return <div className="border-t border-line md:grid md:grid-cols-2 md:gap-x-10">{children}</div>;
 }
 
 function ForumRow({ post }: { post: any }) {
